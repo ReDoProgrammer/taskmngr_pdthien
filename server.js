@@ -32,6 +32,7 @@ const adminStyleController = require("./BE/controllers/BE/style-controller");
 const adminCustomerController = require("./BE/controllers/BE/customer-controller");
 const adminCustomerStyleController = require("./BE/controllers/BE/customer-style-controller");
 const adminHomeController = require('./BE/controllers/BE/home-controller');
+const adminJobController = require('./BE/controllers/BE/job-controller');
 const adminOutputController = require("./BE/controllers/BE/output-controller");
 const adminSkillController = require("./BE/controllers/BE/skill-controller");
 const adminStatusController = require("./BE/controllers/BE/status-controller");
@@ -51,6 +52,8 @@ app.use('/admin/account/login',adminAccountController);
 
 app.use('/admin/customer',adminCustomerController);
 app.use('/admin/customer-style',adminCustomerStyleController);
+
+app.use('/admin/order-list',adminJobController);
 
 app.use('/admin/setting/output',adminOutputController);
 app.use('/admin/setting/status',adminStatusController);
