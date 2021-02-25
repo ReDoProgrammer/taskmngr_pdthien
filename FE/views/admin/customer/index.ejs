@@ -29,6 +29,7 @@
       <th scope="col">Phone</th>
       <th scope="col">Email</th>
       <th></th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -37,6 +38,7 @@
       <td>Mark</td>
       <td>Otto</td>
       <td>@mdo</td>
+      <td> <button class="btn btn-sm btn-info btnStyle">Customer style <span><i class="fa fa-cog" aria-hidden="true"></i></span></button>    </td>
       <td class="text-right">
         <a href="http://" target="_blank" rel="noopener noreferrer">
           <i class="fa fa-eye text-info" aria-hidden="true"></i>
@@ -54,6 +56,7 @@
       <td>Jacob</td>
       <td>Thornton</td>
       <td>@fat</td>
+      <td> <button class="btn btn-sm btn-info btnStyle">Customer style <span><i class="fa fa-cog" aria-hidden="true"></i></span></button>    </td>
       <td class="text-right">
         <a href="http://" target="_blank" rel="noopener noreferrer">
           <i class="fa fa-eye text-info" aria-hidden="true"></i>
@@ -71,6 +74,7 @@
       <td>Larry</td>
       <td>the Bird</td>
       <td>@twitter</td>
+      <td> <button class="btn btn-sm btn-info btnStyle">Customer style <span><i class="fa fa-cog" aria-hidden="true"></i></span></button>    </td>
       <td class="text-right">
         <a href="http://" target="_blank" rel="noopener noreferrer">
           <i class="fa fa-eye text-info" aria-hidden="true"></i>
@@ -99,6 +103,7 @@
 
 
   <%-include('modal')%>
+  <%-include('style')%>
 
 <script>
   $(document).ready(() => {
@@ -106,5 +111,8 @@
   });
   $('#btnAddNew').click(function(){
     $('#modalCustomer').modal();
+  })
+  $('.btnStyle').click(function(){
+    $('#modalStyle').modal();
   })
 </script>
