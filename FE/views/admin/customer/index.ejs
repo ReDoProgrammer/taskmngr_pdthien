@@ -1,16 +1,14 @@
 <div class="row">
-  <div class="col-md-7">
-    <nav aria-label="Page navigation example">
-      <ul class="pagination">
-        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item"><a class="page-link" href="#">Next</a></li>
-      </ul>
-    </nav>
+  <div class="col-md-2">
+    <button class="btn btn-dark" id="btnAddNew">
+      <span>
+        <i class="fa fa-plus" aria-hidden="true"></i>
+      </span>
+      Add New
+    </button>
   </div>
-  <div class="col-md-3 text-right">
+  
+  <div class="offset-md-7 col-md-3 text-right">
     <!-- Another variation with a button -->
     <div class="input-group">
       <input type="text" class="form-control" placeholder="Search this blog" />
@@ -21,17 +19,10 @@
       </div>
     </div>
   </div>
-  <div class="col-md-2">
-    <button class="btn btn-info">
-      <span>
-        <i class="fa fa-plus" aria-hidden="true"></i>
-      </span>
-      Add New
-    </button>
-  </div>
+ 
 </div>
 <table class="table mt-1">
-  <thead class="thead-light">
+  <thead class="thead-dark">
     <tr>
       <th scope="col">#</th>
       <th scope="col">Customer</th>
@@ -95,8 +86,25 @@
   </tbody>
 </table>
 
+
+  <nav aria-label="Page navigation example" class="mt-2">
+    <ul class="pagination">
+      <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+      <li class="page-item"><a class="page-link" href="#">1</a></li>
+      <li class="page-item"><a class="page-link" href="#">2</a></li>
+      <li class="page-item"><a class="page-link" href="#">3</a></li>
+      <li class="page-item"><a class="page-link" href="#">Next</a></li>
+    </ul>
+  </nav>
+
+
+  <%-include('modal')%>
+
 <script>
   $(document).ready(() => {
     $("#direction").val("Quản lý khách hàng");
   });
+  $('#btnAddNew').click(function(){
+    $('#modalCustomer').modal();
+  })
 </script>
