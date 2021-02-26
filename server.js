@@ -33,9 +33,9 @@ const adminCustomerController = require("./BE/controllers/BE/customer-controller
 const adminCustomerStyleController = require("./BE/controllers/BE/customer-style-controller");
 const adminHomeController = require('./BE/controllers/BE/home-controller');
 const adminInputFileFormatController = require("./BE/controllers/BE/input-file-format-controller");
-const adminJobController = require('./BE/controllers/BE/job-controller');
-const adminMoneyUnitContrller = require("./BE/controllers/BE/money-unit-controller");
-const adminOrderController = require("./BE/controllers/BE/order-controller");
+const adminLevelController = require('./BE/controllers/BE/level-controller');
+
+
 const adminOutputFileFormatController = require("./BE/controllers/BE/output-file-format-controller");
 const adminSkillController = require("./BE/controllers/BE/skill-controller");
 const adminStatusController = require("./BE/controllers/BE/status-controller");
@@ -56,12 +56,8 @@ app.use('/admin/account/login',adminAccountController);
 app.use('/admin/customer',adminCustomerController);
 app.use('/admin/customer-style',adminCustomerStyleController);
 
-app.use('/admin/level',adminJobController);
-
-app.use('/admin/order',adminOrderController);
-
-app.use('/admin/setting/money-unit',adminMoneyUnitContrller);
 app.use('/admin/setting/input-file-format',adminInputFileFormatController);
+app.use('/admin/setting/level',adminLevelController);
 app.use('/admin/setting/output-file-format',adminOutputFileFormatController);
 app.use('/admin/setting/status',adminStatusController);
 app.use('/admin/setting/style',adminStyleController);
