@@ -106,22 +106,7 @@
 </html>
 
 <script>
-  $(document).ready(function () {
-    $.ajax({
-      url: "/common/user-group",
-      type: "get",
-      success: function (data, textStatus, xhr) {
-        if (xhr.status == 200) {
-          $("#groups").empty();
-          $.each(data.groups, (k, v) => {
-            let opt = '<option value="' + v._id + '">' + v.name + "</option>";
-            $("#groups").append(opt);
-          });
-        } else {
-          alert(data.msg);
-        }
-      },
-    });
+  $(document).ready(function () {   
 
     $("#alert_msg").hide();
   });
@@ -149,7 +134,8 @@
         password: password    
       },
       success: function (data, textStatus, xhr) {
-        console.log(data);
+        window.localStorage.setItem('accessToken', data.accessToken);
+        window.location.href=data.url;
       },
       error: function (jqXHR, textStatus, errorThrown) {
         $("#error_msg").text(jqXHR.responseJSON.msg);

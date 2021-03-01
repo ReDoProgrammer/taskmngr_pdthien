@@ -33,3 +33,23 @@
 </body>
 </html>
 
+
+<script>
+  $(document).ready(function(){
+    let accessToken = window.localStorage.getItem('accessToken');
+    $.ajax({
+      url:'',
+      type:'get',
+      data:{
+        accessToken:accessToken
+      },
+      success: function (data, textStatus, xhr) {
+        console.log(data);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $("#error_msg").text(jqXHR.responseJSON.msg);
+        $("#alert_msg").show();
+      }
+    })
+  })
+</script>
