@@ -1,24 +1,33 @@
-<div class="modal" tabindex="-1" id="modalSkill">
+<div class="modal" tabindex="-1" id="modalFileFormat">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add or update skill</h5>
+                <h5 class="modal-title">Add or update file format</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="form-row">
-                    <div class="form-group col-md-4">
-                        <label for="">Skill</label>
-                        <input type="text" name="txtSkill" id="txtSkill" class="form-control" placeholder="Skill name">
+                    <div class="form-group col-md-6">
+                        <label for="">File format</label>
+                        <input type="text" name="txtName" id="txtName" class="form-control"
+                            placeholder="file format name">
                     </div>
-                    <div class="form-group col-md-8">
-                        <label for="">Description</label>
-                        <input type="text" name="txtDescription" id="txtDescription" class="form-control"
-                            placeholder="Description">
+                    <div class="form-group col-md-6">
+                        <label for="">Type</label>
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox" id="ckbInputFileFormat" value="option2" checked>
+                            <label class="form-check-label text-success font-weight-bold" for="inlineCheckbox2">Input file format</label>
+                        </div>
                     </div>
-                </div>                
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label for="Description">Description</label>
+                        <input type="text" name="" id="txtDescription" class="form-control">
+                    </div>
+                </div>               
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -31,45 +40,47 @@
 <script>
 
     $('#btnSubmit').click(function () {
-        let name = $('#txtSkill').val().trim();
+        let name = $('#txtName').val().trim();
         let description = $('#txtDescription').val().trim();
-        
+        let is_input = $('#ckbInputFileFormat').is(":checked") ? true : false;
 
-        if (skillId.length > 0) {
+        if (ffId.length > 0) {
             $.ajax({
-                url: '/admin/skill',
+                url: '/admin/file-format',
                 type: 'put',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem('accessToken'),
                 },
                 data: {
-                    id:skillId,
+                    id:ffId,
                     name,
-                    description
+                    description,
+                    is_input
                 },
                 success: function (data, textStatus, xhr) {
                     alert(data.msg);
-                    $('#modalSkill').modal('hide');
-                    skillId = '';
+                    $('#modalFileFormat').modal('hide');
+                    ffId = '';
                 }, error: function (jqXHR, textStatus, errorThrown) {
                     alert(jqXHR.responseJSON.msg);
                 }
             })
         } else {
             $.ajax({
-                url: '/admin/skill',
+                url: '/admin/file-format',
                 type: 'post',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem('accessToken'),
                 },
                 data: {
                     name,
-                    description                   
+                    description,
+                    is_input
                 },
                 success: function (data, textStatus, xhr) {
                     alert(data.msg);
-                    $('#modalSkill').modal('hide');
-                    skillId = '';
+                    $('#modalFileFormat').modal('hide');
+                    ffId = '';
                 }, error: function (jqXHR, textStatus, errorThrown) {
                     alert(jqXHR.responseJSON.msg);
                 }

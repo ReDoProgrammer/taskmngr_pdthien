@@ -32,7 +32,6 @@ router.post("/login", (req, res) => {
           }
           if (isMatch) {
             UserGroup.findOne({}, {}, { sort: { 'created_at' : -1 } }, function(err, group) {
-              console.log(user.group,group._id);
               if(user.group.equals(group._id)){
                 console.log(user.group);
                   let u = {
@@ -47,7 +46,7 @@ router.post("/login", (req, res) => {
                     msg:'Đăng nhập thành công!',
                     url:'/admin',
                     accessToken: accessToken,
-                    refreshToken: refreshToken,
+                    refreshToken: refreshToken
                   });
                 }else{
                   return res.status(401).json({

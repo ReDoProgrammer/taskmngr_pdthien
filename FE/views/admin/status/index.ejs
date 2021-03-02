@@ -1,53 +1,141 @@
-
-    <button type="button" class="btn btn-dark" id="btnAddStatus">
-        <span>
-            <i class="fa fa-plus" aria-hidden="true"></i>
-          </span>
-          Add New
-    </button>
+<button type="button" class="btn btn-dark" id="btnAddStatus">
+  <span>
+    <i class="fa fa-plus" aria-hidden="true"></i>
+  </span>
+  Add New
+</button>
 
 <table class="table mt-2">
-    <thead class="thead-dark">
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">Property</th>
-        <th scope="col">Description</th>
-        <th scope="col">Status</th>
-        <th scope="col"></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <th scope="row">1</th>
-        <td>Upload</td>
-        <td>Upload</td>
-        <td>Active</td>
-        <td></td>
-      </tr>
-      <tr>
-        <th scope="row">2</th>
-        <td>Done</td>
-        <td>Done</td>
-        <td>Active</td>
-        <td></td>
-      </tr>
-      <tr>
-        <th scope="row">3</th>
-        <td>OK DC</td>
-        <td>OK DC</td>
-        <td>Active</td>
-        <td></td>
-      </tr>
-      
-    </tbody>
-  </table>
-  
-  <%-include('modal')%>
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Property</th>
+      <th scope="col">Description</th>
+      <th scope="col">Status</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody id="tblData">
+
+
+  </tbody>
+</table>
+
+<%-include('modal')%>
 
   <script>
-      $(document).ready(function(){
-        $('#btnAddStatus').click(function(){
-            $('#modalStatus').modal();
-        });
+    $(document).ready(function () {
+      $('#btnAddStatus').click(function () {
+        $('#modalStatus').modal();
       });
+    });
+  </script>
+
+  <script>
+
+    var statusId = '';
+
+    function LoadStatuses() {
+      $('#tblData').empty();
+      $.ajax({
+        url: '/admin/status',
+        type: 'get',
+        data: {
+        },
+        success: function (data, textStatus, xhr) {
+          let idx = 1;
+          data.statuses.forEach(status => {
+            let tr = '<tr id=' + status._id + ' data-name=' + status.name + '>';
+            tr += '<th scope="row">' + (idx++) + '</th>';
+            tr += '<td>' + status.name + '</td>';
+            tr += '<td>' + status.description + '</td>';
+            tr += '<td>' + (status.status == true ? "<span class='text-success'>Active</span>" : "<span class='text-danger'>Unactive</span>") + '</td>';
+
+            tr += '<td class="text-right"><button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+            tr += '<button class="btn btn-sm btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
+            tr += '</tr>';
+            $('#tblData').append(tr);
+          });
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          alert(jqXHR.responseJSON.msg);
+        }
+      })
+    }
+
+    $(document).ready(function () {
+      $('#btnAddNew').click(function () {
+        levelId = '';
+        $('#modalLevel').modal();
+      });
+      LoadStatuses();
+    });
+
+    //sự kiện modal shown --> set các giá trị mặc định cho component trên form
+    $(document).on('show.bs.modal', '.modal', function () {
+      $('#txtProperty').val('');
+      $('#txtDescription').val('');
+      $('#ckbStatus').prop('checked', true);
+    });
+
+    //sự kiện load dữ liệu khi modal đc đóng lại
+    $(document).on('hidden.bs.modal', '#modalStatus', function () {
+      LoadStatuses();
+    });
+
+
+    $(document).on("click", "button[name='delete']", function () {
+
+      var r = confirm("Vui lòng xác nhận xóa status " + $(this).closest("tr").data('name') + "?");
+      if (r == true) {
+        $.ajax({
+          url: '/admin/status',
+          type: 'delete',
+          headers: {
+            authorization: "Bearer " + localStorage.getItem('accessToken'),
+          },
+          data: {
+            id: $(this).closest("tr").attr("id")
+          },
+          success: function (data, textStatus, xhr) {
+            alert(data.msg);
+            LoadStatuses();
+          }, error: function (jqXHR, textStatus, errorThrown) {
+            alert(jqXHR.responseJSON.msg);
+          }
+        })
+      }
+
+
+
+    });
+
+    $(document).on("click", "button[name='update']", function () {
+
+      statusId = $(this).closest("tr").attr("id");
+
+      $.ajax({
+        url: "/admin/status/detail",
+        type: "get",
+        headers: {
+          authorization: "Bearer " + localStorage.getItem('accessToken'),
+        },
+        data: {
+          id: statusId
+        },
+        success: function (data, textStatus, xhr) {
+          $('#modalStatus').modal();
+          $('#txtProperty').val(data.status.name);
+          $('#txtDescription').val(data.status.description);
+          if (data.status.status) {
+            $('#ckbStatus').prop('checked', true);
+          } else {
+            $('#ckbStatus').prop('checked', false);
+          }
+        }, error: function (jqXHR, textStatus, errorThrown) {
+          alert(jqXHR.responseJSON.msg);
+        }
+      });
+
+    });
   </script>

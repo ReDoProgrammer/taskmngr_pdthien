@@ -4,20 +4,19 @@ require('dotenv').config();
 
 
 
-const styleSchema = new Schema({
-    key:{
+const skillSchema = new Schema({
+    name:{
         type:String,
         required:true
     },
-    value:{
-        type:String,
-        required:true
+    description:{
+        type:String        
     }
     
 });
 
 
-module.exports = mongoose.model('style',styleSchema);
+module.exports = mongoose.model('skill',skillSchema);
 
 
 

@@ -32,9 +32,10 @@ function authenticateAdminToken(req, res, next) {
       return res.status(403).json({
         msg:`Lỗi xác thực tài khoản ${err.message}`
       });
-    if(!user.is_admin) return res.status(403).json({
-      msg:`Bạn không có quyền truy cập chức năng này`
-    });
+
+    // if(!user.is_admin) return res.status(403).json({
+    //   msg:`Bạn không có quyền truy cập chức năng này`
+    // });
     req.user = user;   
     next();
   });

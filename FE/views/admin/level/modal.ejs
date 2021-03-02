@@ -11,8 +11,7 @@
                 <div class="form-row">
                     <div class="form-group col-md-4">
                         <label for="">Level</label>
-                        <input type="text" name="txtProperty" id="txtProperty" class="form-control"
-                            placeholder="Property">
+                        <input type="text" name="txtLevel" id="txtLevel" class="form-control" placeholder="Level name">
                     </div>
                     <div class="form-group col-md-8">
                         <label for="">Description</label>
@@ -23,15 +22,68 @@
                 <div class="form-row">
                     <label for="">Status</label>
                     <div class="form-check form-check-inline ml-2">
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2" checked>
+                        <input class="form-check-input" type="checkbox" id="ckbStatus" value="option2" checked>
                         <label class="form-check-label text-success" for="inlineCheckbox2">Active</label>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-primary" id="btnSubmit">Save changes</button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+
+    $('#btnSubmit').click(function () {
+        let name = $('#txtLevel').val().trim();
+        let description = $('#txtDescription').val().trim();
+        let status = $('#ckbStatus').is(":checked") ? true : false;
+
+        if (levelId.length > 0) {
+            $.ajax({
+                url: '/admin/level',
+                type: 'put',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem('accessToken'),
+                },
+                data: {
+                    id:levelId,
+                    name,
+                    description,
+                    status
+                },
+                success: function (data, textStatus, xhr) {
+                    alert(data.msg);
+                    $('#modalLevel').modal('hide');
+                    levelId = '';
+                }, error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseJSON.msg);
+                }
+            })
+        } else {
+            $.ajax({
+                url: '/admin/level',
+                type: 'post',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem('accessToken'),
+                },
+                data: {
+                    name,
+                    description,
+                    status
+                },
+                success: function (data, textStatus, xhr) {
+                    alert(data.msg);
+                    $('#modalLevel').modal('hide');
+                    levelId = '';
+                }, error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseJSON.msg);
+                }
+            })
+        }
+
+    })
+</script>

@@ -1,0 +1,130 @@
+<button type="button" class="btn btn-dark" id="btnAddNew">
+    <span>
+        <i class="fa fa-plus" aria-hidden="true"></i>
+      </span>
+      Add New
+  </button>
+  <table class="table mt-2">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Format</th>
+          <th scope="col">Description</th>
+          <th scope="col">Is input</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody id="tblData">        
+        
+      </tbody>
+    </table>
+    
+  
+    <script>
+
+      var ffId = '';
+    
+      function LoadFileFormat() {
+        $('#tblData').empty();
+        $.ajax({
+          url: '/admin/file-format',
+          type: 'get',        
+          success: function (data, textStatus, xhr) {
+            let idx = 1;
+            data.ffs.forEach(ff => {
+              let tr = '<tr id=' + ff._id + ' data-name = '+ff.name+'>';
+              tr += '<th scope="row">' + (idx++) + '</th>';
+              tr += '<td>' + ff.name + '</td>';
+              tr += '<td>' + ff.description + '</td>';
+              tr += '<td>' + (ff.is_input == true ? "<span class='text-info'><i class='fa fa-check-square-o' aria-hidden='true'></i></span>" : "<span class='text-info' ><i class='fa fa-square-o' aria-hidden='true'></i></span>") + '</td>';
+    
+              tr += '<td class="text-right"><button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+              tr += '<button class="btn btn-sm btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
+              tr += '</tr>';
+              $('#tblData').append(tr);
+            });
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            alert(jqXHR.responseJSON.msg);
+          }
+        })
+      }
+    
+      $(document).ready(function () {
+        $('#btnAddNew').click(function () {
+          levelId = '';
+          $('#modalFileFormat').modal();
+        });
+        LoadFileFormat();
+      });
+    
+      //sự kiện modal shown --> set các giá trị mặc định cho component trên form
+      $(document).on('show.bs.modal', '.modal', function () {
+        $('#txtName').val('');
+        $('#txtDescription').val('');
+        $('#ckbInputFileFormat').prop('checked', true);
+      });
+    
+      //sự kiện load lại hàm ds level khi modal đc đóng lại
+      $(document).on('hidden.bs.modal', '#modalFileFormat', function () {
+        LoadFileFormat();
+      });
+    
+    
+      $(document).on("click", "button[name='delete']", function () {
+    
+        var r = confirm("Vui lòng xác nhận xóa định dạng file " + $(this).closest("tr").data('name') + "?");
+        if (r == true) {
+          $.ajax({
+            url: '/admin/file-format',
+            type: 'delete',
+            headers: {
+              authorization: "Bearer " + localStorage.getItem('accessToken'),
+            },
+            data: {
+              id: $(this).closest("tr").attr("id")
+            },
+            success: function (data, textStatus, xhr) {
+              alert(data.msg);
+              LoadFileFormat();
+            }, error: function (jqXHR, textStatus, errorThrown) {
+              alert(jqXHR.responseJSON.msg);
+            }
+          })
+        }
+    
+    
+      });
+    
+      $(document).on("click", "button[name='update']", function () {
+    
+        ffId = $(this).closest("tr").attr("id");
+    
+        $.ajax({
+          url: "/admin/file-format/detail",
+          type: "get",
+          headers: {
+            authorization: "Bearer " + localStorage.getItem('accessToken'),
+          },
+          data: {
+            id: ffId
+          },
+          success: function (data, textStatus, xhr) {
+            console.log(data);
+            $('#modalFileFormat').modal();
+            $('#txtName').val(data.ff.name);
+            $('#txtDescription').val(data.ff.description);
+            if (data.ff.is_input) {
+              $('#ckbInputFileFormat').prop('checked', true);
+            } else {
+              $('#ckbInputFileFormat').prop('checked', false);
+            }
+          }, error: function (jqXHR, textStatus, errorThrown) {
+            alert(jqXHR.responseJSON.msg);
+          }
+        });
+    
+      });
+    </script>
+    
+    <%-include('modal')%>

@@ -33,11 +33,12 @@ const adminAccountController = require("./BE/controllers/Admin/account-controlle
 const adminStyleController = require("./BE/controllers/Admin/style-controller");
 const adminCustomerController = require("./BE/controllers/Admin/customer-controller");
 const adminCustomerStyleController = require("./BE/controllers/Admin/customer-style-controller");
+const adminFileFormatController = require("./BE/controllers/Admin/file-format-controller");
 const adminHomeController = require("./BE/controllers/Admin/home-controller");
-const adminInputFileFormatController = require("./BE/controllers/Admin/input-file-format-controller");
+
 const adminLevelController = require("./BE/controllers/Admin/level-controller");
 
-const adminOutputFileFormatController = require("./BE/controllers/Admin/output-file-format-controller");
+
 const adminSkillController = require("./BE/controllers/Admin/skill-controller");
 const adminStatusController = require("./BE/controllers/Admin/status-controller");
 const adminStaffController = require("./BE/controllers/Admin/staff-controller");
@@ -51,7 +52,13 @@ app.use(layout); //set layout
  * API ADMIN
  * 
  */
+const apiAdminFileFormat = require('./BE/API/admin/api-file-format');
+const apiAdminLevel = require('./BE/API/admin/api-level');
+const apiAdminSkill = require('./BE/API/admin/api-skill');
 const apiAdminUser = require('./BE/API/admin/api-user');
+const apiAdminStatus = require('./BE/API/admin/api-status');
+const apiAdminStyle = require('./BE/API/admin/api-style');
+
 
 /**
  * API CONTROLLERS
@@ -65,6 +72,13 @@ const apiUserGroup = require("./BE/API/common/api-user-group");
  *
  */
 app.use('/admin/account',apiAdminUser);
+app.use('/admin/file-format',apiAdminFileFormat);
+app.use('/admin/level',apiAdminLevel);
+app.use('/admin/skill',apiAdminSkill);
+app.use('/admin/status',apiAdminStatus);
+app.use('/admin/style',apiAdminStyle);
+
+
 
 
 
@@ -79,9 +93,8 @@ app.use("/admin/account/login", adminAccountController);
 app.use("/admin/customer", adminCustomerController);
 app.use("/admin/customer-style", adminCustomerStyleController);
 
-app.use("/admin/setting/input-file-format", adminInputFileFormatController);
+app.use("/admin/setting/file-format", adminFileFormatController);
 app.use("/admin/setting/level", adminLevelController);
-app.use("/admin/setting/output-file-format", adminOutputFileFormatController);
 app.use("/admin/setting/status", adminStatusController);
 app.use("/admin/setting/style", adminStyleController);
 app.use("/admin/setting/skill", adminSkillController);

@@ -1,45 +1,136 @@
 <button type="button" class="btn btn-dark" id="btnAddNew">
-    <span>
-        <i class="fa fa-plus" aria-hidden="true"></i>
-      </span>
-      Add New
-  </button>
-  <table class="table mt-2">
-      <thead class="thead-dark">
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Level</th>
-          <th scope="col">Description</th>
-          <th scope="col">Status</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th scope="row">1</th>
-          <td>Single</td>
-          <td>Single level</td>
-          <td>Active</td>
-          <td></td>
-        </tr>
-        <tr>
-          <th scope="row">2</th>
-          <td>Multi</td>
-          <td>Multi level</td>
-          <td>Active</td>
-          <td></td>
-        </tr>
-        
-      </tbody>
-    </table>
-    
-  
-    <%-include('modal')%>
-  
-    <script>
-        $(document).ready(function(){
-          $('#btnAddNew').click(function(){
-              $('#modalLevel').modal();
-          });
+  <span>
+    <i class="fa fa-plus" aria-hidden="true"></i>
+  </span>
+  Add New
+</button>
+<table class="table mt-2">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Level</th>
+      <th scope="col">Description</th>
+      <th scope="col">Status</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody id="tblData">
+    <a href="http://" target="_blank" rel="noopener noreferrer">
+    </a>
+
+
+  </tbody>
+</table>
+
+
+
+
+<script>
+
+  var levelId = '';
+
+  function LoadLevels() {
+    $('#tblData').empty();
+    $.ajax({
+      url: '/admin/level',
+      type: 'get',
+      data: {
+      },
+      success: function (data, textStatus, xhr) {
+        let idx = 1;
+        data.levels.forEach(level => {
+          let tr = '<tr id=' + level._id + ' data-name = '+level.name+'>';
+          tr += '<th scope="row">' + (idx++) + '</th>';
+          tr += '<td>' + level.name + '</td>';
+          tr += '<td>' + level.description + '</td>';
+          tr += '<td>' + (level.status == true ? "<span class='text-success'>Active</span>" : "<span class='text-danger'>Unactive</span>") + '</td>';
+
+          tr += '<td class="text-right"><button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+          tr += '<button class="btn btn-sm btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
+          tr += '</tr>';
+          $('#tblData').append(tr);
         });
-    </script>
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      }
+    })
+  }
+
+  $(document).ready(function () {
+    $('#btnAddNew').click(function () {
+      levelId = '';
+      $('#modalLevel').modal();
+    });
+    LoadLevels();
+  });
+
+  //sự kiện modal shown --> set các giá trị mặc định cho component trên form
+  $(document).on('show.bs.modal', '.modal', function () {
+    $('#txtLevel').val('');
+    $('#txtDescription').val('');
+    $('#ckbStatus').prop('checked', true);
+  });
+
+  //sự kiện load lại hàm ds level khi modal đc đóng lại
+  $(document).on('hidden.bs.modal', '#modalLevel', function () {
+    LoadLevels();
+  });
+
+
+  $(document).on("click", "button[name='delete']", function () {
+
+    var r = confirm("Vui lòng xác nhận xóa level " + $(this).closest("tr").data('name') + "?");
+    if (r == true) {
+      $.ajax({
+        url: '/admin/level',
+        type: 'delete',
+        headers: {
+          authorization: "Bearer " + localStorage.getItem('accessToken'),
+        },
+        data: {
+          id: $(this).closest("tr").attr("id")
+        },
+        success: function (data, textStatus, xhr) {
+          alert(data.msg);
+          LoadLevels();
+        }, error: function (jqXHR, textStatus, errorThrown) {
+          alert(jqXHR.responseJSON.msg);
+        }
+      })
+    }
+
+
+  });
+
+  $(document).on("click", "button[name='update']", function () {
+
+    levelId = $(this).closest("tr").attr("id");
+
+    $.ajax({
+      url: "/admin/level/detail",
+      type: "get",
+      headers: {
+        authorization: "Bearer " + localStorage.getItem('accessToken'),
+      },
+      data: {
+        id: levelId
+      },
+      success: function (data, textStatus, xhr) {
+        $('#modalLevel').modal();
+        $('#txtLevel').val(data.level.name);
+        $('#txtDescription').val(data.level.description);
+        if (data.level.status) {
+          $('#ckbStatus').prop('checked', true);
+        } else {
+          $('#ckbStatus').prop('checked', false);
+        }
+      }, error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      }
+    });
+
+  });
+</script>
+
+<%-include('modal')%>

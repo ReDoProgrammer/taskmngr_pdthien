@@ -1,8 +1,8 @@
-<div class="modal" tabindex="-1" id="modalSkill">
+<div class="modal" tabindex="-1" id="modalStyle">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add or update skill</h5>
+                <h5 class="modal-title">Add or update style</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -10,15 +10,15 @@
             <div class="modal-body">
                 <div class="form-row">
                     <div class="form-group col-md-4">
-                        <label for="">Skill</label>
-                        <input type="text" name="txtSkill" id="txtSkill" class="form-control" placeholder="Skill name">
+                        <label for="">Name</label>
+                        <input type="text" name="txtkey" id="txtKey" class="form-control" placeholder="Style name">
                     </div>
                     <div class="form-group col-md-8">
-                        <label for="">Description</label>
-                        <input type="text" name="txtDescription" id="txtDescription" class="form-control"
-                            placeholder="Description">
+                        <label for="">Value</label>
+                        <input type="text" name="txtValue" id="txtValue" class="form-control"
+                            placeholder="Style value">
                     </div>
-                </div>                
+                </div>               
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -31,45 +31,45 @@
 <script>
 
     $('#btnSubmit').click(function () {
-        let name = $('#txtSkill').val().trim();
-        let description = $('#txtDescription').val().trim();
-        
+        let key = $('#txtKey').val().trim();
+        let value = $('#txtValue').val().trim();
+      
 
-        if (skillId.length > 0) {
+        if (styleId.length > 0) {
             $.ajax({
-                url: '/admin/skill',
+                url: '/admin/style',
                 type: 'put',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem('accessToken'),
                 },
                 data: {
-                    id:skillId,
-                    name,
-                    description
+                    id:styleId,
+                    key,
+                    value
                 },
                 success: function (data, textStatus, xhr) {
                     alert(data.msg);
-                    $('#modalSkill').modal('hide');
-                    skillId = '';
+                    $('#modalStyle').modal('hide');
+                    styleId = '';
                 }, error: function (jqXHR, textStatus, errorThrown) {
                     alert(jqXHR.responseJSON.msg);
                 }
             })
         } else {
             $.ajax({
-                url: '/admin/skill',
+                url: '/admin/style',
                 type: 'post',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem('accessToken'),
                 },
                 data: {
-                    name,
-                    description                   
+                    key,
+                    value                    
                 },
                 success: function (data, textStatus, xhr) {
                     alert(data.msg);
-                    $('#modalSkill').modal('hide');
-                    skillId = '';
+                    $('#modalStyle').modal('hide');
+                    styleId = '';
                 }, error: function (jqXHR, textStatus, errorThrown) {
                     alert(jqXHR.responseJSON.msg);
                 }
