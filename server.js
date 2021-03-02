@@ -30,6 +30,7 @@ const homeController = require("./BE/controllers/TLA/home-controller");
 
 //ADMIN CONTROLLERS
 const adminAccountController = require("./BE/controllers/Admin/account-controller");
+const adminCloudController = require('./BE/controllers/Admin/cloud-controller');
 const adminStyleController = require("./BE/controllers/Admin/style-controller");
 const adminCustomerController = require("./BE/controllers/Admin/customer-controller");
 const adminCustomerStyleController = require("./BE/controllers/Admin/customer-style-controller");
@@ -52,6 +53,7 @@ app.use(layout); //set layout
  * API ADMIN
  * 
  */
+const apiAdminCloud = require('./BE/API/admin/api-cloud');
 const apiAdminFileFormat = require('./BE/API/admin/api-file-format');
 const apiAdminLevel = require('./BE/API/admin/api-level');
 const apiAdminNationalStyle = require('./BE/API/admin/api-national-style');
@@ -73,6 +75,7 @@ const apiUserGroup = require("./BE/API/common/api-user-group");
  *
  */
 app.use('/admin/account',apiAdminUser);
+app.use('/admin/cloud',apiAdminCloud);
 app.use('/admin/file-format',apiAdminFileFormat);
 app.use('/admin/level',apiAdminLevel);
 app.use('/admin/national-style',apiAdminNationalStyle);
@@ -95,6 +98,7 @@ app.use("/admin/account/login", adminAccountController);
 app.use("/admin/customer", adminCustomerController);
 app.use("/admin/customer-style", adminCustomerStyleController);
 
+app.use('/admin/setting/cloud',adminCloudController);
 app.use("/admin/setting/file-format", adminFileFormatController);
 app.use("/admin/setting/level", adminLevelController);
 app.use('/admin/setting/national-style',adminNationalStyleController);
