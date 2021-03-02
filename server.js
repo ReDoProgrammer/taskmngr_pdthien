@@ -38,7 +38,7 @@ const adminHomeController = require("./BE/controllers/Admin/home-controller");
 
 const adminLevelController = require("./BE/controllers/Admin/level-controller");
 
-
+const adminNationalStyleController = require('./BE/controllers/Admin/national-style-controller');
 const adminSkillController = require("./BE/controllers/Admin/skill-controller");
 const adminStatusController = require("./BE/controllers/Admin/status-controller");
 const adminStaffController = require("./BE/controllers/Admin/staff-controller");
@@ -54,6 +54,7 @@ app.use(layout); //set layout
  */
 const apiAdminFileFormat = require('./BE/API/admin/api-file-format');
 const apiAdminLevel = require('./BE/API/admin/api-level');
+const apiAdminNationalStyle = require('./BE/API/admin/api-national-style');
 const apiAdminSkill = require('./BE/API/admin/api-skill');
 const apiAdminUser = require('./BE/API/admin/api-user');
 const apiAdminStatus = require('./BE/API/admin/api-status');
@@ -74,6 +75,7 @@ const apiUserGroup = require("./BE/API/common/api-user-group");
 app.use('/admin/account',apiAdminUser);
 app.use('/admin/file-format',apiAdminFileFormat);
 app.use('/admin/level',apiAdminLevel);
+app.use('/admin/national-style',apiAdminNationalStyle);
 app.use('/admin/skill',apiAdminSkill);
 app.use('/admin/status',apiAdminStatus);
 app.use('/admin/style',apiAdminStyle);
@@ -95,6 +97,7 @@ app.use("/admin/customer-style", adminCustomerStyleController);
 
 app.use("/admin/setting/file-format", adminFileFormatController);
 app.use("/admin/setting/level", adminLevelController);
+app.use('/admin/setting/national-style',adminNationalStyleController);
 app.use("/admin/setting/status", adminStatusController);
 app.use("/admin/setting/style", adminStyleController);
 app.use("/admin/setting/skill", adminSkillController);

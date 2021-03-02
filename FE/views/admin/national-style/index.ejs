@@ -1,0 +1,122 @@
+<button type="button" class="btn btn-dark" id="btnAddNew">
+    <span>
+        <i class="fa fa-plus" aria-hidden="true"></i>
+      </span>
+      Add New
+  </button>
+  <table class="table mt-2">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">National style</th>
+          <th scope="col">Description</th>       
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody id="tblData">        
+        
+      </tbody>
+    </table>
+    
+  
+    <script>
+
+      var nsId = '';
+    
+      function LoadData() {
+        $('#tblData').empty();
+        $.ajax({
+          url: '/admin/national-style',
+          type: 'get',        
+          success: function (data, textStatus, xhr) {
+            let idx = 1;
+            data.nss.forEach(ns => {
+              let tr = '<tr id=' + ns._id + ' data-name = '+ns.name+'>';
+              tr += '<th scope="row">' + (idx++) + '</th>';
+              tr += '<td>' + ns.name + '</td>';
+              tr += '<td>' + ns.description + '</td>';              
+    
+              tr += '<td class="text-right"><button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+              tr += '<button class="btn btn-sm btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
+              tr += '</tr>';
+              $('#tblData').append(tr);
+            });
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            alert(jqXHR.responseJSON.msg);
+          }
+        })
+      }
+    
+      $(document).ready(function () {
+        $('#btnAddNew').click(function () {
+          levelId = '';
+          $('#modalNationalStyle').modal();
+        });
+        LoadData();
+      });
+    
+      //sự kiện modal shown --> set các giá trị mặc định cho component trên form
+      $(document).on('show.bs.modal', '.modal', function () {
+        $('#txtName').val('');
+        $('#txtDescription').val('');       
+      });
+    
+      //sự kiện load lại hàm ds level khi modal đc đóng lại
+      $(document).on('hidden.bs.modal', '#modalNationalStyle', function () {
+        LoadData();
+      });
+    
+    
+      $(document).on("click", "button[name='delete']", function () {
+    
+        var r = confirm("Vui lòng xác nhận xóa style theo quốc gia " + $(this).closest("tr").data('name') + "?");
+        if (r == true) {
+          $.ajax({
+            url: '/admin/national-style',
+            type: 'delete',
+            headers: {
+              authorization: "Bearer " + localStorage.getItem('accessToken'),
+            },
+            data: {
+              id: $(this).closest("tr").attr("id")
+            },
+            success: function (data, textStatus, xhr) {
+              alert(data.msg);
+              LoadData();
+            }, error: function (jqXHR, textStatus, errorThrown) {
+              alert(jqXHR.responseJSON.msg);
+            }
+          })
+        }
+    
+    
+      });
+    
+      $(document).on("click", "button[name='update']", function () {
+    
+        nsId = $(this).closest("tr").attr("id");
+    
+        $.ajax({
+          url: "/admin/national-style/detail",
+          type: "get",
+          headers: {
+            authorization: "Bearer " + localStorage.getItem('accessToken'),
+          },
+          data: {
+            id: nsId
+          },
+          success: function (data, textStatus, xhr) {
+            console.log(data);
+            $('#modalNationalStyle').modal();
+            $('#txtName').val(data.ns.name);
+            $('#txtDescription').val(data.ns.description);            
+          }, error: function (jqXHR, textStatus, errorThrown) {
+            alert(jqXHR.responseJSON.msg);
+          }
+        });
+    
+      });
+    </script>
+    
+    <%-include('modal')%>
