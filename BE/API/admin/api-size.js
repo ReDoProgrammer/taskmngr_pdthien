@@ -1,25 +1,24 @@
 const router = require('express').Router();
-const UserGroup = require('../../models/user-group-model');
-
+const Size = require('../../models/skill-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 router.delete('/', authenticateAdminToken, (req, res) => {
     let id = req.body.id;
-    UserGroup.findOneAndDelete({ _id: id }, (err, ug) => {
+    Size.findOneAndDelete({ _id: id }, (err, size) => {
         if (err) {
             return res.status(500).json({
-                msg: 'Xóa user group thất bại!',
+                msg: 'Xóa size thất bại!',
                 error: new Error(err.message)
             });
         }
 
-        if (ug) {
+        if (size) {
             return res.status(200).json({
-                msg: 'Xóa user group thành công!'
+                msg: 'Xóa size thành công!'
             });
         } else {
             return res.status(404).json({
-                msg: 'Lỗi không tìm thấy user group tương ứng!'
+                msg: 'Lỗi không tìm thấy size tương ứng!'
             });
         }
 
@@ -27,37 +26,37 @@ router.delete('/', authenticateAdminToken, (req, res) => {
 })
 
 router.get('/', (req, res) => {
-  UserGroup.find({}, (err, ugs) => {
+    Size.find({}, (err, sizes) => {
         if (err) {
             return res.status(500).json({
-                msg: 'load user group list failed'
+                msg: 'load size list failed'
             });
         }
-        console.log(ugs);
+
         return res.status(200).json({
-            msg: 'Load user group list successfully!',
-            ugs: ugs
+            msg: 'Load size list successfully!',
+            sizes: sizes
         });
     });
 });
 
 router.get('/detail', authenticateAdminToken, (req, res) => {
     let { id } = req.query;
-    UserGroup.findById(id, (err, ug) => {
+    Size.findById(id, (err, size) => {
         if (err) {
             return res.status(500).json({
-                msg: 'Lấy thông tin user group thất bại!',
+                msg: 'Lấy thông tin size thất bại!',
                 error: new Error(err.message)
             });
         }
-        if (ug) {
+        if (size) {
             return res.status(200).json({
-                msg: 'Lấy thông tin user group thành công!',
-                ug: ug
+                msg: 'Lấy thông tin size thành công!',
+                size: size
             })
         } else {
             return res.status(404).json({
-                msg: 'Không tìm thấy user group tương ứng!'
+                msg: 'Không tìm thấy size tương ứng!'
             });
         }
     })
@@ -67,28 +66,29 @@ router.get('/detail', authenticateAdminToken, (req, res) => {
 router.post('/', authenticateAdminToken, (req, res) => {
     let { name, description } = req.body;
 
+    console.log({ name, description });
 
     //ràng buộc dữ liệu cho đầu vào tên size
     if (name.length == 0) {
         return res.status(403).json({
-            msg: 'Vui lòng nhập tên user group'
+            msg: 'Vui lòng nhập tên size'
         });
     }
 
-    let ug = new UserGroup({
+    let size = new Size({
         name: name,
         description: description        
     });
-    ug.save()
+    size.save()
         .then(size => {
             return res.status(201).json({
-                msg: 'Thêm mới user group thành công!',
+                msg: 'Thêm mới size thành công!',
                 size: size
             });
         })
         .catch(err => {
             return res.status(500).json({
-                msg: 'Thêm mới user group thất bại!',
+                msg: 'Thêm mới size thất bại!',
                 error: new Error(err.message)
             });
         })
@@ -100,36 +100,34 @@ router.put('/', authenticateAdminToken, (req, res) => {
     //ràng buộc dữ liệu cho đầu vào tên size
     if (name.length == 0) {
         return res.status(403).json({
-            msg: 'Vui lòng nhập tên user group'
+            msg: 'Vui lòng nhập tên size'
         });
     }
 
 
 
-    UserGroup.findOneAndUpdate({ _id: id }, {
+    Size.findOneAndUpdate({ _id: id }, {
         name,
         description      
-    }, { new: true }, (err, ug) => {
+    }, { new: true }, (err, size) => {
         if (err) {
             return res.status(500).json({
-                msg: 'Cập nhật thông tin user group thất bại!',
+                msg: 'Cập nhật thông tin size thất bại!',
                 error: new Error(err.message)
             });
         }
 
-        if (ug) {
+        if (size) {
             return res.status(200).json({
-                msg: 'Cập nhật thông tin user group thành công!',
-                ug: ug
+                msg: 'Cập nhật thông tin size thành công!',
+                size: size
             });
         } else {
             return res.status(500).json({
-                msg: 'Cập nhật thông tin user group thất bại!'
+                msg: 'Cập nhật thông tin size thất bại!'
             });
         }
     })
 })
 
 module.exports = router;
-
-

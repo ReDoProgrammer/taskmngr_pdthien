@@ -1,25 +1,24 @@
 const router = require('express').Router();
-const UserGroup = require('../../models/user-group-model');
-
+const ColorMode = require('../../models/color-mode-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 router.delete('/', authenticateAdminToken, (req, res) => {
     let id = req.body.id;
-    UserGroup.findOneAndDelete({ _id: id }, (err, ug) => {
+    ColorMode.findOneAndDelete({ _id: id }, (err, cm) => {
         if (err) {
             return res.status(500).json({
-                msg: 'Xóa user group thất bại!',
+                msg: 'Xóa color mode thất bại!',
                 error: new Error(err.message)
             });
         }
 
-        if (ug) {
+        if (cm) {
             return res.status(200).json({
-                msg: 'Xóa user group thành công!'
+                msg: 'Xóa color mode thành công!'
             });
         } else {
             return res.status(404).json({
-                msg: 'Lỗi không tìm thấy user group tương ứng!'
+                msg: 'Lỗi không tìm thấy color mode tương ứng!'
             });
         }
 
@@ -27,37 +26,37 @@ router.delete('/', authenticateAdminToken, (req, res) => {
 })
 
 router.get('/', (req, res) => {
-  UserGroup.find({}, (err, ugs) => {
+    ColorMode.find({}, (err, cms) => {
         if (err) {
             return res.status(500).json({
-                msg: 'load user group list failed'
+                msg: 'load danh sách color mode thất bại!'
             });
         }
-        console.log(ugs);
+
         return res.status(200).json({
-            msg: 'Load user group list successfully!',
-            ugs: ugs
+            msg: 'Lấy danh sách color mode thành công!',
+            cms: cms
         });
     });
 });
 
 router.get('/detail', authenticateAdminToken, (req, res) => {
     let { id } = req.query;
-    UserGroup.findById(id, (err, ug) => {
+    ColorMode.findById(id, (err, cm) => {
         if (err) {
             return res.status(500).json({
-                msg: 'Lấy thông tin user group thất bại!',
+                msg: 'Lấy thông tin color mode thất bại!',
                 error: new Error(err.message)
             });
         }
-        if (ug) {
+        if (cm) {
             return res.status(200).json({
-                msg: 'Lấy thông tin user group thành công!',
-                ug: ug
+                msg: 'Lấy thông tin color mode thành công!',
+                cm: cm
             })
         } else {
             return res.status(404).json({
-                msg: 'Không tìm thấy user group tương ứng!'
+                msg: 'Không tìm thấy color mode tương ứng!'
             });
         }
     })
@@ -68,27 +67,27 @@ router.post('/', authenticateAdminToken, (req, res) => {
     let { name, description } = req.body;
 
 
-    //ràng buộc dữ liệu cho đầu vào tên size
+    //ràng buộc dữ liệu cho đầu vào tên level
     if (name.length == 0) {
         return res.status(403).json({
-            msg: 'Vui lòng nhập tên user group'
+            msg: 'Vui lòng nhập tên color mode!'
         });
     }
 
-    let ug = new UserGroup({
+    let cm = new ColorMode({
         name: name,
-        description: description        
+        description
     });
-    ug.save()
-        .then(size => {
+    cm.save()
+        .then(cm => {
             return res.status(201).json({
-                msg: 'Thêm mới user group thành công!',
-                size: size
+                msg: 'Thêm mới color mode thành công!',
+                cm: cm
             });
         })
         .catch(err => {
             return res.status(500).json({
-                msg: 'Thêm mới user group thất bại!',
+                msg: 'Thêm mới color mode thất bại!',
                 error: new Error(err.message)
             });
         })
@@ -97,39 +96,38 @@ router.post('/', authenticateAdminToken, (req, res) => {
 router.put('/', authenticateAdminToken, (req, res) => {
     let { id, name, description } = req.body;
 
-    //ràng buộc dữ liệu cho đầu vào tên size
+
+    //ràng buộc dữ liệu cho đầu vào tên level
     if (name.length == 0) {
         return res.status(403).json({
-            msg: 'Vui lòng nhập tên user group'
+            msg: 'Vui lòng nhập tên color mode'
         });
     }
 
 
 
-    UserGroup.findOneAndUpdate({ _id: id }, {
+    ColorMode.findOneAndUpdate({ _id: id }, {
         name,
-        description      
-    }, { new: true }, (err, ug) => {
+        description
+    }, { new: true }, (err, cm) => {
         if (err) {
             return res.status(500).json({
-                msg: 'Cập nhật thông tin user group thất bại!',
+                msg: 'Cập nhật thông tin color mode thất bại!',
                 error: new Error(err.message)
             });
         }
 
-        if (ug) {
+        if (cm) {
             return res.status(200).json({
-                msg: 'Cập nhật thông tin user group thành công!',
-                ug: ug
+                msg: 'Cập nhật thông tin color mode thành công!',
+                cm: cm
             });
         } else {
             return res.status(500).json({
-                msg: 'Cập nhật thông tin user group thất bại!'
+                msg: 'Cập nhật thông tin color mode thất bại!'
             });
         }
     })
 })
 
 module.exports = router;
-
-

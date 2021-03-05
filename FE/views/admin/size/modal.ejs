@@ -1,0 +1,79 @@
+<div class="modal" tabindex="-1" id="modalSize">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add or update size</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="">Size</label>
+                        <input type="text" name="txtName" id="txtName" class="form-control" placeholder="Size name">
+                    </div>
+                    <div class="form-group col-md-8">
+                        <label for="">Description</label>
+                        <input type="text" name="txtDescription" id="txtDescription" class="form-control"
+                            placeholder="Description">
+                    </div>
+                </div>               
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnSubmit">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $('#btnSubmit').click(function () {
+        let name = $('#txtName').val().trim();
+        let description = $('#txtDescription').val().trim();      
+
+        if (sizeId.length > 0) {
+            $.ajax({
+                url: '/admin/size',
+                type: 'put',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem('accessToken'),
+                },
+                data: {
+                    id:sizeId,
+                    name,
+                    description                   
+                },
+                success: function (data, textStatus, xhr) {
+                    alert(data.msg);
+                    $('#modalSize').modal('hide');
+                    sizeId = '';
+                }, error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseJSON.msg);
+                }
+            })
+        } else {
+            $.ajax({
+                url: '/admin/size',
+                type: 'post',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem('accessToken'),
+                },
+                data: {
+                    name,
+                    description                  
+                },
+                success: function (data, textStatus, xhr) {
+                    alert(data.msg);
+                    $('#modalSize').modal('hide');
+                    sizeId = '';
+                }, error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseJSON.msg);
+                }
+            })
+        }
+
+    })
+</script>

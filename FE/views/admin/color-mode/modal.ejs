@@ -1,0 +1,81 @@
+<div class="modal" tabindex="-1" id="modalColorMode">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add or update color mode</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="">Color mode</label>
+                        <input type="text" name="txtName" id="txtName" class="form-control"
+                            placeholder="Color mode name">
+                    </div>                    
+                
+                    <div class="form-group col-md-6">
+                        <label for="Description">Description</label>
+                        <input type="text" name="" id="txtDescription" class="form-control" placeholder="Description">
+                    </div>
+                </div>               
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnSubmit">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $('#btnSubmit').click(function () {
+        let name = $('#txtName').val().trim();
+        let description = $('#txtDescription').val().trim();       
+
+        if (cmId.length > 0) {
+            $.ajax({
+                url: '/admin/color-mode',
+                type: 'put',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem('accessToken'),
+                },
+                data: {
+                    id:cmId,
+                    name,
+                    description
+                   
+                },
+                success: function (data, textStatus, xhr) {
+                    alert(data.msg);
+                    $('#modalColorMode').modal('hide');
+                    cmId = '';
+                }, error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseJSON.msg);
+                }
+            })
+        } else {
+            $.ajax({
+                url: '/admin/color-mode',
+                type: 'post',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem('accessToken'),
+                },
+                data: {
+                    name,
+                    description                  
+                },
+                success: function (data, textStatus, xhr) {
+                    alert(data.msg);
+                    $('#modalColorMode').modal('hide');
+                    cmId = '';
+                }, error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseJSON.msg);
+                }
+            })
+        }
+
+    })
+</script>
