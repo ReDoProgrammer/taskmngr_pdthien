@@ -80,14 +80,14 @@
     let price = $("#txtPrice").val();
     if (price <= 0) {
       alert("Đơn giá không hợp lệ!");
+      return;
     }
 
     //duyệt table xem đã tồn tại level được chọn hay chưa
     //nếu đã tồn tại thì không cho thêm
     let exist = false;
     $("table > tbody  > tr").each(function (index, tr) {
-      let id = tr["id"];
-
+      let id = tr["id"];     
       if (levelId === id) {
         alert("This level already exist!");
         exist = true;

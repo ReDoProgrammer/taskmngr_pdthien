@@ -16,4 +16,81 @@
 </div>
 
 
+<script>
+$('#btnSubmit').click(function(){
+  let firstname = $('#txtFirstname').val().trim();
+  if(firstname.length == 0){
+    alert('Please enter firstname');
+    return;
+  }
+  let lastname = $('#txtLastname').val().trim();
+  if(lastname.length == 0){
+    alert('Please enter lastname');
+    return;
+  }
+  
 
+
+  let username = $('#txtUsername').val().trim();
+  if(username.length == 0){
+    alert('Please enter username');
+    return;
+  }
+
+
+  let password = $('#txtPassword').val();
+  let confirmpassword = $('#txtConfirmPassword').val();
+  if(password.length == 0 || confirmpassword.length == 0){
+    alert('password can not be empty');
+    return;
+  }
+
+  if(password!==confirmpassword){
+    alert('Password and confirm password not match!');
+    return;
+  }
+
+  let phone = $('#txtPhone').val().trim();
+  let email = $('#txtEmail').val().trim();
+  if(email.length == 0){
+    alert('email can not be blank');
+    return;
+  }
+  let address = $('#txtAddress').val().trim();
+
+
+  let output = $('#slOutput option:selected').val();
+  let size = $('#slSize option:selected').val();
+  let colormode = $('#slColorMode option:selected').val();
+  let is_align = $('#ckbAlign').is('checked')?true:false;
+  let align_note = $('#txtAlign').val().trim();
+  let cloud = $('#slCloud option:selected').val();
+  let nationalstyle = $('#slNationalStyle option:selected').val();
+  let stylenote = $('#txtStyleNote').val().trim();
+
+  let has_tv = $('#ckbTV').is('checked')?true:false;
+  let tv_note = $('#txtTV').val().trim();
+  let has_grass = $('#ckbGrass').is('checked')?true:false;
+  let grass_note = $('#txtGrass').val().trim();
+  let has_sky = $('#ckbSky').is('checked')?true:false;
+  let sky_note = $('#txtSky').val().trim();
+  let has_fire = $('#ckbFire').is('checked')?true:false;
+  let fire_note = $('#txtFire').val().trim();
+
+  let levels = [];
+
+  $("table > tbody  > tr").each(function (index, tr) {
+      let id = tr["id"];
+      let td = $(this).find('td').eq(2);
+      let level = {id:id,price:td.text()};
+      levels.push(level);    
+     
+    });
+
+    console.log(levels);
+
+
+
+})
+
+</script>
