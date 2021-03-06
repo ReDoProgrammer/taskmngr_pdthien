@@ -1,51 +1,57 @@
 <div class="card bg-dark text-white mt-2">
-    <div class="card-header">Basic information</div>
-    <div class="card-body">
-        <form>
-            <div class="form-row">
-                
-                <div class="form-group col-md-2">
-                    <label for="recipient-name" class="col-form-label">Firstname:</label>
-                    <input type="text" class="form-control" id="recipient-name">
-                </div>
-                <div class="form-group col-md-2">
-                    <label for="recipient-name" class="col-form-label">Lastname:</label>
-                    <input type="text" class="form-control" id="recipient-name">
-                </div>
-                <div class="form-group offset-md-2 col-md-2">
-                    <label for="recipient-name" class="col-form-label">Username:</label>
-                    <input type="text" class="form-control" id="recipient-name">
-                </div>
-                <div class="form-group col-md-2">
-                    <label for="recipient-name" class="col-form-label">Password:</label>
-                    <input type="password" class="form-control" id="recipient-name">
-                </div>
-                <div class="form-group col-md-2">
-                    <label for="recipient-name" class="col-form-label">Confirm password:</label>
-                    <input type="password" class="form-control" id="recipient-name">
-                </div>
-                
-            </div>
+  <div class="card-header">Basic information</div>
+  <div class="card-body">
+    <form>
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label for="recipient-name" class="col-form-label">Firstname:</label>
+          <input type="text" class="form-control" id="txtFirstname" placeholder="Firstname"/>
+        </div>
+        <div class="form-group col-md-2">
+          <label for="recipient-name" class="col-form-label">Lastname:</label>
+          <input type="text" class="form-control" id="txtLastname" placeholder="Lastname"/>
+        </div>
+        <div class="form-group offset-md-2 col-md-2">
+          <label for="recipient-name" class="col-form-label">Username:</label>
+          <input type="text" class="form-control" id="txtUsername" placeholder="Username" />
+        </div>
+        <div class="form-group col-md-2">
+          <label for="recipient-name" class="col-form-label">Password:</label>
+          <input type="password" class="form-control" id="txtPassword" placeholder="Password"/>
+        </div>
+        <div class="form-group col-md-2">
+          <label for="recipient-name" class="col-form-label"
+            >Confirm password:</label
+          >
+          <input type="password" class="form-control" id="txtConfirmPassword" placeholder="Confirm password"/>
+        </div>
+      </div>
 
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label for="recipient-name" class="col-form-label">Phone:</label>
+          <input type="text" class="form-control" id="txtPhone" placeholder="Phone"/>
+        </div>
 
-            <div class="form-row">
-                <div class="form-group col-md-2">
-                    <label for="recipient-name" class="col-form-label">Phone:</label>
-                    <input type="text" class="form-control" id="recipient-name">
-                </div>
+        <div class="form-group col-md-4">
+          <label for="recipient-name" class="col-form-label">Email:</label>
+          <input type="text" class="form-control" id="txtEmail" placeholder="Email" />
+        </div>
 
-                <div class="form-group col-md-4">
-                    <label for="recipient-name" class="col-form-label">Email:</label>
-                    <input type="text" class="form-control" id="recipient-name">
-                </div>
-
-                <div class="form-group col-md-6">
-                    <label for="recipient-name" class="col-form-label">Address:</label>
-                    <input type="text" class="form-control" id="recipient-name">
-                </div>
-
-            </div>
-
-        </form>
-    </div>
+        <div class="form-group col-md-6">
+          <label for="recipient-name" class="col-form-label">Address:</label>
+          <input type="text" class="form-control" id="txtAddress" placeholder="Address"/>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>
+
+<script>
+  $(document).ready(function () {});
+
+  $("#txtLastname").keyup(function () {
+    let username = $('#txtFirstname').val().trim() +$('#txtLastname').val().trim();
+    $('#txtUsername').val(username);
+  });
+</script>

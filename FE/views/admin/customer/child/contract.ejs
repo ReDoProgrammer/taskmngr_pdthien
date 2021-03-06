@@ -1,39 +1,113 @@
-<div class="card bg-dark text-white mt-2">
-    <div class="card-header">Contract detail</div>
-    <div class="card-body">
-        <form>
-            
-            <div class="form-row mb-1">
-              <div class="col-md-2">
-                  <label for="">Level</label>                  
-              </div>
-              <div class="col-md-5">
-                  <select name="" id="" class="form-control">
-                      <option value="">Single</option>
-                  </select>
-              </div>
-              <div class="col-md-5">
-                <input type="text" name="" id="" class="form-control" placeholder="price">
-              </div>
-            </div>
-            <div class="form-row">
-                <div class="col-md-2">
-                    <label for="">Level</label>                  
-                </div>
-                <div class="col-md-5">
-                    <select name="" id="" class="form-control">
-                        <option value="">Multi</option>
-                    </select>
-                </div>
-                <div class="col-md-5">
-                    <input type="text" name="" id="" class="form-control" placeholder="price">
-                </div>
-              </div>
-           
-        </form>
-       
-            <button class="btn btn-sm btn-info">Add new level</button>
-           
-        </div>
-    </div>
+<table class="table">
+  <thead>
+    <tr class="form-row">
+      <th scope="col" class="col-md-1">#</th>
+      <th scope="col" class="col-md-8">Level</th>
+      <th scope="col" class="col-md-2">Price ($)</th>
+      <th scope="col" class="col-md-1"></th>
+    </tr>
+  </thead>
+  <tbody id="tblData"></tbody>
+</table>
+<div class="row">
+  <div class="col-md-6">
+    <select name="" id="slLevel" class="form-control"></select>
+  </div>
+  <div class="colmd-4">
+    <input
+      type="text"
+      class="form-control text-right"
+      id="txtPrice"
+      placeholder="Level price"
+      value="0"
+      name="price"
+    />
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-info" id="btnAddNewLevel">
+      <span>
+        <i class="fa fa-plus" aria-hidden="true"></i>
+      </span>
+      Add new level
+    </button>
+  </div>
 </div>
+
+<script>
+  var idx = 1;
+
+  $(document).ready(function () {
+    LoadLevel();
+  });
+
+  function LoadLevel() {
+    $.ajax({
+      url: "/admin/level",
+      type: "get",
+      success: function (data, textStatus, xhr) {
+        $("#slLevel").empty();
+        console.log(data);
+        data.levels.forEach((lv) => {
+          let opt = '<option value="' + lv._id + '">' + lv.name + "</option>";
+          $("#slLevel").append(opt);
+        });
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      },
+    });
+  }
+
+  //ràng buộc nhập dữ liệu, chỉ cho nhập kiểu số thực
+  $("#txtPrice").on("keypress keyup blur", function (event) {
+    //this.value = this.value.replace(/[^0-9\.]/g,'');
+    $(this).val(
+      $(this)
+        .val()
+        .replace(/[^0-9\.]/g, "")
+    );
+    if (
+      (event.which != 46 || $(this).val().indexOf(".") != -1) &&
+      (event.which < 48 || event.which > 57)
+    ) {
+      event.preventDefault();
+    }
+  });
+
+  $("#btnAddNewLevel").click(function () {
+    let levelId = $("#slLevel option:selected").val();
+    let levelName = $("#slLevel option:selected").text();
+    let price = $("#txtPrice").val();
+    if (price <= 0) {
+      alert("Đơn giá không hợp lệ!");
+    }
+
+    //duyệt table xem đã tồn tại level được chọn hay chưa
+    //nếu đã tồn tại thì không cho thêm
+    let exist = false;
+    $("table > tbody  > tr").each(function (index, tr) {
+      let id = tr["id"];
+
+      if (levelId === id) {
+        alert("This level already exist!");
+        exist = true;
+        return;
+      }
+    });
+
+    if (!exist) {
+      let tr = '<tr id ="' + levelId + '" class="row">';
+      tr += '<td class="col-md-1">' + idx++ + "</td>";
+      tr += '<td class="col-md-8 text-info">' + levelName + "</td>";
+      tr +=
+        '<td class="col-md-2 text-center text-danger font-weight-bold">' +
+        price +
+        "</td>";
+      tr += '<td class="col-md-1"></td>';
+      tr += "</tr>";
+
+      $("#tblData").append(tr);
+      $('#txtPrice').val(0);
+    }
+  });
+</script>
