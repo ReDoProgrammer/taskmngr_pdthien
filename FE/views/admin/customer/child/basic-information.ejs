@@ -51,7 +51,7 @@
   $(document).ready(function () {});
 
   $("#txtLastname").keyup(function () {
-    let username = $('#txtFirstname').val().trim() +$('#txtLastname').val().trim();
+    let username = $('#txtFirstname').val().trim().toLowerCase() +$('#txtLastname').val().trim().toLowerCase();
     $('#txtUsername').val(username);
   });
 </script>
