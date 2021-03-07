@@ -38,7 +38,7 @@
       <td>Mark</td>
       <td>Otto</td>
       <td>@mdo</td>
-      <td> <button class="btn btn-sm btn-info btnStyle">Customer style <span><i class="fa fa-cog" aria-hidden="true"></i></span></button>    </td>
+      
       <td class="text-right">
         <a href="http://" target="_blank" rel="noopener noreferrer">
           <i class="fa fa-eye text-info" aria-hidden="true"></i>
@@ -51,42 +51,7 @@
         </a>
       </td>
     </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-      <td> <button class="btn btn-sm btn-info btnStyle">Customer style <span><i class="fa fa-cog" aria-hidden="true"></i></span></button>    </td>
-      <td class="text-right">
-        <a href="http://" target="_blank" rel="noopener noreferrer">
-          <i class="fa fa-eye text-info" aria-hidden="true"></i>
-        </a>
-        <a href="http://" target="_blank" rel="noopener noreferrer">
-          <i class="fa fa-refresh text-warning" aria-hidden="true"></i>
-        </a>
-        <a href="http://" target="_blank" rel="noopener noreferrer">
-          <i class="fa fa-trash text-danger" aria-hidden="true"></i>
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td>Larry</td>
-      <td>the Bird</td>
-      <td>@twitter</td>
-      <td> <button class="btn btn-sm btn-info btnStyle">Customer style <span><i class="fa fa-cog" aria-hidden="true"></i></span></button>    </td>
-      <td class="text-right">
-        <a href="http://" target="_blank" rel="noopener noreferrer">
-          <i class="fa fa-eye text-info" aria-hidden="true"></i>
-        </a>
-        <a href="http://" target="_blank" rel="noopener noreferrer">
-          <i class="fa fa-refresh text-warning" aria-hidden="true"></i>
-        </a>
-        <a href="http://" target="_blank" rel="noopener noreferrer">
-          <i class="fa fa-trash text-danger" aria-hidden="true"></i>
-        </a>
-      </td>
-    </tr>
+   
   </tbody>
 </table>
 
@@ -106,8 +71,11 @@
   <%-include('style')%>
 
 <script>
+  var search = '';
+  var page =1;
   $(document).ready(() => {
     $("#direction").val("Quản lý khách hàng");
+    LoadCustomer();
   });
   $('#btnAddNew').click(function(){
     $('#modalCustomer').modal();
@@ -115,4 +83,25 @@
   $('.btnStyle').click(function(){
     $('#modalStyle').modal();
   })
+
+  function LoadCustomer(){
+    $.ajax({
+      url:'/admin/customer/list',
+      type:'get',
+      headers: {
+                    authorization: "Bearer " + localStorage.getItem('accessToken'),
+                },
+      data:{
+        search,
+        page
+      },
+      success: function (data, textStatus, xhr) {
+        console.log(data);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg+'. '+jqXHR.responseJSON.error);        
+      },
+
+    })
+  }
 </script>

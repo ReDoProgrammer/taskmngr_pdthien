@@ -59,6 +59,7 @@ app.use(layout); //set layout
  */
 const apiAdminCloud = require('./BE/API/admin/api-cloud');
 const apiAdminColorMode = require('./BE/API/admin/api-color-mode');
+const apiAdminCustomer = require('./BE/API/admin/api-customer');
 const apiAdminFileFormat = require('./BE/API/admin/api-file-format');
 const apiAdminLevel = require('./BE/API/admin/api-level');
 const apiAdminNationalStyle = require('./BE/API/admin/api-national-style');
@@ -83,6 +84,7 @@ const apiUserGroup = require("./BE/API/common/api-user-group");
 app.use('/admin/account',apiAdminUser);
 app.use('/admin/cloud',apiAdminCloud);
 app.use('/admin/color-mode',apiAdminColorMode);
+app.use('/admin/customer',apiAdminCustomer);
 app.use('/admin/file-format',apiAdminFileFormat);
 app.use('/admin/level',apiAdminLevel);
 app.use('/admin/national-style',apiAdminNationalStyle);

@@ -46,7 +46,6 @@
       type: "get",
       success: function (data, textStatus, xhr) {
         $("#slLevel").empty();
-        console.log(data);
         data.levels.forEach((lv) => {
           let opt = '<option value="' + lv._id + '">' + lv.name + "</option>";
           $("#slLevel").append(opt);

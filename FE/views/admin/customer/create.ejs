@@ -15,82 +15,110 @@
   </div>
 </div>
 
-
 <script>
-$('#btnSubmit').click(function(){
-  let firstname = $('#txtFirstname').val().trim();
-  if(firstname.length == 0){
-    alert('Please enter firstname');
-    return;
-  }
-  let lastname = $('#txtLastname').val().trim();
-  if(lastname.length == 0){
-    alert('Please enter lastname');
-    return;
-  }
-  
+  $("#btnSubmit").click(function () {
+    let firstname = $("#txtFirstname").val().trim();
+    if (firstname.length == 0) {
+      alert("Please enter firstname");
+      return;
+    }
+    let lastname = $("#txtLastname").val().trim();
+    if (lastname.length == 0) {
+      alert("Please enter lastname");
+      return;
+    }
 
+    let email = $("#txtEmail").val().trim();
+    if (email.length == 0) {
+      alert("email can not be blank");
+      return;
+    }
+   
 
-  let username = $('#txtUsername').val().trim();
-  if(username.length == 0){
-    alert('Please enter username');
-    return;
-  }
+    let password = $("#txtPassword").val();
+    let confirmpassword = $("#txtConfirmPassword").val();
+    if (password.length == 0 || confirmpassword.length == 0) {
+      alert("password can not be empty");
+      return;
+    }
 
+    if (password !== confirmpassword) {
+      alert("Password and confirm password not match!");
+      console.log({ password, confirmpassword });
+      return;
+    }
 
-  let password = $('#txtPassword').val();
-  let confirmpassword = $('#txtConfirmPassword').val();
-  if(password.length == 0 || confirmpassword.length == 0){
-    alert('password can not be empty');
-    return;
-  }
+    let phone = $("#txtPhone").val().trim();
+   
+    let address = $("#txtAddress").val().trim();
 
-  if(password!==confirmpassword){
-    alert('Password and confirm password not match!');
-    return;
-  }
+    let output = $("#slOutput option:selected").val();
+    let size = $("#slSize option:selected").val();
+    let color_mode = $("#slColorMode option:selected").val();
+    let is_align = $("#ckbAlign").is("checked") ? true : false;
+    let align_note = $("#txtAlign").val().trim();
+    let cloud = $("#slCloud option:selected").val();
+    let national_style = $("#slNationalStyle option:selected").val();
+    let style_note = $("#txtStyleNote").val().trim();
 
-  let phone = $('#txtPhone').val().trim();
-  let email = $('#txtEmail').val().trim();
-  if(email.length == 0){
-    alert('email can not be blank');
-    return;
-  }
-  let address = $('#txtAddress').val().trim();
+    let has_TV = $("#ckbTV").is("checked") ? true : false;
+    let TV_note = $("#txtTV").val().trim();
+    let has_grass = $("#ckbGrass").is("checked") ? true : false;
+    let grass_note = $("#txtGrass").val().trim();
+    let has_sky = $("#ckbSky").is("checked") ? true : false;
+    let sky_note = $("#txtSky").val().trim();
+    let has_fire = $("#ckbFire").is("checked") ? true : false;
+    let fire_note = $("#txtFire").val().trim();
 
+    let levels = [];
 
-  let output = $('#slOutput option:selected').val();
-  let size = $('#slSize option:selected').val();
-  let colormode = $('#slColorMode option:selected').val();
-  let is_align = $('#ckbAlign').is('checked')?true:false;
-  let align_note = $('#txtAlign').val().trim();
-  let cloud = $('#slCloud option:selected').val();
-  let nationalstyle = $('#slNationalStyle option:selected').val();
-  let stylenote = $('#txtStyleNote').val().trim();
-
-  let has_tv = $('#ckbTV').is('checked')?true:false;
-  let tv_note = $('#txtTV').val().trim();
-  let has_grass = $('#ckbGrass').is('checked')?true:false;
-  let grass_note = $('#txtGrass').val().trim();
-  let has_sky = $('#ckbSky').is('checked')?true:false;
-  let sky_note = $('#txtSky').val().trim();
-  let has_fire = $('#ckbFire').is('checked')?true:false;
-  let fire_note = $('#txtFire').val().trim();
-
-  let levels = [];
-
-  $("table > tbody  > tr").each(function (index, tr) {
+    $("table > tbody  > tr").each(function (index, tr) {
       let id = tr["id"];
-      let td = $(this).find('td').eq(2);
-      let level = {id:id,price:td.text()};
-      levels.push(level);    
-     
+      let td = $(this).find("td").eq(2);
+      let level = { id: id, price: td.text() };
+      levels.push(level);
     });
 
-    console.log(levels);
-
-
-
-})
-
+    $.ajax({
+      url: "/admin/customer",
+      type: "post",
+      headers: {
+                    authorization: "Bearer " + localStorage.getItem('accessToken'),
+                },
+      data: {
+        firstname,
+        lastname,
+        email,
+        password,
+        phone, 
+        address,
+        output,
+        size,
+        color_mode,
+        is_align,
+        align_note,
+        cloud,
+        national_style,
+        style_note,
+        has_TV,
+        TV_note,
+        has_grass,
+        grass_note,
+        has_sky,
+        sky_note,
+        has_fire,
+        fire_note,
+        levels,
+      },
+      success: function (data, textStatus, xhr) {
+        alert(data.msg);
+        $(location).attr('href',data.url);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg+'. '+jqXHR.responseJSON.error);
+        console.log(jqXHR.responseJSON.error);
+        
+      },
+    });
+  });
 </script>
