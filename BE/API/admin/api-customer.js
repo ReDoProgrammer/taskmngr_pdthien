@@ -28,16 +28,35 @@ router.delete("/", authenticateAdminToken, (req, res) => {
 router.get("/list", (req, res) => {
     let {search,page} = req.query;
     
-    var lst = Customer.find({$or:[
+   Customer.find({$or:[
         {firstname:{ "$regex": search, "$options": "i" }},
         {lastname:{ "$regex": search, "$options": "i" }},
         {phone:{ "$regex": search, "$options": "i" }},
         {email:{ "$regex": search, "$options": "i" }},
     ]})
-    .select('firstname','lastname')
-    .skip((page-1)*process.env.PAGE_SIZE)
-    .limit(process.env.PAGE_SIZE);
-    console.log(lst);
+    .select('firstname lastname phone email address')    
+    .exec((err,customers)=>{
+      if(err){
+        return res.status(500).json({
+          msg:'Load customers failed',
+          error:new Error(err.message)
+        });
+      }
+      if(customers){
+        let result = customers.slice(process.env.PAGE_SIZE*(page-1),process.env.PAGE_SIZE);   
+        return res.status(200).json({
+          msg:'Load customers successfully!',
+          pages:customers.length%process.env.PAGE_SIZE==0?customers.length/process.env.PAGE_SIZE:Math.floor(customers.length/process.env.PAGE_SIZE)+1,
+          result:result
+        })
+      }else{
+        return res.status(500).json({
+          error:'Can not load customers!'
+        });
+      }
+    });
+
+  
 
 });
 

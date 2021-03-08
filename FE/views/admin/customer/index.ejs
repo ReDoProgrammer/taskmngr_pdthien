@@ -7,7 +7,7 @@
       Add New
     </a>
   </div>
-  
+
   <div class="offset-md-7 col-md-3 text-right">
     <!-- Another variation with a button -->
     <div class="input-group">
@@ -19,7 +19,6 @@
       </div>
     </div>
   </div>
- 
 </div>
 <table class="table mt-1">
   <thead class="thead-dark">
@@ -32,76 +31,78 @@
       <th></th>
     </tr>
   </thead>
-  <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-      
-      <td class="text-right">
-        <a href="http://" target="_blank" rel="noopener noreferrer">
-          <i class="fa fa-eye text-info" aria-hidden="true"></i>
-        </a>
-        <a href="http://" target="_blank" rel="noopener noreferrer">
-          <i class="fa fa-refresh text-warning" aria-hidden="true"></i>
-        </a>
-        <a href="http://" target="_blank" rel="noopener noreferrer">
-          <i class="fa fa-trash text-danger" aria-hidden="true"></i>
-        </a>
-      </td>
-    </tr>
-   
-  </tbody>
+  <tbody id="tblData"></tbody>
 </table>
 
+<nav aria-label="Page navigation example" class="mt-2">
+  <ul class="pagination" id="pagination">    
+    
+  </ul>
+</nav>
 
-  <nav aria-label="Page navigation example" class="mt-2">
-    <ul class="pagination">
-      <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-      <li class="page-item"><a class="page-link" href="#">1</a></li>
-      <li class="page-item"><a class="page-link" href="#">2</a></li>
-      <li class="page-item"><a class="page-link" href="#">3</a></li>
-      <li class="page-item"><a class="page-link" href="#">Next</a></li>
-    </ul>
-  </nav>
-
-
-  <%-include('modal')%>
-  <%-include('style')%>
+<%-include('modal')%> <%-include('style')%>
 
 <script>
-  var search = '';
-  var page =1;
+  var search = "";
+  var page = 1;
   $(document).ready(() => {
     $("#direction").val("Quản lý khách hàng");
     LoadCustomer();
   });
-  $('#btnAddNew').click(function(){
-    $('#modalCustomer').modal();
-  })
-  $('.btnStyle').click(function(){
-    $('#modalStyle').modal();
-  })
+  $("#btnAddNew").click(function () {
+    $("#modalCustomer").modal();
+  });
+  $(".btnStyle").click(function () {
+    $("#modalStyle").modal();
+  });
 
-  function LoadCustomer(){
+  function LoadCustomer() {
     $.ajax({
-      url:'/admin/customer/list',
-      type:'get',
+      url: "/admin/customer/list",
+      type: "get",
       headers: {
-                    authorization: "Bearer " + localStorage.getItem('accessToken'),
-                },
-      data:{
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
         search,
-        page
+        page,
       },
       success: function (data, textStatus, xhr) {
-        console.log(data);
+        $('#tblData').empty();
+        $('#pagination').empty();
+        let idx = 1;
+        data.result.forEach((customer) => {
+          let tr = "  <tr>";
+          tr += '<th scope="row">'+(idx++)+'</th>';
+          tr += " <td>"+customer.firstname+" "+customer.lastname+"</td>";
+          tr += "<td>"+customer.phone+"</td>";
+          tr += "<td>"+customer.email+"</td>";
+
+          tr += '<td class="text-right">';
+          tr +=
+            '  <a href="http://" target="_blank" rel="noopener noreferrer">';
+          tr += '    <i class="fa fa-eye text-info" aria-hidden="true"></i>';
+          tr += "  </a>";
+          tr += ' <a href="http://" target="_blank" rel="noopener noreferrer">';
+          tr +=
+            ' <i class="fa fa-refresh text-warning" aria-hidden="true"></i>';
+          tr += " </a>";
+          tr += ' <a href="http://" target="_blank" rel="noopener noreferrer">';
+          tr += '<i class="fa fa-trash text-danger" aria-hidden="true"></i>';
+          tr += "</a>";
+          tr += "  </td>";
+          tr += "</tr>";
+          $('#tblData').append(tr);
+        });
+        console.log(data.pages);
+        for(let i = 1; i<=data.pages; i++){
+          let li = '<li class="page-item"><a class="page-link" href="#">'+i+'</a></li>';
+          $('#pagination').append(li);
+        }
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        alert(jqXHR.responseJSON.msg+'. '+jqXHR.responseJSON.error);        
+        alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
       },
-
-    })
+    });
   }
 </script>
