@@ -24,7 +24,7 @@ const customerSchema = new Schema({
     },
     output:{
         type:Schema.Types.ObjectId,
-        ref:'output'
+        ref:'file_format'
     },
     size:{
         type:Schema.Types.ObjectId,
@@ -36,7 +36,7 @@ const customerSchema = new Schema({
     },
     is_align:{
         type:Boolean,
-        default:'false'
+        default:false
     },
     align_note:{
         type:String,
@@ -50,8 +50,8 @@ const customerSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'national_style'
     },
-    style_note:{
-        stype:String,
+    remark:{
+        type:String,
         default:''
     },
     has_TV:{

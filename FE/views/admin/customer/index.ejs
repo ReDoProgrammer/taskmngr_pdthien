@@ -35,74 +35,184 @@
 </table>
 
 <nav aria-label="Page navigation example" class="mt-2">
-  <ul class="pagination" id="pagination">    
-    
+  <ul class="pagination" id="pagination">
+
   </ul>
 </nav>
 
-<%-include('modal')%> <%-include('style')%>
 
-<script>
-  var search = "";
-  var page = 1;
-  $(document).ready(() => {
-    $("#direction").val("Quản lý khách hàng");
-    LoadCustomer();
-  });
-  $("#btnAddNew").click(function () {
-    $("#modalCustomer").modal();
-  });
-  $(".btnStyle").click(function () {
-    $("#modalStyle").modal();
-  });
 
-  function LoadCustomer() {
-    $.ajax({
-      url: "/admin/customer/list",
-      type: "get",
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        search,
-        page,
-      },
-      success: function (data, textStatus, xhr) {
-        $('#tblData').empty();
-        $('#pagination').empty();
-        let idx = 1;
-        data.result.forEach((customer) => {
-          let tr = "  <tr>";
-          tr += '<th scope="row">'+(idx++)+'</th>';
-          tr += " <td>"+customer.firstname+" "+customer.lastname+"</td>";
-          tr += "<td>"+customer.phone+"</td>";
-          tr += "<td>"+customer.email+"</td>";
+<button class="btn"></button>
 
-          tr += '<td class="text-right">';
-          tr +=
-            '  <a href="http://" target="_blank" rel="noopener noreferrer">';
-          tr += '    <i class="fa fa-eye text-info" aria-hidden="true"></i>';
-          tr += "  </a>";
-          tr += ' <a href="http://" target="_blank" rel="noopener noreferrer">';
-          tr +=
-            ' <i class="fa fa-refresh text-warning" aria-hidden="true"></i>';
-          tr += " </a>";
-          tr += ' <a href="http://" target="_blank" rel="noopener noreferrer">';
-          tr += '<i class="fa fa-trash text-danger" aria-hidden="true"></i>';
-          tr += "</a>";
-          tr += "  </td>";
-          tr += "</tr>";
-          $('#tblData').append(tr);
+<%-include('modal')%>
+  <%-include('style')%>
+    <%-include('detail')%>
+
+      <script>
+        var search = "";
+        var page = 1;
+        $(document).ready(() => {
+          $("#direction").val("Quản lý khách hàng");
+          LoadCustomers();
         });
-        console.log(data.pages);
-        for(let i = 1; i<=data.pages; i++){
-          let li = '<li class="page-item"><a class="page-link" href="#">'+i+'</a></li>';
-          $('#pagination').append(li);
+        $("#btnAddNew").click(function () {
+          $("#modalCustomer").modal();
+        });
+        $(".btnStyle").click(function () {
+          $("#modalStyle").modal();
+        });
+
+
+        $(document).on("click", "button[name='view']", function () {
+          customerId = $(this).closest("tr").attr("id");
+          LoadCustomer(customerId);
+        });
+
+        function LoadCustomer(customerId) {
+          $.ajax({
+            url: "/admin/customer/detail",
+            type: "get",
+            headers: {
+              authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+              customerId
+            },
+            success: function (data, textStatus, xhr) {
+
+              $('#modalCustomerDetail').modal();
+              $('#fullname').text(data.customer.firstname + ' ' + data.customer.lastname);
+              $('#phone').text(data.customer.phone);
+              $('#email').text(data.customer.email);
+              $('#address').text(data.customer.address);
+              $('#output').text(data.customer.output.name);
+              $('#size').text(data.customer.size.name);
+              $('#color_mode').text(data.customer.color_mode.name);
+
+              if (data.customer.is_align) {
+                if (data.customer.align_note.length > 0) {
+                  $('#align').text(data.customer.align_note);
+                } else {
+                  $('#align').html('<i class="fa fa-check-square-o" aria-hidden="true"></i>');
+                }
+              } else {
+                $('#align').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+              }
+
+
+
+
+
+              $('#cloud').text(data.customer.cloud.name);
+
+              $('#national_style').text(data.customer.national_style.name);
+              $('#remark').text(data.customer.remark);
+
+
+              //special requests
+              if (data.customer.has_TV) {
+                if (data.customer.TV_note.length > 0) {
+                  $('#tv').text(data.customer.TV_note);
+                } else {
+                  $('#tv').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                }
+              } else {
+                $('#tv').html('<i class="fa fa-square-o text-warning" aria-hidden="true"></i>');
+              }
+
+              if (data.customer.has_grass) {
+                if (data.customer.grass_note.length > 0) {
+                  $('#grass').text(data.customer.grass_note);
+                } else {
+                  $('#grass').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                }
+              } else {
+                $('#grass').html('<i class="fa fa-square-o text-warning" aria-hidden="true"></i>');
+              }
+
+              if (data.customer.has_sky) {
+                if (data.customer.sky_note.length > 0) {
+                  $('#sky').text(data.customer.sky_note);
+                } else {
+                  $('#sky').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                }
+              } else {
+                $('#sky').html('<i class="fa fa-square-o text-warning" aria-hidden="true"></i>');
+              }
+
+
+              if (data.customer.has_fire) {
+                if (data.customer.fire_note.length > 0) {
+                  $('#fire').text(data.customer.fire_note);
+                } else {
+                  $('#fire').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                }
+              } else {
+                $('#fire').html('<i class="fa fa-square-o text-warning" aria-hidden="true"></i>');
+              }
+
+
+              //binding levels list
+              $('#tblLevelList').empty();
+              let rIdx = 1;
+              data.customer.levels.forEach(level => {
+                let tr = '<tr>';
+                tr += '<th scope="row">'+(rIdx++)+'</th>';
+                tr += ' <td>'+level.id+'</td>';
+                tr += ' <td>'+level.price+'</td>';
+                tr += ' </tr>';
+                $('#tblLevelList').append(tr);
+              })
+
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
+            }
+          })
         }
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
-      },
-    });
-  }
-</script>
+
+        function LoadCustomers() {
+          $.ajax({
+            url: "/admin/customer/list",
+            type: "get",
+            headers: {
+              authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+              search,
+              page,
+            },
+            success: function (data, textStatus, xhr) {
+              $('#tblData').empty();
+              $('#pagination').empty();
+              let idx = 1;
+              data.result.forEach((customer) => {
+                let tr = "  <tr id='" + customer._id + "'>";
+                tr += '<th scope="row">' + (idx++) + '</th>';
+                tr += " <td>" + customer.firstname + " " + customer.lastname + "</td>";
+                tr += "<td>" + customer.phone + "</td>";
+                tr += "<td>" + customer.email + "</td>";
+
+                tr += "<td class='text-right'>";
+                tr +=
+                  '<button class="btn btn-sm btn-info" name="view"><i class="fa fa-eye" aria-hidden="true"></i></button>';
+                tr +=
+                  '<button class="btn btn-sm btn-warning ml-2" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+                tr +=
+                  '<button class="btn btn-sm btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                tr += "</td>";
+                $('#tblData').append(tr);
+              });
+              console.log(data.pages);
+              for (let i = 1; i <= data.pages; i++) {
+                let li = '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>';
+                $('#pagination').append(li);
+              }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
+            },
+          });
+        }
+      </script>

@@ -61,15 +61,23 @@ router.get("/list", (req, res) => {
 });
 
 router.get("/detail", authenticateAdminToken, (req, res) => {
-  let { id } = req.query;
-  Customer.findById(id, (err, customer) => {
+  let { customerId } = req.query;
+  Customer.findById(customerId) 
+  .populate('output','name')
+  .populate('size','name')
+  .populate('color_mode','name')
+  .populate('cloud','name')
+  .populate('national_style','name')
+  .exec((err,customer)=> {
     if (err) {
+      console.log(err);
       return res.status(500).json({
         msg: "Can not get customer detail",
         error: new Error(err.message),
       });
     }
     if (customer) {
+      console.log(customer);
       return res.status(200).json({
         msg: "Get customer detail successfully!",
         customer: customer,
@@ -98,7 +106,7 @@ router.post("/", authenticateAdminToken, (req, res) => {
     align_note,
     cloud,
     national_style,
-    style_note,
+    remark,
     has_TV,
     TV_note,
     has_grass,
@@ -144,7 +152,7 @@ router.post("/", authenticateAdminToken, (req, res) => {
             align_note,
             cloud,
             national_style,
-            style_note,
+            remark,
             has_TV,
             TV_note,
             has_grass,
@@ -154,10 +162,12 @@ router.post("/", authenticateAdminToken, (req, res) => {
             has_fire,
             fire_note,
             levels,
-          });
+          });         
+
           customer
             .save()
             .then((customer) => {
+              console.log(customer);
               return res.status(201).json({
                 msg: "Customer has been created successfully!",
                 customer: customer,

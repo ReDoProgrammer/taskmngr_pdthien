@@ -55,19 +55,20 @@
     let output = $("#slOutput option:selected").val();
     let size = $("#slSize option:selected").val();
     let color_mode = $("#slColorMode option:selected").val();
-    let is_align = $("#ckbAlign").is("checked") ? true : false;
+    let is_align = $("#ckbAlign").is(":checked") ? true : false;
+
     let align_note = $("#txtAlign").val().trim();
     let cloud = $("#slCloud option:selected").val();
     let national_style = $("#slNationalStyle option:selected").val();
-    let style_note = $("#txtStyleNote").val().trim();
+    let remark = $("#txtRemark").val().trim();
 
-    let has_TV = $("#ckbTV").is("checked") ? true : false;
+    let has_TV = $("#ckbTV").is(":checked") ? true : false;
     let TV_note = $("#txtTV").val().trim();
-    let has_grass = $("#ckbGrass").is("checked") ? true : false;
+    let has_grass = $("#ckbGrass").is(":checked") ? true : false;
     let grass_note = $("#txtGrass").val().trim();
-    let has_sky = $("#ckbSky").is("checked") ? true : false;
+    let has_sky = $("#ckbSky").is(":checked") ? true : false;
     let sky_note = $("#txtSky").val().trim();
-    let has_fire = $("#ckbFire").is("checked") ? true : false;
+    let has_fire = $("#ckbFire").is(":checked") ? true : false;
     let fire_note = $("#txtFire").val().trim();
 
     let levels = [];
@@ -99,7 +100,7 @@
         align_note,
         cloud,
         national_style,
-        style_note,
+        remark,
         has_TV,
         TV_note,
         has_grass,

@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const Size = require('../../models/skill-model');
+const Size = require('../../models/size-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 router.delete('/', authenticateAdminToken, (req, res) => {
