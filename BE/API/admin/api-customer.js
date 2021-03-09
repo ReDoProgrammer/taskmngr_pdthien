@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Customer = require("../../models/customer-model");
+const CustomerLevel = require('../../models/customer-level-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 require("dotenv").config();
 
@@ -77,7 +78,6 @@ router.get("/detail", authenticateAdminToken, (req, res) => {
       });
     }
     if (customer) {
-      console.log(customer);
       return res.status(200).json({
         msg: "Get customer detail successfully!",
         customer: customer,
@@ -99,6 +99,8 @@ router.post("/", authenticateAdminToken, (req, res) => {
     phone,
     email,
     address,
+    local_storage,
+    cloud_storage,
     output,
     size,
     color_mode,
@@ -145,6 +147,8 @@ router.post("/", authenticateAdminToken, (req, res) => {
             phone,
             email,
             address,
+            local_storage,
+            cloud_storage,
             output,
             size,
             color_mode,
@@ -160,14 +164,15 @@ router.post("/", authenticateAdminToken, (req, res) => {
             has_sky,
             sky_note,
             has_fire,
-            fire_note,
-            levels,
+            fire_note          
           });         
 
           customer
             .save()
             .then((customer) => {
-              console.log(customer);
+              levels.forEach(cl=>{
+                console.log(cl);
+              })
               return res.status(201).json({
                 msg: "Customer has been created successfully!",
                 customer: customer,
@@ -227,5 +232,18 @@ router.put("/", authenticateAdminToken, (req, res) => {
     }
   );
 });
+
+var insert_levels = (levels,customerId)=> {
+  return new Promise(async (resolve,reject)=>{
+    await levels.forEach(async level=>{
+      let cl = await new CustomerLevel({
+        customer:customerId,
+        level:level.id,
+        price:level.price
+      })
+      cl.save();      
+    })
+  })
+}
 
 module.exports = router;

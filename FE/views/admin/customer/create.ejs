@@ -52,6 +52,9 @@
    
     let address = $("#txtAddress").val().trim();
 
+    let local_storage = $('#txtLocalStorage').val().trim();
+    let cloud_storage = $('#txtCloudStorage').val().trim();
+
     let output = $("#slOutput option:selected").val();
     let size = $("#slSize option:selected").val();
     let color_mode = $("#slColorMode option:selected").val();
@@ -93,6 +96,8 @@
         password,
         phone, 
         address,
+        local_storage,
+        cloud_storage,
         output,
         size,
         color_mode,

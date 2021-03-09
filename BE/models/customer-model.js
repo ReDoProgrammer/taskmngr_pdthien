@@ -22,6 +22,14 @@ const customerSchema = new Schema({
     address:{
         type:String
     },
+    local_storage:{
+        type:String,
+        default:''
+    },    
+    cloud_storage:{
+        type:String,
+        default:''
+    },    
     output:{
         type:Schema.Types.ObjectId,
         ref:'file_format'
@@ -85,11 +93,7 @@ const customerSchema = new Schema({
     fire_note:{
         type:String,
         default:''
-    },
-    levels:{
-        type:Array
-    }
-    
+    }    
 });
 
 
