@@ -120,6 +120,26 @@ router.post("/", authenticateAdminToken, (req, res) => {
     levels,
   } = req.body;
 
+  //rang buoc du lieu
+  if(firstname.trim().length == 0 && lastname.trim().length == 0){
+    return res.status(403).json({
+      msg:'Firstname and last name can not be empty'
+    });
+  }
+
+  if(email.trim().length == 0){
+    return res.status(403).json({
+      msg:'Email can not be empty'
+    })
+  }
+
+  if(password.trim().length == 0){
+    return res.status(403).json({
+      msg:'Password can blank!'
+    })
+  }
+
+
   if (typeof levels == 'undefined' || levels.length == 0) {
     return res.status(403).json({
       msg: "Level list can not be empty!",
@@ -239,31 +259,22 @@ router.put("/", authenticateAdminToken, (req, res) => {
 
 var insert_levels = (levels,customerId)=> {
   return new Promise(async (resolve,reject)=>{
-    let is_ok = true;
-    let error = null;
-    await levels.forEach(async level=>{
-      let cl = await new CustomerLevel({
-        customer:customerId,
-        level:level.id,
-        price:level.price
-      })
-      cl.save()
-      .then(x=>{
-        console.log(x);
-      })      
-      .catch(err=>{
-        is_ok = false;
-        error = err;
-      })
+    let customer_levels = levels.map(level=>{
+      var obj = {};
+      obj['customer'] = customerId;
+      obj['level'] = level.id;
+      obj['price'] = level.price;
+      return obj;
+    });
+    CustomerLevel.insertMany(customer_levels,(err,cls)=>{
+      if(err){
+        return reject({
+          msg:'Insert customer levels failed',
+          error:new Error(err.message)
+        })
+      }
+      return resolve(cls);
     })
-
-    if(is_ok){
-      return resolve('insert levels successfully');
-    }else{
-      return reject({
-        error: new Error(error)
-      })
-    }
   })
 }
 
