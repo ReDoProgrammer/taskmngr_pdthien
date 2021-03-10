@@ -21,6 +21,8 @@ const customerLevelModel = new Schema({
     
 });
 
+customerLevelModel.index({ customer: 1, level: 1 }, { unique: true });
+
 
 module.exports = mongoose.model('customer_level',customerLevelModel);
 

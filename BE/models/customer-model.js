@@ -93,7 +93,11 @@ const customerSchema = new Schema({
     fire_note:{
         type:String,
         default:''
-    }    
+    },
+    levels:[{
+        type:Schema.Types.ObjectId,
+        ref:'customer_level'
+    }]    
 });
 
 

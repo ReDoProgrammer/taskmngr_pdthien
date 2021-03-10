@@ -16,8 +16,11 @@ const levelSchema = new Schema({
     status:{
         type:Boolean,
         default:true
-    }
-
+    },
+    customer:[{
+        type:Schema.Types.ObjectId,
+        ref:'customer_level'
+    }]   
     
 });
 

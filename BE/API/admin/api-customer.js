@@ -170,18 +170,22 @@ router.post("/", authenticateAdminToken, (req, res) => {
           customer
             .save()
             .then((customer) => {
-              levels.forEach(cl=>{
-                console.log(cl);
+              insert_levels(levels,customer)
+              .then(customer=>{
+                return res.status(201).json({
+                  msg:'Insert customer succesfully!',
+                  customer:customer,
+                  url:'/admin/customer'
+                })
               })
-              return res.status(201).json({
-                msg: "Customer has been created successfully!",
-                customer: customer,
-                url:'/admin/customer'
-              });
+              .catch(err=>{
+                return res.status(500).json({
+                  msg:'Insert customer failed',
+                  error: new Error(err.message)
+                })
+              })
             })
-            .catch((err) => {
-                console.log(err);
-        
+            .catch((err) => {        
               return res.status(500).json({
                 msg: "Create new customer failed",
                 error: new Error(err.message),
@@ -235,14 +239,31 @@ router.put("/", authenticateAdminToken, (req, res) => {
 
 var insert_levels = (levels,customerId)=> {
   return new Promise(async (resolve,reject)=>{
+    let is_ok = true;
+    let error = null;
     await levels.forEach(async level=>{
       let cl = await new CustomerLevel({
         customer:customerId,
         level:level.id,
         price:level.price
       })
-      cl.save();      
+      cl.save()
+      .then(x=>{
+        console.log(x);
+      })      
+      .catch(err=>{
+        is_ok = false;
+        error = err;
+      })
     })
+
+    if(is_ok){
+      return resolve('insert levels successfully');
+    }else{
+      return reject({
+        error: new Error(error)
+      })
+    }
   })
 }
 
