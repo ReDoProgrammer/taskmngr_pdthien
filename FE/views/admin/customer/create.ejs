@@ -33,7 +33,6 @@
       alert("email can not be blank");
       return;
     }
-   
 
     let password = $("#txtPassword").val();
     let confirmpassword = $("#txtConfirmPassword").val();
@@ -49,11 +48,11 @@
     }
 
     let phone = $("#txtPhone").val().trim();
-   
+
     let address = $("#txtAddress").val().trim();
 
-    let local_storage = $('#txtLocalStorage').val().trim();
-    let cloud_storage = $('#txtCloudStorage').val().trim();
+    let local_storage = $("#txtLocalStorage").val().trim();
+    let cloud_storage = $("#txtCloudStorage").val().trim();
 
     let output = $("#slOutput option:selected").val();
     let size = $("#slSize option:selected").val();
@@ -87,14 +86,14 @@
       url: "/admin/customer",
       type: "post",
       headers: {
-                    authorization: "Bearer " + localStorage.getItem('accessToken'),
-                },
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
       data: {
         firstname,
         lastname,
         email,
         password,
-        phone, 
+        phone,
         address,
         local_storage,
         cloud_storage,
@@ -118,13 +117,18 @@
       },
       success: function (data, textStatus, xhr) {
         alert(data.msg);
-        $(location).attr('href',data.url);
+        $(location).attr("href", data.url);
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        alert(jqXHR.responseJSON.msg+'. '+jqXHR.responseJSON.error);
+        alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
         console.log(jqXHR.responseJSON.error);
-        
       },
     });
+  });
+
+  //delete level
+  $(document).on("click", "button[name='delete']", function () {
+    levelId = $(this).closest("tr").attr("id");
+    $("#" + levelId).remove();
   });
 </script>
