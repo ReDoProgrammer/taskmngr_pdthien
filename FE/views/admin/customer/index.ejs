@@ -160,13 +160,12 @@
               //binding levels list
               $('#tblLevelList').empty();
               let rIdx = 1;
-              data.customer.levels.forEach(level => {
+              data.customer.levels.forEach(item => {
                 let tr = '<tr>';
-                tr += '<th scope="row">'+(rIdx++)+'</th>';
-                tr += ' <td>'+level.id+'</td>';
-                tr += ' <td>'+level.price+'</td>';
-                tr += ' </tr>';
-                $('#tblLevelList').append(tr);
+                  tr+='<td>'+(rIdx++)+'</td>';
+                  tr+= '<td class="font-italic text-info">'+item.level.name+'</td>';
+                  tr+= '<td class="text-center font-weight-bold text-warning">'+item.price+'</td>';
+                  $('#tblLevelList').append(tr);
               })
 
 

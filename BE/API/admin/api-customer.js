@@ -64,20 +64,23 @@ router.get("/list", (req, res) => {
 router.get("/detail", authenticateAdminToken, (req, res) => {
   let { customerId } = req.query;
   Customer.findById(customerId) 
+  .populate({
+    path:'levels',
+    populate:{path:'level'}
+    })
   .populate('output','name')
   .populate('size','name')
   .populate('color_mode','name')
   .populate('cloud','name')
   .populate('national_style','name')
   .exec((err,customer)=> {
-    if (err) {
-      console.log(err);
+    if (err) {     
       return res.status(500).json({
         msg: "Can not get customer detail",
         error: new Error(err.message),
       });
     }
-    if (customer) {
+    if (customer) {   
       return res.status(200).json({
         msg: "Get customer detail successfully!",
         customer: customer,
@@ -266,14 +269,29 @@ var insert_levels = (levels,customerId)=> {
       obj['price'] = level.price;
       return obj;
     });
-    CustomerLevel.insertMany(customer_levels,(err,cls)=>{
+
+    CustomerLevel.insertMany(customer_levels,async (err,cls)=>{
       if(err){
         return reject({
           msg:'Insert customer levels failed',
           error:new Error(err.message)
         })
       }
-      return resolve(cls);
+
+      clIds = await cls.map(lv=>{
+        return lv._id;
+      });
+      Customer.findOneAndUpdate({_id:customerId},{
+         $push: { levels: clIds } 
+      },(err,customer)=>{
+        if(err){
+          return reject({
+            msg:'Can not push customer levels',
+            error:new Error(err)
+          });
+        }
+        return resolve(customer);
+      })
     })
   })
 }
