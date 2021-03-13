@@ -39,6 +39,7 @@ const adminFileFormatController = require("./BE/controllers/Admin/file-format-co
 const adminHomeController = require("./BE/controllers/Admin/home-controller");
 
 const adminLevelController = require("./BE/controllers/Admin/level-controller");
+const adminLocalLevelController = require("./BE/controllers/Admin/local-level-controller");
 
 const adminNationalStyleController = require('./BE/controllers/Admin/national-style-controller');
 const adminSizeController = require('./BE/controllers/Admin/size-controller');
@@ -46,6 +47,7 @@ const adminSkillController = require("./BE/controllers/Admin/skill-controller");
 const adminStatusController = require("./BE/controllers/Admin/status-controller");
 const adminStaffController = require("./BE/controllers/Admin/staff-controller");
 const adminUserGroupController = require('./BE/controllers/Admin/user-group-controller');
+const adminUserTypeController = require('./BE/controllers/Admin/user-type-controller');
 
 
 //common controllers
@@ -62,6 +64,7 @@ const apiAdminColorMode = require('./BE/API/admin/api-color-mode');
 const apiAdminCustomer = require('./BE/API/admin/api-customer');
 const apiAdminFileFormat = require('./BE/API/admin/api-file-format');
 const apiAdminLevel = require('./BE/API/admin/api-level');
+const apiAdminLocalLevel = require('./BE/API/admin/api-local-level');
 const apiAdminNationalStyle = require('./BE/API/admin/api-national-style');
 const apiAdminSize = require('./BE/API/admin/api-size');
 const apiAdminSkill = require('./BE/API/admin/api-skill');
@@ -69,6 +72,7 @@ const apiAdminUser = require('./BE/API/admin/api-user');
 const apiAdminStatus = require('./BE/API/admin/api-status');
 const apiAdminStyle = require('./BE/API/admin/api-style');
 const apiAdminUserGroup = require('./BE/API/admin/api-user-group');
+const apiAdminUserType = require('./BE/API/admin/api-user-type');
 
 /**
  * API CONTROLLERS
@@ -87,6 +91,7 @@ app.use('/admin/color-mode',apiAdminColorMode);
 app.use('/admin/customer',apiAdminCustomer);
 app.use('/admin/file-format',apiAdminFileFormat);
 app.use('/admin/level',apiAdminLevel);
+app.use('/admin/local-level',apiAdminLocalLevel);
 app.use('/admin/national-style',apiAdminNationalStyle);
 app.use('/admin/size',apiAdminSize);
 app.use('/admin/skill',apiAdminSkill);
@@ -94,6 +99,7 @@ app.use('/admin/status',apiAdminStatus);
 app.use('/admin/style',apiAdminStyle);
 
 app.use('/admin/user-group',apiAdminUserGroup);
+app.use('/admin/user-type',apiAdminUserType);
 
 
 
@@ -112,12 +118,14 @@ app.use('/admin/setting/color-mode',adminColorModeController);
 app.use('/admin/setting/cloud',adminCloudController);
 app.use("/admin/setting/file-format", adminFileFormatController);
 app.use("/admin/setting/level", adminLevelController);
+app.use("/admin/setting/local-level", adminLocalLevelController);
 app.use('/admin/setting/national-style',adminNationalStyleController);
 app.use("/admin/setting/size", adminSizeController);
 app.use("/admin/setting/status", adminStatusController);
 app.use("/admin/setting/style", adminStyleController);
 app.use("/admin/setting/skill", adminSkillController);
 app.use('/admin/setting/user-group',adminUserGroupController);
+app.use('/admin/setting/user-type',adminUserTypeController);
 
 
 app.use("/admin/staff", adminStaffController);

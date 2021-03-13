@@ -8,6 +8,10 @@ const jwt = require("jsonwebtoken");
 
 let refershTokens = [];
 
+router.post('',authenticateAdminToken,(req,res)=>{
+  let {group,fullname,username,password,idno,phone,address,is_active,is_editor,is_qa} = req.body;
+  console.log({group,fullname,username,password,idno,phone,address,is_active,is_editor,is_qa});
+})
 
 
 

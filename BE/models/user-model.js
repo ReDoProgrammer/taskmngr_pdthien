@@ -15,6 +15,18 @@ const UserSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "user_group",
   },
+  bank:{
+    type:String,
+    default:''
+  },
+  bank_no:{
+    type:String,
+    default:''
+  },
+  bank_name:{
+    type:String,
+    default:''
+  }
 });
 
 UserSchema.pre("save", function (next) {

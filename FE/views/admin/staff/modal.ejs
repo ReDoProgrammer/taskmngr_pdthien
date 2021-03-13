@@ -1,97 +1,262 @@
-<div class="modal fade" id="modalStaff" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Staff modal</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+<div
+  class="modal fade"
+  id="modalStaff"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Staff modal</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label for="recipient-name" class="col-form-label">Group:</label>
+              <select name="" id="usergroup" class="form-control">
+                <option value="">Employee</option>
+              </select>
             </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="recipient-name" class="col-form-label">Group:</label>
-                            <select name="" id="" class="form-control">
-                                <option value="">Employee</option>
-                                <option value="">Freelancer</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-8">
-                            <label for="recipient-name" class="col-form-label">Fullname:</label>
-                            <input type="text" class="form-control" id="recipient-name">
-                        </div>
-                        
-                    </div>
-
-
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="recipient-name" class="col-form-label">Username:</label>
-                            <input type="text" class="form-control" id="recipient-name">
-                        </div>
-
-                        <div class="form-group col-md-4">
-                            <label for="recipient-name" class="col-form-label">Password:</label>
-                            <input type="password" class="form-control" id="recipient-name">
-                        </div>
-
-                        <div class="form-group col-md-4">
-                            <label for="recipient-name" class="col-form-label">Confirm Password:</label>
-                            <input type="password" class="form-control" id="recipient-name">
-                        </div>
-
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group col-md-2">
-                            <label for="recipient-name" class="col-form-label">ID Card:</label>
-                            <input type="text" class="form-control" id="recipient-name">
-                        </div>
-                        <div class="form-group col-md-2">
-                            <label for="recipient-name" class="col-form-label">Phone:</label>
-                            <input type="text" class="form-control" id="recipient-name">
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="recipient-name" class="col-form-label">Address:</label>
-                            <input type="text" class="form-control" id="recipient-name">
-                        </div>
-                        <div class="form-group col-md-2">
-                            <label for="recipient-name" class="col-form-label">Status:</label>
-                            <div class="form-group form-check mt-1">
-                                <input type="checkbox" class="form-check-input" id="exampleCheck1" checked>
-                                <label class="form-check-label" for="exampleCheck1">Active</label>
-                            </div>
-                        </div>
-                    </div>
-
-      
-
-                    <div class="form-row">
-
-                        <label for="recipient-name" class="col-form-label col-md-2">Skills:</label>
-
-
-                        <div class="form-check form-check-inline col-md-3">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
-                            <label class="form-check-label" for="inlineCheckbox1">Editor</label>
-                        </div>
-                        <div class="form-check form-check-inline col-md-3">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
-                            <label class="form-check-label" for="inlineCheckbox2">Q.A</label>
-                        </div>
-
-                    </div>
-
-
-
-
-                </form>
+            <div class="form-group col-md-4">
+              <label for="recipient-name" class="col-form-label">Type:</label>
+              <select name="" id="usertype" class="form-control"></select>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Send message</button>
+            <div class="form-group col-md-4">
+              <label for="recipient-name" class="col-form-label"
+                >Fullname:</label
+              >
+              <input type="text" class="form-control" id="fullname" />
             </div>
-        </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label for="recipient-name" class="col-form-label"
+                >Username:</label
+              >
+              <input type="text" class="form-control" id="username" />
+            </div>
+
+            <div class="form-group col-md-4">
+              <label for="recipient-name" class="col-form-label"
+                >Password:</label
+              >
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                value="123"
+              />
+            </div>
+
+            <div class="form-group col-md-4">
+              <label for="recipient-name" class="col-form-label"
+                >Confirm Password:</label
+              >
+              <input
+                type="password"
+                class="form-control"
+                id="confirmpassword"
+                value="123"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-2">
+              <label for="recipient-name" class="col-form-label"
+                >ID Card:</label
+              >
+              <input type="text" class="form-control" id="idno" />
+            </div>
+            <div class="form-group col-md-2">
+              <label for="recipient-name" class="col-form-label">Phone:</label>
+              <input type="text" class="form-control" id="phone" />
+            </div>
+            <div class="form-group col-md-6">
+              <label for="recipient-name" class="col-form-label"
+                >Address:</label
+              >
+              <input type="text" class="form-control" id="address" />
+            </div>
+            <div class="form-group col-md-2">
+              <label for="recipient-name" class="col-form-label">Status:</label>
+              <div class="form-group form-check mt-1">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  id="is_active"
+                  checked
+                />
+                <label class="form-check-label" for="exampleCheck1"
+                  >Active</label
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label for="recipient-name" class="col-form-label">Bank:</label>
+              <input type="text" class="form-control" id="bank" />
+            </div>
+            <div class="form-group col-md-4">
+              <label for="recipient-name" class="col-form-label"
+                >Account Number:</label
+              >
+              <input type="text" class="form-control" id="account_number" />
+            </div>
+            <div class="form-group col-md-4">
+              <label for="recipient-name" class="col-form-label"
+                >Account holder:</label
+              >
+              <input type="text" class="form-control" id="account_holder" />
+            </div>
+          </div>
+
+          <div class="card text-white bg-secondary mb-3">
+            <div class="card-header">Skill</div>
+            <div class="card-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Skill</th>
+                    <th scope="col">Description</th>                    
+                  </tr>
+                </thead>
+                <tbody id="tblSkill"></tbody>
+              </table>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+        <button type="button" class="btn btn-primary" id="btnSubmit">
+          Submit
+        </button>
+      </div>
     </div>
+  </div>
 </div>
+
+<script>
+  $("#btnSubmit").click(function () {});
+
+  $(document).ready(function () {
+    LoadUserGroup();
+    LoadUserType();
+    LoadSkill();
+  });
+
+  $("#fullname").keyup(function () {
+    $("#username").val(GenerateUsername($("#fullname").val()));
+  });
+
+  function LoadUserType() {
+    $("#usertype").empty();
+    $.ajax({
+      url: "/admin/user-type/list",
+      type: "get",
+      data: {},
+      success: function (data, textStatus, xhr) {
+        let idx = 1;
+        data.uts.forEach((ut) => {
+          let opt = '<option value="' + ut._id + '">' + ut.name + "</option>";
+          $("#usertype").append(opt);
+        });
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      },
+    });
+  }
+
+  function LoadUserGroup() {
+    $("#usergroup").empty();
+    $.ajax({
+      url: "/admin/user-group",
+      type: "get",
+      data: {},
+      success: function (data, textStatus, xhr) {
+        let idx = 1;
+        data.ugs.forEach((ug) => {
+          let opt = '<option value="' + ug._id + '">' + ug.name + "</option>";
+          $("#usergroup").append(opt);
+        });
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      },
+    });
+  }
+
+  function LoadSkill() {
+    $.ajax({
+      url: "/admin/skill",
+      type: "get",
+      success: function (data, textStatus, xhr) {
+        let idx = 1;
+        $("#tblSkill").empty();
+        data.skills.forEach((skill) => {
+          let tr = "  <tr>";
+          tr += '        <th scope="row">1</th>';
+          tr += "       <td><input";
+          tr += '          type="checkbox"';
+          tr += '         class="form-check-input"';
+          tr += '        id="is_active"';
+          tr += "      checked";
+          tr += "   />";
+          tr += '  <label class="form-check-label" for="exampleCheck1"';
+          tr += "   >Active</label";
+          tr += " ></td>";
+          tr += "<td></td>";
+          tr += " <td>@mdo</td>";
+          tr += "</tr>      ";
+          $("#tblSkill").append(tr);
+        });
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      },
+    });
+  }
+
+  function GenerateUsername(fullname) {
+    shortkeys = fullname.split(" ");
+    username = shortkeys.pop();
+    for (i = 0; i < shortkeys.length; i++) {
+      username += shortkeys[i].substring(0, 1);
+    }
+
+    return username
+      .toLowerCase()
+      .trim() //đưa hết về kiểu chữ thường và loại bỏ khoảng trống thừa đầu và cuối của chuỗi
+      .replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a")
+      .replace(/\ /g, "-")
+      .replace(/đ/g, "d")
+      .replace(/đ/g, "d")
+      .replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y")
+      .replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u")
+      .replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ.+/g, "o")
+      .replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ.+/g, "e")
+      .replace(/ì|í|ị|ỉ|ĩ/g, "i")
+      .replace(/\s+/g, "-") // thay thế khoảng trắng bằng dấu -
+      .replace(/&/g, "-va-") // thay thế kí tự & bằng -va-
+      .replace(/[^\w\-]+/g, "") // loại bỏ các khoảng trắng thừa
+      .replace(/\-\-+/g, "-"); // thay thế các kí tự - liên tục bằng 1 kí tự -;
+  }
+</script>

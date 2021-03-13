@@ -68,6 +68,11 @@
           LoadCustomer(customerId);
         });
 
+        $(document).on("click", "button[name='update']", function () {
+          
+        });
+
+
         function LoadCustomer(customerId) {
           $.ajax({
             url: "/admin/customer/detail",
