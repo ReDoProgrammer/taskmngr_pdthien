@@ -1,0 +1,140 @@
+<div class="row">
+  <div class="col-md-9">
+    <nav aria-label="Page navigation example" class="mt-2">
+      <ul class="pagination" id="pagination"></ul>
+    </nav>
+  </div>
+  <div class="col-md-3 text-right">
+    <!-- Another variation with a button -->
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="Search this blog" />
+      <div class="input-group-append">
+        <button class="btn btn-secondary" type="button">
+          <i class="fa fa-search"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Customer</th>
+      <th scope="col">Phone</th>
+      <th scope="col">Email</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody id="tblData">
+    <tr>
+      <th scope="row">1</th>
+      <td>Mark</td>
+      <td>Otto</td>
+      <td>@mdo</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+<%-include('modal')%>
+
+<script>
+  var search = "";
+  var page = 1;
+  var customerId = "";
+
+  $(document).ready(function () {
+    LoadCustomers();
+  });
+
+  function LoadCustomers() {
+    $.ajax({
+      url: "/sale/customer/list",
+      type: "get",
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        search,
+        page,
+      },
+      success: function (data, textStatus, xhr) {
+        $("#tblData").empty();
+        // $("#pagination").empty();
+        let idx = 1;
+        data.result.forEach((customer) => {
+          let tr = "  <tr id='" + customer._id + "'>";
+          tr += '<th scope="row">' + idx++ + "</th>";
+          tr +=
+            " <td>" + customer.firstname + " " + customer.lastname + "</td>";
+          tr += "<td>" + customer.phone + "</td>";
+          tr += "<td>" + customer.email + "</td>";
+
+          tr += "<td class='text-right'>";
+          tr +=
+            '<button class="btn btn-sm btn-info" name="add_job"><i class="fa fa-plus mr-1" aria-hidden="true"></i>Add new job</button>';
+          tr += "</td>";
+          $("#tblData").append(tr);
+        });
+
+        for (let i = 1; i <= data.pages; i++) {
+          let li =
+            '<li class="page-item"><a class="page-link" href="#">' +
+            i +
+            "</a></li>";
+          $("#pagination").append(li);
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
+      },
+    });
+  }
+
+  $(document).on("click", "button[name='add_job']", function () {
+    customerId = $(this).closest("tr").attr("id");
+    $.ajax({
+      url: "/sale/customer/detail",
+      type: "get",
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        customerId,
+      },
+      success: function (data, textStatus, xhr) {
+        $("#customer_fullname").text(
+          data.customer.firstname + " " + data.customer.lastname
+        );
+        $("#customer_phone").text(data.customer.phone);
+        $("#customer_email").text(data.customer.email);
+        $("#customer_address").text(data.customer.address);
+        $("#customer_cloud").text(data.customer.cloud.name);
+
+        $("#receive_date").datetimepicker({
+          format: "DD/MM/YYYY HH:mm",
+          pickDate: false,
+          pickSeconds: false,
+          pick12HourFormat: false,
+        });
+
+        $("#deadline").datetimepicker({
+          format: "DD/MM/YYYY HH:mm",
+          pickDate: false,
+          pickSeconds: false,
+          pick12HourFormat: false,
+        });
+        $("#receive_date").val("");
+        $("#txtDeadline").val("");
+        $("#txtSourceLink").val("");
+        $("#txaIntruction").val("");
+        $("#modalJob").modal();
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
+      },
+    });
+  });
+</script>

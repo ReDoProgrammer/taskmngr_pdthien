@@ -1,8 +1,9 @@
 const router = require('express').Router();
 
+
 router.get('/',(req,res)=>{
-    res.render('home/index',{
-        layout:'layouts/tla-layout'
+    res.render('sale/home/index',{
+        layout:'layouts/sale-layout'
     });
 })
 

@@ -16,7 +16,10 @@
       crossorigin="anonymous"
     />
 
-    <title>Hello, world!</title>
+     <!--font awesome-->
+     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+    <title>TLA Dashboard</title>
   </head>
   <body>
     <script
@@ -32,12 +35,12 @@
 
     <div class="container mt-10">
       <div class="container">
-        <%- include('child/navbar') %>
+        <%- include('child/TLA/navbar') %>
 
         <div class="card">
           <div class="card-header">Header</div>
           <div class="card-body" style="min-height: 600px"><%- body %></div>
-          <div class="card-footer"><%- include('child/footer') %></div>
+          <div class="card-footer"><%- include('child/TLA/footer') %></div>
         </div>
       </div>
     </div>

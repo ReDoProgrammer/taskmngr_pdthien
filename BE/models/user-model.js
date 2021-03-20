@@ -11,10 +11,6 @@ const UserSchema = new Schema({
   phone: { type: String, required:true },
   email: { type: String, require: true },
   address: { type: String, default: "" },
-  group: {
-    type: Schema.Types.ObjectId,
-    ref: "user_group",
-  },
   bank:{
     type:String,
     default:''
@@ -26,6 +22,30 @@ const UserSchema = new Schema({
   bank_name:{
     type:String,
     default:''
+  },
+  is_admin:{
+    type:Boolean,
+    default:false
+  },
+  is_tla:{
+    type:Boolean,
+    default:false
+  },
+  is_accountant:{
+    type:Boolean,
+    default:false
+  },
+  is_sale:{
+    type:Boolean,
+    default:false
+  },
+  is_staff:{
+    type:Boolean,
+    default:true
+  },
+  is_employee:{
+    type:Boolean,
+    default:true
   }
 });
 

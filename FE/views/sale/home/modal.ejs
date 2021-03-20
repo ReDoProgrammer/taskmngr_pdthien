@@ -1,0 +1,178 @@
+<div class="modal" tabindex="-1" id="modalJob">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create new job</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="card text-white bg-secondary mb-3">
+          <div class="card-header">Customer summary</div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-2">Customer:</div>
+              <div class="col-md-4">
+                <label
+                  id="customer_fullname"
+                  class="font-weight-bold text-warning"
+                ></label>
+              </div>
+              <div class="col-md-2">Phone:</div>
+              <div class="col-md-4">
+                <label
+                  id="customer_phone"
+                  class="font-weight-bold text-warning"
+                ></label>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-2">
+                <label for="">Email:</label>
+              </div>
+              <div class="col-md-4">
+                <label
+                  id="customer_email"
+                  class="font-weight-bold text-warning"
+                ></label>
+              </div>
+              <div class="col-md-2">
+                <label for="">Address:</label>
+              </div>
+              <div class="col-md-4">
+                <label
+                  id="customer_address"
+                  class="font-weight-bold text-warning"
+                ></label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-12">
+            <label for="">Source link</label>
+            <input
+              type="text"
+              name="txtSourceLink"
+              id="txtSourceLink"
+              class="form-control"
+              placeholder="Source link"
+            />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="offset-md-4 col-md-4">
+            <div class="form-group">
+              <label for="">Receive date</label>
+
+              <div class="input-group date" data-target-input="nearest">
+                <input
+                  type="text"
+                  class="form-control datetimepicker-input"
+                  data-target="#receive_date"
+                  id="receive_date"
+                />
+                <div
+                  class="input-group-append"
+                  data-target="#receive_date"
+                  data-toggle="datetimepicker"
+                >
+                  <div class="input-group-text">
+                    <i class="fa fa-calendar"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="">Deadline</label>
+              <div
+                class="input-group date"
+                id="deadline"
+                data-target-input="nearest"
+              >
+                <input
+                  type="text"
+                  class="form-control datetimepicker-input"
+                  data-target="#deadline"
+                  id="txtDeadline"
+                />
+                <div
+                  class="input-group-append"
+                  data-target="#deadline"
+                  data-toggle="datetimepicker"
+                >
+                  <div class="input-group-text">
+                    <i class="fa fa-calendar"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="txaIntruction">Intruction</label>
+              <textarea
+                class="form-control"
+                id="txaIntruction"
+                rows="3"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+        <button type="button" class="btn btn-primary" id="btnSubmit">
+          Save changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+
+  $("#btnSubmit").click(function () {
+    let source_link = $("#txtSourceLink").val();
+    let receive_date = $("#receive_date").val();
+    let deadline = $("#txtDeadline").val();
+    let intruction = $("#txaIntruction").val();
+    
+    $.ajax({
+        url:'/sale/job',
+        type:'post',
+        headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        customerId,
+        source_link,
+        receive_date,
+        deadline,
+        intruction
+      },
+      success: function (data, textStatus, xhr) {
+         alert(data.msg);
+         $('#modalJob').modal('hide');
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      },
+    })
+  });
+</script>

@@ -5,18 +5,31 @@ const Schema = mongoose.Schema;
 
 
 const jobSchema = new Schema({
-    name:{
-        type:String,
-        required:true
-    },
-    description:{
-        type:String        
-    },
-    is_input:{
-        type:Boolean,
-        default:true
-    }  
-    
+   customer:{
+       type:Schema.Types.ObjectId,
+       ref:'customer'
+   },
+   source_link:{
+       type:String,
+       require:[true,'Source link can not be blank']
+   },
+   receive_date:{
+       type:Date,
+       require:true
+   },
+   deadline:{
+       type:Date,
+       require:true
+   },
+   intruction:{
+       type:String,
+       default:''
+   },
+   status:{
+       type:Number,
+       default:-1
+   }
+
 });
 
 

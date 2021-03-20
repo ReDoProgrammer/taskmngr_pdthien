@@ -50,6 +50,26 @@ const adminUserGroupController = require('./BE/controllers/Admin/user-group-cont
 const adminUserTypeController = require('./BE/controllers/Admin/user-type-controller');
 
 
+/*
+
+define sale controllers
+
+*/
+const saleHomeController = require('./BE/controllers/Sale/sale-home-controller');
+const saleJobController = require('./BE/controllers/Sale/sale-job-controller');
+
+
+/*
+
+  TLA Controllers
+
+*/
+
+const TLAHomeController = require('./BE/controllers/TLA/home-controller');
+
+
+
+
 //common controllers
 const commonAccountController = require("./BE/controllers/common/account-controller");
 
@@ -71,15 +91,22 @@ const apiAdminSkill = require('./BE/API/admin/api-skill');
 const apiAdminUser = require('./BE/API/admin/api-user');
 const apiAdminStatus = require('./BE/API/admin/api-status');
 const apiAdminStyle = require('./BE/API/admin/api-style');
-const apiAdminUserGroup = require('./BE/API/admin/api-user-group');
 const apiAdminUserType = require('./BE/API/admin/api-user-type');
 
-/**
- * API CONTROLLERS
- * COMMON
- */
-const apiUser = require("./BE/API/common/api-user");
-const apiUserGroup = require("./BE/API/common/api-user-group");
+
+/*
+  SALE API CONTROLLERS
+*/
+const apiSaleCustomer = require('./BE/API/Sale/api-sale-customer');
+const apiSaleJob = require('./BE/API/Sale/api-sale-job');
+
+
+/*
+  TLA API CONTROLLERS
+*/
+const TLAAuth = require('./BE/API/TLA/api-auth');
+
+
 
 /**
  * USING API
@@ -97,8 +124,6 @@ app.use('/admin/size',apiAdminSize);
 app.use('/admin/skill',apiAdminSkill);
 app.use('/admin/status',apiAdminStatus);
 app.use('/admin/style',apiAdminStyle);
-
-app.use('/admin/user-group',apiAdminUserGroup);
 app.use('/admin/user-type',apiAdminUserType);
 
 
@@ -129,6 +154,26 @@ app.use('/admin/setting/user-type',adminUserTypeController);
 
 
 app.use("/admin/staff", adminStaffController);
+
+
+//using sale controllers
+app.use('/sale',saleHomeController);
+app.use('/sale/customer',apiSaleCustomer);
+app.use('/sale/job',saleJobController);
+
+//using sale api controllers 
+app.use('/sale/job',apiSaleJob);
+
+
+//using TLA Controllers 
+
+app.use('/tla',TLAHomeController);
+
+
+//using TLA API 
+app.use('/tla/auth',TLAAuth);
+
+
 
 //using common controllers
 app.use("/account", commonAccountController);
