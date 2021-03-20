@@ -9,6 +9,10 @@ const jobSchema = new Schema({
        type:Schema.Types.ObjectId,
        ref:'customer'
    },
+   name:{
+    type:String,
+    default:''
+   },
    source_link:{
        type:String,
        require:[true,'Source link can not be blank']

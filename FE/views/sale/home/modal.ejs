@@ -56,6 +56,18 @@
           </div>
         </div>
         <div class="form-row">
+            <div class="form-group col-md-12">
+              <label for="">Job name</label>
+              <input
+                type="text"
+                name="txtJobName"
+                id="txtJobName"
+                class="form-control"
+                placeholder="Job name"
+              />
+            </div>
+          </div>
+        <div class="form-row">
           <div class="form-group col-md-12">
             <label for="">Source link</label>
             <input
@@ -148,6 +160,7 @@
 
 
   $("#btnSubmit").click(function () {
+    let name = $('#txtJobName').val();
     let source_link = $("#txtSourceLink").val();
     let receive_date = $("#receive_date").val();
     let deadline = $("#txtDeadline").val();
@@ -160,6 +173,7 @@
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       data: {
+        name,
         customerId,
         source_link,
         receive_date,

@@ -2,8 +2,28 @@ const router = require("express").Router();
 const Job = require("../../models/job-model");
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
+router.get("/list", (req, res) => {
+  Job.find({})
+    .populate("customer", "firstname lastname phone email -_id")
+    .exec()
+    .then((jobs) => {
+      console.log(jobs);
+      return res.status(200).json({
+        msg: "load jobs list successfully",
+        jobs: jobs,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        msg: "Can not load jobs list",
+        error: new Error(err.message),
+      });
+    });
+});
+
 router.post("/", (req, res) => {
   let {
+    name,
     customerId,
     source_link,
     receive_date,
@@ -38,11 +58,12 @@ router.post("/", (req, res) => {
         });
       }
       let job = new Job({
+          name,
         customer: customerId,
-        source_link:source_link,
-        receive_date:d1,
-        deadline:d2,
-        intruction:intruction,
+        source_link: source_link,
+        receive_date: d1,
+        deadline: d2,
+        intruction: intruction,
       });
       job
         .save()

@@ -1,9 +1,9 @@
 const router = require('express').Router();
 
 
-router.get('/job',(req,res)=>{
+router.get('/',(req,res)=>{
     res.render('sale/job/index',{
-        layout:'sale-layout'
+        layout:'layouts/sale-layout'
     });
 })
 
