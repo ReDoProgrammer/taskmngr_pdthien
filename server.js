@@ -105,7 +105,7 @@ const apiSaleJob = require('./BE/API/Sale/api-sale-job');
   TLA API CONTROLLERS
 */
 const TLAAuth = require('./BE/API/TLA/api-auth');
-
+const apiTLAJob = require('./BE/API/TLA/api-tla-job');
 
 
 /**
@@ -172,6 +172,7 @@ app.use('/tla',TLAHomeController);
 
 //using TLA API 
 app.use('/tla/auth',TLAAuth);
+app.use('/tla/job',apiTLAJob);
 
 
 
