@@ -25,7 +25,8 @@ router.get('/list',(req,res)=>{
 router.get('/detail',(req,res)=>{
     let {id} = req.query;
     Job.findById(id)
-    .populate('customer','firstname lastname -_id')
+    .populate({path:'customer',populate:({path:'cloud'})})   
+    .populate({path:'customer',populate:({path:'color_mode'})})       
     .exec()
     .then(job=>{
         return res.status(200).json({

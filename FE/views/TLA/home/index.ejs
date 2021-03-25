@@ -1,87 +1,131 @@
 <div class="row">
-    <div class="col-md-12 text-right">
-       <h4 class="text-info">Jobs list</h4>
-    </div>
+  <div class="col-md-12 text-right">
+    <h4 class="text-info">Jobs list</h4>
+  </div>
 </div>
-<div class="row mt-2">  
-    <div class="offset-md-7 col-md-2">
-        <select name="" id="" class="form-control">
-            <option value="">Open</option>
-            <option value="">Processing</option>
-            <option value="">Upload</option>
-            <option value="">Reject</option>
-            <option value="">Cancel</option>
-            <option value="">Done</option>
-        </select>
-    </div>
-  
-    <div class="col-md-3 text-right">
-      <!-- Another variation with a button -->
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search this blog" />
-        <div class="input-group-append">
-          <button class="btn btn-secondary" type="button">
-            <i class="fa fa-search"></i>
-          </button>
-        </div>
+<div class="row mt-2">
+  <div class="offset-md-7 col-md-2">
+    <select name="" id="" class="form-control">
+      <option value="">Open</option>
+      <option value="">Processing</option>
+      <option value="">Upload</option>
+      <option value="">Reject</option>
+      <option value="">Cancel</option>
+      <option value="">Done</option>
+    </select>
+  </div>
+
+  <div class="col-md-3 text-right">
+    <!-- Another variation with a button -->
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="Search this blog" />
+      <div class="input-group-append">
+        <button class="btn btn-secondary" type="button">
+          <i class="fa fa-search"></i>
+        </button>
       </div>
     </div>
   </div>
+</div>
 <table class="table table-dark mt-1">
-    <thead>
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">Customer</th>
-        <th scope="col">Name case</th>
-        <th scope="col">Receive date</th>
-        <th scope="col">Deadline</th>
-        <th scope="col">Status</th>
-      </tr>
-    </thead>
-    <tbody id="tblData">     
-    </tbody>
-  </table>
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Customer</th>
+      <th scope="col">Name case</th>
+      <th scope="col">Receive date</th>
+      <th scope="col">Deadline</th>
+      <th scope="col">Status</th>
+    </tr>
+  </thead>
+  <tbody id="tblData">
+  </tbody>
+</table>
 
-  <script>
-      var search = '';
-      var page = 1;
+<%-include('modal')%>
 
+<script>
+  var search = '';
+  var page = 1;
+  var jobId = '';
 
-      $(document).ready(function(){
-        LoadJob();
-      })
+  $(document).ready(function () {
+    LoadJob();
+  })
 
-      function LoadJob(){
-          $.ajax({
-              url:'/tla/job/list',
-              type:'get',
-              headers: {
-              authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-              search,
-              page
-            },
-            success: function (data, textStatus, xhr) {
-                console.log(data);
-                let idx = 1;
-                data.jobs.forEach(job=>{
-                    let tr = '<tr id = "'+job._id+'">';
-                        tr+= '<td>'+(idx++)+'</td>'
-                        tr+= '<td>'+job.customer.firstname +' '+job.customer.lastname+'</td>';
-                        tr+= '<td><a href = "#">'+job.name+'</a></td>';
-                        tr+= '<td>'+job.receive_date+'</td>';
-                        tr+= '<td>'+job.deadline+'</td>';
-                        tr+= '<td>status</td>';
-                        tr+= '</tr>';
-                        $('#tblData').append(tr);
-                })
-                
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-              alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
-            }
-          })
+  function LoadJob() {
+    $.ajax({
+      url: '/tla/job/list',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        search,
+        page
+      },
+      success: function (data, textStatus, xhr) {
+        let idx = 1;
+        data.jobs.forEach(job => {
+          let tr = '<tr id = "' + job._id + '">';
+          tr += '<td>' + (idx++) + '</td>'
+          tr += '<td>' + job.customer.firstname + ' ' + job.customer.lastname + '</td>';
+          tr += '<td><button name = "job_level" class="btn btn-sm btn-info">' + job.name + '</button></td>';
+          tr += "<td>" + new Date(job.receive_date).toLocaleString() + "</td>";
+          tr += "<td>" + new Date(job.deadline).toLocaleString() + "</td>";
+          tr += '<td>';
+          switch (job.status) {
+            case -1:
+              tr += '<i class="text-info">Initial</i>';
+              break;
+            case 0:
+              tr += '<i class = "text-info">Processing</i>';
+              break;
+            case 1:
+              tr += '<i class = "text-warning">Upload</i>';
+              break;
+            case 2:
+              tr += '<i class = "text-success">Done</i>';
+              break;
+            case -2:
+              tr += '<i class = "text-danger">Rejected</i>';
+              break;
+            case -3:
+              tr += '<i class = "text-danger">Canceled</i>';
+              break;
+          }
+          tr += '</td>';
+          tr += '</tr>';
+          $('#tblData').append(tr);
+        })
 
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
       }
-  </script>
+    })
+  }
+
+
+  $(document).on("click", "button[name='job_level']", function () {
+    jobId = $(this).closest("tr").attr("id");
+    $.ajax({
+      url: '/tla/job/detail',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        id:jobId
+      },
+      success: function (data, textStatus, xhr) {
+        console.log(data.job);
+        $('#modalJobLevel').modal();
+        $('#customer_fullname').text(data.job.customer.firstname+' '+data.job.customer.lastname);
+        $('#name_case').text(data.job.name);
+        $('#customer_remark').text(data.job.customer.remark);
+        $('#job_intruction').text(data.job.intruction);                
+      }
+    })
+  })
+</script>

@@ -1,0 +1,145 @@
+<div class="modal" tabindex="-1" id="modalJobLevel">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Job & level</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="card text-white bg-secondary mb-3">
+                    <div class="card-header font-weight-bold">Summary</div>
+                    <div class="card-body">                      
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="">Name case:</label>
+                            </div>
+                            <div class="col-md-9"><label id="name_case"
+                                    class="text-white font-weight-bold font-italic"></label></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="">Remark:</label>
+                            </div>
+                            <div class="col-md-9">
+                                <label id="customer_remark" class="text-warning"></label>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="">Intruction:</label>
+                            </div>
+                            <div class="col-md-9">
+                                <label id="job_intruction" class="text-warning"></label>
+                            </div>
+                        </div>
+<hr>
+                        <div class="row">
+                            <div class="col-md-3">
+                                Fire:
+                            </div>
+                            <div class="col-md-3" id="customer_fire">
+
+                            </div>
+                            <div class="col-md-3">
+                                Grass:
+                            </div>
+                            <div class="col-md-3" id="customer_grass">
+                                
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                Sky:
+                            </div>
+                            <div class="col-md-3" id="customer_sky">
+
+                            </div>
+                            <div class="col-md-3">
+                                TV:
+                            </div>
+                            <div class="col-md-3" id="customer_tv"></div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                Color mode:
+                            </div>
+                            <div class="col-md-3">
+
+                            </div>
+                            <div class="col-md-3">
+                                Cloud:
+                            </div>
+                            <div class="col-md-3">
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                National style:
+                            </div>
+                            <div class="col-md-3">
+
+                            </div>
+                            <div class="col-md-3">
+                                Output:
+                            </div>
+                            <div class="col-md-3">
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>             
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Close
+                </button>
+                <button type="button" class="btn btn-primary" id="btnSubmit">
+                    Save changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+
+    $("#btnSubmit").click(function () {
+        let name = $('#txtJobName').val();
+        let source_link = $("#txtSourceLink").val();
+        let receive_date = $("#receive_date").val();
+        let deadline = $("#txtDeadline").val();
+        let intruction = $("#txaIntruction").val();
+
+        $.ajax({
+            url: '/sale/job',
+            type: 'post',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                name,
+                customerId,
+                source_link,
+                receive_date,
+                deadline,
+                intruction
+            },
+            success: function (data, textStatus, xhr) {
+                alert(data.msg);
+                $('#modalJob').modal('hide');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+            },
+        })
+    });
+</script>
