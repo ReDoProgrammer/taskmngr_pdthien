@@ -8,6 +8,31 @@
         </button>
       </div>
       <div class="modal-body">
+        <div class="card text-white bg-secondary mb-1">
+          <div class="card-header">Role</div>
+          <div class="card-body">
+            <div class="form-check form-check-inline col-md-2">
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_admin" value="option1">
+              <label class="form-check-label" for="inlineRadio1">Admin</label>
+            </div>
+            <div class="form-check form-check-inline col-md-2">
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_tla" value="option1">
+              <label class="form-check-label" for="inlineRadio1">TLA</label>
+            </div>
+            <div class="form-check form-check-inline col-md-2">
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_sale" value="option1">
+              <label class="form-check-label" for="inlineRadio1">Sale</label>
+            </div>
+            <div class="form-check form-check-inline col-md-2">
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_qc" value="option1">
+              <label class="form-check-label" for="inlineRadio1">QC</label>
+            </div>
+            <div class="form-check form-check-inline col-md-2">
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_accountant" value="option1">
+              <label class="form-check-label" for="inlineRadio1">Accountant</label>
+            </div>
+          </div>
+        </div>
         <div class="card text-white bg-secondary mb-3">
           <div class="card-header">Summary</div>
           <div class="card-body">
@@ -19,39 +44,39 @@
                 </div>
                 <div class="form-group col-md-4">
                   <label for="recipient-name" class="col-form-label">Fullname:</label>
-                  <input type="text" class="form-control" id="fullname" />
+                  <input type="text" class="form-control" id="txtFullname" />
                 </div>
                 <div class="form-group col-md-4">
                   <label for="recipient-name" class="col-form-label">Phone:</label>
-                  <input type="text" class="form-control" id="phone" />
+                  <input type="text" class="form-control" id="txtPhone" />
                 </div>
               </div>
 
               <div class="form-row">
                 <div class="form-group col-md-4">
                   <label for="recipient-name" class="col-form-label">Username:</label>
-                  <input type="text" class="form-control" id="username" />
+                  <input type="text" class="form-control" id="txtUsername" />
                 </div>
 
                 <div class="form-group col-md-4">
                   <label for="recipient-name" class="col-form-label">Password:</label>
-                  <input type="password" class="form-control" id="password" value="123" />
+                  <input type="password" class="form-control" id="txtPassword" value="123" />
                 </div>
 
                 <div class="form-group col-md-4">
                   <label for="recipient-name" class="col-form-label">Confirm Password:</label>
-                  <input type="password" class="form-control" id="confirmpassword" value="123" />
+                  <input type="password" class="form-control" id="txtConfirmPassword" value="123" />
                 </div>
               </div>
 
               <div class="form-row">
                 <div class="form-group col-md-4">
                   <label for="recipient-name" class="col-form-label">ID Card:</label>
-                  <input type="text" class="form-control" id="idno" />
+                  <input type="text" class="form-control" id="txtIDNo" />
                 </div>
                 <div class="form-group col-md-4">
                   <label for="recipient-name" class="col-form-label">Address:</label>
-                  <input type="text" class="form-control" id="address" />
+                  <input type="text" class="form-control" id="txtAddress" />
                 </div>
                 <div class="form-group col-md-4">
                   <label for="recipient-name" class="col-form-label">Status:</label>
@@ -61,52 +86,23 @@
                   </div>
                 </div>
               </div>
-
-              <div class="form-row">
-                <div class="form-group col-md-4">
-                  <label for="recipient-name" class="col-form-label">Bank:</label>
-                  <input type="text" class="form-control" id="bank" />
-                </div>
-                <div class="form-group col-md-4">
-                  <label for="recipient-name" class="col-form-label">Account Number:</label>
-                  <input type="text" class="form-control" id="account_number" />
-                </div>
-                <div class="form-group col-md-4">
-                  <label for="recipient-name" class="col-form-label">Account holder:</label>
-                  <input type="text" class="form-control" id="account_holder" />
-                </div>
-              </div>
               <hr>
-              <div class="card text-white bg-secondary mb-3">
-                <div class="card-header">Role</div>
-                <div class="card-body">
-                  <div class="form-check form-check-inline col-md-2">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"
-                      value="option1">
-                    <label class="form-check-label" for="inlineRadio1">Admin</label>
-                  </div>
-                  <div class="form-check form-check-inline col-md-2">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"
-                      value="option1">
-                    <label class="form-check-label" for="inlineRadio1">TLA</label>
-                  </div>
-                  <div class="form-check form-check-inline col-md-2">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"
-                      value="option1">
-                    <label class="form-check-label" for="inlineRadio1">Sale</label>
-                  </div>
-                  <div class="form-check form-check-inline col-md-2">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"
-                      value="option1">
-                    <label class="form-check-label" for="inlineRadio1">QC</label>
-                  </div>
-                  <div class="form-check form-check-inline col-md-2">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"
-                      value="option1">
-                    <label class="form-check-label" for="inlineRadio1">Accountant</label>
-                  </div>
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="recipient-name" class="col-form-label">Bank:</label>
+                  <select name="" id="slBanks" class="form-control"></select>
+                </div>
+                <div class="form-group col-md-3">
+                  <label for="recipient-name" class="col-form-label">Account Number:</label>
+                  <input type="text" class="form-control" id="txtAccountNumber" />
+                </div>
+                <div class="form-group col-md-3">
+                  <label for="recipient-name" class="col-form-label">Account holder:</label>
+                  <input type="text" class="form-control" id="txtAccountHolder" />
                 </div>
               </div>
+
+
             </form>
           </div>
         </div>
@@ -125,17 +121,73 @@
 </div>
 
 <script>
-  $("#btnSubmit").click(function () { });
+  $("#btnSubmit").click(function () {
+
+    let is_admin = $('#is_admin').is(':checked');
+    let is_tla = $('#is_tla').is(':checked');
+    let is_qc = $('#is_qc').is(':checked');
+    let is_sale = $('#is_sale').is(':checked');
+    let is_accountant = $('#is_accountant').is(':checked');
+    let user_type = $('#usertype option:selected').val();
+    let fullname = $('#txtFullname').val();
+    let phone = $('#txtPhone').val();
+    let username = $('#txtUsername').val();
+    let password = $('#txtPassword').val();
+    let confirm_password = $('#txtConfirmPassword').val();
+    let idno = $('#txtIDNo').val();
+    let address = $('#txtAddress').val();
+    let is_active = $('#is_active').is(':checked');
+
+    let bank = $('#slBanks option:selected').val();
+    let account_number = $('#txtAccountNumber').val();
+    let account_holder = $('#txtAccountHolder').val();
+
+    if(password!=confirm_password){
+      alert('Password & confirm password do not match!');
+      return;
+    }
+
+
+    console.log({user_type,fullname,username,password,confirm_password,phone,idno,address,is_active,bank,account_number,account_holder});
+    $.ajax({
+      url:'/admin/user',
+      type:'post',
+      data:{
+        
+      },
+      
+    })
+  });
 
   $(document).ready(function () {
-    LoadUserGroup();
     LoadUserType();
     LoadSkill();
+    LoadBanks();
   });
 
   $("#fullname").keyup(function () {
     $("#username").val(GenerateUsername($("#fullname").val()));
   });
+
+  function LoadBanks() {
+    $.ajax({
+      url: '/admin/bank/list',
+      type: 'get',
+      data: {
+
+      },
+      success: function (data, textStatus, xhr) {
+        data.banks.forEach((bank) => {
+          let opt = '<option value="' + bank._id + '">' + bank.name + "</option>";
+          $("#slBanks").append(opt);
+        });
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      },
+    })
+  }
+
 
   function LoadUserType() {
     $("#usertype").empty();
@@ -156,24 +208,7 @@
     });
   }
 
-  function LoadUserGroup() {
-    $("#usergroup").empty();
-    $.ajax({
-      url: "/admin/user-group",
-      type: "get",
-      data: {},
-      success: function (data, textStatus, xhr) {
-        let idx = 1;
-        data.ugs.forEach((ug) => {
-          let opt = '<option value="' + ug._id + '">' + ug.name + "</option>";
-          $("#usergroup").append(opt);
-        });
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        alert(jqXHR.responseJSON.msg);
-      },
-    });
-  }
+
 
   function LoadSkill() {
     $.ajax({

@@ -4,7 +4,12 @@ const bcrypt = require("bcrypt");
 const SALT_WORK_FACTOR = 10;
 
 const UserSchema = new Schema({
-  username: { type: String, default: "", unique: true },
+  username: { 
+    type: String, 
+    default: "", 
+    unique: true,
+    required: [true, 'Username can not be blank!']
+  },
   password: { type: String, required:true },
   fullname: { type: String, required:true },
   idNo:{type:String,require:true},
@@ -28,6 +33,10 @@ const UserSchema = new Schema({
     default:false
   },
   is_tla:{
+    type:Boolean,
+    default:false
+  },
+  is_qc:{
     type:Boolean,
     default:false
   },
