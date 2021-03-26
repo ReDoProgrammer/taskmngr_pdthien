@@ -124,7 +124,65 @@
         $('#customer_fullname').text(data.job.customer.firstname+' '+data.job.customer.lastname);
         $('#name_case').text(data.job.name);
         $('#customer_remark').text(data.job.customer.remark);
-        $('#job_intruction').text(data.job.intruction);                
+        $('#job_intruction').text(data.job.intruction);  
+        if(data.job.customer.has_fire){
+          if(data.job.customer.fire_note.trim().length > 0){
+            $('#customer_fire').html(data.job.customer.fire_note);
+          }else{
+            $('#customer_fire').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+          }
+        }else{
+          $('#customer_fire').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+        }    
+        
+        if(data.job.customer.has_grass){
+          if(data.job.customer.grass_note.trim().length > 0){
+            $('#customer_grass').html(data.job.customer.grass_note);
+          }else{
+            $('#customer_grass').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+          }
+        }else{
+          $('#customer_grass').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+        }         
+        
+        if(data.job.customer.has_sky){
+          if(data.job.customer.sky_note.trim().length > 0){
+            $('#customer_sky').html(data.job.customer.sky_note);
+          }else{
+            $('#customer_sky').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+          }
+        }else{
+          $('#customer_sky').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+        }     
+        
+        if(data.job.customer.has_TV){
+          if(data.job.customer.TV_note.trim().length > 0){
+            $('#customer_tv').html(data.job.customer.TV_note);
+          }else{
+            $('#customer_tv').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+          }
+        }else{
+          $('#customer_tv').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+        }
+
+        if(data.job.customer.is_align){
+          if(data.job.customer.align_note.trim().length > 0){
+            $('#customer_align').html(data.job.customer.align_note);
+          }else{
+            $('#customer_align').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+          }
+        }else{
+          $('#customer_align').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+        }
+        
+        
+
+        $('#customer_colormode').html('<i class="text-warning font-weight-bold">'+data.job.customer.color_mode.name+'</i>')
+        $('#customer_cloud').html('<i class="text-warning font-weight-bold">'+data.job.customer.cloud.name+'</i>')      
+        $('#customer_nationalstyle').html('<i class="text-warning font-weight-bold">'+data.job.customer.national_style.name+'</i>')
+        $('#customer_output').html('<i class="text-warning font-weight-bold">'+data.job.customer.output.name+'</i>')
+        $('#customer_size').html('<i class="text-warning font-weight-bold">'+data.job.customer.size.name+'</i>')
+        
       }
     })
   })
