@@ -1,145 +1,116 @@
-<div
-  class="modal fade"
-  id="modalStaff"
-  tabindex="-1"
-  aria-labelledby="exampleModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="modalStaff" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Staff modal</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <form>
-          <div class="form-row">
-            <div class="form-group col-md-4">
-              <label for="recipient-name" class="col-form-label">Group:</label>
-              <select name="" id="usergroup" class="form-control">
-                <option value="">Employee</option>
-              </select>
-            </div>
-            <div class="form-group col-md-4">
-              <label for="recipient-name" class="col-form-label">Type:</label>
-              <select name="" id="usertype" class="form-control"></select>
-            </div>
-            <div class="form-group col-md-4">
-              <label for="recipient-name" class="col-form-label"
-                >Fullname:</label
-              >
-              <input type="text" class="form-control" id="fullname" />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group col-md-4">
-              <label for="recipient-name" class="col-form-label"
-                >Username:</label
-              >
-              <input type="text" class="form-control" id="username" />
-            </div>
-
-            <div class="form-group col-md-4">
-              <label for="recipient-name" class="col-form-label"
-                >Password:</label
-              >
-              <input
-                type="password"
-                class="form-control"
-                id="password"
-                value="123"
-              />
-            </div>
-
-            <div class="form-group col-md-4">
-              <label for="recipient-name" class="col-form-label"
-                >Confirm Password:</label
-              >
-              <input
-                type="password"
-                class="form-control"
-                id="confirmpassword"
-                value="123"
-              />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group col-md-2">
-              <label for="recipient-name" class="col-form-label"
-                >ID Card:</label
-              >
-              <input type="text" class="form-control" id="idno" />
-            </div>
-            <div class="form-group col-md-2">
-              <label for="recipient-name" class="col-form-label">Phone:</label>
-              <input type="text" class="form-control" id="phone" />
-            </div>
-            <div class="form-group col-md-6">
-              <label for="recipient-name" class="col-form-label"
-                >Address:</label
-              >
-              <input type="text" class="form-control" id="address" />
-            </div>
-            <div class="form-group col-md-2">
-              <label for="recipient-name" class="col-form-label">Status:</label>
-              <div class="form-group form-check mt-1">
-                <input
-                  type="checkbox"
-                  class="form-check-input"
-                  id="is_active"
-                  checked
-                />
-                <label class="form-check-label" for="exampleCheck1"
-                  >Active</label
-                >
+        <div class="card text-white bg-secondary mb-3">
+          <div class="card-header">Summary</div>
+          <div class="card-body">
+            <form>
+              <div class="form-row">
+                <div class="form-group col-md-4">
+                  <label for="recipient-name" class="col-form-label">Group:</label>
+                  <select name="" id="usertype" class="form-control"></select>
+                </div>
+                <div class="form-group col-md-4">
+                  <label for="recipient-name" class="col-form-label">Fullname:</label>
+                  <input type="text" class="form-control" id="fullname" />
+                </div>
+                <div class="form-group col-md-4">
+                  <label for="recipient-name" class="col-form-label">Phone:</label>
+                  <input type="text" class="form-control" id="phone" />
+                </div>
               </div>
-            </div>
-          </div>
 
-          <div class="form-row">
-            <div class="form-group col-md-4">
-              <label for="recipient-name" class="col-form-label">Bank:</label>
-              <input type="text" class="form-control" id="bank" />
-            </div>
-            <div class="form-group col-md-4">
-              <label for="recipient-name" class="col-form-label"
-                >Account Number:</label
-              >
-              <input type="text" class="form-control" id="account_number" />
-            </div>
-            <div class="form-group col-md-4">
-              <label for="recipient-name" class="col-form-label"
-                >Account holder:</label
-              >
-              <input type="text" class="form-control" id="account_holder" />
-            </div>
-          </div>
+              <div class="form-row">
+                <div class="form-group col-md-4">
+                  <label for="recipient-name" class="col-form-label">Username:</label>
+                  <input type="text" class="form-control" id="username" />
+                </div>
 
-          <div class="card text-white bg-secondary mb-3">
-            <div class="card-header">Skill</div>
-            <div class="card-body">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Skill</th>
-                    <th scope="col">Description</th>                    
-                  </tr>
-                </thead>
-                <tbody id="tblSkill"></tbody>
-              </table>
-            </div>
+                <div class="form-group col-md-4">
+                  <label for="recipient-name" class="col-form-label">Password:</label>
+                  <input type="password" class="form-control" id="password" value="123" />
+                </div>
+
+                <div class="form-group col-md-4">
+                  <label for="recipient-name" class="col-form-label">Confirm Password:</label>
+                  <input type="password" class="form-control" id="confirmpassword" value="123" />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-md-4">
+                  <label for="recipient-name" class="col-form-label">ID Card:</label>
+                  <input type="text" class="form-control" id="idno" />
+                </div>
+                <div class="form-group col-md-4">
+                  <label for="recipient-name" class="col-form-label">Address:</label>
+                  <input type="text" class="form-control" id="address" />
+                </div>
+                <div class="form-group col-md-4">
+                  <label for="recipient-name" class="col-form-label">Status:</label>
+                  <div class="form-group form-check mt-1">
+                    <input type="checkbox" class="form-check-input" id="is_active" checked />
+                    <label class="form-check-label" for="exampleCheck1">Active</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-md-4">
+                  <label for="recipient-name" class="col-form-label">Bank:</label>
+                  <input type="text" class="form-control" id="bank" />
+                </div>
+                <div class="form-group col-md-4">
+                  <label for="recipient-name" class="col-form-label">Account Number:</label>
+                  <input type="text" class="form-control" id="account_number" />
+                </div>
+                <div class="form-group col-md-4">
+                  <label for="recipient-name" class="col-form-label">Account holder:</label>
+                  <input type="text" class="form-control" id="account_holder" />
+                </div>
+              </div>
+              <hr>
+              <div class="card text-white bg-secondary mb-3">
+                <div class="card-header">Role</div>
+                <div class="card-body">
+                  <div class="form-check form-check-inline col-md-2">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"
+                      value="option1">
+                    <label class="form-check-label" for="inlineRadio1">Admin</label>
+                  </div>
+                  <div class="form-check form-check-inline col-md-2">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"
+                      value="option1">
+                    <label class="form-check-label" for="inlineRadio1">TLA</label>
+                  </div>
+                  <div class="form-check form-check-inline col-md-2">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"
+                      value="option1">
+                    <label class="form-check-label" for="inlineRadio1">Sale</label>
+                  </div>
+                  <div class="form-check form-check-inline col-md-2">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"
+                      value="option1">
+                    <label class="form-check-label" for="inlineRadio1">QC</label>
+                  </div>
+                  <div class="form-check form-check-inline col-md-2">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"
+                      value="option1">
+                    <label class="form-check-label" for="inlineRadio1">Accountant</label>
+                  </div>
+                </div>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -154,7 +125,7 @@
 </div>
 
 <script>
-  $("#btnSubmit").click(function () {});
+  $("#btnSubmit").click(function () { });
 
   $(document).ready(function () {
     LoadUserGroup();

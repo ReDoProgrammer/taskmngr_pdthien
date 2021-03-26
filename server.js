@@ -30,6 +30,7 @@ const homeController = require("./BE/controllers/TLA/home-controller");
 
 //ADMIN CONTROLLERS
 const adminAccountController = require("./BE/controllers/Admin/account-controller");
+const adminBankController = require('./BE/controllers/Admin/bank-controller');
 const adminCloudController = require('./BE/controllers/Admin/cloud-controller');
 const adminColorModeController = require('./BE/controllers/Admin/color-mode-controller');
 const adminStyleController = require("./BE/controllers/Admin/style-controller");
@@ -79,6 +80,7 @@ app.use(layout); //set layout
  * API ADMIN
  * 
  */
+const apiAdminBank = require('./BE/API/admin/api-bank');
 const apiAdminCloud = require('./BE/API/admin/api-cloud');
 const apiAdminColorMode = require('./BE/API/admin/api-color-mode');
 const apiAdminCustomer = require('./BE/API/admin/api-customer');
@@ -112,6 +114,7 @@ const apiTLAJob = require('./BE/API/TLA/api-tla-job');
  * USING API
  *
  */
+app.use('/admin/bank',apiAdminBank);
 app.use('/admin/account',apiAdminUser);
 app.use('/admin/cloud',apiAdminCloud);
 app.use('/admin/color-mode',apiAdminColorMode);
@@ -139,6 +142,7 @@ app.use("/admin/account/login", adminAccountController);
 app.use("/admin/customer", adminCustomerController);
 app.use("/admin/customer-style", adminCustomerStyleController);
 
+app.use('/admin/setting/bank',adminBankController);
 app.use('/admin/setting/color-mode',adminColorModeController);
 app.use('/admin/setting/cloud',adminCloudController);
 app.use("/admin/setting/file-format", adminFileFormatController);
