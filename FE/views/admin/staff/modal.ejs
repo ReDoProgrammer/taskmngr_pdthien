@@ -53,32 +53,41 @@
               </div>
 
               <div class="form-row">
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
+                  <label for="recipient-name" class="col-form-label">Email:</label>
+                  <input type="email" class="form-control" id="txtEmail" />
+                </div>
+                <div class="form-group col-md-3">
                   <label for="recipient-name" class="col-form-label">Username:</label>
                   <input type="text" class="form-control" id="txtUsername" />
                 </div>
 
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
                   <label for="recipient-name" class="col-form-label">Password:</label>
                   <input type="password" class="form-control" id="txtPassword" value="123" />
                 </div>
 
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
                   <label for="recipient-name" class="col-form-label">Confirm Password:</label>
                   <input type="password" class="form-control" id="txtConfirmPassword" value="123" />
                 </div>
               </div>
 
               <div class="form-row">
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
                   <label for="recipient-name" class="col-form-label">ID Card:</label>
                   <input type="text" class="form-control" id="txtIDNo" />
                 </div>
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
+                  <label for="recipient-name" class="col-form-label">Issued by:</label>
+                  <input type="text" class="form-control" id="txtIssuedBy" />
+                </div>
+
+                <div class="form-group col-md-3">
                   <label for="recipient-name" class="col-form-label">Address:</label>
                   <input type="text" class="form-control" id="txtAddress" />
                 </div>
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
                   <label for="recipient-name" class="col-form-label">Status:</label>
                   <div class="form-group form-check mt-1">
                     <input type="checkbox" class="form-check-input" id="is_active" checked />
@@ -131,10 +140,12 @@
     let user_type = $('#usertype option:selected').val();
     let fullname = $('#txtFullname').val();
     let phone = $('#txtPhone').val();
+    let email =$('#txtEmail').val();
     let username = $('#txtUsername').val();
     let password = $('#txtPassword').val();
     let confirm_password = $('#txtConfirmPassword').val();
     let idno = $('#txtIDNo').val();
+    let issued_by = $('#txtIssuedBy').val();
     let address = $('#txtAddress').val();
     let is_active = $('#is_active').is(':checked');
 
@@ -142,20 +153,46 @@
     let account_number = $('#txtAccountNumber').val();
     let account_holder = $('#txtAccountHolder').val();
 
-    if(password!=confirm_password){
+    if (password != confirm_password) {
       alert('Password & confirm password do not match!');
       return;
     }
-
-
-    console.log({user_type,fullname,username,password,confirm_password,phone,idno,address,is_active,bank,account_number,account_holder});
+    
     $.ajax({
-      url:'/admin/user',
-      type:'post',
-      data:{
-        
+      url: '/admin/user',
+      type: 'post',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem('accessToken'),
       },
-      
+      data: {
+        user_type,
+        fullname,
+        username,
+        password,
+        phone,
+        email,
+        idno,
+        issued_by,
+        address,
+        is_active,
+        bank,
+        account_number,
+        account_holder,
+        is_admin,
+        is_tla,
+        is_qc,
+        is_sale,
+        is_tla,
+        is_accountant
+      },
+      success: function (data, textStatus, xhr) {
+        alert(data.msg);
+        $('#modalStaff').modal('hide');
+        userId = '';
+      }, error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      }
+
     })
   });
 
@@ -165,8 +202,8 @@
     LoadBanks();
   });
 
-  $("#fullname").keyup(function () {
-    $("#username").val(GenerateUsername($("#fullname").val()));
+  $("#txtFullname").keyup(function () {
+    $("#txtUsername").val(GenerateUsername($("#txtFullname").val()));
   });
 
   function LoadBanks() {
@@ -204,6 +241,7 @@
       },
       error: function (jqXHR, textStatus, errorThrown) {
         alert(jqXHR.responseJSON.msg);
+        console.log(jqXHR.responseJSON);
       },
     });
   }

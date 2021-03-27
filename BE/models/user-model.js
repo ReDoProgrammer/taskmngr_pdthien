@@ -13,8 +13,9 @@ const UserSchema = new Schema({
   password: { type: String, required:true },
   fullname: { type: String, required:true },
   idNo:{type:String,require:true},
+  issued_by:{type:String,default:''},
   phone: { type: String, required:true },
-  email: { type: String, require: true },
+  email: { type: String, require: true , unique:true},
   address: { type: String, default: "" },
   bank:{
     type:String,

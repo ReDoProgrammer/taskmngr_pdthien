@@ -115,7 +115,7 @@ const apiTLAJob = require('./BE/API/TLA/api-tla-job');
  *
  */
 app.use('/admin/bank',apiAdminBank);
-app.use('/admin/account',apiAdminUser);
+app.use('/admin/user',apiAdminUser);
 app.use('/admin/cloud',apiAdminCloud);
 app.use('/admin/color-mode',apiAdminColorMode);
 app.use('/admin/customer',apiAdminCustomer);
