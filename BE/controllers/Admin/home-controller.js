@@ -19,17 +19,15 @@ router.get("/init", (req, res) => {
         password: "admin",
         fullname: "Administrator",
         idNo: "1234454787",
+        issued_by:"Gia Lai",
         phone: "0911397764",
         email: "redo2011dht@gmail.com",
         address: "Đăk Đoa - Đăk Đoa - Gia Lai",
-        bank: "BIDV",
+        bank: "",
         bank_no: "62110000454278",
         bank_name: "Nguyen Huu Truong",
-        is_admin: true,
-        is_tla: true,
-        is_sale: true,
-        is_accountant: true,
-        is_staff: true,
+        is_admin: true
+       
       });
       admin
         .save()
