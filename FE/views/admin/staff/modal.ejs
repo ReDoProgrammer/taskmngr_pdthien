@@ -33,7 +33,6 @@
           </div>
         </div>
         <div class="card text-white bg-secondary mb-3">
-          <div class="card-header">Summary</div>
           <div class="card-body">
             <form>
               <div class="form-row">
@@ -87,17 +86,17 @@
                   <input type="text" class="form-control" id="txtAddress" />
                 </div>
                 <div class="form-group col-md-1">
-                  <label for="recipient-name" class="col-form-label">Status:</label>
-                  <div class="form-group form-check mt-1">
+                  <label for="recipient-name" class="col-form-label">Active:</label>
+                  <div class="form-group form-check mt-1 text-center">
                     <input type="checkbox" class="form-check-input" id="is_active" checked />
-                    <label class="form-check-label" for="exampleCheck1">Active</label>
+                    <label class="form-check-label" for="exampleCheck1"></label>
                   </div>
                 </div>
                 <div class="form-group col-md-2">
-                  <label for="recipient-name" class="col-form-label">Employee:</label>
+                  <label for="recipient-name" class="col-form-label">Type:</label>
                   <div class="form-group form-check mt-1">
-                    <input type="checkbox" class="form-check-input" id="is_active" checked />
-                    <label class="form-check-label" for="exampleCheck1">Active</label>
+                    <input type="checkbox" class="form-check-input" id="is_employee" checked />
+                    <label class="form-check-label" for="exampleCheck1">Employee</label>
                   </div>
                 </div>
               </div>
@@ -109,11 +108,11 @@
                 </div>
                 <div class="form-group col-md-3">
                   <label for="recipient-name" class="col-form-label">Account Number:</label>
-                  <input type="text" class="form-control" id="txtAccountNumber" />
+                  <input type="text" class="form-control" id="txtBankNo" />
                 </div>
                 <div class="form-group col-md-3">
                   <label for="recipient-name" class="col-form-label">Account holder:</label>
-                  <input type="text" class="form-control" id="txtAccountHolder" />
+                  <input type="text" class="form-control" id="txtBankName" />
                 </div>
               </div>
 
@@ -150,14 +149,15 @@
     let username = $('#txtUsername').val();
     let password = $('#txtPassword').val();
     let confirm_password = $('#txtConfirmPassword').val();
-    let idno = $('#txtIDNo').val();
+    let idNo = $('#txtIDNo').val();
     let issued_by = $('#txtIssuedBy').val();
     let address = $('#txtAddress').val();
     let is_active = $('#is_active').is(':checked');
+    let is_employee = $('#is_employee').is(':checked');
 
     let bank = $('#slBanks option:selected').val();
-    let account_number = $('#txtAccountNumber').val();
-    let account_holder = $('#txtAccountHolder').val();
+    let bank_no = $('#txtBankNo').val();
+    let bank_name = $('#txtBankName').val();
 
     if (password != confirm_password) {
       alert('Password & confirm password do not match!');
@@ -177,19 +177,20 @@
         password,
         phone,
         email,
-        idno,
+        idNo,
         issued_by,
         address,
         is_active,
         bank,
-        account_number,
-        account_holder,
+        bank_no,
+        bank_name,
         is_admin,
         is_tla,
         is_qc,
         is_sale,
         is_tla,
-        is_accountant
+        is_accountant,
+        is_employee
       },
       success: function (data, textStatus, xhr) {
         alert(data.msg);

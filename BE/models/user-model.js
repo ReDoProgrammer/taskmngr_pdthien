@@ -18,7 +18,8 @@ const UserSchema = new Schema({
   email: { type: String, require: true , unique:true},
   address: { type: String, default: "" },
   bank:{
-    type:String,
+    type:Schema.Types.ObjectId,
+    ref:'bank',
     default:''
   },
   bank_no:{
@@ -54,6 +55,10 @@ const UserSchema = new Schema({
     default:true
   },
   is_employee:{
+    type:Boolean,
+    default:true
+  },
+  is_active:{
     type:Boolean,
     default:true
   }

@@ -1,21 +1,15 @@
 <div class="row">
   <div class="col-md-7">
     <nav aria-label="Page navigation example">
-      <ul class="pagination">
-        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item"><a class="page-link" href="#">Next</a></li>
-      </ul>
+      <ul class="pagination" id="paginantion"></ul>
     </nav>
   </div>
   <div class="col-md-3 text-right">
     <!-- Another variation with a button -->
     <div class="input-group">
-      <input type="text" class="form-control" placeholder="Search this blog" />
+      <input type="text" class="form-control" placeholder="Search this blog" id="txtSearch"/>
       <div class="input-group-append">
-        <button class="btn btn-secondary" type="button">
+        <button class="btn btn-secondary" type="button" id="btnSearch">
           <i class="fa fa-search"></i>
         </button>
       </div>
@@ -38,30 +32,12 @@
       <th scope="col">Phone</th>
       <th scope="col">Email</th>
       <th scope="col">Address</th>
-      <th scope="col">ID Number</th>
       <th scope="col">Role</th>
       <th scope="col">Status</th>
       <th></th>
     </tr>
   </thead>
-  <tbody id="tblUsers">
-    <tr>
-     
-
-      <td class="text-right">
-        <a href="http://" target="_blank" rel="noopener noreferrer">
-          <i class="fa fa-eye text-info" aria-hidden="true"></i>
-        </a>
-        <a href="http://" target="_blank" rel="noopener noreferrer">
-          <i class="fa fa-refresh text-warning" aria-hidden="true"></i>
-        </a>
-        <a href="http://" target="_blank" rel="noopener noreferrer">
-          <i class="fa fa-trash text-danger" aria-hidden="true"></i>
-        </a>
-      </td>
-    </tr>
-
-  </tbody>
+  <tbody id="tblUsers"></tbody>
 </table>
 
 
@@ -77,9 +53,25 @@
     });
 
     $('#btnAddStaff').click(function () {
+      $('#txtFullname').val('');
+      $('#txtPhone').val('');
+      $('#txtEmail').val('');
+      $('#txtUsername').val('');
+      $('#txtPassword').val('123');
+      $('#txtConfirmPassword').val('123');
+      $('#txtIDNo').val('');
+      $('#txtIssuedBy').val('');
+      $('#txtAddress').val('');
+      $('#txtBankNo').val('');
+      $('#txtBankName').val('');
       $('#modalStaff').modal();
     })
 
+    $('#btnSearch').click(function(){
+      search = $('#txtSearch').val();
+      page = 1;
+      LoadUsers();
+    })
 
     function LoadUsers() {
       $.ajax({
@@ -93,16 +85,37 @@
           page
         },
         success: function (data, textStatus, xhr) {
-          console.log(data.users);
           $('#tblUsers').empty();
+          let idx = 1;
+          Pagination(data.pages);
           data.users.forEach(user=>{
             let tr = '<tr>';
-              tr+= '<td>'+user.fullname+'</td>';
+              tr+= '<td>'+(idx++)+'</td>';
+              tr+= '<td class = "font-weight-bold text-info"><a href ="'+user._id+'" class="table_row">'+user.fullname+'</a></td>';
               tr+= '<td>'+user.phone+'</td>';
               tr+= '<td>'+user.email+'</td>';
               tr+= '<td>'+user.address+'</td>';
-              tr+= '<td>'+user.idno+'</td>';
-              tr+= '<td>role</td>';
+            
+              if(user.is_admin){
+                tr+= '<td class="text-info font-italic">Admin</td>';
+              }else if(user.is_tla){
+                tr+= '<td class="text-info font-italic">TLA</td>';
+              }else if(user.is_sale){
+                tr+= '<td class="text-info font-italic">Sale</td>';
+              }else if(user.is_qc){
+                tr+= '<td class="text-info font-italic">QC</td>';
+              }else if(user.is_accountant){
+                tr+= '<td class="text-info font-italic">Accountant</td>';
+              }else{
+                tr+= '<td class="text-info font-italic">Staff</td>';
+              }
+
+              if(user.is_active){
+                tr+= '<td class="text-success">Active</td>';
+              }else{
+                tr+= '<td class="text-danger">Unactive</td>';
+              }
+              
               tr+= '</tr>';
               $('#tblUsers').append(tr);
           })
@@ -112,4 +125,23 @@
       })
     }
 
+
+
+    $(document).ready(function(){
+      $('a.table_row').on("click",function(e){
+        e.preventDefault();
+      })
+      $('#tblUsers tr').click(function(e){
+        userId = $(this).find('a').attr('href');
+        console.log(userId);
+      })
+    })
+
+    function Pagination(pages){
+     $('#pagination').empty();
+      for(i = 1; i <= pages; i++){
+        let li = '<li class="page-item"><a class="page-link" href="#">1</a></li>';
+        $('#pagination').append(li);
+      }
+    }
   </script>

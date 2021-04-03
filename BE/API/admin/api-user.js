@@ -17,10 +17,10 @@ router.get('/', authenticateAdminToken, (req, res) => {
       { username: { "$regex": search, "$options": "i" } },
     ]
   })
-    .select('fullname idno address phone is_admin is_sale is_tla is_qc is_accountant is_active')
+    .select('fullname address phone email is_admin is_sale is_tla is_qc is_accountant is_active')
     .exec()
     .then(users => {
-      let result = users.slice(process.env.PAGE_SIZE*(page-1),process.env.PAGE_SIZE);   
+      let result = users.slice(process.env.PAGE_SIZE*(page-1),process.env.PAGE_SIZE);  
       return res.status(200).json({
         msg: 'Load users list successfully!',
         pages:users.length%process.env.PAGE_SIZE==0?users.length/process.env.PAGE_SIZE:Math.floor(users.length/process.env.PAGE_SIZE)+1,
@@ -36,25 +36,28 @@ router.get('/', authenticateAdminToken, (req, res) => {
 })
 
 router.post('/', authenticateAdminToken, (req, res) => {
-  let { user_type, fullname, username, password, phone, idno, address, is_active, bank, account_number, account_holder, is_admin, is_tla, is_qc, is_sale, is_accountant } = req.body;
-  console.log({ user_type, fullname, username, password, phone, idno, address, is_active, bank, account_number, account_holder, is_admin, is_tla, is_qc, is_sale, is_accountant });
+  let { user_type, fullname, username, password, phone,email, idNo,issued_by, address, is_active, bank, bank_no, bank_name, is_admin, is_tla, is_qc, is_sale, is_accountant ,is_employee} = req.body;
+  
   let u = new User({
     user_type,
     fullname,
     username,
     password,
     phone,
-    idno,
+    email,
+    idNo,
+    issued_by,
     address,
     is_active,
     bank,
-    account_number,
-    account_holder,
+    bank_no,
+    bank_name,
     is_admin,
     is_sale,
     is_qc,
     is_tla,
-    is_accountant
+    is_accountant,
+    is_employee
   });
   u.save()
     .then(user => {
