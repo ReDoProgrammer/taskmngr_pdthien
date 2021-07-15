@@ -119,8 +119,18 @@
         id:jobId
       },
       success: function (data, textStatus, xhr) {
-        console.log(data.job);
+
         $('#modalJobLevel').modal();
+
+        LoadUsers();
+
+      
+
+
+
+
+
+
         $('#customer_fullname').text(data.job.customer.firstname+' '+data.job.customer.lastname);
         $('#name_case').text(data.job.name);
         $('#customer_remark').text(data.job.customer.remark);
@@ -186,4 +196,26 @@
       }
     })
   })
+
+
+  function LoadUsers(){
+        $.ajax({
+            url: '/tla/user/list',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },          
+            success: function (data, textStatus, xhr) {
+
+                $('#slEmployees').empty();
+                data.users.forEach(user=>{
+                  let opt = '<option value="'+user._id+'">'+user.fullname+'</option>';
+                  $('#slEmployees').append(opt);
+                })
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+            },
+        })
+    }
 </script>
