@@ -18,8 +18,7 @@ const UserSchema = new Schema({
   email: { type: String, require: true , unique:true},
   address: { type: String, default: "" },
   bank:{
-    type:Schema.Types.ObjectId,
-    ref:'bank',
+    type:String,   
     default:''
   },
   bank_no:{

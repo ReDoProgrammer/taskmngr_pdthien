@@ -32,7 +32,12 @@ router.get("/init", (req, res) => {
       admin
         .save()
         .then((user) => {
+          
           console.log("initial root user successfully!");
+          return res.status(201).json({
+            msg:'Initialize administrator account successfully!',
+            user
+          })
         })
         .catch((err) => {
           console.log(
