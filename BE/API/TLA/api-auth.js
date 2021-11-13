@@ -13,7 +13,7 @@ let refershTokens = [];
 router.post("/login", (req, res) => {
     let { username, password } = req.body;
   
- 
+ console.log({ username, password } );
     User.findOne({ username: username }, function (err, user) {
       if (err) {
         return res.status(500).json({

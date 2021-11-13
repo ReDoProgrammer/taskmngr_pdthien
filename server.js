@@ -56,6 +56,10 @@ const adminUserTypeController = require('./BE/controllers/Admin/user-type-contro
 define sale controllers
 
 */
+const saleAuthController = require('./BE/controllers/Sale/sale-authenticate-controller');
+
+
+
 const saleHomeController = require('./BE/controllers/Sale/sale-home-controller');
 const saleJobController = require('./BE/controllers/Sale/sale-job-controller');
 
@@ -103,12 +107,27 @@ const apiSaleCustomer = require('./BE/API/Sale/api-sale-customer');
 const apiSaleJob = require('./BE/API/Sale/api-sale-job');
 
 
+
+/*
+  TLA Controllers
+*/
+const TLAAuth = require('./BE/controllers/TLA/authentication-controller');
+app.use('/tla/auth',TLAAuth);
+
+
 /*
   TLA API CONTROLLERS
 */
-const TLAAuth = require('./BE/API/TLA/api-auth');
+
+const apiTLAAuth = require('./BE/API/TLA/api-auth');
+app.use('/tla/auth',apiTLAAuth);
+
 const apiTLAJob = require('./BE/API/TLA/api-tla-job');
+app.use('/tla/job',apiTLAJob);
+
 const apiTLAUser = require('./BE/API/TLA/api-tla-user');
+app.use('/tla/user',apiTLAUser);
+
 
 /**
  * USING API
@@ -161,6 +180,7 @@ app.use("/admin/staff", adminStaffController);
 
 
 //using sale controllers
+app.use('/sale/auth',saleAuthController);
 app.use('/sale',saleHomeController);
 app.use('/sale/customer',apiSaleCustomer);
 app.use('/sale/job',saleJobController);
@@ -173,11 +193,6 @@ app.use('/sale/job',apiSaleJob);
 
 app.use('/tla',TLAHomeController);
 
-
-//using TLA API 
-app.use('/tla/auth',TLAAuth);
-app.use('/tla/job',apiTLAJob);
-app.use('/tla/user',apiTLAUser);
 
 
 
