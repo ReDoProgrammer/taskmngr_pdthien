@@ -1,13 +1,74 @@
 <div class="modal" tabindex="-1" role="dialog" id="addJobModal">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">       
-        <div class="modal-body">
-          
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary">Save changes</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="card text-white bg-dark">
+          <div class="card-header">Header</div>
+          <div class="card-body">
+            <div class="row form-group">
+              <div class="col-sm-4">Customer:</div>
+              <div class="col-sm-8 font-weight-bold text-warning" id="lblCustomerFullname"></div>
+            </div>
+            <div class="row form-group">
+              <div class="col-sm-4">Phone:</div>
+              <div class="col-sm-8" id="lblCustomerPhone"></div>
+            </div>
+            <div class="row form-group">
+              <div class="col-sm-4">Email:</div>
+              <div class="col-sm-8" id="lblCustomerEmail"></div>
+            </div>
+
+            <hr>
+
+            <div class="form-group">
+              <label for="">Link source:</label>
+              <input type="text" name="" id="txtLinkSource" class="form-control">
+            </div>
+
+
+            <div class="row">
+              <div class="col-sm-6">
+                <div class=" form-group">
+                  <label for="">Received Date</label>
+                  <input type="text" class="inputDate form-control" id="txtReceivedDate">
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label for="">Delivery Date:</label>
+                  <input type="text" class="inputDate form-control" id="txtDeliveryDate">
+                </div>
+              </div>
+            </div>
+
+            <div class="row form-group">
+              <label for="">Intruction:</label>
+              <textarea name="" id="txaIntruction" rows="2" class="form-control"></textarea>
+            </div>
+
+
+
+            <div class="form-group text-right">
+              <button type="button" class="btn btn-sm btn-warning">Save changes</button>
+              <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+</div>
+
+<script type='text/javascript'
+  src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
+
+<script>
+  // $(":input").inputmask();
+  $('.inputDate').inputmask("datetime", {
+    mask: "1/2/y h:s",
+    placeholder: "dd/mm/yyyy hh:mm",
+    leapday: "-02-29",
+    separator: "/",
+    alias: "dd/mm/yyyy hh:mm"
+  })
+</script>

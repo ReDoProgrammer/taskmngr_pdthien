@@ -27,6 +27,8 @@ const jobSchema = new Schema({
    },
    intruction:{
        type:String,
+
+       
        default:''
    },
    status:{

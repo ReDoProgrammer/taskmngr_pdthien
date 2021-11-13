@@ -49,6 +49,22 @@
 
 
         $(document).on("click", "button[name='btnAddJob']", function () {
+            $.ajax({
+                url:'/sale/customer/detail',
+                type:'get',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data:{
+                    id:$(this).closest("tr").attr("id")
+                },
+                success:function(data){
+                    console.log(data);
+                    $('#lblCustomerFullname').text(data.customer.firstname+' '+data.customer.lastname);
+                    $('#lblCustomerPhone').text(data.customer.phone);
+                    $('#lblCustomerEmail').text(data.customer.email);
+                }
+            })
             $('#addJobModal').modal();
         })
 
@@ -66,8 +82,7 @@
                 },
                 success: function (data) {
                     $('#tblData').empty();
-                    let idx = 1;
-                    console.log(data.customers);
+                    let idx = 1;                   
                     data.customers.forEach(cus => {
                         let tr = '<tr id = "' + cus._id + '">';
                         tr += '<td>' + (idx++) + '</td>';

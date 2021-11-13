@@ -36,22 +36,17 @@ router.get('/list',authenticateSaleToken,(req,res)=>{
 
 router.get('/detail',(req,res)=>{
     let {id} = req.query;
-    Job.findById(id)
-    .populate({path:'customer',populate:({path:'cloud', select:'name -_id'})})   
-    .populate({path:'customer',populate:({path:'color_mode',select:'name -_id'})})       
-    .populate({path:'customer',populate:({path:'national_style',select:'name -_id'})})       
-    .populate({path:'customer',populate:({path:'output',select:'name -_id'})})       
-    .populate({path:'customer',populate:({path:'size',select:'name -_id'})})        
+    Customer.findById(id)   
     .exec()
-    .then(job=>{
+    .then(customer=>{
         return res.status(200).json({
-            msg:'Get job detail successfully!',
-            job:job
+            msg:'Get Customer detail successfully!',
+           customer
         })
     })
     .catch(err=>{
         return res.status(500).json({
-            msg:'Get job information failed!',
+            msg:'Can not get customer detail!',
             error: new Error(err.message)
         })
     })
