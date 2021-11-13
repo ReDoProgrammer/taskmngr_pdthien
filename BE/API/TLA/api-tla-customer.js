@@ -1,9 +1,9 @@
 const router = require('express').Router();
-const { authenticateSaleToken } = require("../../../middlewares/sale-middleware");
+const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const Customer = require('../../models/customer-model');
 
 
-router.get('/list',authenticateSaleToken,(req,res)=>{
+router.get('/list',authenticateTLAToken,(req,res)=>{
     let {page,search} = req.query;   
     Customer.find({$or:[
         {firstname:{ "$regex": search, "$options": "i" }},

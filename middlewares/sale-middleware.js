@@ -1,7 +1,7 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
-function authenticateTLAToken(req, res, next) {
+function authenticateSaleToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
   if (token == null) return res.status(401).json({
@@ -18,7 +18,7 @@ function authenticateTLAToken(req, res, next) {
         });
   
       }     
-    if(!user.is_tla){
+    if(!user.is_sale){
       return res.status(403).json({
         msg:`Your account can not access these functions: `
       });
@@ -32,5 +32,5 @@ function authenticateTLAToken(req, res, next) {
 
 
 module.exports = {
-  authenticateTLAToken
+  authenticateSaleToken
 }

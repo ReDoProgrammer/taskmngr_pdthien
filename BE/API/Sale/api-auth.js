@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const { TLAMiddleware } = require("../../../middlewares/tla-middleware");
 const User = require('../../models/user-model');
 const jwt = require("jsonwebtoken");
 
@@ -11,11 +10,12 @@ let refershTokens = [];
 
 router.post("/login", (req, res) => {
   let { username, password } = req.body;
-  
+
   User.findOne({ username: username }, function (err, user) {
+     
     if (err) {
       return res.status(500).json({
-        msg: `Hệ thống gặp lỗi khi xác thực tài khoản ${err.message}`,
+        msg: `Catch an error when authenticating:  ${err.message}`,
       });
     }
     if (user == null) {
@@ -31,11 +31,12 @@ router.post("/login", (req, res) => {
               msg: `Can not auth this account:  ${err.message}`,
             });
           }
-          if (isMatch) {
-            if(user.is_admin || user.is_tla){
+           
+          if (isMatch) {             
+            if(user.is_admin || user.is_sale){
               let u = {
                       _id: user._id,
-                      is_tla: user.is_admin||user.is_tla
+                      is_sale: user.is_admin||user.is_sale
                     };
                     const accessToken = generateAccessToken(u);
                     const refreshToken = jwt.sign(u, process.env.REFRESH_TOKEN_SECRET);
@@ -43,7 +44,7 @@ router.post("/login", (req, res) => {
                     refershTokens.push(refreshToken);
                     return res.status(200).json({
                       msg: 'Login successfully!',
-                      url: '/tla',
+                      url: '/sale',
                       accessToken: accessToken,
                       refreshToken: refreshToken
                     });
@@ -60,7 +61,7 @@ router.post("/login", (req, res) => {
         });
       } else {
         return res.status(401).json({
-          msg: "TLA account not match",
+          msg: "Sale account not match",
         });
       }
     }

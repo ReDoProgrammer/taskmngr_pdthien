@@ -1,0 +1,91 @@
+<div class="row">
+    <div class="col-md-9">
+        <nav aria-label="Page navigation example" class="mt-2">
+            <ul class="pagination" id="pagination"></ul>
+        </nav>
+    </div>
+    <div class="col-md-3 text-right">
+        <!-- Another variation with a button -->
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search this blog" />
+            <div class="input-group-append">
+                <button class="btn btn-secondary" type="button">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<table class="table mt-1 table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Customer</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Email</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody id="tblData" class="bg-white text-dark"></tbody>
+</table>
+<nav aria-label="...">
+    <ul class="pagination pagination-sm">
+        <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">1</a>
+        </li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+    </ul>
+</nav>
+
+<%-include('modalAddJob')%>
+
+    <script>
+        var search = "";
+        var page = 1;
+        $(document).ready(() => {
+            LoadCustomers(search, page);
+        });
+
+
+        $(document).on("click", "button[name='btnAddJob']", function () {
+            $('#addJobModal').modal();
+        })
+
+
+        function LoadCustomers(search, page) {
+            $.ajax({
+                url: '/sale/customer/list',
+                type: 'get',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                    search,
+                    page
+                },
+                success: function (data) {
+                    $('#tblData').empty();
+                    let idx = 1;
+                    console.log(data.customers);
+                    data.customers.forEach(cus => {
+                        let tr = '<tr id = "' + cus._id + '">';
+                        tr += '<td>' + (idx++) + '</td>';
+                        tr += '<td class="font-weight-bold">' + cus.firstname + ' ' + cus.lastname + '</td>';
+                        tr += '<td>' + cus.phone + '</td>';
+                        tr += '<td>' + cus.email + '</td>';
+                        tr += '<td class="text-right"><button class="btn-sm btn-warning" name="btnAddJob"><i class="fa fa-plus text-success" aria-hidden="true"></i> Add job</button></td>'
+                        tr += '</tr>';
+                        $('#tblData').append(tr);
+                    });
+
+                },
+                error: function (request, status, error) {
+                    alert(request.responseJSON.msg);
+                    window.location.href = '/sale/login';
+                }
+            })
+        }
+
+
+    </script>

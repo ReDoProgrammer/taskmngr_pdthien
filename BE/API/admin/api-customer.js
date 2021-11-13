@@ -26,7 +26,7 @@ router.delete("/", authenticateAdminToken, (req, res) => {
   });
 });
 
-router.get("/list", (req, res) => {
+router.get("/list",authenticateAdminToken, (req, res) => {
     let {search,page} = req.query;
     
    Customer.find({$or:[

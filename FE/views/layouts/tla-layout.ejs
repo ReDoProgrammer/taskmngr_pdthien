@@ -9,19 +9,37 @@
     />
 
     <%-include('child/common')%>
-    <title>TLA Dashboard</title>
+    <title>TLA Dashboard - BamBoo Photo</title>
   </head>
   <body>   
     <div class="container mt-10">
+      <%- include('child/TLA/navbar') %>
       <div class="container">
-        <%- include('child/TLA/navbar') %>
-
-        <div class="card">
-          <div class="card-header">Header</div>
-          <div class="card-body" style="min-height: 600px"><%- body %></div>
-          <div class="card-footer"><%- include('child/TLA/footer') %></div>
+        <div class="card text-white bg-secondary  mt-5" style="margin-top: 20px; display: block;">
+          <div class="card-header font-weight-bold"><%=title%></div>
+          <div class="card-body" style="min-height: 500px !important;">
+            <%-body%>
+          </div>
+          <div class="card-footer bg-dark" id="footer">
+            <h6>BambooPhoto - TLA Module</h6>
+          </div>
         </div>
       </div>
     </div>
   </body>
 </html>
+
+<style>
+
+    #footer{
+    left:0;
+    right:0;
+     position:fixed;
+     bottom:0px;
+     z-index:300;
+     box-shadow: 9px 1px 10px 0px #242424;
+     padding-bottom:2px; 
+     background-color:#ffffff;
+    }
+
+</style>
