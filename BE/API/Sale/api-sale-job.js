@@ -2,18 +2,36 @@ const router = require("express").Router();
 const Job = require("../../models/job-model");
 const { authenticateSaleToken } = require("../../../middlewares/sale-middleware");
 
-router.get("/list", authenticateSaleToken,(req, res) => {
-  let {page,search} = req.query;
-  console.log({page,search});
-  Job.find({})
-    .populate("customer", "firstname lastname -_id")
+router.get("/list", authenticateSaleToken, (req, res) => {
+  let { page, search } = req.query;
+
+
+  Job.find({
+    $or: [
+      { name: { "$regex": search, "$options": "i" } }
+    ]
+  })
+    .populate({
+      path: 'customer',
+
+      $or: [
+        { firstname: { $regex: search, $options: "i" } },
+        { lastname: { $regex: search, $options: "i" } },
+        { phone: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+      ]
+
+    })
     .exec()
     .then((jobs) => {
       console.log(jobs);
+      let result = jobs.slice(process.env.PAGE_SIZE * (page - 1), process.env.PAGE_SIZE);
       return res.status(200).json({
-        msg: "load jobs list successfully",
-        jobs: jobs,
-      });
+        msg: 'Load jobs list successfully!',
+        pages: jobs.length % process.env.PAGE_SIZE == 0 ? jobs.length / process.env.PAGE_SIZE : Math.floor(jobs.length / process.env.PAGE_SIZE) + 1,
+        jobs: result
+      })
+
     })
     .catch((err) => {
       return res.status(500).json({
@@ -23,8 +41,8 @@ router.get("/list", authenticateSaleToken,(req, res) => {
     });
 });
 
-router.post("/",authenticateSaleToken, (req, res) => {
-  let {   
+router.post("/", authenticateSaleToken, (req, res) => {
+  let {
     customer,
     name,
     source_link,
@@ -33,7 +51,7 @@ router.post("/",authenticateSaleToken, (req, res) => {
     intruction,
   } = req.body;
 
-  console.log('job name: ',name);
+  console.log('job name: ', name);
   //validation
   if (source_link.trim().length == 0) {
     return res.status(403).json({
@@ -70,8 +88,8 @@ router.post("/",authenticateSaleToken, (req, res) => {
         name,
         customer,
         source_link,
-        received_date:d1,
-        delivery_date:d2,
+        received_date: d1,
+        delivery_date: d2,
         intruction,
       });
       job

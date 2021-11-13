@@ -2,9 +2,9 @@
   <div class="offset-md-9 col-md-3 text-right">
     <!-- Another variation with a button -->
     <div class="input-group">
-      <input type="text" class="form-control" placeholder="Search this blog" />
+      <input type="text" class="form-control" placeholder="search job .." id="txtSearch"/>
       <div class="input-group-append">
-        <button class="btn btn-warning" type="button">
+        <button class="btn btn-warning" type="button" id="btnSearch">
           <i class="fa fa-search text-info"></i>
         </button>
       </div>
@@ -48,6 +48,21 @@
   $(document).ready(function () {
     LoadJobs();
   });
+
+
+  $('#btnSearch').click(function(){
+    search = $('#txtSearch').val();
+    LoadJobs();
+  })
+
+
+  $('#txtSearch').keyup(function(e){
+    if(e.keyCode == 13)
+    {
+      $("#btnSearch").click()
+    }
+});
+
 
   function LoadJobs() {
     $.ajax({
