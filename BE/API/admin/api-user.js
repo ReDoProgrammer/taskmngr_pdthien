@@ -89,11 +89,15 @@ router.post("/login", (req, res) => {
       });
     }
     if (user) {//if username exist
-
+      if(!user.is_admin){
+        return res.status(500).json({
+          msg: `Your account can not access this module!!`,
+        });
+      }
       user.ComparePassword(password, function (err, isMatch) {
         if (err) {
           return res.status(500).json({
-            msg: `Hệ thống gặp lỗi khi xác thực tài khoản ${err.message}`,
+            msg: `Could not authenticate this account: ${err.message}`,
           });
         }
         if (isMatch) {
@@ -107,21 +111,21 @@ router.post("/login", (req, res) => {
 
           refershTokens.push(refreshToken);
           return res.status(200).json({
-            msg: 'Đăng nhập thành công!',
+            msg: 'Admin login successfully!',
             url: '/admin',
             accessToken: accessToken,
             refreshToken: refreshToken
           });
         } else {
           return res.status(401).json({
-            msg: 'Bạn không có quyền truy cập modul này!'
+            msg: 'Admin password not match!'
           })
         }
 
       });
     } else {
       return res.status(401).json({
-        msg: "Tài khoản không tồn tại. Vui lòng kiểm tra lại",
+        msg: "Account not found. Please try again",
       });
     }
   });
