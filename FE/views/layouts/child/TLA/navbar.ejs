@@ -25,69 +25,20 @@
         <a class="nav-link" href="#">Job</a>
       </li>
     </ul>
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <div class="input-group mt-2">
-          <div class="input-group-prepend account-control">
-            <div class="input-group-text">U</div>
-          </div>
-          <input
-            type="text"
-            class="form-control account-control"
-            id="txtUsername"
-            placeholder="Username"
-          />
-        </div>
-      </li>
-      <li class="nav-item col-auto">
-        <div class="input-group mt-2">
-          <div class="input-group-prepend account-control">
-            <div class="input-group-text">P</div>
-          </div>
-          <input
-            type="password"
-            class="form-control account-control"
-            id="txtPassword"
-            placeholder="Password"
-          />
-        </div>
-      </li>
+    <ul class="navbar-nav">     
       <li class="nav-item text-center">
-        <a class="nav-link" href="#" id="btnLogin">Login</a>
+        <a class="nav-link font-weight-bold text-warning" href="#" id="btnLogout"><i class="fa fa-sign-out text-danger" aria-hidden="true"></i>Logout</a>
       </li>
     </ul>
   </div>
 </nav>
 
-<style>
-  .account-control {
-    height: 25px !important;
-  }
-  input.account-control {
-    width: 100px !important;
-  }
-</style>
-
 <script>
   $(document).ready(function () {});
 
-  $("#btnLogin").click(function () {
-    let username = $("#txtUsername").val();
-    let password = $("#txtPassword").val();
-
-    $.ajax({
-      url: "/tla/auth/login",
-      type: "post",
-      data: {
-        username,
-        password,
-      },
-      success: function (data, textStatus, xhr) {
-        console.log(data);
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        
-      },
-    });
+  $("#btnLogout").click(function (e) {
+    e.preventDefault();
+    localStorage.removeItem('accessToken');
+    window.location.href = '/tla/login';
   });
 </script>

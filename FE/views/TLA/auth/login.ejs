@@ -10,7 +10,8 @@
 				password
 			},
 			success: function (data) {
-				console.log(data);
+				window.localStorage.setItem('accessToken', data.accessToken);
+        		window.location.href=data.url;
 			},
 			error: function (request, status, error) {
 				$('#lblError').text(request.responseJSON.msg);				
