@@ -1,10 +1,12 @@
 const router = require("express").Router();
 const Job = require("../../models/job-model");
-const { authenticateAdminToken } = require("../../../middlewares/middleware");
+const { authenticateSaleToken } = require("../../../middlewares/sale-middleware");
 
-router.get("/list", (req, res) => {
+router.get("/list", authenticateSaleToken,(req, res) => {
+  let {page,search} = req.query;
+  console.log({page,search});
   Job.find({})
-    .populate("customer", "firstname lastname phone email -_id")
+    .populate("customer", "firstname lastname -_id")
     .exec()
     .then((jobs) => {
       console.log(jobs);
@@ -21,49 +23,56 @@ router.get("/list", (req, res) => {
     });
 });
 
-router.post("/", (req, res) => {
-  let {
+router.post("/",authenticateSaleToken, (req, res) => {
+  let {   
+    customer,
     name,
-    customerId,
     source_link,
-    receive_date,
-    deadline,
+    received_date,
+    delivery_date,
     intruction,
   } = req.body;
 
+  console.log('job name: ',name);
   //validation
   if (source_link.trim().length == 0) {
     return res.status(403).json({
       msg: "Source link can not be blank",
     });
   }
-  if (receive_date.trim().length == 0) {
+  if (received_date.trim().length == 0) {
     return res.status(403).json({
       msg: "Receive date can not be blank",
     });
   }
-  if (deadline.trim().length == 0) {
+  if (received_date.trim().length == 0) {
     return res.status(403).json({
-      msg: "Deadline can not be blank",
+      msg: "received date can not be blank",
     });
   }
 
-  Promise.all([strToDate(receive_date), strToDate(deadline)])
+  if (delivery_date.trim().length == 0) {
+    return res.status(403).json({
+      msg: "delivery date can not be blank",
+    });
+  }
+
+  Promise.all([strToDate(received_date), strToDate(delivery_date)])
     .then((result) => {
       let d1 = result[0];
       let d2 = result[1];
       if (d1 >= d2) {
         return res.status(403).json({
-          msg: "Receive date can not later than deadline",
+          msg: "Receive date can not later than delivery date",
         });
       }
       let job = new Job({
-          name,
-        customer: customerId,
-        source_link: source_link,
-        receive_date: d1,
-        deadline: d2,
-        intruction: intruction,
+        name,
+        customer,
+        source_link,
+        received_date:d1,
+        delivery_date:d2,
+        intruction,
       });
       job
         .save()
@@ -74,6 +83,7 @@ router.post("/", (req, res) => {
           });
         })
         .catch((err) => {
+          console.log(err);
           return res.status(500).json({
             msg: "Cannot create new job",
             error: new Error(err.message),

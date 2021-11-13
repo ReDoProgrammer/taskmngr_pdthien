@@ -3,7 +3,7 @@
     <div class="modal-content">
       <div class="modal-body">
         <div class="card text-white bg-dark">
-          <div class="card-header">Header</div>
+          <div class="card-header"><i class="fa fa-plus" aria-hidden="true"></i> Add a new job</div>
           <div class="card-body">
             <div class="row form-group">
               <div class="col-sm-4">Customer:</div>
@@ -19,10 +19,14 @@
             </div>
 
             <hr>
+            <div class="form-group">
+              <label for="">Job name:</label>
+              <input type="text" name="" id="txtName" class="form-control" placeholder="Job name">
+            </div>
 
             <div class="form-group">
               <label for="">Link source:</label>
-              <input type="text" name="" id="txtLinkSource" class="form-control">
+              <input type="text" name="" id="txtLinkSource" class="form-control" placeholder="Images link">
             </div>
 
 
@@ -49,7 +53,7 @@
 
 
             <div class="form-group text-right">
-              <button type="button" class="btn btn-sm btn-warning">Save changes</button>
+              <button type="button" class="btn btn-sm btn-warning" id="btnSubmitJob">Submit job</button>
               <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
             </div>
           </div>
@@ -63,7 +67,37 @@
   src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
 
 <script>
-  // $(":input").inputmask();
+
+  $('#btnSubmitJob').click(function () {
+    let customer = customerId;
+    let name = $('#txtName').val();
+    let source_link = $('#txtLinkSource').val();
+    let received_date = $('#txtReceivedDate').val();
+    let delivery_date = $('#txtDeliveryDate').val();
+    let intruction = $('#txaIntruction').val();
+
+    console.log({ customer, name, source_link, received_date, delivery_date, intruction });
+
+    $.ajax({
+      url: '/sale/job',
+      type: 'post',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: { customer, name, source_link, received_date, delivery_date, intruction },
+      success:function(data){
+        alert(data.msg);
+        $('#addJobModal').modal('hide');
+        customerId = "";
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);       
+      },
+    })
+  })
+
+
+
   $('.inputDate').inputmask("datetime", {
     mask: "1/2/y h:s",
     placeholder: "dd/mm/yyyy hh:mm",

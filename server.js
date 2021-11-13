@@ -61,7 +61,7 @@ const saleAuthController = require('./BE/controllers/Sale/sale-authenticate-cont
 
 
 const saleHomeController = require('./BE/controllers/Sale/sale-home-controller');
-const saleJobController = require('./BE/controllers/Sale/sale-job-controller');
+
 
 
 
@@ -101,6 +101,10 @@ const apiAdminUserType = require('./BE/API/admin/api-user-type');
 const saleCustomerController = require('./BE/controllers/Sale/sale-customer-controller');
 app.use('/sale/customer',saleCustomerController);
 
+
+const saleJobController = require('./BE/controllers/Sale/sale-job-controller');
+app.use('/sale/job',saleJobController);
+
 /*
   SALE API CONTROLLERS
 */
@@ -109,9 +113,10 @@ app.use('/sale',apiSaleAuth);
 
 
 const apiSaleCustomer = require('./BE/API/Sale/api-sale-customer');
+app.use('/sale/customer',apiSaleCustomer);
+
 const apiSaleJob = require('./BE/API/Sale/api-sale-job');
-
-
+app.use('/sale/job',apiSaleJob);
 
 /*
   TLA Controllers
@@ -203,10 +208,9 @@ app.use('/sale',saleAuthController);
 
 app.use('/sale',saleHomeController);
 app.use('/sale/customer',apiSaleCustomer);
-app.use('/sale/job',saleJobController);
 
-//using sale api controllers 
-app.use('/sale/job',apiSaleJob);
+
+
 
 
 

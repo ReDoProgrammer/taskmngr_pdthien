@@ -17,18 +17,18 @@ const jobSchema = new Schema({
        type:String,
        require:[true,'Source link can not be blank']
    },
-   receive_date:{
+   received_date:{
        type:Date,
        require:true
    },
-   deadline:{
+   delivery_date:{
        type:Date,
        require:true
    },
    intruction:{
        type:String,
 
-       
+
        default:''
    },
    status:{
