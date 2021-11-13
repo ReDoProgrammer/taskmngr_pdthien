@@ -48,10 +48,5 @@ router.get("/init", (req, res) => {
   });
 });
 
-router.get("/login", (req, res) => {
-  res.render("admin/home/login", {
-    layout: "admin/home/login",
-  });
-});
 
 module.exports = router;

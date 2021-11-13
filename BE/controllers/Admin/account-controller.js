@@ -1,9 +1,10 @@
 const router = require('express').Router();
 
 
-router.get('/',(req,res)=>{
-    res.render('admin/account/login',{
-        layout:'admin/account/login'
+router.get('/login',(req,res)=>{
+    res.render('admin/auth/login',{
+        layout:'layouts/auth-layout',
+        title:'Admin authentication - BamBooPhoto'
     });
 })
 

@@ -64,19 +64,10 @@ const saleHomeController = require('./BE/controllers/Sale/sale-home-controller')
 const saleJobController = require('./BE/controllers/Sale/sale-job-controller');
 
 
-/*
-
-  TLA Controllers
-
-*/
-
-const TLAHomeController = require('./BE/controllers/TLA/home-controller');
 
 
 
 
-//common controllers
-const commonAccountController = require("./BE/controllers/common/account-controller");
 
 app.use(layout); //set layout
 
@@ -111,8 +102,10 @@ const apiSaleJob = require('./BE/API/Sale/api-sale-job');
 /*
   TLA Controllers
 */
+
+
 const TLAAuth = require('./BE/controllers/TLA/authentication-controller');
-app.use('/tla/auth',TLAAuth);
+app.use('/tla',TLAAuth);
 
 
 /*
@@ -120,7 +113,10 @@ app.use('/tla/auth',TLAAuth);
 */
 
 const apiTLAAuth = require('./BE/API/TLA/api-auth');
-app.use('/tla/auth',apiTLAAuth);
+app.use('/tla',apiTLAAuth);
+
+const TLAHomeController = require('./BE/controllers/TLA/home-controller');
+app.use('/tla',TLAHomeController);
 
 const apiTLAJob = require('./BE/API/TLA/api-tla-job');
 app.use('/tla/job',apiTLAJob);
@@ -156,7 +152,7 @@ app.use("/", homeController);
 //USING ADMIN CONTROLLERS
 
 app.use("/admin", adminHomeController);
-app.use("/admin/account/login", adminAccountController);
+app.use("/admin", adminAccountController);
 
 app.use("/admin/customer", adminCustomerController);
 app.use("/admin/customer-style", adminCustomerStyleController);
@@ -189,15 +185,7 @@ app.use('/sale/job',saleJobController);
 app.use('/sale/job',apiSaleJob);
 
 
-//using TLA Controllers 
 
-app.use('/tla',TLAHomeController);
-
-
-
-
-//using common controllers
-app.use("/account", commonAccountController);
 
 app.listen(process.env.PORT, (_) => {
   console.log(`server is running on port ${process.env.PORT}`);
