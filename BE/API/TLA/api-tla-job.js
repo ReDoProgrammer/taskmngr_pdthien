@@ -1,9 +1,9 @@
 const router = require('express').Router();
-const { TLAMiddleware } = require("../../../middlewares/tla-middleware");
+const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const Job = require('../../models/job-model');
 
 
-router.get('/list',(req,res)=>{
+router.get('/list',authenticateTLAToken,(req,res)=>{
     let {page,search} = req.query;
     Job.find({})
     .populate('customer','firstname lastname remark -_id')
@@ -22,7 +22,7 @@ router.get('/list',(req,res)=>{
     })
 })
 
-router.get('/detail',(req,res)=>{
+router.get('/detail',authenticateTLAToken,(req,res)=>{
     let {id} = req.query;
     Job.findById(id)
     .populate({path:'customer',populate:({path:'cloud', select:'name -_id'})})   
