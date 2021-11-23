@@ -54,7 +54,11 @@
 
         $(document).ready(function () {
             LoadJob();
+            LoadLevels();
         })
+
+
+
 
         function LoadJob() {
             $.ajax({
@@ -215,6 +219,26 @@
                 },
             })
         }
+    
+        function LoadLevels(){
+            $.ajax({
+                url:'/tla/level',
+                type:'get',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                success:function(data){
+                    console.log(data);
+                    data.levels.forEach(l=>{
+                       
+                    })
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
+                }
+            })
+        }
+    
     </script>
 
 

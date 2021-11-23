@@ -1,6 +1,6 @@
 <div class="modal" tabindex="-1" id="assignJobModal">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">    
+    <div class="modal-content">
       <div class="modal-body text-dark">
         <div class="card mb-3">
           <div class="card-header font-weight-bold">Summary</div>
@@ -29,7 +29,7 @@
               <div class="col-md-9">
                 <label id="job_intruction" class="text-warning"></label>
               </div>
-            </div>               
+            </div>
           </div>
         </div>
 
@@ -48,20 +48,18 @@
 
         <hr />
         <div class="form-row">
-          <div class="col-md-5 text-right">
+          <div class="col-md-7 text-right">
             <select name="" id="slEmployees" class="form-control"></select>
           </div>
 
-          <div class="col-md-2 text-right">
-            <label>Task:</label>
-          </div>
-          <div class="form-check col-md-2 mt-1 text-right">
-            <input class="form-check-input" type="checkbox" id="isEditor" />
-            <label class="form-check-label"> Editor </label>
-          </div>
-          <div class="form-check col-md-2 mt-1 text-center">
-            <input class="form-check-input" type="checkbox" id="isQA" />
-            <label class="form-check-label"> Q.C </label>
+          <div class="col-sm-2">
+            <select name="slTask" id="slTask" class="form-control">
+              <option value="Editor">Editor</option>
+              <option value="QA">Q.A</option>
+            </select>
+          </div>        
+          <div class="col-sm-2">
+            <input type="text" name="" id="txtDeadline" class="form-control">
           </div>
           <div class="col-md-1">
             <button class="btn btn-info" id="btnAddUser">
@@ -92,12 +90,13 @@
 
 <script type="text/javascript">
   let idx = 1;
+  let task = [];
   $("#btnAddUser").click(function () {
     let user_id = $("#slEmployees option:selected").val();
 
     let fullname = $("#slEmployees option:selected").text();
 
-    if (!$('#isEditor').is(':checked') && !$('#isEditor').is(':checked')) {
+    if (!$('#isEditor').is(':checked') && !$('#isQA').is(':checked')) {
       $('#msgError').text('Vui lòng chọn ít nhất 1 tác vụ Q.A hoặc Editor');
       return;
     }
@@ -110,6 +109,12 @@
       }
     });
     if (!exist) {
+      let el = {
+        user: user_id,
+        is_qa: $("#isQA").is(":checked"),
+        is_editor: $("#isEditor").is(":checked")
+      }
+      task.push(el);
       let tr = '<tr id="' + user_id + '">';
       tr += "<td>" + idx++ + "</td>";
       tr += "<td>" + fullname + "</td>";
@@ -118,33 +123,35 @@
         tr += '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
       else tr += '<i class="fa fa-square-o" aria-hidden="true"></i>';
       tr += "</td>";
-      tr += "<td>";
-      if ($("#isQC").is(":checked"))
-        tr += '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
-      else tr += '<i class="fa fa-square-o" aria-hidden="true"></i>';
-      tr += "</td>";
+
+      if ($("#isQA").is(":checked"))
+        tr += '<td data-task="QC"><i class="fa fa-check-square-o" aria-hidden="true"></i></td>';
+      else tr += '<td data-task="Editor"><i class="fa fa-square-o" aria-hidden="true"></i></td>';
+
       tr += '<td><button class="btn btn-sm"><i class="fa fa-trash text-danger" aria-hidden="true"></i></button></td>';
       tr += "</tr>";
 
       $("#tblEmployees").append(tr);
       $('#msgError').text('');
+      console.log(task);
     }
   });
 
   $("#btnSubmit").click(function () {
-    if($('#tblEmployees tr').length == 0){
+    if ($('#tblEmployees tr').length == 0) {
       $('#msgError').text('Vui lòng thiết lập tác vụ cho nhân viên trước khi tiếp tục!');
       return;
     }
 
-    let task = [];
-
-    $('#tblEmployees tr').each(function () {
-      console.log($(this).attr('id'));
-      let cells = $(this.cells[0]).
-      console.log(cells);
-
-    });
-
+    $.ajax({
+      url: '/tla/task',
+      type: 'post',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        task
+      }
+    })
   });
 </script>

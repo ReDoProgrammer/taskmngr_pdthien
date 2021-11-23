@@ -12,7 +12,8 @@ router.get('/detail',authenticateTLAToken,(req,res)=>{
 })
 
 router.post('/',authenticateTLAToken,(req,res)=>{
-
+    let {task} = req.body;
+    console.log(task);
 })
 
 router.put('/',authenticateTLAToken,(req,res)=>{

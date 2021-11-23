@@ -147,6 +147,13 @@ app.use('/tla/customer',apiTLACustomer);
 const apiTLAJob = require('./BE/API/TLA/api-tla-job');
 app.use('/tla/job',apiTLAJob);
 
+const apiTLALevel = require('./BE/API/TLA/api-tla-level');
+app.use('/tla/level',apiTLALevel);
+
+const apiTLATask = require('./BE/API/TLA/api-tla-task');
+app.use('/tla/task',apiTLATask);
+
+
 const apiTLAUser = require('./BE/API/TLA/api-tla-user');
 app.use('/tla/user',apiTLAUser);
 
