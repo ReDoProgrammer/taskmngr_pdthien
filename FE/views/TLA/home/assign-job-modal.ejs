@@ -34,12 +34,13 @@
         </div>
 
         <table class="table mt-1 table-striped bg-white text-dark">
-          <thead class="thead-dark">
+          <thead class="thead-secondary">
             <tr>
               <th scope="col">#</th>
               <th scope="col">Employee</th>
               <th scope="col">Editor</th>
               <th scope="col">Q.C</th>
+              <th scope="col">Deadline</th>
               <th></th>
             </tr>
           </thead>
@@ -48,25 +49,41 @@
 
         <hr />
         <div class="form-row">
-          <div class="col-md-7 text-right">
+
+          <div class="col-sm-3">
             <select name="" id="slEmployees" class="form-control"></select>
           </div>
 
-          <div class="col-sm-2">
-            <select name="slTask" id="slTask" class="form-control">
-              <option value="Editor">Editor</option>
-              <option value="QA">Q.A</option>
-            </select>
-          </div>        
-          <div class="col-sm-2">
-            <input type="text" name="" id="txtDeadline" class="form-control">
+          <div class="col-sm-1 mt-2">
+            <label class="font-weight-bold text-danger pl-2">Task: </label>
           </div>
-          <div class="col-md-1">
+
+          <div class="col-sm-1 form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" value="" id="ckbEditor">
+          <label class="form-check-label font-weight-bold" for="inlineRadio1">Editor</label>
+          </div>
+
+          <div class="form-check form-check-inline col-sm-1">
+            <input class="form-check-input" type="checkbox" value="" id="ckbQA">
+            <label class="form-check-label font-weight-bold" for="inlineRadio2">Q.A</label>
+          </div>
+
+          <div class="col-sm-1 mt-2">
+            <label for="">Deadline: </label>
+          </div>
+
+          <div class="col-sm-3">
+            <input type="text" name="" id="txtDeadline" class="form-control ml-1">
+          </div>
+
+          <div class="col-sm-1">
             <button class="btn btn-info" id="btnAddUser">
               <i class="fa fa-plus" aria-hidden="true"></i>Add
             </button>
-          </div>
+          </div>     
         </div>
+
+
         <div class="form-row">
           <div class="col-sm-12">
             <label class="font-weight-bold text-danger mt-3" id="msgError"></label>
@@ -93,13 +110,7 @@
   let task = [];
   $("#btnAddUser").click(function () {
     let user_id = $("#slEmployees option:selected").val();
-
     let fullname = $("#slEmployees option:selected").text();
-
-    if (!$('#isEditor').is(':checked') && !$('#isQA').is(':checked')) {
-      $('#msgError').text('Vui lòng chọn ít nhất 1 tác vụ Q.A hoặc Editor');
-      return;
-    }
     let exist = false;
     $("#tblEmployees tr").each(function () {
       if (this.id == user_id) {
@@ -108,32 +119,63 @@
         return;
       }
     });
+
+
+    if(!$('#ckbEditor').is(':checked') && !$('#ckbQA').is(':checked')){
+      $('#msgError').text("Vui lòng thiết lập công việc cho nhân viên này!");       
+        return;
+    }
+
+    if($('#txtDeadline').val().length <12){
+      $('#msgError').text("Vui lòng nhập deadline của task này!");
+      return;
+    }
+
+    let deadline =  new Date( Date.parse($('#txtDeadline').val()) );
+
+    //validate deadline
+    // if(deadline<=new Date($.now())){
+    //   $('#msgError').text("Deadline của task không hợp lệ!");
+    //   return;
+    // }
+   
+
     if (!exist) {
       let el = {
         user: user_id,
-        is_qa: $("#isQA").is(":checked"),
-        is_editor: $("#isEditor").is(":checked")
+        is_qa: $("#ckbQA").is(":checked"),
+        is_editor: $("#ckbEditor").is(":checked"),
+        deadline: $('#txtDeadline').val()
       }
+
+
       task.push(el);
       let tr = '<tr id="' + user_id + '">';
       tr += "<td>" + idx++ + "</td>";
       tr += "<td>" + fullname + "</td>";
       tr += "<td>";
-      if ($("#isEditor").is(":checked"))
+      if ($("#ckbEditor").is(":checked"))
         tr += '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
       else tr += '<i class="fa fa-square-o" aria-hidden="true"></i>';
       tr += "</td>";
 
-      if ($("#isQA").is(":checked"))
+      if ($("#ckbQA").is(":checked"))
         tr += '<td data-task="QC"><i class="fa fa-check-square-o" aria-hidden="true"></i></td>';
       else tr += '<td data-task="Editor"><i class="fa fa-square-o" aria-hidden="true"></i></td>';
+
+      tr += '<td>'+$('#txtDeadline').val()+'</td>';
 
       tr += '<td><button class="btn btn-sm"><i class="fa fa-trash text-danger" aria-hidden="true"></i></button></td>';
       tr += "</tr>";
 
       $("#tblEmployees").append(tr);
+
+
+      //reset components value
       $('#msgError').text('');
-      console.log(task);
+      $('#ckbEditor').prop('checked', false);
+      $('#ckbQA').prop('checked', false);
+      $('#txtDeadline').val('');
     }
   });
 
@@ -154,4 +196,12 @@
       }
     })
   });
+
+  $('#txtDeadline').inputmask("datetime", {
+    mask: "1/2/y h:s",
+    placeholder: "dd/mm/yyyy hh:mm",
+    leapday: "-02-29",
+    separator: "/",
+    alias: "dd/mm/yyyy hh:mm"
+  })
 </script>

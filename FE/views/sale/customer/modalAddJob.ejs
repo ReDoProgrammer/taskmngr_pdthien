@@ -76,8 +76,7 @@
     let delivery_date = $('#txtDeliveryDate').val();
     let intruction = $('#txaIntruction').val();
 
-    console.log({ customer, name, source_link, received_date, delivery_date, intruction });
-
+   
     $.ajax({
       url: '/sale/job',
       type: 'post',
