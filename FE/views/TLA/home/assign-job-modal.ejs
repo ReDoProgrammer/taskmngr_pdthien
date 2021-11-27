@@ -40,6 +40,7 @@
               <th scope="col">Employee</th>
               <th scope="col">Editor</th>
               <th scope="col">Q.C</th>
+              <th scope="col">Assigned date</th>
               <th scope="col">Deadline</th>
               <th></th>
             </tr>
@@ -60,7 +61,7 @@
 
           <div class="col-sm-1 form-check form-check-inline">
             <input class="form-check-input" type="checkbox" value="" id="ckbEditor">
-          <label class="form-check-label font-weight-bold" for="inlineRadio1">Editor</label>
+            <label class="form-check-label font-weight-bold" for="inlineRadio1">Editor</label>
           </div>
 
           <div class="form-check form-check-inline col-sm-1">
@@ -80,7 +81,7 @@
             <button class="btn btn-info" id="btnAddUser">
               <i class="fa fa-plus" aria-hidden="true"></i>Add
             </button>
-          </div>     
+          </div>
         </div>
 
 
@@ -121,31 +122,33 @@
     });
 
 
-    if(!$('#ckbEditor').is(':checked') && !$('#ckbQA').is(':checked')){
-      $('#msgError').text("Vui lòng thiết lập công việc cho nhân viên này!");       
-        return;
+    if (!$('#ckbEditor').is(':checked') && !$('#ckbQA').is(':checked')) {
+      $('#msgError').text("Vui lòng thiết lập công việc cho nhân viên này!");
+      return;
     }
 
-    if($('#txtDeadline').val().length <12){
+    if ($('#txtDeadline').val().length < 12) {
       $('#msgError').text("Vui lòng nhập deadline của task này!");
       return;
     }
 
-    let deadline =  new Date( Date.parse($('#txtDeadline').val()) );
+    let deadline = new Date(Date.parse($('#txtDeadline').val()));
 
     //validate deadline
     // if(deadline<=new Date($.now())){
     //   $('#msgError').text("Deadline của task không hợp lệ!");
     //   return;
     // }
-   
+
 
     if (!exist) {
       let el = {
+        jobId: jobId,
         user: user_id,
         is_qa: $("#ckbQA").is(":checked"),
         is_editor: $("#ckbEditor").is(":checked"),
-        deadline: $('#txtDeadline').val()
+        assigned_date:new Date($.now()),
+        deadline: new Date($('#txtDeadline').val())
       }
 
 
@@ -163,7 +166,8 @@
         tr += '<td data-task="QC"><i class="fa fa-check-square-o" aria-hidden="true"></i></td>';
       else tr += '<td data-task="Editor"><i class="fa fa-square-o" aria-hidden="true"></i></td>';
 
-      tr += '<td>'+$('#txtDeadline').val()+'</td>';
+      tr+= '<td>'+formatDate(new Date($.now()))+'</td>';
+      tr += '<td>' + $('#txtDeadline').val() + '</td>';
 
       tr += '<td><button class="btn btn-sm"><i class="fa fa-trash text-danger" aria-hidden="true"></i></button></td>';
       tr += "</tr>";
@@ -193,8 +197,57 @@
       },
       data: {
         task
-      }
+      },
+      success: function (data) {
+        alert(data.msg);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      },
     })
+  });
+
+
+  $("#assignJobModal").on('shown.bs.modal', function (e) {
+    $("#tblEmployees").empty();
+    $.ajax({
+      url: '/tla/task/list',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        jobId
+      },
+      success: function (data) {
+        let idx = 1;
+        data.tasks.forEach(t => {
+          let tr = '<tr id="' + t.staff._id + '">';
+          tr += "<td>" + idx++ + "</td>";
+          tr += "<td>" + t.staff.fullname + "</td>";
+          tr += "<td>";
+          if (t.editor)
+            tr += '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
+          else tr += '<i class="fa fa-square-o" aria-hidden="true"></i>';
+          tr += "</td>";
+
+          if (t.qa)
+            tr += '<td><i class="fa fa-check-square-o" aria-hidden="true"></i></td>';
+          else tr += '<td><i class="fa fa-square-o" aria-hidden="true"></i></td>';
+
+          tr += '<td>' +formatDate(new Date($.now())) + '</td>';
+          tr += '<td>' +formatDate(t.deadline) + '</td>';
+
+          tr += '<td><button class="btn btn-sm"><i class="fa fa-trash text-danger" aria-hidden="true"></i></button></td>';
+          tr += "</tr>";
+
+          $("#tblEmployees").append(tr);
+        })
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $('#msgError').text(jqXHR.responseJSON.msg);
+      },
+    });
   });
 
   $('#txtDeadline').inputmask("datetime", {
@@ -204,4 +257,19 @@
     separator: "/",
     alias: "dd/mm/yyyy hh:mm"
   })
+
+  function formatDate(d) {
+    date = new Date(d)
+    var dd = date.getDate();
+    var mm = date.getMonth() + 1;
+    var yyyy = date.getFullYear();
+
+    var hh = date.getHours();
+    var MM = date.getMinutes();
+    if (dd < 10) { dd = '0' + dd }
+    if (mm < 10) { mm = '0' + mm };
+    if (MM < 10) { MM = '0' + MM };
+    if (hh < 10) { hh = '0' + hh };
+    return d = dd + '/' + mm + '/' + yyyy +' '+hh+':'+MM;
+  }
 </script>
