@@ -9,8 +9,7 @@ router.get('/list', authenticateTLAToken, (req, res) => {
         .find({ job: jobId })
         .populate('staff', 'fullname')
         .exec()
-        .then(tasks => {
-            console.log(tasks);
+        .then(tasks => {           
             return res.status(200).json({
                 tasks,
                 msg: 'Load tasks by job id successfully!'
@@ -34,9 +33,11 @@ router.post('/', authenticateTLAToken, (req, res) => {
         try {
 
             Task
-                .countDocuments({ job: jobId, staff: t.user })
-                .exec(count => {
+                .countDocuments({ job: t.jobId, staff: t.user })
+                .exec()
+                .then(count => {
                     if (count == 0) {
+                        
                         let o = new Task({
                             job: t.jobId,
                             staff: t.user,
@@ -44,7 +45,8 @@ router.post('/', authenticateTLAToken, (req, res) => {
                             editor: t.is_editor,
                             deadline: t.deadline,
                             assigned_date: t.assigned_date
-                        });
+                        });     
+                                      
                         o.save()
                             .then(_ => {
                                 console.log('task has been created!');

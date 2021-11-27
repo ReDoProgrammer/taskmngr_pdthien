@@ -21,11 +21,10 @@ const taskSchema = new Schema({
         default: false
     },
     assigned_date: {
-        type: Date,
-        default: Date.now()
+        type: String      
     },
     deadline: {
-        type: Date
+        type: String
     },
     status: {
         type: Number,

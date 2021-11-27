@@ -34,7 +34,7 @@
         </div>
 
         <table class="table mt-1 table-striped bg-white text-dark">
-          <thead class="thead-secondary">
+          <thead class="thead-dark">
             <tr>
               <th scope="col">#</th>
               <th scope="col">Employee</th>
@@ -147,10 +147,9 @@
         user: user_id,
         is_qa: $("#ckbQA").is(":checked"),
         is_editor: $("#ckbEditor").is(":checked"),
-        assigned_date:new Date($.now()),
-        deadline: new Date($('#txtDeadline').val())
-      }
-
+        assigned_date: formatDate(new Date($.now())),
+        deadline: $('#txtDeadline').val()
+      }  
 
       task.push(el);
       let tr = '<tr id="' + user_id + '">';
@@ -166,7 +165,7 @@
         tr += '<td data-task="QC"><i class="fa fa-check-square-o" aria-hidden="true"></i></td>';
       else tr += '<td data-task="Editor"><i class="fa fa-square-o" aria-hidden="true"></i></td>';
 
-      tr+= '<td>'+formatDate(new Date($.now()))+'</td>';
+      tr += '<td>' + formatDate(new Date($.now())) + '</td>';
       tr += '<td>' + $('#txtDeadline').val() + '</td>';
 
       tr += '<td><button class="btn btn-sm"><i class="fa fa-trash text-danger" aria-hidden="true"></i></button></td>';
@@ -221,7 +220,8 @@
       },
       success: function (data) {
         let idx = 1;
-        data.tasks.forEach(t => {
+        data.tasks.forEach(t => {      
+
           let tr = '<tr id="' + t.staff._id + '">';
           tr += "<td>" + idx++ + "</td>";
           tr += "<td>" + t.staff.fullname + "</td>";
@@ -235,8 +235,8 @@
             tr += '<td><i class="fa fa-check-square-o" aria-hidden="true"></i></td>';
           else tr += '<td><i class="fa fa-square-o" aria-hidden="true"></i></td>';
 
-          tr += '<td>' +formatDate(new Date($.now())) + '</td>';
-          tr += '<td>' +formatDate(t.deadline) + '</td>';
+          tr += '<td>' + t.assigned_date + '</td>';
+          tr += '<td>' + t.deadline+ '</td>';
 
           tr += '<td><button class="btn btn-sm"><i class="fa fa-trash text-danger" aria-hidden="true"></i></button></td>';
           tr += "</tr>";
@@ -270,6 +270,6 @@
     if (mm < 10) { mm = '0' + mm };
     if (MM < 10) { MM = '0' + MM };
     if (hh < 10) { hh = '0' + hh };
-    return d = dd + '/' + mm + '/' + yyyy +' '+hh+':'+MM;
+    return d = dd + '/' + mm + '/' + yyyy + ' ' + hh + ':' + MM;
   }
 </script>
