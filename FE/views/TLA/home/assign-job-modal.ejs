@@ -113,6 +113,10 @@
     let user_id = $("#slEmployees option:selected").val();
     let fullname = $("#slEmployees option:selected").text();
     let exist = false;
+
+
+
+
     $("#tblEmployees tr").each(function () {
       if (this.id == user_id) {
         $('#msgError').text("Nhân viên này đã được xếp công việc!");
@@ -149,7 +153,7 @@
         is_editor: $("#ckbEditor").is(":checked"),
         assigned_date: formatDate(new Date($.now())),
         deadline: $('#txtDeadline').val()
-      }  
+      }
 
       task.push(el);
       let tr = '<tr id="' + user_id + '">';
@@ -168,7 +172,7 @@
       tr += '<td>' + formatDate(new Date($.now())) + '</td>';
       tr += '<td>' + $('#txtDeadline').val() + '</td>';
 
-      tr += '<td><button class="btn btn-sm"><i class="fa fa-trash text-danger" aria-hidden="true"></i></button></td>';
+      tr += '<td><button class="btn btn-sm" name="btnDelTask"><i class="fa fa-trash text-danger" aria-hidden="true"></i></button></td>';
       tr += "</tr>";
 
       $("#tblEmployees").append(tr);
@@ -207,7 +211,50 @@
   });
 
 
-  $("#assignJobModal").on('shown.bs.modal', function (e) {
+  $("#assignJobModal").on('shown.bs.modal', function (e) {   
+    LoadTasks();
+  });
+
+
+  $(document).ready(function () {
+    $(document).on("click", "button[name='btnDelTask']", function () {
+
+      let user = $(this).closest("tr").attr("id");
+      if (confirm("Bạn thực sự muốn xóa tác vụ của nhân viên này?")) {
+        $.ajax({
+          url: '/tla/task',
+          type: 'delete',
+          headers: {
+            authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+          data: {
+            jobId,
+            user
+          },
+          success: function (data) {
+            alert(data.msg);
+            LoadTasks();
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            $('#msgError').text(jqXHR.responseJSON.msg);
+          }
+        })
+      }
+    })
+  })
+
+
+
+  $('#txtDeadline').inputmask("datetime", {
+    mask: "1/2/y h:s",
+    placeholder: "dd/mm/yyyy hh:mm",
+    leapday: "-02-29",
+    separator: "/",
+    alias: "dd/mm/yyyy hh:mm"
+  })
+
+
+  function LoadTasks() {
     $("#tblEmployees").empty();
     $.ajax({
       url: '/tla/task/list',
@@ -220,7 +267,7 @@
       },
       success: function (data) {
         let idx = 1;
-        data.tasks.forEach(t => {      
+        data.tasks.forEach(t => {
 
           let tr = '<tr id="' + t.staff._id + '">';
           tr += "<td>" + idx++ + "</td>";
@@ -236,9 +283,9 @@
           else tr += '<td><i class="fa fa-square-o" aria-hidden="true"></i></td>';
 
           tr += '<td>' + t.assigned_date + '</td>';
-          tr += '<td>' + t.deadline+ '</td>';
+          tr += '<td>' + t.deadline + '</td>';
 
-          tr += '<td><button class="btn btn-sm"><i class="fa fa-trash text-danger" aria-hidden="true"></i></button></td>';
+          tr += '<td><button class="btn btn-sm" name="btnDelTask"><i class="fa fa-trash text-danger" aria-hidden="true"></i></button></td>';
           tr += "</tr>";
 
           $("#tblEmployees").append(tr);
@@ -248,15 +295,8 @@
         $('#msgError').text(jqXHR.responseJSON.msg);
       },
     });
-  });
+  }
 
-  $('#txtDeadline').inputmask("datetime", {
-    mask: "1/2/y h:s",
-    placeholder: "dd/mm/yyyy hh:mm",
-    leapday: "-02-29",
-    separator: "/",
-    alias: "dd/mm/yyyy hh:mm"
-  })
 
   function formatDate(d) {
     date = new Date(d)
@@ -272,4 +312,6 @@
     if (hh < 10) { hh = '0' + hh };
     return d = dd + '/' + mm + '/' + yyyy + ' ' + hh + ':' + MM;
   }
+
+
 </script>

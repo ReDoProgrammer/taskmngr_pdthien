@@ -63,10 +63,6 @@ router.post('/', authenticateTLAToken, (req, res) => {
                     })
                 })
 
-
-
-
-
             return res.status(201).json({
                 msg: 'Created tasks successfully!'
             })
@@ -85,7 +81,23 @@ router.put('/', authenticateTLAToken, (req, res) => {
 })
 
 router.delete('/', authenticateTLAToken, (req, res) => {
-
+    let {jobId,user} = req.body;
+    Task.findOneAndDelete({
+        job:jobId,
+        staff:user
+    })
+    .exec()
+    .then(_=>{
+        return res.status(200).json({
+            msg:'Task has been deleted!'
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not delete this task`,
+            error: `Error found: ${new Error(err.message)}`
+        })
+    })
 })
 
 
