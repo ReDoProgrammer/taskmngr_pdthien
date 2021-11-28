@@ -9,7 +9,7 @@ router.get('/list', authenticateTLAToken, (req, res) => {
         .find({ job: jobId })
         .populate('staff', 'fullname')
         .exec()
-        .then(tasks => {           
+        .then(tasks => {
             return res.status(200).json({
                 tasks,
                 msg: 'Load tasks by job id successfully!'
@@ -21,6 +21,33 @@ router.get('/list', authenticateTLAToken, (req, res) => {
                 error: new Error(err.message)
             })
         })
+})
+
+router.get('/', authenticateTLAToken, (req, res) => {
+    let { page, search } = req.query;
+    Task
+        .find(
+            {
+                // $or: [
+                //     { firstname: { "$regex": search, "$options": "i" } },
+                // ]
+            }
+        )
+        .populate('staff', 'fullname -_id')
+        .populate('job','name')
+        .exec()
+        .then(tasks=>{
+            return res.status(200).json({
+                msg:'Load tasks list successfully!',
+                tasks
+            })
+        })
+        .catch(err=>{
+            return res.status(500).json({
+                msg:`Can not load taks list with error: ${new Error(err.message)}`
+            })
+        })
+
 })
 
 router.get('/detail', authenticateTLAToken, (req, res) => {
@@ -37,7 +64,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
                 .exec()
                 .then(count => {
                     if (count == 0) {
-                        
+
                         let o = new Task({
                             job: t.jobId,
                             staff: t.user,
@@ -45,8 +72,8 @@ router.post('/', authenticateTLAToken, (req, res) => {
                             editor: t.is_editor,
                             deadline: t.deadline,
                             assigned_date: t.assigned_date
-                        });     
-                                      
+                        });
+
                         o.save()
                             .then(_ => {
                                 console.log('task has been created!');
@@ -58,7 +85,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
                 })
                 .catch(err => {
                     return res.status(500).json({
-                        msg:`Can not check exist task by id: ${t.jobId} and user: ${t.user}`,
+                        msg: `Can not check exist task by id: ${t.jobId} and user: ${t.user}`,
                         error: new Error(err.message)
                     })
                 })
@@ -81,23 +108,23 @@ router.put('/', authenticateTLAToken, (req, res) => {
 })
 
 router.delete('/', authenticateTLAToken, (req, res) => {
-    let {jobId,user} = req.body;
+    let { jobId, user } = req.body;
     Task.findOneAndDelete({
-        job:jobId,
-        staff:user
+        job: jobId,
+        staff: user
     })
-    .exec()
-    .then(_=>{
-        return res.status(200).json({
-            msg:'Task has been deleted!'
+        .exec()
+        .then(_ => {
+            return res.status(200).json({
+                msg: 'Task has been deleted!'
+            })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not delete this task`,
-            error: `Error found: ${new Error(err.message)}`
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not delete this task`,
+                error: `Error found: ${new Error(err.message)}`
+            })
         })
-    })
 })
 
 
