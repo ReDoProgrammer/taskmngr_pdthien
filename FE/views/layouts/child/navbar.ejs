@@ -2,7 +2,7 @@
   class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top"
   role="navigation"
 >
-  <a class="navbar-brand" href="#">Task Mngr</a>
+  <a class="navbar-brand" href="#">BambooPhoto</a>
   <button
     class="navbar-toggler"
     type="button"
@@ -19,10 +19,13 @@
         >
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">Features</a>
+        <a class="nav-link" href="#">Doing</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">Pricing</a>
+        <a class="nav-link" href="#">Done</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Rejected</a>
       </li>
     </ul>
     <ul class="navbar-nav">
@@ -39,7 +42,7 @@
           />
         </div>
       </li>
-      <li class="nav-item col-auto">
+      <li class="nav-item col-auto" id="loginPanel">
         <div class="input-group mt-2">
           <div class="input-group-prepend account-control">
             <div class="input-group-text">P</div>
@@ -53,7 +56,7 @@
         </div>
       </li>
       <li class="nav-item text-center">
-        <a class="nav-link" href="#" id="btnLogin">Login</a>
+        <a class="nav-link text-warning font-weight-bold" href="#" id="btnLogin">Login</a>
       </li>
     </ul>
   </div>
@@ -71,22 +74,26 @@
 <script>
   $(document).ready(function () {});
 
-  $("#btnLogin").click(function () {
+  $("#btnLogin").click(function (e) {
+    e.preventDefault();
+
     let username = $("#txtUsername").val();
     let password = $("#txtPassword").val();
 
     $.ajax({
-      url: "/tla/auth/login",
+      url: "/auth/login",
       type: "post",
       data: {
         username,
         password,
       },
-      success: function (data, textStatus, xhr) {
-        console.log(data);
+     success: function (data, textStatus, xhr) {
+        window.localStorage.setItem('accessToken', data.accessToken);
+        window.location.href=data.url;
+        
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        
+        $("#lblError").text(jqXHR.responseJSON.msg);       
       },
     });
   });

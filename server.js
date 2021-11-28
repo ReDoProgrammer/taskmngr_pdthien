@@ -11,6 +11,8 @@ app.use(express.static("./public")); //set đường dẫn tới thư mục publ
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.use(layout); //set layout
+
 mongoose.connect(
   process.env.mongoose,
   {
@@ -26,7 +28,13 @@ mongoose.connect(
 );
 
 //USER CONTROLLERS
-const homeController = require("./BE/controllers/TLA/home-controller");
+const homeController = require("./BE/controllers/staff/home-controller");
+app.use("/", homeController);
+
+
+//STAFF API
+const staffAuthAPI = require('./BE/API/Staff/authenticate');
+app.use('/auth',staffAuthAPI);
 
 //ADMIN CONTROLLERS
 const adminAccountController = require("./BE/controllers/Admin/account-controller");
@@ -69,7 +77,7 @@ const saleHomeController = require('./BE/controllers/Sale/sale-home-controller')
 
 
 
-app.use(layout); //set layout
+
 
 /**
  * API ADMIN
@@ -179,8 +187,7 @@ app.use('/admin/user-type',apiAdminUserType);
 
 
 
-//USING USER CONTROLLERS
-app.use("/", homeController);
+
 
 //USING ADMIN CONTROLLERS
 

@@ -1,4 +1,19 @@
-<table class="table">
+<div id="divLogo">
+  <img src="/images/GUI/logo.jpg" id="imgLogo">
+</div>
+
+<style>
+  #divLogo{
+    width: 50%;
+    height: auto;
+    margin:0 auto;
+    margin-top: 30px;
+  }
+</style>
+
+
+
+<table class="table" id="tblTasks">
     <thead class="thead-dark">
       <tr>
         <th scope="col">#</th>
@@ -7,7 +22,7 @@
         <th scope="col">Handle</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="tbdTasks">
       <tr>
         <th scope="row">1</th>
         <td>Mark</td>
@@ -29,3 +44,10 @@
     </tbody>
   </table>
   
+
+  <script>
+    $(document).ready(function(){
+      $('#divLogo').show(100);
+      $('#tblTasks').hide();
+    })
+  </script>
