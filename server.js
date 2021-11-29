@@ -50,6 +50,8 @@ const adminCustomerStyleController = require("./BE/controllers/Admin/customer-st
 const adminFileFormatController = require("./BE/controllers/Admin/file-format-controller");
 const adminHomeController = require("./BE/controllers/Admin/home-controller");
 
+const adminJobLevelController = require('./BE/controllers/Admin/job-leve-controller');
+
 const adminLevelController = require("./BE/controllers/Admin/level-controller");
 const adminLocalLevelController = require("./BE/controllers/Admin/local-level-controller");
 
@@ -91,6 +93,7 @@ const apiAdminCloud = require('./BE/API/admin/api-cloud');
 const apiAdminColorMode = require('./BE/API/admin/api-color-mode');
 const apiAdminCustomer = require('./BE/API/admin/api-customer');
 const apiAdminFileFormat = require('./BE/API/admin/api-file-format');
+const apiAdminJobLevel = require('./BE/API/admin/api-job-level');
 const apiAdminLevel = require('./BE/API/admin/api-level');
 const apiAdminLocalLevel = require('./BE/API/admin/api-local-level');
 const apiAdminNationalStyle = require('./BE/API/admin/api-national-style');
@@ -179,6 +182,7 @@ app.use('/admin/cloud',apiAdminCloud);
 app.use('/admin/color-mode',apiAdminColorMode);
 app.use('/admin/customer',apiAdminCustomer);
 app.use('/admin/file-format',apiAdminFileFormat);
+app.use('/admin/job-level',apiAdminJobLevel);
 app.use('/admin/level',apiAdminLevel);
 app.use('/admin/local-level',apiAdminLocalLevel);
 app.use('/admin/national-style',apiAdminNationalStyle);
@@ -204,6 +208,7 @@ app.use('/admin/setting/bank',adminBankController);
 app.use('/admin/setting/color-mode',adminColorModeController);
 app.use('/admin/setting/cloud',adminCloudController);
 app.use("/admin/setting/file-format", adminFileFormatController);
+app.use('/admin/setting/job-level',adminJobLevelController);
 app.use("/admin/setting/level", adminLevelController);
 app.use("/admin/setting/local-level", adminLocalLevelController);
 app.use('/admin/setting/national-style',adminNationalStyleController);

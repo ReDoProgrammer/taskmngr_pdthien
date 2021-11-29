@@ -8,7 +8,7 @@ const jobLevelModel = require('../../models/job-level-model');
     api này dùng để quản trị các joblevel ( loại mặt hàng của khác)
 */
 
-router.get('/list',authenticateAdminToken,(req,res)=>{
+router.get('/',authenticateAdminToken,(req,res)=>{
     JobLevel
     .find({})
     .exec()
@@ -26,9 +26,9 @@ router.get('/list',authenticateAdminToken,(req,res)=>{
 })
 
 router.get('/detail',authenticateAdminToken,(req,res)=>{
-    let {jlId} = req.query;
+    let {id} = req.query;
     JobLevel
-    .findById(jlId)
+    .findById(id)
     .exec()
     .then(jl=>{
         if(jl == null){

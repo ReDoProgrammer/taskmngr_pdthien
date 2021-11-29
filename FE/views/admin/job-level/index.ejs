@@ -1,0 +1,126 @@
+<div class="row">
+    <div class="col-sm-2 offset-sm-10 text-right">
+        <button class="btn btn-sm btn-success" id="btnAddNew">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+            Add New
+        </button>
+    </div>
+</div>
+<table class="table mt-2">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody id="tblJobLevels">
+    </tbody>
+</table>
+
+<%-include('modalJobLevel')%>
+
+
+
+    <script>
+        var id = '';
+        $(document).ready(function () {
+            LoadJobLevels();
+        })
+
+
+        $('#btnAddNew').click(function () {
+            $('#modalJobLevel').modal();
+        })
+
+
+        function LoadJobLevels() {
+            $.ajax({
+                url: '/admin/job-level',
+                type: 'get',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                success: function (data) {
+                    let idx = 1;
+                    $('#tblJobLevels').empty();
+                    data.jl.forEach(j => {
+                        let tr = '<tr id="' + j._id + '" data-name="' + j.name + '">';
+                        tr += '<td>' + (idx++) + '</td>';
+                        tr += '<td class="text-info font-weight-bold">' + j.name + '</td>';
+                        tr += '<td>' + j.description + '</td>';
+                        tr += '<td class="text-right"><button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+                        tr += '<button class="btn btn-sm btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
+                        tr += '</tr>';
+                        $('#tblJobLevels').append(tr);
+                    })
+                }, error: function (request, status, error) {
+                    alert(request.responseJSON.msg);
+                }
+            })
+        }
+
+
+
+        $(document).on("click", "button[name='delete']", function () {
+
+            var r = confirm("Vui lòng xác nhận xóa job level " + $(this).closest("tr").data('name') + "?");
+            if (r == true) {
+                $.ajax({
+                    url: '/admin/job-level',
+                    type: 'delete',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem('accessToken'),
+                    },
+                    data: {
+                        id: $(this).closest("tr").attr("id")
+                    },
+                    success: function (data, textStatus, xhr) {
+                        alert(data.msg);
+                        LoadJobLevels();
+                    }, error: function (jqXHR, textStatus, errorThrown) {
+                        alert(jqXHR.responseJSON.msg);
+                    }
+                })
+            }
+
+
+        });
+
+        $(document).on("click", "button[name='update']", function () {
+
+            id = $(this).closest("tr").attr("id");
+
+            $.ajax({
+                url: "/admin/job-level/detail",
+                type: "get",
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem('accessToken'),
+                },
+                data: {
+                    id
+                },
+                success: function (data, textStatus, xhr) {
+                    $('#modalJobLevel').modal();
+                    $('#txtName').val(data.jl.name);
+                    $('#txtDescription').val(data.jl.description);
+                }, error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseJSON.msg);
+                }
+            });
+
+        });
+
+
+
+        //sự kiện modal shown --> set các giá trị mặc định cho component trên form
+        $(document).on('show.bs.modal', '.modal', function () {
+            $('#txtName').val('');
+            $('#txtDescription').val('');
+        });
+
+        $('#modalJobLevel').on('hidden.bs.modal', function () {
+            LoadJobLevels();
+        })
+    </script>
