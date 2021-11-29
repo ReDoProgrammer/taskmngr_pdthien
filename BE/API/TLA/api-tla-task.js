@@ -33,7 +33,7 @@ router.get('/', authenticateTLAToken, (req, res) => {
                 // ]
             }
         )
-        .populate('staff', 'fullname -_id')
+        .populate('level', 'name -_id')
         .populate('job','name')
         .exec()
         .then(tasks=>{
@@ -67,11 +67,8 @@ router.post('/', authenticateTLAToken, (req, res) => {
 
                         let o = new Task({
                             job: t.jobId,
-                            staff: t.user,
-                            qa: t.is_qa,
-                            editor: t.is_editor,
-                            deadline: t.deadline,
-                            assigned_date: t.assigned_date
+                            level:t.level,
+                            remark:t.remark
                         });
 
                         o.save()
@@ -127,12 +124,5 @@ router.delete('/', authenticateTLAToken, (req, res) => {
         })
 })
 
-
-
-function convertToDate(t) {
-    t = (t + ':00').replace('\/', '-');
-    console.log(t);
-    return moment(t + ':00').replace('/', '-').format('DD-MMM-YYYY HH:mm:ss')
-}
 
 module.exports = router;

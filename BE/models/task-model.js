@@ -8,6 +8,10 @@ const taskSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'job'
     },
+    level: {
+        type: Schema.Types.ObjectId,
+        ref: 'job-level'
+    },
     staff: {
         type: Schema.Types.ObjectId,
         ref: 'user'
@@ -20,17 +24,11 @@ const taskSchema = new Schema({
         type: Boolean,
         default: false
     },
-    assigned_date: {
-        type: String      
-    },
-    deadline: {
-        type: String
-    },
     status: {
         type: Number,
         default: -1
         /*
-             -1: editor nhận
+             -1: khởi tạo
              0: Editor đang xử lý
              1: editor done
              2: QA ok
@@ -39,9 +37,23 @@ const taskSchema = new Schema({
              -3: DC reject
         */
     },
+
     edited_time: {
+        //thuộc tính đánh dấu số lần edit
+
         type: Number,
         default: 0
+    },
+    is_assigned: {
+        //thuộc tính dùng để đánh dấu nhân viên được TLA giao việc (task) hay do nhân viên lựa chọn
+        type: Boolean,
+        default: false
+    },
+    remark:{
+        //phần ghi chú cho task/level
+        //cả tla, sale,admin,dc đều có thể can thiệp
+        type:String,
+        default:''
     }
 
 },

@@ -31,6 +31,7 @@
                 <th scope="col">#</th>
                 <th scope="col">Customer</th>
                 <th scope="col">Job name</th>
+                <th scope="col">Intruction</th>
                 <th scope="col">Received date</th>
                 <th scope="col">Delivery date</th>
                 <th scope="col">Status</th>
@@ -79,7 +80,8 @@
                         let tr = '<tr id = "' + job._id + '">';
                         tr += '<td>' + (idx++) + '</td>'
                         tr += '<td>' + job.customer.firstname + ' ' + job.customer.lastname + '</td>';
-                        tr += '<td>' + job.name + '</button></td>';
+                        tr += '<td>' + job.name + '</td>';
+                        tr += '<td>' + job.intruction + '</td>';
                         tr += "<td>" + new Date(job.received_date).toLocaleString() + "</td>";
                         tr += "<td>" + new Date(job.delivery_date).toLocaleString() + "</td>";
                         tr += '<td class = "text-info"><i>';
@@ -104,7 +106,7 @@
                                 break;
                         }
                         tr += '</i></td>';
-                        tr += '<td class="font-weight-bold"><button class="btn btn-sm btn-info" name="assign-job"><i class="fa fa-tasks text-warning" aria-hidden="true"></i> Assign job</button></td>'
+                        tr += '<td class="font-weight-bold"><button class="btn btn-sm btn-info" name="assign-job"><i class="fa fa-tasks text-warning" aria-hidden="true"></i> Assign level</button></td>'
                         tr += '</tr>';
                         $('#tblData').append(tr);
                     })
@@ -130,9 +132,7 @@
                 },
                 success: function (data, textStatus, xhr) {
 
-                    $('#assignJobModal').modal();
-
-                    LoadUsers();
+                    $('#assignJobModal').modal();                    
 
                     $('#customer_fullname').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
                     $('#name_case').text(data.job.name);
@@ -201,26 +201,7 @@
         })
 
 
-        function LoadUsers() {
-            $.ajax({
-                url: '/tla/user/list',
-                type: 'get',
-                headers: {
-                    authorization: "Bearer " + localStorage.getItem("accessToken"),
-                },
-                success: function (data, textStatus, xhr) {
 
-                    $('#slEmployees').empty();
-                    data.users.forEach(user => {
-                        let opt = '<option value="' + user._id + '">' + user.fullname + '</option>';
-                        $('#slEmployees').append(opt);
-                    })
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.responseJSON.msg);
-                },
-            })
-        }
     
         function LoadLevels(){
             $.ajax({
@@ -250,12 +231,11 @@
         }
 
         #tblMaster {
-            height: 300px;
+            height: 500px;
+            overflow-y: auto;
         }
 
-        #tblDetail {
-            height: 200px;
-        }
+        
 
 
         .tableFixHead thead th {
