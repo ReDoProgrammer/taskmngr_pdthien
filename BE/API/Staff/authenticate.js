@@ -43,7 +43,7 @@ router.post("/login", (req, res) => {
                         const refreshToken = jwt.sign(u, process.env.REFRESH_TOKEN_SECRET);
 
                         refershTokens.push(refreshToken);
-                        
+
                         return res.status(200).json({
                             msg: 'Login successfully!',
                             url: '/',

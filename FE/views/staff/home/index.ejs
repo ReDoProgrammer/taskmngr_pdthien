@@ -1,53 +1,58 @@
-<div id="divLogo">
-  <img src="/images/GUI/logo.jpg" id="imgLogo">
-</div>
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Job</th>
+      <th scope="col">Assigned date</th>
+      <th scope="col">Deadline</th>
+      <th scope="col">Q.A</th>
+      <th scope="col">Editor</th>
+    </tr>
+  </thead>
+  <tbody id="tbdTasks">
+    <tr>
+      <th scope="row">1</th>
+      <td>Mark</td>
+      <td>Otto</td>
+      <td>@mdo</td>
+    </tr>
+  </tbody>
+</table>
 
-<style>
-  #divLogo{
-    width: 50%;
-    height: auto;
-    margin:0 auto;
-    margin-top: 30px;
-  }
-</style>
 
+<script>
+  $(document).ready(function () {
+    LoadAssignedTasks();
+  })
 
+  var page = 1;
+  var search = '';
 
-<table class="table" id="tblTasks">
-    <thead class="thead-dark">
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">First</th>
-        <th scope="col">Last</th>
-        <th scope="col">Handle</th>
-      </tr>
-    </thead>
-    <tbody id="tbdTasks">
-      <tr>
-        <th scope="row">1</th>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>@mdo</td>
-      </tr>
-      <tr>
-        <th scope="row">2</th>
-        <td>Jacob</td>
-        <td>Thornton</td>
-        <td>@fat</td>
-      </tr>
-      <tr>
-        <th scope="row">3</th>
-        <td>Larry</td>
-        <td>the Bird</td>
-        <td>@twitter</td>
-      </tr>
-    </tbody>
-  </table>
-  
+  function LoadAssignedTasks() {
+    $.ajax({
+      url: '/task',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {        
+        page,
+        search
+      },
+      success: function (data) {
+        $('#tbdTasks').empty();
+        data.tasks.forEach(t=>{
+          let tr = '<tr id="'+t._id+'">';
+            
 
-  <script>
-    $(document).ready(function(){
-      $('#divLogo').show(100);
-      $('#tblTasks').hide();
+            tr+= '</tr>';
+        })
+
+      }, error: function (request, status, error) {
+        alert(request.responseJSON.msg);
+        window.location.href = '/tla/login';
+      }
+
     })
-  </script>
+  }
+</script>

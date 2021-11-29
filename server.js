@@ -36,6 +36,9 @@ app.use("/", homeController);
 const staffAuthAPI = require('./BE/API/Staff/authenticate');
 app.use('/auth',staffAuthAPI);
 
+const staffTaskAPI = require('./BE/API/Staff/api-task');
+app.use('/task',staffTaskAPI);
+
 //ADMIN CONTROLLERS
 const adminAccountController = require("./BE/controllers/Admin/account-controller");
 const adminBankController = require('./BE/controllers/Admin/bank-controller');
