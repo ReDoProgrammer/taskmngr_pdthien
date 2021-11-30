@@ -94,37 +94,7 @@
     let name = $("#slJobLevels option:selected").text();
 
 
-    let el = {
-      jobId: jobId,
-      level: level,
-      remark: $('#txtRemark').val()
-    }
 
-    task.push(el);
-    let tr = '<tr id="' + jobId + '">';
-    tr += "<td>" + idx++ + "</td>";
-    tr += "<td>" + name + "</td>";
-    tr += "<td>" + $('#txtRemark').val() + "</td>";
-    tr += '<td></td>';
-    tr += '<td></td>';
-    tr += '<td></td>';
-    tr += '<td><button class="btn btn-sm btn-danger" name="btnDelTask"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
-    tr += '</tr>';
-
-    $("#tblJobLevels").append(tr);
-
-
-    //reset components value
-    $('#msgError').text(''); 
-    $('#txtRemark').val('');
-
-  });
-
-  $("#btnSubmit").click(function () {
-    if ($('#tblEmployees tr').length == 0) {
-      $('#msgError').text('Vui lòng thiết lập tác vụ cho nhân viên trước khi tiếp tục!');
-      return;
-    }
 
     $.ajax({
       url: '/tla/task',
@@ -133,15 +103,25 @@
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       data: {
-        task
+        job: jobId,
+        level: level,
+        remark: $('#txtRemark').val()
       },
       success: function (data) {
         alert(data.msg);
+        LoadTasks();
       },
       error: function (jqXHR, textStatus, errorThrown) {
         alert(jqXHR.responseJSON.msg);
       },
     })
+
+
+
+    //reset components value
+    $('#msgError').text('');
+    $('#txtRemark').val('');
+
   });
 
 
@@ -218,7 +198,7 @@
       success: function (data) {
         let idx = 1;
         data.tasks.forEach(t => {
-
+          
           let tr = '<tr id="' + t.staff._id + '">';
           tr += "<td>" + idx++ + "</td>";
           tr += "<td>" + t.staff.fullname + "</td>";

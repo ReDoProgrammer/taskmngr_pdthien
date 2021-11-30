@@ -37,6 +37,7 @@ router.get('/', authenticateTLAToken, (req, res) => {
         .populate('job','name')
         .exec()
         .then(tasks=>{
+            console.log(tasks);
             return res.status(200).json({
                 msg:'Load tasks list successfully!',
                 tasks
@@ -55,49 +56,25 @@ router.get('/detail', authenticateTLAToken, (req, res) => {
 })
 
 router.post('/', authenticateTLAToken, (req, res) => {
-    let { task } = req.body;
-    task.forEach(t => {
-        try {
-
-            Task
-                .countDocuments({ job: t.jobId, staff: t.user })
-                .exec()
-                .then(count => {
-                    if (count == 0) {
-
-                        let o = new Task({
-                            job: t.jobId,
-                            level:t.level,
-                            remark:t.remark
-                        });
-
-                        o.save()
-                            .then(_ => {
-                                console.log('task has been created!');
-                            })
-                            .catch(err => {
-                                console.log(`create a new task failed: ${new Error(err.message)}`);
-                            })
-                    }
-                })
-                .catch(err => {
-                    return res.status(500).json({
-                        msg: `Can not check exist task by id: ${t.jobId} and user: ${t.user}`,
-                        error: new Error(err.message)
-                    })
-                })
-
-            return res.status(201).json({
-                msg: 'Created tasks successfully!'
-            })
-
-        } catch (error) {
-            return res.status(500).json({
-                msg: `Create tasks failed with error: ${new Error(error.message)}`
-            })
-
-        }
+    let  {job,level,remark} = req.body;
+    let task = new Task({
+        job,
+        level,
+        remark
     });
+    task.save()
+    .then(_=>{
+        return res.status(201).json({
+            msg:`Task has been created`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not create task with error: ${new Error(err.message)}`,
+            error: new Error(err.message)
+        })
+    })
+    
 })
 
 router.put('/', authenticateTLAToken, (req, res) => {
