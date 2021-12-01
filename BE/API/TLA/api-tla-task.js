@@ -7,7 +7,7 @@ router.get('/list', authenticateTLAToken, (req, res) => {
     let { jobId } = req.query;
     Task
         .find({ job: jobId })
-        .populate('staff', 'fullname')
+        .populate('level', 'name -_id')
         .exec()
         .then(tasks => {
             return res.status(200).json({
@@ -33,19 +33,18 @@ router.get('/', authenticateTLAToken, (req, res) => {
                 // ]
             }
         )
-        .populate('level', 'name -_id')
-        .populate('job','name')
+        .populate('level')
         .exec()
-        .then(tasks=>{
+        .then(tasks => {
             console.log(tasks);
             return res.status(200).json({
-                msg:'Load tasks list successfully!',
+                msg: 'Load tasks list successfully!',
                 tasks
             })
         })
-        .catch(err=>{
+        .catch(err => {
             return res.status(500).json({
-                msg:`Can not load taks list with error: ${new Error(err.message)}`
+                msg: `Can not load taks list with error: ${new Error(err.message)}`
             })
         })
 
@@ -56,25 +55,25 @@ router.get('/detail', authenticateTLAToken, (req, res) => {
 })
 
 router.post('/', authenticateTLAToken, (req, res) => {
-    let  {job,level,remark} = req.body;
+    let { job, level, remark } = req.body;
     let task = new Task({
         job,
         level,
         remark
     });
     task.save()
-    .then(_=>{
-        return res.status(201).json({
-            msg:`Task has been created`
+        .then(_ => {
+            return res.status(201).json({
+                msg: `Task has been created`
+            })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not create task with error: ${new Error(err.message)}`,
-            error: new Error(err.message)
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not create task with error: ${new Error(err.message)}`,
+                error: new Error(err.message)
+            })
         })
-    })
-    
+
 })
 
 router.put('/', authenticateTLAToken, (req, res) => {
@@ -82,11 +81,8 @@ router.put('/', authenticateTLAToken, (req, res) => {
 })
 
 router.delete('/', authenticateTLAToken, (req, res) => {
-    let { jobId, user } = req.body;
-    Task.findOneAndDelete({
-        job: jobId,
-        staff: user
-    })
+    let { _id } = req.body;
+    Task.findByIdAndDelete(_id)
         .exec()
         .then(_ => {
             return res.status(200).json({

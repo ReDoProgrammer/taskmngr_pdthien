@@ -64,52 +64,52 @@
                 console.log(data);
                 let idx = 1;
                 data.tasks.forEach(t => {
-                    let tr = '<tr id="' + t._id + '">';
-                    tr += '<td>' + (idx++) + '</td>';
-                    tr += '<td>' + t.job.name + '</td>';
-                    tr += '<td>' + t.assigned_date + '</td>';
-                    tr += '<td>' + t.deadline + '</td>';
-                    tr += '<td>' + t.staff.fullname + '</td>';
-                    tr += '<td class="text-center">';
-                    if (t.editor) {
-                        tr += '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
-                    } else
-                        tr += '<i class="fa fa-square-o" aria-hidden="true"></i>';
-                    tr += '</td>';
+                    // let tr = '<tr id="' + t._id + '">';
+                    // tr += '<td>' + (idx++) + '</td>';
+                    // tr += '<td>' + t.job.name + '</td>';
+                    // tr += '<td>' + t.assigned_date + '</td>';
+                    // tr += '<td>' + t.deadline + '</td>';
+                    // tr += '<td>' + t.staff.fullname + '</td>';
+                    // tr += '<td class="text-center">';
+                    // if (t.editor) {
+                    //     tr += '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
+                    // } else
+                    //     tr += '<i class="fa fa-square-o" aria-hidden="true"></i>';
+                    // tr += '</td>';
 
-                    tr += '<td class="text-center">';
-                    if (t.qa) {
-                        tr += '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
-                    } else
-                        tr += '<i class="fa fa-square-o" aria-hidden="true"></i>';
-                    tr += '</td>';
+                    // tr += '<td class="text-center">';
+                    // if (t.qa) {
+                    //     tr += '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
+                    // } else
+                    //     tr += '<i class="fa fa-square-o" aria-hidden="true"></i>';
+                    // tr += '</td>';
 
 
-                    tr += '<td class ="font-italic text-info">';
+                    // tr += '<td class ="font-italic text-info">';
 
-                    switch (t.status) {
-                        case -1: tr += 'Initial';
-                            break;
-                        case 0: tr += 'Editing';
-                            break;
-                        case 1:
-                            tr += 'Edited';
-                            break;
-                        case 2:
-                            tr += 'Q.A ok!';
-                            break;
-                        case 3:
-                            tr += 'DC ok!'
-                            break;
-                        case -3:
-                            tr += 'DC rejected';
-                            break;
+                    // switch (t.status) {
+                    //     case -1: tr += 'Initial';
+                    //         break;
+                    //     case 0: tr += 'Editing';
+                    //         break;
+                    //     case 1:
+                    //         tr += 'Edited';
+                    //         break;
+                    //     case 2:
+                    //         tr += 'Q.A ok!';
+                    //         break;
+                    //     case 3:
+                    //         tr += 'DC ok!'
+                    //         break;
+                    //     case -3:
+                    //         tr += 'DC rejected';
+                    //         break;
 
-                    }
-                    tr += '</td>';
+                    // }
+                    // tr += '</td>';
 
-                    tr += '</tr>';
-                    $('#tblLines').append(tr);
+                    // tr += '</tr>';
+                    // $('#tblLines').append(tr);
                 })
             },
             error: function (jqXHR, textStatus, errorThrown) {

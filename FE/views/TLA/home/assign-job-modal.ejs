@@ -45,7 +45,7 @@
               <th></th>
             </tr>
           </thead>
-          <tbody id="tblJobLevels"></tbody>
+          <tbody id="tblTasks"></tbody>
         </table>
 
         <hr />
@@ -134,8 +134,8 @@
     LoadJobLevels();
     $(document).on("click", "button[name='btnDelTask']", function () {
 
-      let user = $(this).closest("tr").attr("id");
-      if (confirm("Bạn thực sự muốn xóa tác vụ của nhân viên này?")) {
+      let _id = $(this).closest("tr").attr("id");
+      if (confirm("Are you sure to delete this level?")) {
         $.ajax({
           url: '/tla/task',
           type: 'delete',
@@ -143,8 +143,7 @@
             authorization: "Bearer " + localStorage.getItem("accessToken"),
           },
           data: {
-            jobId,
-            user
+            _id
           },
           success: function (data) {
             alert(data.msg);
@@ -185,7 +184,7 @@
 
 
   function LoadTasks() {
-    $("#tblEmployees").empty();
+    $("#tblTasks").empty();
     $.ajax({
       url: '/tla/task/list',
       type: 'get',
@@ -198,27 +197,36 @@
       success: function (data) {
         let idx = 1;
         data.tasks.forEach(t => {
-          
-          let tr = '<tr id="' + t.staff._id + '">';
+          let tr = '<tr id="' + t._id + '">';
           tr += "<td>" + idx++ + "</td>";
-          tr += "<td>" + t.staff.fullname + "</td>";
-          tr += "<td>";
-          if (t.editor)
-            tr += '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
-          else tr += '<i class="fa fa-square-o" aria-hidden="true"></i>';
-          tr += "</td>";
+          tr += "<td class='font-weight-bold text-info'>" + t.level.name + "</td>";
+          tr += "<td>" + t.remark + "</td>";
 
-          if (t.qa)
-            tr += '<td><i class="fa fa-check-square-o" aria-hidden="true"></i></td>';
-          else tr += '<td><i class="fa fa-square-o" aria-hidden="true"></i></td>';
 
-          tr += '<td>' + t.assigned_date + '</td>';
-          tr += '<td>' + t.deadline + '</td>';
+          if (typeof t.staff === 'undefined' || t.staff === null) {
+            tr += '<td></td><td></td><td></td>';
+          } else {
 
-          tr += '<td><button class="btn btn-sm" name="btnDelTask"><i class="fa fa-trash text-danger" aria-hidden="true"></i></button></td>';
+            tr += '<td>' + t.staff.fullname + '</td>';
+            if (t.editor)
+              tr += '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
+            else tr += '<i class="fa fa-square-o" aria-hidden="true"></i>';
+            tr += "</td>";
+
+            if (t.qa)
+              tr += '<td><i class="fa fa-check-square-o" aria-hidden="true"></i></td>';
+            else tr += '<td><i class="fa fa-square-o" aria-hidden="true"></i></td>';
+          }
+
+
+          tr += '<td class="text-right">';
+          
+          tr += '<button class="btn btn-sm btn-info" name="btnDelTask"><i class="fa fa-plus" aria-hidden="true"></i> Assign staff</button>';
+          tr += '<button class="ml-1 btn btn-sm btn-danger" name="btnDelTask"><i class="fa fa-trash text-white" aria-hidden="true"></i></button>';
+          tr += '</td>';
           tr += "</tr>";
 
-          $("#tblEmployees").append(tr);
+          $("#tblTasks").append(tr);
         })
       },
       error: function (jqXHR, textStatus, errorThrown) {
