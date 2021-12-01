@@ -8,6 +8,7 @@ router.get('/list', authenticateTLAToken, (req, res) => {
     Task
         .find({ job: jobId })
         .populate('level', 'name -_id')
+        .populate('staff','fullname -_id')
         .exec()
         .then(tasks => {
             return res.status(200).json({
@@ -76,8 +77,22 @@ router.post('/', authenticateTLAToken, (req, res) => {
 })
 
 router.put('/', authenticateTLAToken, (req, res) => {
-    let {staff,qa,editor} = req.body;
-    console.log({staff,qa,editor});
+    let {taskId,staff,qa,editor} = req.body;
+    Task.findByIdAndUpdate(taskId,{
+        staff,
+        qa,
+        editor
+    },{new:true},(err,task)=>{
+        if(err){
+            return res.status(500).json({
+                msg:`Assign task failed with error: ${new Error(err.message)}`,
+                error: new Error(err.message)
+            })
+        }
+        return res.status(200).json({
+            msg:`Assign staff successfully!`
+        })
+    })
 })
 
 router.delete('/', authenticateTLAToken, (req, res) => {

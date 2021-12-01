@@ -116,6 +116,37 @@
 <script type="text/javascript">
   let idx = 1;
   var taskId = '';
+
+
+  $('#btnAssign').on('click', function () {
+    if (!$('#ckbQA').is(":checked") && !$('#ckbEditor').is(":checked")) {
+      $('#msgError').text('Vui lòng chọn tác vụ Editor hoặc Q.A cho nhân viên này!!!');
+      return;
+    }
+
+
+    $.ajax({
+      url: '/tla/task/',
+      type: 'put',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        taskId,
+        staff: $('#slStaffs option:selected').val(),
+        editor: $('#ckbEditor').is(":checked"),
+        qa: $('#ckbQA').is(":checked")
+      },
+      success: function (data) {
+        alert(data.msg);
+        LoadTasks();
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $('#msgError').text(jqXHR.responseJSON.msg);
+      },
+    })
+  })
+
   $("#btnAddLevel").click(function () {
     let level = $("#slJobLevels option:selected").val();
     let name = $("#slJobLevels option:selected").text();
@@ -150,6 +181,8 @@
     $('#txtRemark').val('');
 
   });
+
+
 
 
   $("#assignJobModal").on('shown.bs.modal', function (e) {
@@ -203,16 +236,16 @@
 
 
 
-  function LoadStaffs(){
+  function LoadStaffs() {
     $.ajax({
-      url:'/tla/user/list',
-      type:'get',
+      url: '/tla/user/list',
+      type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      success:function(data){
-        data.users.forEach(u=>{
-          let opt = '<option value="'+u._id+'">'+u.fullname+'</option>';
+      success: function (data) {
+        data.users.forEach(u => {
+          let opt = '<option value="' + u._id + '">' + u.fullname + '</option>';
           $('#slStaffs').append(opt);
         })
       },
@@ -272,15 +305,19 @@
           } else {
 
             tr += '<td>' + t.staff.fullname + '</td>';
+
+            tr += '<td>';
             if (t.editor)
               tr += '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
             else tr += '<i class="fa fa-square-o" aria-hidden="true"></i>';
             tr += "</td>";
 
+            tr += '<td>';
             if (t.qa)
-              tr += '<td><i class="fa fa-check-square-o" aria-hidden="true"></i></td>';
-            else tr += '<td><i class="fa fa-square-o" aria-hidden="true"></i></td>';
+              tr += '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
+            else tr += '<i class="fa fa-square-o" aria-hidden="true"></i>';
           }
+          tr += '</td>';
 
 
           tr += '<td class="text-right">';
