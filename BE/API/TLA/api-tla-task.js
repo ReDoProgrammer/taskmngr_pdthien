@@ -35,8 +35,7 @@ router.get('/', authenticateTLAToken, (req, res) => {
         )
         .populate('level')
         .exec()
-        .then(tasks => {
-            console.log(tasks);
+        .then(tasks => {           
             return res.status(200).json({
                 msg: 'Load tasks list successfully!',
                 tasks
@@ -77,7 +76,8 @@ router.post('/', authenticateTLAToken, (req, res) => {
 })
 
 router.put('/', authenticateTLAToken, (req, res) => {
-
+    let {staff,qa,editor} = req.body;
+    console.log({staff,qa,editor});
 })
 
 router.delete('/', authenticateTLAToken, (req, res) => {

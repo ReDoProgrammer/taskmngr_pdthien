@@ -49,7 +49,7 @@
         </table>
 
         <hr />
-        <div class="form-row">
+        <div class="form-row" id="divLevel">
 
           <div class="col-sm-3">
             <select name="" id="slJobLevels" class="form-control"></select>
@@ -63,7 +63,34 @@
             </button>
           </div>
         </div>
-
+        <div class="form-row mt-3" id="divAssign">
+          <div class="col-sm-6">
+            <select name="" id="slStaffs" class="form-control"></select>
+          </div>
+          <div class="col-sm-1">Task:</div>
+          <div class="col-sm-1 form-check">
+            <input class="form-check-input" type="checkbox" value="" id="ckbEditor">
+            <label class="form-check-label" for="flexCheckDefault">
+              Editor
+            </label>
+          </div>
+          <div class="col-sm-1 form-check">
+            <input class="form-check-input" type="checkbox" value="" id="ckbQA">
+            <label class="form-check-label" for="flexCheckDefault">
+              Q.A
+            </label>
+          </div>
+          <div class="col-sm-1">
+            <button class="btn btn-sm btn-warning" id="btnAssign">
+              <i class="fa fa-check" aria-hidden="true"></i> Assign
+            </button>
+          </div>
+          <div class="offset-sm-1 col-sm-1">
+            <button class="btn btn-sm btn-black" id="btnCancelAssign">
+              <i class="fa fa-times text-danger" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
 
         <div class="form-row">
           <div class="col-sm-12">
@@ -88,7 +115,7 @@
 
 <script type="text/javascript">
   let idx = 1;
-  let task = [];
+  var taskId = '';
   $("#btnAddLevel").click(function () {
     let level = $("#slJobLevels option:selected").val();
     let name = $("#slJobLevels option:selected").text();
@@ -132,31 +159,68 @@
 
   $(document).ready(function () {
     LoadJobLevels();
-    $(document).on("click", "button[name='btnDelTask']", function () {
+    LoadStaffs();
+    $('#divAssign').hide();
 
-      let _id = $(this).closest("tr").attr("id");
-      if (confirm("Are you sure to delete this level?")) {
-        $.ajax({
-          url: '/tla/task',
-          type: 'delete',
-          headers: {
-            authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-          data: {
-            _id
-          },
-          success: function (data) {
-            alert(data.msg);
-            LoadTasks();
-          },
-          error: function (jqXHR, textStatus, errorThrown) {
-            $('#msgError').text(jqXHR.responseJSON.msg);
-          }
-        })
-      }
-    })
+  })
+  $('#btnCancelAssign').on('click', function () {
+    $('#divAssign').hide(100);
+    $('#divLevel').show(500);
+    taskId = '';
   })
 
+  $(document).on("click", "button[name='btnAssignStaff']", function () {
+    taskId = $(this).closest("tr").attr("id");
+    $('#divAssign').show(500);
+    $('#divLevel').hide(100);
+  })
+
+  $(document).on("click", "button[name='btnDelTask']", function () {
+
+    let _id = $(this).closest("tr").attr("id");
+    if (confirm("Are you sure to delete this level?")) {
+      $.ajax({
+        url: '/tla/task',
+        type: 'delete',
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: {
+          _id
+        },
+        success: function (data) {
+          alert(data.msg);
+          LoadTasks();
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          $('#msgError').text(jqXHR.responseJSON.msg);
+        }
+      })
+    }
+  })
+
+
+
+
+
+  function LoadStaffs(){
+    $.ajax({
+      url:'/tla/user/list',
+      type:'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      success:function(data){
+        data.users.forEach(u=>{
+          let opt = '<option value="'+u._id+'">'+u.fullname+'</option>';
+          $('#slStaffs').append(opt);
+        })
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $('#msgError').text(jqXHR.responseJSON.msg);
+      },
+    })
+  }
 
   function LoadJobLevels() {
     $.ajax({
@@ -220,8 +284,8 @@
 
 
           tr += '<td class="text-right">';
-          
-          tr += '<button class="btn btn-sm btn-info" name="btnDelTask"><i class="fa fa-plus" aria-hidden="true"></i> Assign staff</button>';
+
+          tr += '<button class="btn btn-sm btn-secondary" name="btnAssignStaff"><i class="fa fa-plus" aria-hidden="true"></i> Assign staff</button>';
           tr += '<button class="ml-1 btn btn-sm btn-danger" name="btnDelTask"><i class="fa fa-trash text-white" aria-hidden="true"></i></button>';
           tr += '</td>';
           tr += "</tr>";
