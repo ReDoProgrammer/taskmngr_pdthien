@@ -7,7 +7,7 @@
   <div class="col-md-3 text-right">
     <!-- Another variation with a button -->
     <div class="input-group">
-      <input type="text" class="form-control" placeholder="Search this blog" id="txtSearch"/>
+      <input type="text" class="form-control" placeholder="Search this blog" id="txtSearch" />
       <div class="input-group-append">
         <button class="btn btn-secondary" type="button" id="btnSearch">
           <i class="fa fa-search"></i>
@@ -47,10 +47,50 @@
     var userId = '';
     var search = '';
     var page = 1;
+    is_readonly = false;
     $(document).ready(() => {
-      $("#direction").val("Quản lý khách hàng");
+      $("#direction").val("Employee Management");
       LoadUsers();
     });
+
+    $(document).on("click", "button[name='btnEditUser']", function () {
+      userId = $(this).closest("tr").attr("id");
+      $('#modalStaff').modal();
+    })
+    $(document).on("click", "button[name='btnDelUser']", function () {
+      if (confirm("Are you really want to delete this user?")) {
+        userId = $(this).closest("tr").attr("id");
+        $.ajax({
+          url: '/admin/user',
+          type: 'delete',
+          headers: {
+            authorization: "Bearer " + localStorage.getItem('accessToken'),
+          },
+          data: {
+            userId
+          }, success: function (data) {
+            alert(data.msg);
+            LoadUsers();
+            userId = '';
+          }, error: function (jqXHR, textStatus, errorThrown) {
+            alert(jqXHR.responseJSON.msg);
+          }
+        })
+      }
+    })
+    $(document).on("click", "button[name='btnUserInfo']", function () {
+      userId = $(this).closest("tr").attr("id");
+      $('#modalStaff').modal();
+      is_readonly = true;
+    })
+
+
+
+    $('#modalStaff').on('hidden.bs.modal', function () {
+      LoadUsers();
+      is_readonly = false;
+    })
+
 
     $('#btnAddStaff').click(function () {
       $('#txtFullname').val('');
@@ -67,7 +107,7 @@
       $('#modalStaff').modal();
     })
 
-    $('#btnSearch').click(function(){
+    $('#btnSearch').click(function () {
       search = $('#txtSearch').val();
       page = 1;
       LoadUsers();
@@ -88,36 +128,41 @@
           $('#tblUsers').empty();
           let idx = 1;
           Pagination(data.pages);
-          data.users.forEach(user=>{
-            let tr = '<tr>';
-              tr+= '<td>'+(idx++)+'</td>';
-              tr+= '<td class = "font-weight-bold text-info"><a href ="'+user._id+'" class="table_row">'+user.fullname+'</a></td>';
-              tr+= '<td>'+user.phone+'</td>';
-              tr+= '<td>'+user.email+'</td>';
-              tr+= '<td>'+user.address+'</td>';
-            
-              if(user.is_admin){
-                tr+= '<td class="text-info font-italic">Admin</td>';
-              }else if(user.is_tla){
-                tr+= '<td class="text-info font-italic">TLA</td>';
-              }else if(user.is_sale){
-                tr+= '<td class="text-info font-italic">Sale</td>';
-              }else if(user.is_qc){
-                tr+= '<td class="text-info font-italic">QC</td>';
-              }else if(user.is_accountant){
-                tr+= '<td class="text-info font-italic">Accountant</td>';
-              }else{
-                tr+= '<td class="text-info font-italic">Staff</td>';
-              }
+          data.users.forEach(user => {
+            let tr = '<tr id="' + user._id + '">';
+            tr += '<td>' + (idx++) + '</td>';
+            tr += '<td class = "font-weight-bold text-info"><a href ="' + user._id + '" class="table_row">' + user.fullname + '</a></td>';
+            tr += '<td>' + user.phone + '</td>';
+            tr += '<td>' + user.email + '</td>';
+            tr += '<td>' + user.address + '</td>';
 
-              if(user.is_active){
-                tr+= '<td class="text-success">Active</td>';
-              }else{
-                tr+= '<td class="text-danger">Unactive</td>';
-              }
-              
-              tr+= '</tr>';
-              $('#tblUsers').append(tr);
+            tr += '<td class="text-info font-italic">';
+            if (user.is_admin) tr += 'Administrator';
+            else if (user.is_dc) tr += 'DC';
+            else if (user.is_sale) tr += 'Sale';
+            else if (user.is_tla) tr += 'TLA';
+            else if (user.is_qa) tr += 'Q.A'
+            else if (user.is_editor) tr += 'Editor';
+            else if (user.is_accountant) tr += 'Accountant'
+            tr += '</td>';
+
+            if (user.is_active) {
+              tr += '<td class="text-success">Active</td>';
+            } else {
+              tr += '<td class="text-danger">Unactive</td>';
+            }
+
+            tr += '<td>';
+            tr += '<button class="btn btn-sm btn-info mr-1" name="btnUserInfo"><i class="fa fa-info-circle" aria-hidden="true"></i></button>';
+            if (!user.is_admin) {
+              tr += '<button class="btn btn-sm btn-warning mr-1" name="btnEditUser"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+              tr += '<button class="btn btn-sm btn-danger" name="btnDelUser"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+            }
+            tr += '</td>';
+
+
+            tr += '</tr>';
+            $('#tblUsers').append(tr);
           })
         }, error: function (jqXHR, textStatus, errorThrown) {
           alert(jqXHR.responseJSON.msg);
@@ -127,19 +172,19 @@
 
 
 
-    $(document).ready(function(){
-      $('a.table_row').on("click",function(e){
+    $(document).ready(function () {
+      $('a.table_row').on("click", function (e) {
         e.preventDefault();
       })
-      $('#tblUsers tr').click(function(e){
+      $('#tblUsers tr').click(function (e) {
         userId = $(this).find('a').attr('href');
         console.log(userId);
       })
     })
 
-    function Pagination(pages){
-     $('#pagination').empty();
-      for(i = 1; i <= pages; i++){
+    function Pagination(pages) {
+      $('#pagination').empty();
+      for (i = 1; i <= pages; i++) {
         let li = '<li class="page-item"><a class="page-link" href="#">1</a></li>';
         $('#pagination').append(li);
       }

@@ -2,6 +2,8 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+
+//phân nhóm nhân viên: người nhà, người quen,...
 const userTypeSchema = new Schema({
     name:{
         type:String      

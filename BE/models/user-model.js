@@ -4,6 +4,10 @@ const bcrypt = require("bcrypt");
 const SALT_WORK_FACTOR = 10;
 
 const UserSchema = new Schema({
+  user_type:{
+    type: Schema.Types.ObjectId,
+    ref:'user_type'
+  },
   username: { 
     type: String, 
     default: "", 

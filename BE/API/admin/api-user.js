@@ -17,13 +17,13 @@ router.get('/', authenticateAdminToken, (req, res) => {
       { username: { "$regex": search, "$options": "i" } },
     ]
   })
-    .select('fullname address phone email is_admin is_sale is_tla is_qc is_accountant is_active')
+    
     .exec()
     .then(users => {
-      let result = users.slice(process.env.PAGE_SIZE*(page-1),process.env.PAGE_SIZE);  
+      let result = users.slice(process.env.PAGE_SIZE * (page - 1), process.env.PAGE_SIZE);
       return res.status(200).json({
         msg: 'Load users list successfully!',
-        pages:users.length%process.env.PAGE_SIZE==0?users.length/process.env.PAGE_SIZE:Math.floor(users.length/process.env.PAGE_SIZE)+1,
+        pages: users.length % process.env.PAGE_SIZE == 0 ? users.length / process.env.PAGE_SIZE : Math.floor(users.length / process.env.PAGE_SIZE) + 1,
         users: result
       })
     })
@@ -33,6 +33,30 @@ router.get('/', authenticateAdminToken, (req, res) => {
         error: new Error(err.message)
       })
     })
+})
+
+router.get('/detail',authenticateAdminToken,(req,res)=>{
+  let {userId} = req.query;
+  User
+  .findById(userId)
+  .exec()
+  .then(user=>{
+    if(user == null){
+      return res.status(404).json({
+        msg:`User not found`
+      })
+    }
+    return res.status(200).json({
+      msg:`Get user info successfully!!!`,
+      user
+    })
+  })
+  .catch(err=>{
+    return res.status(500).json({
+      msg:`Can not get user info with error: ${new Error(err.message)}`,
+      error: new Error(err.message)
+    })
+  })
 })
 
 router.post('/', authenticateAdminToken, (req, res) => {
@@ -49,37 +73,37 @@ router.post('/', authenticateAdminToken, (req, res) => {
     is_active,
     bank,
     bank_no,
-    bank_name,
+    bank_holder,
     is_dc,
     is_sale,
     is_tla,
     is_qa,
     is_editor,
-    is_accountant       
+    is_accountant
   } = req.body;
-  
+
 
 
   let u = new User({
     user_type,
-        fullname,
-        username,
-        password,
-        phone,
-        email,
-        idNo,
-        issued_by,
-        address,
-        is_active,
-        bank,
-        bank_no,
-        bank_name,
-        is_dc,
-        is_sale,
-        is_tla,
-        is_qa,
-        is_editor,
-        is_accountant       
+    fullname,
+    username,
+    password,
+    phone,
+    email,
+    idNo,
+    issued_by,
+    address,
+    is_active,
+    bank,
+    bank_no,
+    bank_holder,
+    is_dc,
+    is_sale,
+    is_tla,
+    is_qa,
+    is_editor,
+    is_accountant
   });
   u.save()
     .then(user => {
@@ -97,6 +121,88 @@ router.post('/', authenticateAdminToken, (req, res) => {
     })
 })
 
+router.put('/', authenticateAdminToken, (req, res) => {
+  let { userId,
+    user_type,
+    fullname,
+    username,
+    password,
+    phone,
+    email,
+    idNo,
+    issued_by,
+    address,
+    is_active,
+    bank,
+    bank_no,
+    bank_holder,
+    is_dc,
+    is_sale,
+    is_tla,
+    is_qa,
+    is_editor,
+    is_accountant } = req.body;
+
+  User.findByIdAndUpdate(userId, {
+    user_type,
+    fullname,
+    username,
+    password,
+    phone,
+    email,
+    idNo,
+    issued_by,
+    address,
+    is_active,
+    bank,
+    bank_no,
+    bank_holder,
+    is_dc,
+    is_sale,
+    is_tla,
+    is_qa,
+    is_editor,
+    is_accountant
+  }, { new: true }, (err, user) => {
+    if (err) {
+      return res.status(500).json({
+        msg: `Update employee failed with error: ${new Error(err.message)}`,
+        error: new Error(err.message)
+      })
+    }
+
+    if (user == null) {
+      return res.status(404).json({
+        msg: `Employee not found!!!`
+      })
+    }
+
+    return res.status(200).json({
+      msg: `Update employee info successfully!!`
+    })
+  })
+})
+
+router.delete('/',authenticateAdminToken,(req,res)=>{
+  let {userId} = req.body;
+  User.findByIdAndDelete(userId,(err,user)=>{
+    if(err){
+      return res.status(500).json({
+        msg:`Delete user failed with error: ${new Error(err.message)}`,
+        error: new Error(err.message)
+      })     
+    }
+    if(user == null){
+      return res.status(404).json({
+        msg:`User not found!`
+      })
+    }
+
+    return res.status(200).json({
+      msg:`User has been deleted!`
+    })
+  })
+})
 
 
 
@@ -111,7 +217,7 @@ router.post("/login", (req, res) => {
       });
     }
     if (user) {//if username exist
-      if(!user.is_admin){
+      if (!user.is_admin) {
         return res.status(500).json({
           msg: `Your account can not access this module!!`,
         });
