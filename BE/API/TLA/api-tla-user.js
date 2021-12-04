@@ -4,7 +4,10 @@ const User = require('../../models/user-model');
 
 
 router.get('/list',(req,res)=>{  
-    User.find({is_active:true}) 
+    User.find({
+        is_active:true,
+        
+    }) 
     .select('fullname')   
     .then(users=>{
         return res.status(200).json({
