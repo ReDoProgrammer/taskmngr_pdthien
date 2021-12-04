@@ -1,7 +1,7 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
-function authenticateStaffToken(req, res, next) {
+function authenticateEditorToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
   if (token == null) return res.status(401).json({
@@ -27,5 +27,5 @@ function authenticateStaffToken(req, res, next) {
 
 
 module.exports = {
-  authenticateStaffToken
+  authenticateEditorToken
 }

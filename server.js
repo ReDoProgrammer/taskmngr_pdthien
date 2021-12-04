@@ -27,16 +27,17 @@ mongoose.connect(
   (error) => console.log(error.message)
 );
 
-//USER CONTROLLERS
-const homeController = require("./BE/controllers/staff/home-controller");
-app.use("/", homeController);
+//EDITOR CONTROLLERS
+const editorAuthController = require('./BE/API/editor/authenticate');
+app.use('/editor/auth',editorAuthController);
+
+const editorHomeController = require("./BE/controllers/editor/home-controller");
+app.use("/editor", editorHomeController);
 
 
-//STAFF API
-const staffAuthAPI = require('./BE/API/Staff/authenticate');
-app.use('/auth',staffAuthAPI);
 
-const staffTaskAPI = require('./BE/API/Staff/api-task');
+
+const staffTaskAPI = require('./BE/API/editor/api-task');
 app.use('/task',staffTaskAPI);
 
 //ADMIN CONTROLLERS

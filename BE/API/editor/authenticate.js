@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { authenticateStaffToken } = require("../../../middlewares/staff-middleware");
+const { authenticateStaffToken } = require("../../../middlewares/editor-middleware");
 const User = require('../../models/user-model');
 const jwt = require("jsonwebtoken");
 
@@ -46,7 +46,7 @@ router.post("/login", (req, res) => {
 
                         return res.status(200).json({
                             msg: 'Login successfully!',
-                            url: '/',
+                            url: '/editor',
                             accessToken: accessToken,
                             refreshToken: refreshToken
                         });

@@ -1,13 +1,17 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
-const { authenticateStaffToken } = require("../../../middlewares/staff-middleware");
+const { authenticateEditorToken } = require("../../../middlewares/editor-middleware");
 
 
-router.get('/',authenticateStaffToken,(req,res)=>{
+router.get('/',authenticateEditorToken,(req,res)=>{
     
     Task
-    .find({staff:req.user._id})
-    .populate('job','name -_id')
+    .find({$or:[
+        {staff:req.user._id},
+        {status:-1}
+    ]})
+    .populate('level','name -_id')
+    .populate('job')
     .exec()
     .then(tasks=>{       
         return res.status(200).json({
@@ -23,11 +27,11 @@ router.get('/',authenticateStaffToken,(req,res)=>{
     })
 })
 
-router.get('/detail',authenticateStaffToken,(req,res)=>{
+router.get('/detail',authenticateEditorToken,(req,res)=>{
 
 })
 
-router.put('/',authenticateStaffToken,(req,res)=>{
+router.put('/',authenticateEditorToken,(req,res)=>{
 
 })
 
