@@ -24,21 +24,23 @@
     </button>
   </div>
 </div>
-<table class="table mt-1">
-  <thead class="thead-light">
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Fullname</th>
-      <th scope="col">Phone</th>
-      <th scope="col">Email</th>
-      <th scope="col">Address</th>
-      <th scope="col">Role</th>
-      <th scope="col">Status</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody id="tblUsers"></tbody>
-</table>
+<div class="table-striped">
+  <table class="table mt-1 text-nowrap">
+    <thead class="thead-light">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Fullname</th>
+        <th scope="col">Phone</th>
+        <th scope="col">Email</th>
+        <th scope="col">Address</th>
+        <th scope="col">Role</th>
+        <th scope="col">Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="tblUsers"></tbody>
+  </table>
+</div>
 
 
 <%-include('modal')%>
@@ -93,6 +95,15 @@
 
 
     $('#btnAddStaff').click(function () {
+
+      $('#is_dc').prop('checked', false);
+      $('#is_sale').prop('checked', false);
+      $('#is_tla').prop('checked', false);
+      $('#is_editor').prop('checked', false);
+      $('#is_qa').prop('checked', false);
+      $('#is_accountant').prop('checked', false);
+
+
       $('#txtFullname').val('');
       $('#txtPhone').val('');
       $('#txtEmail').val('');
@@ -103,7 +114,8 @@
       $('#txtIssuedBy').val('');
       $('#txtAddress').val('');
       $('#txtBankNo').val('');
-      $('#txtBankName').val('');
+      $('#txtBankHolder').val('');
+      userId = '';
       $('#modalStaff').modal();
     })
 

@@ -19,7 +19,7 @@
             </div>
 
             <div class="form-check form-check-inline col-md-1">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_qc" value="option1">
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_qa" value="option1">
               <label class="form-check-label" for="inlineRadio1">Q.A</label>
             </div>
             <div class="form-check form-check-inline col-md-1">
@@ -150,7 +150,6 @@
           userId
         },
         success: function (data) {
-          console.log(data);
           if (data.user.is_dc) {
             $('#is_dc').prop('checked', true);
           } else if (data.user.is_sale) {
