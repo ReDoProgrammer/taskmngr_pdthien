@@ -36,9 +36,7 @@ router.get('/', authenticateAdminToken, (req, res) => {
 })
 
 router.post('/', authenticateAdminToken, (req, res) => {
-  let { user_type, fullname, username, password, phone,email, idNo,issued_by, address, is_active, bank, bank_no, bank_name, is_admin, is_tla, is_qc, is_sale, is_accountant ,is_employee} = req.body;
-  
-  let u = new User({
+  let {
     user_type,
     fullname,
     username,
@@ -52,12 +50,36 @@ router.post('/', authenticateAdminToken, (req, res) => {
     bank,
     bank_no,
     bank_name,
-    is_admin,
+    is_dc,
     is_sale,
-    is_qc,
     is_tla,
-    is_accountant,
-    is_employee
+    is_qa,
+    is_editor,
+    is_accountant       
+  } = req.body;
+  
+
+
+  let u = new User({
+    user_type,
+        fullname,
+        username,
+        password,
+        phone,
+        email,
+        idNo,
+        issued_by,
+        address,
+        is_active,
+        bank,
+        bank_no,
+        bank_name,
+        is_dc,
+        is_sale,
+        is_tla,
+        is_qa,
+        is_editor,
+        is_accountant       
   });
   u.save()
     .then(user => {

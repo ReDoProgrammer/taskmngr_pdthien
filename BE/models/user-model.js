@@ -12,52 +12,66 @@ const UserSchema = new Schema({
   },
   password: { type: String, required:true },
   fullname: { type: String, required:true },
-  idNo:{type:String,require:true},
-  issued_by:{type:String,default:''},
-  phone: { type: String, required:true },
-  email: { type: String, require: true , unique:true},
-  address: { type: String, default: "" },
+  idNo:{type:String,require:true},//số cmnd/cccd
+  issued_by:{type:String,default:''},//ngày tạo tài khoản
+  phone: { type: String, required:true },//số điện thoại
+  email: { type: String, require: true , unique:true},//địa chỉ email
+  address: { type: String, default: "" },//địa chỉ
+
   bank:{
+    //tên ngân hàng
     type:String,   
     default:''
   },
   bank_no:{
+    //số tài khoản ngân hàng
     type:String,
     default:''
   },
-  bank_name:{
+  bank_holder:{
+    //tên chủ tài khoản
     type:String,
     default:''
   },
   is_admin:{
+    //là quản trị viên
     type:Boolean,
     default:false
   },
   is_tla:{
+    //là TLA
     type:Boolean,
     default:false
   },
-  is_qc:{
+  is_qa:{
+    //là Q.A
     type:Boolean,
     default:false
   },
+  is_dc:{
+    //là DC
+    type:Boolean,
+    default:false
+  },
+
   is_accountant:{
+    //là kế toán
     type:Boolean,
     default:false
   },
   is_sale:{
+    //là sale
     type:Boolean,
     default:false
   },
-  is_staff:{
+
+  is_editor:{
+    //là editor
     type:Boolean,
     default:true
-  },
-  is_employee:{
-    type:Boolean,
-    default:true
-  },
+  }, 
   is_active:{
+    //tài khoản đang hoạt động?
     type:Boolean,
     default:true
   }

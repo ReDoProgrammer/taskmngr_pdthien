@@ -1,30 +1,30 @@
 <div class="modal fade" id="modalStaff" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">      
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
+    <div class="modal-content">      
       <div class="modal-body">
         <div class="card text-white bg-secondary mb-1">
           <div class="card-header">Role</div>
           <div class="card-body">
-            <div class="form-check form-check-inline col-md-2">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_admin" value="option1">
-              <label class="form-check-label" for="inlineRadio1">Admin</label>
+            <div class="form-check form-check-inline col-md-1">
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_dc" value="option1">
+              <label class="form-check-label" for="inlineRadio1">DC</label>
+            </div>
+            <div class="form-check form-check-inline col-md-1">
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_sale" value="option1">
+              <label class="form-check-label" for="inlineRadio1">Sale</label>
             </div>
             <div class="form-check form-check-inline col-md-2">
               <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_tla" value="option1">
               <label class="form-check-label" for="inlineRadio1">TLA</label>
             </div>
-            <div class="form-check form-check-inline col-md-2">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_sale" value="option1">
-              <label class="form-check-label" for="inlineRadio1">Sale</label>
-            </div>
-            <div class="form-check form-check-inline col-md-2">
+            
+            <div class="form-check form-check-inline col-md-1">
               <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_qc" value="option1">
-              <label class="form-check-label" for="inlineRadio1">QC</label>
+              <label class="form-check-label" for="inlineRadio1">Q.A</label>
+            </div>
+            <div class="form-check form-check-inline col-md-1">
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_editor" value="option1">
+              <label class="form-check-label" for="inlineRadio1">Editor</label>
             </div>
             <div class="form-check form-check-inline col-md-2">
               <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_accountant" value="option1">
@@ -81,7 +81,7 @@
                   <input type="text" class="form-control" id="txtIssuedBy" />
                 </div>
 
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-5">
                   <label for="recipient-name" class="col-form-label">Address:</label>
                   <input type="text" class="form-control" id="txtAddress" />
                 </div>
@@ -91,14 +91,7 @@
                     <input type="checkbox" class="form-check-input" id="is_active" checked />
                     <label class="form-check-label" for="exampleCheck1"></label>
                   </div>
-                </div>
-                <div class="form-group col-md-2">
-                  <label for="recipient-name" class="col-form-label">Type:</label>
-                  <div class="form-group form-check mt-1">
-                    <input type="checkbox" class="form-check-input" id="is_employee" checked />
-                    <label class="form-check-label" for="exampleCheck1">Employee</label>
-                  </div>
-                </div>
+                </div>                
               </div>
               <hr>
               <div class="form-row">
@@ -115,7 +108,11 @@
                   <input type="text" class="form-control" id="txtBankName" />
                 </div>
               </div>
-
+              <div class="form-row">
+                <div class="col-sm-12 mt-2">
+                  <label id="errMessage" class="text-warning font-weight-bold">1243</label>
+                </div>
+              </div>
 
             </form>
           </div>
@@ -135,13 +132,25 @@
 </div>
 
 <script>
+  $(document).ready(function(){
+    $('#errMessage').hide();
+  })
   $("#btnSubmit").click(function () {
 
-    let is_admin = $('#is_admin').is(':checked');
-    let is_tla = $('#is_tla').is(':checked');
-    let is_qc = $('#is_qc').is(':checked');
+    let is_dc = $('#is_dc').is(':checked');
     let is_sale = $('#is_sale').is(':checked');
+    let is_tla = $('#is_tla').is(':checked');
+    let is_qa = $('#is_qa').is(':checked');
+    let is_editor = $('#is_editor').is(':checked');
     let is_accountant = $('#is_accountant').is(':checked');
+
+    
+    if(!is_dc && !is_sale && !is_tla && !is_qa && !is_editor && !is_accountant){
+      $('#errMessage').text('Please choose employee role!!');
+      $('#errMessage').show(200);
+      return;
+    }
+
     let user_type = $('#usertype option:selected').val();
     let fullname = $('#txtFullname').val();
     let phone = $('#txtPhone').val();
@@ -153,14 +162,15 @@
     let issued_by = $('#txtIssuedBy').val();
     let address = $('#txtAddress').val();
     let is_active = $('#is_active').is(':checked');
-    let is_employee = $('#is_employee').is(':checked');
+   
 
     let bank = $('#slBanks option:selected').val();
     let bank_no = $('#txtBankNo').val();
     let bank_name = $('#txtBankName').val();
 
     if (password != confirm_password) {
-      alert('Password & confirm password do not match!');
+      $('#errMessage').text('Two passwords not match!');
+      $('#errMessage').show(200);
       return;
     }
     
@@ -184,13 +194,12 @@
         bank,
         bank_no,
         bank_name,
-        is_admin,
-        is_tla,
-        is_qc,
+        is_dc,
         is_sale,
         is_tla,
-        is_accountant,
-        is_employee
+        is_qa,
+        is_editor,
+        is_accountant       
       },
       success: function (data, textStatus, xhr) {
         alert(data.msg);
