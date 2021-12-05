@@ -36,8 +36,15 @@ router.post("/login", (req, res) => {
 
 
                     if (isMatch) {
+                        if(!user.is_editor){
+                            return res.status(403).json({
+                                msg:`You have no permission to access this module`
+                            })
+                        }
+                        
                         let u = {
-                            _id: user._id
+                            _id: user._id,
+                            is_editor:user.is_editor
                         };
                         const accessToken = generateAccessToken(u);
                         const refreshToken = jwt.sign(u, process.env.REFRESH_TOKEN_SECRET);

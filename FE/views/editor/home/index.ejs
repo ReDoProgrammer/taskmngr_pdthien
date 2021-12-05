@@ -5,10 +5,9 @@
         <th scope="col">#</th>
         <th scope="col">Job</th>
         <th scope="col">Level</th>
-        <th scope="col">Deadline</th>
-        <th scope="col">Q.A</th>
-        <th scope="col">Editor</th>
+        <th scope="col">Deadline</th>       
         <th scope="col">Intruction</th>
+        <th scope="col">Remark</th>
         <th scope="col"></th>
       </tr>
     </thead>
@@ -49,24 +48,12 @@
           tr += '<td>' + t.level.name + '</td>';
           tr += '<td class="text-danger">' + ConvertTimeStamp(t.job.delivery_date) + '</td>';
 
-          tr += '<td>';
-          if (t.editor) {
-            tr += '<i class="fa fa-check-square-o"></i>'
-          } else {
-            tr += '<i class="fa fa-square-o" aria-hidden="true"></i>';
-          }
-          tr += '</td>';
-          tr += '<td>';
-          if (t.qa) {
-            tr += '<i class="fa fa-check-square-o"></i>'
-          } else {
-            tr += '<i class="fa fa-square-o" aria-hidden="true"></i>';
-          }
-          tr += '</td>';
+        
 
           tr += '<td>' + t.job.intruction + '</td>';
+          tr += '<td>' + t.remark + '</td>';
 
-          tr += '<td>';
+          tr += '<td class="text-right">';
             if(t.status == -1){
               tr+= '<button class="btn btn-sm btn-info" name="btnTaskInfo"><i class="fa fa-info-circle" aria-hidden="true"></i></button>';
             }
@@ -78,7 +65,7 @@
 
       }, error: function (request, status, error) {
 
-        window.location.href = '/default';
+        window.location.href = '/editor/default';
       }
 
     })

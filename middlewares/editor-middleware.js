@@ -17,7 +17,11 @@ function authenticateEditorToken(req, res, next) {
         });
   
       }    
-    
+    if(!user.is_editor){
+      return res.status(403).json({
+        msg:`Your account can not access this module`
+      });
+    }
     req.user = user;   
     next();
   });
