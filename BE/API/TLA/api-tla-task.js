@@ -8,9 +8,10 @@ router.get('/list', authenticateTLAToken, (req, res) => {
     Task
         .find({ job: jobId })
         .populate('level', 'name -_id')
-        .populate('staff','fullname -_id')
+        .populate('qa', 'fullname -_id')
+        .populate('editor', 'fullname -_id')
         .exec()
-        .then(tasks => {
+        .then(tasks => {           
             return res.status(200).json({
                 tasks,
                 msg: 'Load tasks by job id successfully!'
@@ -36,7 +37,7 @@ router.get('/', authenticateTLAToken, (req, res) => {
         )
         .populate('level')
         .exec()
-        .then(tasks => {           
+        .then(tasks => {
             return res.status(200).json({
                 msg: 'Load tasks list successfully!',
                 tasks
@@ -77,22 +78,31 @@ router.post('/', authenticateTLAToken, (req, res) => {
 })
 
 router.put('/', authenticateTLAToken, (req, res) => {
-    let {taskId,staff,qa,editor} = req.body;
-    Task.findByIdAndUpdate(taskId,{
-        staff,
-        qa,
-        editor
-    },{new:true},(err,task)=>{
-        if(err){
-            return res.status(500).json({
-                msg:`Assign task failed with error: ${new Error(err.message)}`,
-                error: new Error(err.message)
+    // phần này chỉ dùng khi TLA muốn assign nhiệm vụ Q.A hoặc edit trực tiếp cho nhân viên khi phân job ra thành level
+    let { taskId, staff, qa, editor } = req.body;
+
+    Task.findByIdAndUpdate(taskId,
+        {
+            qa: (qa == 'true' ? staff : null),
+
+            editor: (editor == 'true' ? staff : null)
+        }, { new: true }, (err, task) => {
+            if (err) {
+                return res.status(500).json({
+                    msg: `Assigned staff failed with error: ${new Error(err.message)}`
+                })
+            }
+            if (task == null) {
+                return res.status(404).json({
+                    msg: `Task not found`
+                })
+            }
+
+            return res.status(200).json({
+                msg: `Staff has been assigned successfully!`
             })
-        }
-        return res.status(200).json({
-            msg:`Assign staff successfully!`
         })
-    })
+
 })
 
 router.delete('/', authenticateTLAToken, (req, res) => {
@@ -114,3 +124,6 @@ router.delete('/', authenticateTLAToken, (req, res) => {
 
 
 module.exports = router;
+
+
+

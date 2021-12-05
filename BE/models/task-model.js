@@ -14,12 +14,26 @@ const taskSchema = new Schema({
     },
 
     qa: {
+        //lưu id của nhân viên Q.A
         type: Schema.Types.ObjectId,
         ref: 'user'
     },
+    qa_assigned:{
+        //true: task này đc TLA assign trực tiếp cho 1 nhân viên làm Q.A 
+        //
+        type:Boolean,
+        default:false
+    },
     editor: {
+        //lưu id nhân viên làm Editor
         type: Schema.Types.ObjectId,
         ref: 'user'
+    },
+    editor_assigned:{
+        //khi true <=> task này đc TLA assign trực tiếp cho 1 nhân viên làm Editor
+        //false: nhân viên Editor tự nhận task
+        type:Boolean,
+        default:false
     },
     status: {
         type: Number,
@@ -41,11 +55,7 @@ const taskSchema = new Schema({
         type: Number,
         default: 0
     },
-    is_assigned: {
-        //thuộc tính dùng để đánh dấu nhân viên được TLA giao việc (task) hay do nhân viên lựa chọn
-        type: Boolean,
-        default: false
-    },
+   
     remark: {
         //phần ghi chú cho task/level
         //cả tla, sale,admin,dc đều có thể can thiệp
