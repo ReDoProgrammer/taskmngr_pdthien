@@ -12,17 +12,14 @@ const taskSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'job-level'
     },
-    staff: {
-        type: Schema.Types.ObjectId,
-        ref: 'user'        
-    },
+
     qa: {
-        type: Boolean,
-        default: false
+        type: Schema.Types.ObjectId,
+        ref: 'user'
     },
     editor: {
-        type: Boolean,
-        default: false
+        type: Schema.Types.ObjectId,
+        ref: 'user'
     },
     status: {
         type: Number,
@@ -49,16 +46,14 @@ const taskSchema = new Schema({
         type: Boolean,
         default: false
     },
-    remark:{
+    remark: {
         //phần ghi chú cho task/level
         //cả tla, sale,admin,dc đều có thể can thiệp
-        type:String,
-        default:''
+        type: String,
+        default: ''
     }
 
-},
-    { timestamps: { assigned_date: 'assigned_date', deadline: 'deadline' } }
-);
+});
 
 
 
