@@ -84,8 +84,9 @@ router.put('/', authenticateTLAToken, (req, res) => {
     Task.findByIdAndUpdate(taskId,
         {
             qa: (qa == 'true' ? staff : null),
-
-            editor: (editor == 'true' ? staff : null)
+            assigned_qa:qa,
+            editor: (editor == 'true' ? staff : null),
+            assigned_editor:editor
         }, { new: true }, (err, task) => {
             if (err) {
                 return res.status(500).json({
