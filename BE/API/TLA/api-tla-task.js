@@ -11,7 +11,8 @@ router.get('/list', authenticateTLAToken, (req, res) => {
         .populate('qa', 'fullname -_id')
         .populate('editor', 'fullname -_id')
         .exec()
-        .then(tasks => {           
+        .then(tasks => {      
+            console.log(tasks);     
             return res.status(200).json({
                 tasks,
                 msg: 'Load tasks by job id successfully!'
@@ -79,30 +80,48 @@ router.post('/', authenticateTLAToken, (req, res) => {
 
 router.put('/', authenticateTLAToken, (req, res) => {
     // phần này chỉ dùng khi TLA muốn assign nhiệm vụ Q.A hoặc edit trực tiếp cho nhân viên khi phân job ra thành level
+    /**
+     * XẢY RA 2 TRƯỜNG HỢP NHƯ SAU:
+     * TH1: TLA assign editor/q.a hoặc cả editor và q.a cho cùng 1 nhân viên
+     * TH2: TLA assign editor và q.a cho 2người khác nhau.
+     * => để tránh trường hợp bị đè nếu ở TH2 thì cần tìm kiếm task trước đó và update lại trạng thái, nhân viên đã có 
+     * 
+     */
     let { taskId, staff, qa, editor } = req.body;
 
-    Task.findByIdAndUpdate(taskId,
-        {
-            qa: (qa == 'true' ? staff : null),
-            assigned_qa:qa,
-            editor: (editor == 'true' ? staff : null),
-            assigned_editor:editor
-        }, { new: true }, (err, task) => {
-            if (err) {
-                return res.status(500).json({
-                    msg: `Assigned staff failed with error: ${new Error(err.message)}`
+    Task.findById(taskId)
+    .exec()
+    .then(t=>{
+        Task.findByIdAndUpdate(taskId,
+            {
+                qa: (qa == 'true' ? staff : t.qa),
+                qa_assigned:(qa=='true'?true:t.qa_assigned),
+                editor: (editor == 'true' ? staff : t.editor),
+                editor_assigned:(editor=='true'?true:t.editor_assigned)
+            }, { new: true }, (err, task) => {
+                if (err) {
+                    return res.status(500).json({
+                        msg: `Assigned staff failed with error: ${new Error(err.message)}`
+                    })
+                }
+                if (task == null) {
+                    return res.status(404).json({
+                        msg: `Task not found`
+                    })
+                }
+    
+                return res.status(200).json({
+                    msg: `Staff has been assigned successfully!`
                 })
-            }
-            if (task == null) {
-                return res.status(404).json({
-                    msg: `Task not found`
-                })
-            }
-
-            return res.status(200).json({
-                msg: `Staff has been assigned successfully!`
             })
+    })
+    .catch(err =>{
+        return res.status(500).json({
+            msg:`Can not find task by id ${new Error(err.mesaage)}`
         })
+    })
+
+   
 
 })
 

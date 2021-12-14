@@ -38,8 +38,7 @@
             <tr>
               <th scope="col">#</th>
               <th scope="col">Level</th>
-              <th scope="col">Remark</th>
-              <th scope="col">Staff</th>
+              <th scope="col">Remark</th>            
               <th scope="col">Editor</th>
               <th scope="col">Q.C</th>
               <th></th>
@@ -300,24 +299,21 @@
           tr += "<td>" + t.remark + "</td>";
 
 
-          if (typeof t.staff === 'undefined' || t.staff === null) {
-            tr += '<td></td><td></td><td></td>';
-          } else {
 
-            tr += '<td>' + t.staff.fullname + '</td>';
 
-            tr += '<td>';
-            if (t.editor)
-              tr += '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
-            else tr += '<i class="fa fa-square-o" aria-hidden="true"></i>';
-            tr += "</td>";
 
-            tr += '<td>';
-            if (t.qa)
-              tr += '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
-            else tr += '<i class="fa fa-square-o" aria-hidden="true"></i>';
-          }
-          tr += '</td>';
+
+          tr += '<td>';
+          if (t.editor_assigned)
+            tr += t.editor.fullname;
+          else tr += '';
+          tr += "</td>";
+
+          tr += '<td>';
+          if (t.qa_assigned)
+            tr += t.qa.fullname;
+          else tr += '';
+
 
 
           tr += '<td class="text-right">';
