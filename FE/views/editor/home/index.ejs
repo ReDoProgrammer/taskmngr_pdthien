@@ -64,7 +64,7 @@
         })
 
       }, error: function (request, status, error) {
-
+        alert(request.responseJSON.msg)
         window.location.href = '/editor/default';
       }
 

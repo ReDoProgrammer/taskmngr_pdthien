@@ -13,7 +13,7 @@ router.get('/', authenticateEditorToken, (req, res) => {
     Task.countDocuments({
         staff: req.user._id,
         status: 0,
-        editor: true
+       // editor_assigned: true
     })
         .exec()
         .then(count => {
@@ -31,6 +31,7 @@ router.get('/', authenticateEditorToken, (req, res) => {
                     .limit(1)
                     .exec()
                     .then(tasks => {
+                        console.log('task:');
                         return res.status(200).json({
                             msg: 'Load your tasks successfully!',
                             tasks
