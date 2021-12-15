@@ -13,7 +13,7 @@ router.get('/', authenticateEditorToken, (req, res) => {
     Task.countDocuments({
         staff: req.user._id,
         status: 0,
-       // editor_assigned: true
+        // editor_assigned: true
     })
         .exec()
         .then(count => {
@@ -31,7 +31,6 @@ router.get('/', authenticateEditorToken, (req, res) => {
                     .limit(1)
                     .exec()
                     .then(tasks => {
-                        console.log('task:');
                         return res.status(200).json({
                             msg: 'Load your tasks successfully!',
                             tasks
@@ -60,7 +59,33 @@ router.get('/', authenticateEditorToken, (req, res) => {
 
 
 router.get('/detail', authenticateEditorToken, (req, res) => {
+    let { taskId } = req.query;
 
+    Task.findById(taskId)
+        .populate('level', 'name')
+        .populate({
+            path: 'job',
+            populate: {
+                path: 'customer',             
+                populate: {
+                    path: 'size'                   
+                },
+                populate: {
+                    path: 'color_mode'                  
+                }
+            }
+        }
+
+        )
+        .exec()
+        .then(task => {
+            console.log(task);
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not get task info with error: ${new Error(err.message)}`
+            })
+        })
 })
 
 router.put('/', authenticateEditorToken, (req, res) => {

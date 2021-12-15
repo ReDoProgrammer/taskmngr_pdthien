@@ -1,0 +1,47 @@
+<div class="modal" tabindex="-1" role="dialog" id="modalTaskDetail">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="card text-white bg-dark">
+                    <div class="card-header"><i class="fa fa-info-circle" aria-hidden="true"></i> Job description</div>
+                    <div class="card-body">
+
+
+
+
+
+
+
+
+                        <div class="form-group text-right">
+                            <button type="button" class="btn btn-sm btn-warning" id="btnSubmitJob">Submit job</button>
+                            <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $("#modalTaskDetail").on('shown.bs.modal', function (e) {        
+        $.ajax({
+            url: '/task/detail',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                taskId
+            },
+            success: function (data) {
+                console.log(data);
+            }, error: function (request, status, error) {
+                alert(request.responseJSON.msg)
+                window.location.href = '/editor/default';
+            }
+        })
+    });
+</script>

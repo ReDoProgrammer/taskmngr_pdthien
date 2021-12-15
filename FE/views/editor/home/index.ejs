@@ -5,7 +5,7 @@
         <th scope="col">#</th>
         <th scope="col">Job</th>
         <th scope="col">Level</th>
-        <th scope="col">Deadline</th>       
+        <th scope="col">Deadline</th>
         <th scope="col">Intruction</th>
         <th scope="col">Remark</th>
         <th scope="col"></th>
@@ -16,71 +16,80 @@
   </table>
 </div>
 
+<%-include('task_detail')%>
 
-<script>
-  $(document).ready(function () {
-    LoadAssignedTasks();
-  })
-
-  var page = 1;
-  var search = '';
-
-  function LoadAssignedTasks() {
-    $.ajax({
-      url: '/task',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        page,
-        search
-      },
-      success: function (data) {
-        $('#tbdTasks').empty();
-        console.log(data.tasks);
-        let idx = 1;
-        data.tasks.forEach(t => {
-          let tr = '<tr id="' + t._id + '">';
-
-          tr += '<td>' + (idx++) + '</td>';
-          tr += '<td class="font-weight-bold">' + t.job.name + '</td>';
-          tr += '<td>' + t.level.name + '</td>';
-          tr += '<td class="text-danger">' + ConvertTimeStamp(t.job.delivery_date) + '</td>';
-
-        
-
-          tr += '<td>' + t.job.intruction + '</td>';
-          tr += '<td>' + t.remark + '</td>';
-
-          tr += '<td class="text-right">';
-            if(t.status == -1){
-              tr+= '<button class="btn btn-sm btn-info" name="btnTaskInfo"><i class="fa fa-info-circle" aria-hidden="true"></i></button>';
-            }
-          tr += '<button class="ml-1 btn btn-sm btn-success" name="btnGetTask"><i class="fa fa-plus" aria-hidden="true"></i></button></td>';
-
-          tr += '</tr>';
-          $('#tbdTasks').append(tr);
-        })
-
-      }, error: function (request, status, error) {
-        alert(request.responseJSON.msg)
-        window.location.href = '/editor/default';
-      }
-
+  <script>
+    $(document).ready(function () {
+      LoadAssignedTasks();
     })
-  }
 
-  function ConvertTimeStamp(timestamp) {
+    var taskId = '';
 
-    let date = new Date(timestamp);
-    console.log(date);
-    let dd = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
-    let month = (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
-    let year = date.getFullYear();
-    let hh = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-    let mm = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+    $(document).on("click", "button[name='btnTaskInfo']", function () {
+      taskId = $(this).closest("tr").attr("id");
+      $('#modalTaskDetail').modal();
+    })
 
-    return dd + '/' + month + '/' + year + ' ' + hh + ':' + mm;
-  }
-</script>
+
+    var page = 1;
+    var search = '';
+
+    function LoadAssignedTasks() {
+      $.ajax({
+        url: '/task',
+        type: 'get',
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: {
+          page,
+          search
+        },
+        success: function (data) {
+          $('#tbdTasks').empty();
+          console.log(data.tasks);
+          let idx = 1;
+          data.tasks.forEach(t => {
+            let tr = '<tr id="' + t._id + '">';
+
+            tr += '<td>' + (idx++) + '</td>';
+            tr += '<td class="font-weight-bold">' + t.job.name + '</td>';
+            tr += '<td>' + t.level.name + '</td>';
+            tr += '<td class="text-danger">' + ConvertTimeStamp(t.job.delivery_date) + '</td>';
+
+
+
+            tr += '<td>' + t.job.intruction + '</td>';
+            tr += '<td>' + t.remark + '</td>';
+
+            tr += '<td class="text-right">';
+            if (t.status == -1) {
+              tr += '<button class="btn btn-sm btn-info" name="btnTaskInfo"><i class="fa fa-info-circle" aria-hidden="true"></i></button>';
+            }
+            tr += '<button class="ml-1 btn btn-sm btn-success" name="btnGetTask"><i class="fa fa-check" aria-hidden="true"></i></button></td>';
+
+            tr += '</tr>';
+            $('#tbdTasks').append(tr);
+          })
+
+        }, error: function (request, status, error) {
+          alert(request.responseJSON.msg)
+          window.location.href = '/editor/default';
+        }
+
+      })
+    }
+
+    function ConvertTimeStamp(timestamp) {
+
+      let date = new Date(timestamp);
+      console.log(date);
+      let dd = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+      let month = (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
+      let year = date.getFullYear();
+      let hh = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+      let mm = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+
+      return dd + '/' + month + '/' + year + ' ' + hh + ':' + mm;
+    }
+  </script>
