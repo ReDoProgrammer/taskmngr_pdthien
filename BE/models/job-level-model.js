@@ -13,7 +13,7 @@ const Schema = mongoose.Schema;
 const jobLevel = new Schema({
     name:{
         type:String,
-        required: [true, 'Please input bank name']
+        required: [true, 'Please input job level']
     },
     description:{
         type:String,
