@@ -51,6 +51,7 @@
       <script>
         var search = "";
         var page = 1;
+        var customerId = '';
         $(document).ready(() => {
           $("#direction").val("Quản lý khách hàng");
           LoadCustomers();
@@ -162,16 +163,9 @@
               }
 
 
-              //binding levels list
-              $('#tblLevelList').empty();
-              let rIdx = 1;
-              data.customer.levels.forEach(item => {
-                let tr = '<tr>';
-                  tr+='<td>'+(rIdx++)+'</td>';
-                  tr+= '<td class="font-italic text-info">'+item.level.name+'</td>';
-                  tr+= '<td class="text-center font-weight-bold text-warning">'+item.price+'</td>';
-                  $('#tblLevelList').append(tr);
-              })
+              LoadCustomerLevels(customerId) ;
+
+             
 
 
             },
@@ -180,6 +174,27 @@
             }
           })
         }
+
+        function LoadCustomerLevels(customerId) {
+        $.ajax({
+            url: "/admin/customer-level",
+            type: "get",
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data:{
+              customerId
+            },
+            success: function (data, textStatus, xhr) {
+                console.log(data);
+               
+            
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+            },
+        });
+    }
 
         function LoadCustomers() {
           $.ajax({

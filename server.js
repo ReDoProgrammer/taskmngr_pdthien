@@ -93,6 +93,7 @@ const apiAdminBank = require('./BE/API/admin/api-bank');
 const apiAdminCloud = require('./BE/API/admin/api-cloud');
 const apiAdminColorMode = require('./BE/API/admin/api-color-mode');
 const apiAdminCustomer = require('./BE/API/admin/api-customer');
+const apiAdminCustomerLevel = require('./BE/API/admin/api-customer-level');
 const apiAdminFileFormat = require('./BE/API/admin/api-file-format');
 const apiAdminJobLevel = require('./BE/API/admin/api-job-level');
 const apiAdminLevel = require('./BE/API/admin/api-level');
@@ -180,21 +181,22 @@ app.use('/tla/user',apiTLAUser);
  * USING API
  *
  */
-app.use('/admin/bank',apiAdminBank);
-app.use('/admin/user',apiAdminUser);
-app.use('/admin/cloud',apiAdminCloud);
-app.use('/admin/color-mode',apiAdminColorMode);
-app.use('/admin/customer',apiAdminCustomer);
-app.use('/admin/file-format',apiAdminFileFormat);
-app.use('/admin/job-level',apiAdminJobLevel);
-app.use('/admin/level',apiAdminLevel);
-app.use('/admin/local-level',apiAdminLocalLevel);
-app.use('/admin/national-style',apiAdminNationalStyle);
-app.use('/admin/size',apiAdminSize);
-app.use('/admin/skill',apiAdminSkill);
-app.use('/admin/status',apiAdminStatus);
-app.use('/admin/style',apiAdminStyle);
-app.use('/admin/user-type',apiAdminUserType);
+app.use('/admin/bank',apiAdminBank);//quản lý thông tin danh sách ngân hàng
+app.use('/admin/user',apiAdminUser);//quản lý thông tin nhân viên
+app.use('/admin/cloud',apiAdminCloud);//quản lý thông tin cloud để upload link file của khách
+app.use('/admin/color-mode',apiAdminColorMode);//quảnlý hệ màu của hình ảnh
+app.use('/admin/customer',apiAdminCustomer);//quản lý thông tin khách hàng
+app.use('/admin/customer-level',apiAdminCustomerLevel);//quản lý thông tin các level mặt hàng của khách, liên quan tới thông tin hợp đồng của từng khách hàng
+app.use('/admin/file-format',apiAdminFileFormat);//quản lý thông tin định dạng file hình ảnh xuất cho khách
+app.use('/admin/job-level',apiAdminJobLevel);//quản lý thông tin danh sách level, khác với apiAdminCustomerLevel
+app.use('/admin/level',apiAdminLevel);//quản lý thông tin level --- tạm thời bị dư thừa, k xài tới
+app.use('/admin/local-level',apiAdminLocalLevel);//quản lý level của nhân viên, phân loại nhân viên: người mới, tập sự, học việc,...
+app.use('/admin/national-style',apiAdminNationalStyle);//quản lý thông tin style của khách hàng theo quốc gia
+app.use('/admin/size',apiAdminSize);//quản lý thông tin kích thước file hình ảnh 
+app.use('/admin/skill',apiAdminSkill);//quản lý thông tin kỹ năng của nhân viên: Q.C, Editor,...
+app.use('/admin/status',apiAdminStatus);//trạng thái của đơn hàng, tạm thời không sử dụng tới
+app.use('/admin/style',apiAdminStyle);//style này tạm thời chưa sử dụng tới
+app.use('/admin/user-type',apiAdminUserType);//quản lý nhóm nhân viên: người nhà, người dưng,....
 
 
 

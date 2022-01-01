@@ -3,7 +3,12 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 var Float = require('mongoose-float').loadType(mongoose);
 const Schema = mongoose.Schema;
+/*
+Model này dùng để lưu trữ thông tin hợp đồng của khách hàng
+quan hệ 1 - n tới khách hàng
+cụ thể: bảng giá của từng level mặt hàng
 
+*/
 
 const customerLevelModel = new Schema({
     customer:{

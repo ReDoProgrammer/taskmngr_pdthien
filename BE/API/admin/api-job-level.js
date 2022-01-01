@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const JobLevel = require('../../models/job-level-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
-const jobLevelModel = require('../../models/job-level-model');
+
 
 
 /*
@@ -12,7 +12,7 @@ router.get('/',authenticateAdminToken,(req,res)=>{
     JobLevel
     .find({})
     .exec()
-    .then(jl=>{
+    .then(jl=>{        
         return res.status(200).json({
             msg:`Load job levels list successfully!!`,
             jl
@@ -106,5 +106,10 @@ router.delete('/',authenticateAdminToken,(req,res)=>{
             msg:`Delete job level failed with error: ${new Error(err.message)}`
         })
     })
+})
+
+router.get('/customer',authenticateAdminToken,(req,res)=>{
+    let {custId} = req.query();
+    
 })
 module.exports = router;
