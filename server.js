@@ -54,6 +54,8 @@ const adminHomeController = require("./BE/controllers/Admin/home-controller");
 const adminJobLevelController = require('./BE/controllers/Admin/job-leve-controller');
 
 const adminLevelController = require("./BE/controllers/Admin/level-controller");
+const adminModuleController = require('./BE/controllers/Admin/module-controller');
+
 const adminStaffLevelController = require("./BE/controllers/Admin/staff-level-controller");
 
 const adminNationalStyleController = require('./BE/controllers/Admin/national-style-controller');
@@ -97,6 +99,7 @@ const apiAdminFileFormat = require('./BE/API/admin/api-file-format');
 const apiAdminJobLevel = require('./BE/API/admin/api-job-level');
 const apiAdminLevel = require('./BE/API/admin/api-level');
 const apiAdminStaffLevel = require('./BE/API/admin/api-staff-level');
+const apiAdminModule = require('./BE/API/admin/api-module');
 const apiAdminNationalStyle = require('./BE/API/admin/api-national-style');
 const apiAdminSize = require('./BE/API/admin/api-size');
 const apiAdminSkill = require('./BE/API/admin/api-skill');
@@ -190,10 +193,11 @@ app.use('/admin/customer-level',apiAdminCustomerLevel);//quản lý thông tin c
 app.use('/admin/file-format',apiAdminFileFormat);//quản lý thông tin định dạng file hình ảnh xuất cho khách
 app.use('/admin/job-level',apiAdminJobLevel);//quản lý thông tin danh sách level, khác với apiAdminCustomerLevel
 app.use('/admin/level',apiAdminLevel);//quản lý thông tin level --- tạm thời bị dư thừa, k xài tới
-app.use('/admin/staff-level',apiAdminStaffLevel);//quản lý level của nhân viên, phân loại nhân viên: người mới, tập sự, học việc,...
+app.use('/admin/module',apiAdminModule);// quản lý danh sách module của web
 app.use('/admin/national-style',apiAdminNationalStyle);//quản lý thông tin style của khách hàng theo quốc gia
 app.use('/admin/size',apiAdminSize);//quản lý thông tin kích thước file hình ảnh 
 app.use('/admin/skill',apiAdminSkill);//quản lý thông tin kỹ năng của nhân viên: Q.C, Editor,...
+app.use('/admin/staff-level',apiAdminStaffLevel);//quản lý level của nhân viên, phân loại nhân viên: người mới, tập sự, học việc,...
 app.use('/admin/status',apiAdminStatus);//trạng thái của đơn hàng, tạm thời không sử dụng tới
 app.use('/admin/style',apiAdminStyle);//style này tạm thời chưa sử dụng tới
 app.use('/admin/user-group',apiAdminUserGroup);//quản lý nhóm nhân viên: người nhà, người dưng,....
@@ -217,7 +221,7 @@ app.use('/admin/setting/cloud',adminCloudController);
 app.use("/admin/setting/file-format", adminFileFormatController);
 app.use('/admin/setting/job-level',adminJobLevelController);
 app.use("/admin/setting/level", adminLevelController);
-app.use("/admin/setting/staff-level", adminStaffLevelController);
+app.use('/admin/setting/module',adminModuleController);
 app.use('/admin/setting/national-style',adminNationalStyleController);
 app.use("/admin/setting/size", adminSizeController);
 app.use("/admin/setting/status", adminStatusController);
@@ -228,7 +232,7 @@ app.use('/admin/setting/user-type',adminUserGroupController);
 
 
 app.use("/admin/staff", adminStaffController);
-
+app.use("/admin/setting/staff-level", adminStaffLevelController);
 
 //using sale controllers
 app.use('/sale',saleAuthController);

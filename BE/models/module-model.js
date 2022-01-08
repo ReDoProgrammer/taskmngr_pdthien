@@ -1,3 +1,7 @@
+/*
+    Module này dùng để quản lý các module của web như: module Admin, module TLA, module của Sale, ...
+
+*/
 require('dotenv').config();
 
 const mongoose = require('mongoose');

@@ -1,0 +1,105 @@
+<button type="button" class="btn btn-success" id="btnAddNew">
+    <span>
+        <i class="fa fa-plus" aria-hidden="true"></i>
+    </span>
+    Add New
+</button>
+<table class="table mt-2">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col" class="text-center">Status</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody id="tblModules">
+
+    </tbody>
+</table>
+
+
+<script>
+
+    var moduleId = '';
+
+    function LoadData() {
+        $('#tblModules').empty();
+        $.ajax({
+            url: '/admin/module/list',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem('accessToken'),
+            },
+            success: function (data, textStatus, xhr) {
+                let idx = 1;
+                data.modules.forEach(m => {
+                    let tr = '<tr id=' + m._id + ' data-name = ' + m.name + '>';
+                    tr += '<th scope="row">' + (idx++) + '</th>';
+                    tr += '<td class ="font-weight-bold">' + m.name + '</td>';
+                    tr += '<td>' + m.description + '</td>';
+                    tr += '<td class ="text-center">';
+                    if (m.status) {
+                        tr += '<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>';
+                    } else {
+                        tr += '<i class="fa fa-ban text-danger" aria-hidden="true"></i>'
+                    }
+
+                    tr += '</td>';
+
+                    tr += '<td class="text-right"><button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button></td>';
+
+                    tr += '</tr>';
+                    $('#tblModules').append(tr);
+                });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {              
+                alert(jqXHR.responseJSON.msg);
+            }
+        })
+    }
+
+    $(document).ready(function () {
+        $('#btnAddNew').click(function () {
+            moduleId = '';
+            $('#modalModule').modal();
+        });
+        LoadData();
+    });
+
+
+
+
+    $(document).on("click", "button[name='update']", function () {
+
+        moduleId = $(this).closest("tr").attr("id");
+
+        $.ajax({
+            url: "/admin/module/detail",
+            type: "get",
+            headers: {
+                authorization: "Bearer " + localStorage.getItem('accessToken'),
+            },
+            data: {
+                moduleId
+            },
+            success: function (data, textStatus, xhr) {
+                console.log(data);
+                $('#modalModule').modal();
+                $('#txtName').val(data.module.name);
+                $('#txtDescription').val(data.module.description);
+                if(data.module.status){
+                    $('#ckbStatus').prop('checked', true);
+                }else{
+                    $('#ckbStatus').prop('checked', false);
+                }
+            }, error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+            }
+        });
+
+    });
+</script>
+
+<%-include('modal')%>
