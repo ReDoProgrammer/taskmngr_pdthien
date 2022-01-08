@@ -24,6 +24,11 @@
 
     var moduleId = '';
 
+    $(document).on("click", "button[name='staff']", function () {
+        moduleId = $(this).closest("tr").attr("id");
+        $('#modalStaff').modal();
+    })
+
     function LoadData() {
         $('#tblModules').empty();
         $.ajax({
@@ -48,13 +53,16 @@
 
                     tr += '</td>';
 
-                    tr += '<td class="text-right"><button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button></td>';
+                    tr += '<td class="text-right">';
+                    tr += '<button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+                    tr += '<button class="btn btn-sm btn-info ml-1" name="staff"><i class="fa fa-list" aria-hidden="true"></i></button>';
+                    tr += '</td>';
 
                     tr += '</tr>';
                     $('#tblModules').append(tr);
                 });
             },
-            error: function (jqXHR, textStatus, errorThrown) {              
+            error: function (jqXHR, textStatus, errorThrown) {
                 alert(jqXHR.responseJSON.msg);
             }
         })
@@ -89,9 +97,9 @@
                 $('#modalModule').modal();
                 $('#txtName').val(data.module.name);
                 $('#txtDescription').val(data.module.description);
-                if(data.module.status){
+                if (data.module.status) {
                     $('#ckbStatus').prop('checked', true);
-                }else{
+                } else {
                     $('#ckbStatus').prop('checked', false);
                 }
             }, error: function (jqXHR, textStatus, errorThrown) {
@@ -103,3 +111,4 @@
 </script>
 
 <%-include('modal')%>
+<%-include('staff-modal')%>
