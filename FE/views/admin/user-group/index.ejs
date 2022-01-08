@@ -17,7 +17,7 @@
 </table>
 
 <script>
-  var utId = "";
+  var ugId = "";
 
   function LoadData() {
     $("#tblData").empty();
@@ -34,7 +34,7 @@
           tr += "<td>" + ut.description + "</td>";
           tr +=
             '<td class="text-right"><button class="btn btn-sm btn-info" name="detail"><i class="fa fa-eye" aria-hidden="true"></i></button>';
-          tr+=  '<button class="btn btn-sm btn-warning ml-1" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+          tr += '<button class="btn btn-sm btn-warning ml-1" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
           tr +=
             '<button class="btn btn-sm btn-danger ml-1" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
           tr += "</tr>";
@@ -49,7 +49,7 @@
 
   $(document).ready(function () {
     $("#btnAddNew").click(function () {
-      utId = "";
+      ugId = "";
       $("#modalUserType").modal();
     });
     LoadData();
@@ -64,16 +64,17 @@
   //sự kiện load lại hàm ds level khi modal đc đóng lại
   $(document).on("hidden.bs.modal", "#modalUserType", function () {
     LoadData();
-    utId="";
+    ugId = "";
   });
 
   $("#tblData").on("click", "button[name='delete']", function () {
     var r = confirm(
       "Vui lòng xác nhận xóa user type " +
-        $(this).closest("tr").data("name") +
-        "?"
+      $(this).closest("tr").data("name") +
+      "?"
     );
     if (r == true) {
+      let ugId = $(this).closest("tr").attr("id");
       $.ajax({
         url: "/admin/user-group",
         type: "delete",
@@ -81,11 +82,27 @@
           authorization: "Bearer " + localStorage.getItem("accessToken"),
         },
         data: {
-          id: $(this).closest("tr").attr("id"),
+          id: ugId
         },
         success: function (data, textStatus, xhr) {
-          alert(data.msg);
-          LoadData();
+          //xóa các thông tin tiền công liên quan tới nhóm nhân viên vừa xóa
+          $.ajax({
+            url: '/admin/user-group-wage',
+            type: 'delete',
+            headers: {
+              authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+              ugId
+            }
+            , success: function (data) {
+              alert(data.msg);
+              LoadData();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              alert(jqXHR.responseJSON.msg);
+            },
+          })
         },
         error: function (jqXHR, textStatus, errorThrown) {
           alert(jqXHR.responseJSON.msg);
@@ -96,12 +113,12 @@
 
 
   $("#tblData").on("click", "button[name='detail']", function () {
-    utId = $(this).closest("tr").attr("id");
+    ugId = $(this).closest("tr").attr("id");
     $("#modalUserGroupDetail").modal();
   })
 
   $("#tblData").on("click", "button[name='update']", function () {
-    utId = $(this).closest("tr").attr("id");
+    ugId = $(this).closest("tr").attr("id");
 
     $.ajax({
       url: "/admin/user-group/detail",
@@ -110,7 +127,7 @@
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       data: {
-        id: utId,
+        id: ugId,
       },
       success: function (data, textStatus, xhr) {
         $("#modalUserType").modal();
@@ -147,4 +164,4 @@
 </script>
 
 <%-include('modal')%>
-<%-include('detail')%>
+  <%-include('detail')%>

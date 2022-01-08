@@ -3,12 +3,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Add or update user type</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -16,23 +11,12 @@
         <div class="form-row">
           <div class="form-group col-md-4">
             <label for="">Name</label>
-            <input
-              type="text"
-              name="txtName"
-              id="txtName"
-              class="form-control"
-              placeholder="User type name"
-            />
+            <input type="text" name="txtName" id="txtName" class="form-control" placeholder="User type name" />
           </div>
           <div class="form-group col-md-8">
             <label for="">Description</label>
-            <input
-              type="text"
-              name="txtDescription"
-              id="txtDescription"
-              class="form-control"
-              placeholder="Description"
-            />
+            <input type="text" name="txtDescription" id="txtDescription" class="form-control"
+              placeholder="Description" />
           </div>
         </div>
         <div class="card text-white bg-secondary mb-3">
@@ -51,29 +35,12 @@
               <tbody id="tblWages"></tbody>
             </table>
             <div class="form-inline form-row">
-              <select
-                name=""
-                id="slSkill"
-                class="form-control col-md-3"
-              ></select>
-              <select
-                name=""
-                id="slLevel"
-                class="form-control col-md-3 ml-1"
-              ></select>
+              <select name="" id="slSkill" class="form-control col-md-3"></select>
+              <select name="" id="slLevel" class="form-control col-md-3 ml-1"></select>
 
-              <input
-                type="text"
-                id="txtWage"
-                class="form-control col-md-2 ml-1 mr-1 text-right"
-                value="0"
-              />
+              <input type="text" id="txtWage" class="form-control col-md-2 ml-1 mr-1 text-right" value="0" />
 
-              <button
-                type="submit"
-                class="btn btn-info col-md-2"
-                id="btnAddNewLine"
-              >
+              <button type="submit" class="btn btn-info col-md-2" id="btnAddNewLine">
                 Add New wage
               </button>
             </div>
@@ -114,11 +81,11 @@
       let level = $(this).closest("tr").data("level");
       let skill = $(this).closest("tr").data("skill");
       let td = $(this).find("td").eq(3);
-      let wage = { skill: skill, level: level, wage: parseInt(td.text()) };
+      let wage = { skill, level, wage: parseFloat(td.text()) };
       wages.push(wage);
     });
 
-    if (utId.length > 0) {//case update user type
+    if (ugId.length > 0) {//case update user type
       $.ajax({
         url: "/admin/user-group",
         type: "put",
@@ -126,7 +93,7 @@
           authorization: "Bearer " + localStorage.getItem("accessToken"),
         },
         data: {
-          id: utId,
+          id: ugId,
           name,
           description,
           wages
@@ -153,8 +120,34 @@
           wages,
         },
         success: function (data, textStatus, xhr) {
-          alert(data.msg);
-          $("#modalUserType").modal("hide");
+          let ws = wages.map(x => {
+            var o = {};
+            o = x;
+            o.user_group = data.ug._id
+            return o;
+          });
+
+          //thêm các thông tin liên quan tới tiền công của nhóm nhân viên này
+          $.ajax({
+            url: '/admin/user-group-wage',
+            type: 'post',
+            headers: {
+              authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+              wages
+            },
+            success: function (data) {
+              alert(data.msg);
+              $("#modalUserType").modal("hide");
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              alert(jqXHR.responseJSON.msg);
+            },
+          })
+
+
+
           ugId = "";
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -212,25 +205,25 @@
   // });
 
   $().ready(function () {
-        $("input[id*='txtWage']").keydown(function (event) {
-          if (event.shiftKey == true) {
-            event.preventDefault();
-        }
+    $("input[id*='txtWage']").keydown(function (event) {
+      if (event.shiftKey == true) {
+        event.preventDefault();
+      }
 
-        if ((event.keyCode >= 48 && event.keyCode <= 57) || 
-            (event.keyCode >= 96 && event.keyCode <= 105) || 
-            event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 37 ||
-            event.keyCode == 39 || event.keyCode == 46 || event.keyCode == 190) {
+      if ((event.keyCode >= 48 && event.keyCode <= 57) ||
+        (event.keyCode >= 96 && event.keyCode <= 105) ||
+        event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 37 ||
+        event.keyCode == 39 || event.keyCode == 46 || event.keyCode == 190) {
 
-        } else {
-            event.preventDefault();
-        }
+      } else {
+        event.preventDefault();
+      }
 
-        if($(this).val().indexOf('.') !== -1 && event.keyCode == 190)
-            event.preventDefault(); 
-        //if a decimal has been added, disable the "."-button
-        });
+      if ($(this).val().indexOf('.') !== -1 && event.keyCode == 190)
+        event.preventDefault();
+      //if a decimal has been added, disable the "."-button
     });
+  });
 
 
 
@@ -253,13 +246,13 @@
       let level = $(this).closest("tr").data("level");
       let skill = $(this).closest("tr").data("skill");
 
-      if (skillId === skill && levelId === level) {      
+      if (skillId === skill && levelId === level) {
         exist = true;
         return;
       }
     });
 
-    if (wageId.trim().length == 0) {    
+    if (wageId.trim().length == 0) {
       if (!exist) {
         let tr =
           '<tr class="row" data-level="' +
@@ -272,7 +265,7 @@
         tr += '<td class="col-md-3">' + levelName + "</td>";
         tr +=
           '<td class="col-md-2 text-center font-weight-bold">' +
-          parseInt(wage) +
+          parseFloat(wage) +
           "</td>";
         tr +=
           '<td class="col-md-2"><button class="btn btn-sm btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
@@ -280,12 +273,12 @@
 
         $("#tblWages").append(tr);
         $("#txtWage").val(0);
-      }else{
+      } else {
         alert("Giá trị này đã tồn tại!");
         return;
       }
-    }else{  
-      $('#tblWages').find('tr#'+wageId).find('td:eq(3)').html($('#txtWage').val());
+    } else {
+      $('#tblWages').find('tr#' + wageId).find('td:eq(3)').html($('#txtWage').val());
     }
 
     $(this).text("Add new wage");

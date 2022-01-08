@@ -44,39 +44,39 @@ router.get('/list', (req, res) => {
 router.get('/detail', authenticateAdminToken, (req, res) => {
     let { id } = req.query;
     UserGroup.findById(id)
-    .populate({
-        path:'wages',
-        populate:{path:'skill'}       
-    })
-    .populate({
-        path:'wages',
-        populate:{path:'level'}       
-    })
-    .exec((err,ut)=>{
-        if(err){
-            return res.status(500).json({
-                msg:'can not get user type detail',
-                error:new Error(err.message)
-            })
-        }
-        if(ut){
-            return res.status(200).json({
-                msg:'get user type detail successfully',
-                ut:ut
-            })
-        }
-        else{
-            return res.status(403).json({
-                msg:'User type not found!'
-            })
-        }
-    })
-   
+        .populate({
+            path: 'wages',
+            populate: { path: 'skill' }
+        })
+        .populate({
+            path: 'wages',
+            populate: { path: 'level' }
+        })
+        .exec((err, ut) => {
+            if (err) {
+                return res.status(500).json({
+                    msg: 'can not get user type detail',
+                    error: new Error(err.message)
+                })
+            }
+            if (ut) {
+                return res.status(200).json({
+                    msg: 'get user type detail successfully',
+                    ut: ut
+                })
+            }
+            else {
+                return res.status(403).json({
+                    msg: 'User type not found!'
+                })
+            }
+        })
+
 })
 
 
 router.post('/', authenticateAdminToken, (req, res) => {
-    let { name, description,wages } = req.body;
+    let { name, description } = req.body;
 
 
     //validation user type name
@@ -86,32 +86,18 @@ router.post('/', authenticateAdminToken, (req, res) => {
         });
     }
 
-    
-   //wages validation
-   if (typeof wages == 'undefined' || wages.length == 0) {
-    return res.status(403).json({
-      msg: "wage list can not be empty!",
-    });
-  }
+
+
 
     let ut = new UserGroup({
         name: name,
-        description: description        
+        description: description
     });
     ut.save()
-        .then(ut => {
-            InsertWages(ut._id,wages)
-            .then(ut =>{
-                return res.status(201).json({
-                    msg:'Create new User type successfully',
-                    ut:ut
-                })
-            })
-            .catch(err=>{
-                return res.status(500).json({
-                    msg:err.msg,
-                    error:new Error(err.message)
-                })
+        .then(ug => {
+            return res.status(201).json({
+                msg: `New user group has been created successfully!`,
+                ug
             })
         })
         .catch(err => {
@@ -123,7 +109,7 @@ router.post('/', authenticateAdminToken, (req, res) => {
 })
 
 router.put('/', authenticateAdminToken, (req, res) => {
-    let { id, name, description,wages } = req.body;
+    let { id, name, description, wages } = req.body;
 
     //ràng buộc dữ liệu cho đầu vào tên size
     if (name.length == 0) {
@@ -136,7 +122,7 @@ router.put('/', authenticateAdminToken, (req, res) => {
 
     UserGroup.findOneAndUpdate({ _id: id }, {
         name,
-        description      
+        description
     }, { new: true }, (err, ut) => {
         if (err) {
             return res.status(500).json({
@@ -146,18 +132,8 @@ router.put('/', authenticateAdminToken, (req, res) => {
         }
 
         if (ut) {
-            UpdateWages(id,wages)
-            .then(ut=>{
-                return res.status(200).json({
-                    msg:'Update user type successfully!',
-                    ut:ut
-                })
-            })
-            .catch(err=>{
-                return res.status(500).json({
-                    msg:'Can not update user type!',
-                    error:new Error(err.message)
-                })
+            return res.status(200).json({
+                msg: `Update user group successfully!`
             })
         } else {
             return res.status(500).json({
@@ -169,84 +145,11 @@ router.put('/', authenticateAdminToken, (req, res) => {
 
 
 
-var UpdateWages = (UserGroupId,wages)=>{
-    return new Promise((resolve,reject)=>{
-        Wage.find({user_type:UserGroupId},(err,wl)=>{
-            if(err){
-                return reject({
-                    msg:'User wages can not found!',
-                    error:new Error(err.message)
-                });
-            }
-            // let DiffInDB = wl.filter(x=>)           
-           
-        })
-    })
-}
-
-var DeleteFromDB = (lst)=>{
-    return new Promise((resolve,reject)=>{
-        Wage.deleteMany({_id:{$in:lst}},err=>{
-            if(err){
-                return reject({
-                    msg:'Can not delete wages from DB',
-                    error:new Error(err.message)
-                });
-            }
-            return resolve('Delete wages from db successfully!')
-        })
-    })
-}
 
 
 
-var InsertWages = (UserGroupId,wages)=>{
-    return new Promise(async (resolve,reject)=>{
-        var wages_list =await wages.map(w=>{
-            var obj  = {};
-            obj['user_type'] = UserGroupId;
-            obj['skill'] = w.skill;
-            obj['level'] = w.level;
-            obj['wage'] = w.wage;
-            return obj;
-        });
-        Wage.insertMany(wages_list,(err,wages)=>{
-            if(err){
-                return reject({
-                    msg:'Can not insert wages list!',
-                    error: new Error(err.message)
-                })
-            }
-            if(wages){
-                let wagesId = wages.map(w=>{
-                    return w._id;
-                })
-               UserGroup.findOneAndUpdate({_id:UserGroupId},{
-                $push: { wages: wagesId } 
-               },{new:true},(err,ut)=>{
-                   if(err){
-                       return reject({
-                           msg:'Cannot push user type wages!',
-                           error:new Error(err.message)
-                       })
-                   }
-                   if(ut){
-                       return resolve({
-                           msg:'Init user type wage successfully!',
-                           ut:ut
-                       })
-                   }
-                   else{
-                       return reject({
-                           msg:'User type wage can not init!'
-                       })
-                   }
-               })
-            }
-        })
 
-    })
-}
+
 
 module.exports = router;
 

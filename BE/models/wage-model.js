@@ -5,10 +5,10 @@ const Schema = mongoose.Schema;
 
 
 const wageSchema = new Schema({
-    user_type:{
+    user_group:{
         type:Schema.Types.ObjectId,
         required:true,
-        ref:'user_type'
+        ref:'user_group'
     },
     skill:{
         type:Schema.Types.ObjectId,
