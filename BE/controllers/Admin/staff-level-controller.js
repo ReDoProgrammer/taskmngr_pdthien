@@ -2,7 +2,7 @@ const router = require('express').Router();
 
 
 router.get('/',(req,res)=>{
-    res.render('admin/local-level/index',{
+    res.render('admin/staff-level/index',{
         layout:'layouts/admin-layout',
         title:'Staff level'
     });

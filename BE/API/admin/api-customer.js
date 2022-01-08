@@ -82,8 +82,7 @@ router.get("/detail", authenticateAdminToken, (req, res) => {
           error: new Error(err.message),
         });
       }
-      if (customer) {
-        console.log(customer);
+      if (customer) {      
         return res.status(200).json({
           msg: "Get customer detail successfully!",
           customer: customer,

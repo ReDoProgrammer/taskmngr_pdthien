@@ -1,10 +1,10 @@
 const router = require('express').Router();
-const LocalLevel = require('../../models/local-level-model');
+const StaffLevel = require('../../models/staff-level-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 router.delete('/', authenticateAdminToken, (req, res) => {
     let id = req.body.id;
-    LocalLevel.findOneAndDelete({ _id: id }, (err, level) => {
+    StaffLevel.findOneAndDelete({ _id: id }, (err, level) => {
         if (err) {
             return res.status(500).json({
                 msg: 'Xóa level thất bại!',
@@ -26,7 +26,7 @@ router.delete('/', authenticateAdminToken, (req, res) => {
 })
 
 router.get('/', (req, res) => {
-    LocalLevel.find({}, (err, levels) => {
+    StaffLevel.find({}, (err, levels) => {
         if (err) {
             return res.status(500).json({
                 msg: 'load levels list failed'
@@ -42,7 +42,7 @@ router.get('/', (req, res) => {
 
 router.get('/detail', authenticateAdminToken, (req, res) => {
     let { id } = req.query;
-    LocalLevel.findById(id, (err, level) => {
+    StaffLevel.findById(id, (err, level) => {
         if (err) {
             return res.status(500).json({
                 msg: 'Lấy thông tin level thất bại!',
@@ -73,7 +73,7 @@ router.post('/', authenticateAdminToken, (req, res) => {
         });
     }
 
-    let level = new LocalLevel({
+    let level = new StaffLevel({
         name: name,
         description: description,
         status: status
@@ -105,7 +105,7 @@ router.put('/', authenticateAdminToken, (req, res) => {
 
 
 
-    LocalLevel.findOneAndUpdate({ _id: id }, {
+    StaffLevel.findOneAndUpdate({ _id: id }, {
         name,
         description,
         status

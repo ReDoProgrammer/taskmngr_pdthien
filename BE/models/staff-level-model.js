@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 
-const localLevelSchema = new Schema({
+const StaffLevelSchema = new Schema({
     name:{
         type:String,
         required:true
@@ -21,7 +21,7 @@ const localLevelSchema = new Schema({
 });
 
 
-module.exports = mongoose.model('local_level',localLevelSchema);
+module.exports = mongoose.model('staff_level',StaffLevelSchema);
 
 
 

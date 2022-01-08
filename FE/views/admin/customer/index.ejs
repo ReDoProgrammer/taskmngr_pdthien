@@ -67,11 +67,28 @@
         $(document).on("click", "button[name='view']", function () {
           customerId = $(this).closest("tr").attr("id");
           LoadCustomer(customerId);
+          LoadCustomerLevels(customerId);
         });
 
         $(document).on("click", "button[name='update']", function () {
-          
+
         });
+
+        function LoadCustomerLevels(customerId) {
+          $.ajax({
+            url: '/customer-level',
+            type: 'get',
+            headers: {
+              authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+              customerId
+            },
+            success: function (data) {
+              console.log(data);
+            }
+          })
+        }
 
 
         function LoadCustomer(customerId) {
@@ -163,9 +180,9 @@
               }
 
 
-              LoadCustomerLevels(customerId) ;
+              LoadCustomerLevels(customerId);
 
-             
+
 
 
             },
@@ -176,25 +193,25 @@
         }
 
         function LoadCustomerLevels(customerId) {
-        $.ajax({
+          $.ajax({
             url: "/admin/customer-level",
             type: "get",
             headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
+              authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
-            data:{
+            data: {
               customerId
             },
             success: function (data, textStatus, xhr) {
-                console.log(data);
-               
-            
+              console.log(data);
+
+
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                alert(jqXHR.responseJSON.msg);
+              alert(jqXHR.responseJSON.msg);
             },
-        });
-    }
+          });
+        }
 
         function LoadCustomers() {
           $.ajax({

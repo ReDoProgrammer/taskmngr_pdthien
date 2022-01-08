@@ -5,9 +5,10 @@ const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 router.get('/',authenticateAdminToken,(req,res)=>{
     let {customerId} = req.query;
+   
     CustomerLevel
     .find({customer:customerId})
-    .populate('level')
+   // .populate('level')
     .exec()
     .then(cl=>{
         console.log(cl);
