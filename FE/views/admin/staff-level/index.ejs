@@ -27,7 +27,7 @@
   function LoadLevels() {
     $('#tblData').empty();
     $.ajax({
-      url: '/admin/local-level',
+      url: '/admin/staff-level',
       type: 'get',
       data: {
       },
@@ -36,7 +36,7 @@
         data.levels.forEach(level => {
           let tr = '<tr id=' + level._id + ' data-name = '+level.name+'>';
           tr += '<th scope="row">' + (idx++) + '</th>';
-          tr += '<td>' + level.name + '</td>';
+          tr += '<td class="text-info font-weight-bold">' + level.name + '</td>';
           tr += '<td>' + level.description + '</td>';
          
 

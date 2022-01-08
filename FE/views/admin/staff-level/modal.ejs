@@ -37,7 +37,7 @@
 
         if (levelId.length > 0) {
             $.ajax({
-                url: '/admin/local-level',
+                url: '/admin/staff-level',
                 type: 'put',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem('accessToken'),
@@ -58,7 +58,7 @@
             })
         } else {
             $.ajax({
-                url: '/admin/local-level',
+                url: '/admin/staff-level',
                 type: 'post',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem('accessToken'),
