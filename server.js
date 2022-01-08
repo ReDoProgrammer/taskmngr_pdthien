@@ -62,7 +62,6 @@ const adminSkillController = require("./BE/controllers/Admin/skill-controller");
 const adminStatusController = require("./BE/controllers/Admin/status-controller");
 const adminStaffController = require("./BE/controllers/Admin/staff-controller");
 const adminUserGroupController = require('./BE/controllers/Admin/user-group-controller');
-const adminUserTypeController = require('./BE/controllers/Admin/user-type-controller');
 
 
 /*
@@ -104,7 +103,8 @@ const apiAdminSkill = require('./BE/API/admin/api-skill');
 const apiAdminUser = require('./BE/API/admin/api-user');
 const apiAdminStatus = require('./BE/API/admin/api-status');
 const apiAdminStyle = require('./BE/API/admin/api-style');
-const apiAdminUserType = require('./BE/API/admin/api-user-type');
+const apiAdminUserGroup = require('./BE/API/admin/api-user-group');
+const apiAdminUserGroupWage = require('./BE/API/admin/api-user-group-wage');
 
 
 
@@ -196,7 +196,8 @@ app.use('/admin/size',apiAdminSize);//quản lý thông tin kích thước file 
 app.use('/admin/skill',apiAdminSkill);//quản lý thông tin kỹ năng của nhân viên: Q.C, Editor,...
 app.use('/admin/status',apiAdminStatus);//trạng thái của đơn hàng, tạm thời không sử dụng tới
 app.use('/admin/style',apiAdminStyle);//style này tạm thời chưa sử dụng tới
-app.use('/admin/user-type',apiAdminUserType);//quản lý nhóm nhân viên: người nhà, người dưng,....
+app.use('/admin/user-group',apiAdminUserGroup);//quản lý nhóm nhân viên: người nhà, người dưng,....
+app.use('/admin/user-group-wage',apiAdminUserGroupWage);//quản lý tiền công của từng nhóm nhân viên dựa theo kĩ năng làm việc: editor, Q.A
 
 
 
@@ -222,8 +223,8 @@ app.use("/admin/setting/size", adminSizeController);
 app.use("/admin/setting/status", adminStatusController);
 app.use("/admin/setting/style", adminStyleController);
 app.use("/admin/setting/skill", adminSkillController);
-app.use('/admin/setting/user-group',adminUserGroupController);
-app.use('/admin/setting/user-type',adminUserTypeController);
+
+app.use('/admin/setting/user-type',adminUserGroupController);
 
 
 app.use("/admin/staff", adminStaffController);

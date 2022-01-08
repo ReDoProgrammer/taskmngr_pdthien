@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 
 //phân nhóm nhân viên: người nhà, người quen,...
-const userTypeSchema = new Schema({
+const UserGroupSchema = new Schema({
     name:{
         type:String      
     },
@@ -19,4 +19,4 @@ const userTypeSchema = new Schema({
 });
 
 
-module.exports = mongoose.model('user_type',userTypeSchema);
+module.exports = mongoose.model('user_group',UserGroupSchema);

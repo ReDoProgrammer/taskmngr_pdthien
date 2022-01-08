@@ -1,11 +1,11 @@
 const router = require('express').Router();
-const UserType = require('../../models/user-type-model');
+const UserGroup = require('../../models/user-group-model');
 const Wage = require('../../models/wage-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 router.delete('/', authenticateAdminToken, (req, res) => {
     let id = req.body.id;
-    UserType.findOneAndDelete({ _id: id }, (err, ut) => {
+    UserGroup.findOneAndDelete({ _id: id }, (err, ut) => {
         if (err) {
             return res.status(500).json({
                 msg: 'Delete user type failed!',
@@ -27,7 +27,7 @@ router.delete('/', authenticateAdminToken, (req, res) => {
 })
 
 router.get('/list', (req, res) => {
-    UserType.find({}, (err, uts) => {
+    UserGroup.find({}, (err, uts) => {
         if (err) {
             return res.status(500).json({
                 msg: 'load user group types failed'
@@ -43,7 +43,7 @@ router.get('/list', (req, res) => {
 
 router.get('/detail', authenticateAdminToken, (req, res) => {
     let { id } = req.query;
-    UserType.findById(id)
+    UserGroup.findById(id)
     .populate({
         path:'wages',
         populate:{path:'skill'}       
@@ -94,7 +94,7 @@ router.post('/', authenticateAdminToken, (req, res) => {
     });
   }
 
-    let ut = new UserType({
+    let ut = new UserGroup({
         name: name,
         description: description        
     });
@@ -134,7 +134,7 @@ router.put('/', authenticateAdminToken, (req, res) => {
 
 
 
-    UserType.findOneAndUpdate({ _id: id }, {
+    UserGroup.findOneAndUpdate({ _id: id }, {
         name,
         description      
     }, { new: true }, (err, ut) => {
@@ -169,9 +169,9 @@ router.put('/', authenticateAdminToken, (req, res) => {
 
 
 
-var UpdateWages = (userTypeId,wages)=>{
+var UpdateWages = (UserGroupId,wages)=>{
     return new Promise((resolve,reject)=>{
-        Wage.find({user_type:userTypeId},(err,wl)=>{
+        Wage.find({user_type:UserGroupId},(err,wl)=>{
             if(err){
                 return reject({
                     msg:'User wages can not found!',
@@ -200,11 +200,11 @@ var DeleteFromDB = (lst)=>{
 
 
 
-var InsertWages = (userTypeId,wages)=>{
+var InsertWages = (UserGroupId,wages)=>{
     return new Promise(async (resolve,reject)=>{
         var wages_list =await wages.map(w=>{
             var obj  = {};
-            obj['user_type'] = userTypeId;
+            obj['user_type'] = UserGroupId;
             obj['skill'] = w.skill;
             obj['level'] = w.level;
             obj['wage'] = w.wage;
@@ -221,7 +221,7 @@ var InsertWages = (userTypeId,wages)=>{
                 let wagesId = wages.map(w=>{
                     return w._id;
                 })
-               UserType.findOneAndUpdate({_id:userTypeId},{
+               UserGroup.findOneAndUpdate({_id:UserGroupId},{
                 $push: { wages: wagesId } 
                },{new:true},(err,ut)=>{
                    if(err){

@@ -18,7 +18,7 @@ const wageSchema = new Schema({
     level:{
         type:Schema.Types.ObjectId,
         required:true,
-        ref:'local_level'
+        ref:'staff_level'
     },
     wage:{
         type:Number,
