@@ -44,9 +44,7 @@ router.get('/detail',authenticateAdminToken,(req,res)=>{
     .populate('level','name -_id')
     .populate('skill','name -_id')
     .exec()
-    .then(wages =>{
-        console.log(wages);
-
+    .then(wages =>{       
         return res.status(200).json({
             msg:'Load user group wages successfully',
             wages

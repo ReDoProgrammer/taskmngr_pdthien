@@ -11,9 +11,8 @@
                 <table class="table mt-2">
                     <thead class="thead-dark">
                         <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Level</th>
                             <th scope="col">Skill</th>
+                            <th scope="col">Level</th>
                             <th scope="col">Wage</th>
                         </tr>
                     </thead>
@@ -41,8 +40,21 @@
                 ugId
             },
             success: function (data) {
-                console.log(data);
+                $('#tblUserGroupWage').empty();
+                data.wages.forEach(w => {
+                    let tr = '<tr id = "' + w._id + '">';
+                    tr += '<td>' + w.skill.name + '</td>';
+                    tr += '<td>' + w.level.name + '</td>';
+
+                    tr += '<td class = "text-warning text-center">' + w.wage + '</td>';
+                    tr += '</tr>';
+                    $('#tblUserGroupWage').append(tr);
+                })
             }
         })
     });
+
+    $('#modalUserGroupDetail').on('hidden.bs.modal', function () {
+        ugId = '';
+    })
 </script>
