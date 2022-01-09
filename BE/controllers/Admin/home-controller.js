@@ -1,53 +1,104 @@
 const router = require("express").Router();
 const User = require("../../models/user-model");
-
+const UserModule = require('../../models/user-module-model');
+const Module = require('../../models/module-model');
 router.get("/", (req, res) => {
   res.render("admin/home/index", {
     layout: "layouts/admin-layout",
     title: "Home",
-   
+
   });
 });
 
 router.get("/init", (req, res) => {
-  User.countDocuments((err, docs) => {
-    if (err) {
-      console.log(`Can not count users with error: ${new Error(err.message)}`);
-    }
-    if (docs == 0) {
-      let admin = new User({
-        username: "admin",
-        password: "admin",
-        fullname: "Administrator",
-        idNo: "1234454787",
-        issued_by:"Gia Lai",
-        phone: "0911397764",
-        email: "redo2011dht@gmail.com",
-        address: "Đăk Đoa - Đăk Đoa - Gia Lai",
-        bank: "",
-        bank_no: "62110000454278",
-        bank_name: "Nguyen Huu Truong",
-        is_admin: true
-       
-      });
-      admin
-        .save()
-        .then((user) => {
-          
-          console.log("initial root user successfully!");
-          return res.status(201).json({
-            msg:'Initialize administrator account successfully!',
-            user
-          })
+
+  Promise.all([initModule, initAdministrator])
+    .then(result => {
+    
+      initUserModule(result[1]._id,result[0][0]._id)
+      .then(um=>{
+        return res.status(201).json({
+          msg:'Initial administrator account successfully',
+          um
         })
-        .catch((err) => {
-          console.log(
-            "can not init root user. Error: " + new Error(err.message)
-          );
-        });
-    }
-  });
+      })
+      .catch(err=>{
+        return res.status(500).json({
+          msg:`Can not init administrator account with error: ${new Error(err.message)}`
+        })
+      })
+    })
+    .catch(err => {
+      return res.status(500).json({
+        msg: `Can not initial administrator account with error: ${new Error(err.message)}`
+      })
+    })
+
+
+
 });
 
+
+const initAdministrator = new Promise((resolve, reject) => {
+  let admin = new User({
+    username: "admin",
+    password: "admin",
+    fullname: "Administrator",
+    idNo: "1234454787",
+    issued_by: "Gia Lai",
+    phone: "0911397764",
+    email: "redo2011dht@gmail.com",
+    address: "Đăk Đoa - Đăk Đoa - Gia Lai",
+    bank: "",
+    bank_no: "62110000454278",
+    bank_name: "Nguyen Huu Truong"
+
+  });
+  admin
+    .save()
+    .then((user) => {
+      return resolve(user)
+    })
+    .catch((err) => {
+      return reject(new Error(err.message))
+    });
+
+})
+
+const initModule = new Promise((resolve, reject) => {
+
+  let modules = [
+    { name: 'ADMIN', description: 'Administrator' },
+    { name: 'SALE', description: 'Quản lý đơn hàng' },
+    { name: 'TLA', description: 'Quản lý phân luồng công việc' },
+    { name: 'DC', description: 'Quản lý đầu ra' },
+    { name: 'EDITOR', description: 'Nhân viên chỉnh sửa ảnh' },
+    { name: 'QA', description: 'Nhân viên kiểm định' },
+    { name: 'ACCOUNTANT', description: 'Kế toán' },
+  ]
+  Module.insertMany(modules)
+    .then(mods => {
+      return resolve(mods)
+    })
+    .catch(err => {
+      return reject(err)
+    })
+
+})
+
+const initUserModule = (userId, moduleId) => {
+  return new Promise((resolve, reject) => {
+    let usermodule = new UserModule();
+    usermodule.user = userId;
+    usermodule.module = moduleId;
+    usermodule.save()
+      .then(um => {
+        return resolve(um)
+      })
+      .catch(err => {
+        return reject(new Error(err.message))
+      })
+  })
+}
 
 module.exports = router;

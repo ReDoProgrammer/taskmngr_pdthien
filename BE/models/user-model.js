@@ -37,43 +37,8 @@ const UserSchema = new Schema({
     type:String,
     default:''
   },
-  is_admin:{
-    //là quản trị viên
-    type:Boolean,
-    default:false
-  },
-  is_tla:{
-    //là TLA
-    type:Boolean,
-    default:false
-  },
-  is_qa:{
-    //là Q.A
-    type:Boolean,
-    default:false
-  },
-  is_dc:{
-    //là DC
-    type:Boolean,
-    default:false
-  },
 
-  is_accountant:{
-    //là kế toán
-    type:Boolean,
-    default:false
-  },
-  is_sale:{
-    //là sale
-    type:Boolean,
-    default:false
-  },
-
-  is_editor:{
-    //là editor
-    type:Boolean,
-    default:true
-  }, 
+  
   is_active:{
     //tài khoản đang hoạt động?
     type:Boolean,

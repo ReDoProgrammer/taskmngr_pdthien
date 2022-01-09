@@ -11,7 +11,9 @@ const Schema = mongoose.Schema;
 const moduleSchema = new Schema({
     name:{
         type:String,
-        required:true
+        required:true,
+        index: true,
+        unique: true 
     },
     description:{
         type:String,
