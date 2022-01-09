@@ -36,7 +36,11 @@
                 </div>
                 <!-- /.row -->
 
-
+                <div class="row">
+                    <div class="col-sm-12">
+                        <lable class="text-danger" id="msgError"></lable>
+                    </div>
+                </div>
 
                 <table class="table table-dark" style="margin-top: 20px;">
                     <thead class="thead-dark">
@@ -48,7 +52,7 @@
                             <th scope="col"></th>
                         </tr>
                     </thead>
-                    <tbody id="tblStaffs">
+                    <tbody id="tblUserModuleRoles">
 
                     </tbody>
                 </table>
@@ -62,17 +66,91 @@
     $(function () {
         $('.selectpicker').selectpicker();
     });
+    $(document).on('hidden.bs.modal', '#modalStaff', function () {       
+        moduleId = '';
+    });
+
+
+
+    $(document).on("click", "button[name='deleteRole']", function () {
+        let _id = $(this).closest("tr").attr("id");
+        if (confirm("Are you sure want to delete this role?")) {
+            $.ajax({
+                url: '/admin/user-module',
+                type: 'delete',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem('accessToken'),
+                },
+                data: {
+                    _id
+                },
+                success: function (data) {
+                    alert(data.msg);
+                    LoadUserModuleRoles();
+                }
+            })
+        }
+    })
+
+
 
 
     $('#modalStaff').on('show.bs.modal', function (e) {
         LoadStaffs();
+        LoadUserModuleRoles();
+        $('#msgError').hide();
     })
 
-    $('#btnAddStaffIntoModule').click(function(e){
+    $('#btnAddStaffIntoModule').click(function (e) {
         e.preventDefault();
-        let staff = $('#select-staff option:selected').val();
-        console.log(staff);
+        let userId = $('#select-staff option:selected').val();
+        $.ajax({
+            url: '/admin/user-module',
+            type: 'post',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem('accessToken'),
+            },
+            data: {
+                moduleId,
+                userId
+            },
+            success: function (data) {
+                LoadUserModuleRoles();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $('#msgError').show();
+                alert(jqXHR.responseJSON.msg);
+
+            }
+        })
     })
+
+    function LoadUserModuleRoles() {
+        $.ajax({
+            url: '/admin/user-module',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem('accessToken'),
+            },
+            data: {
+                moduleId
+            },
+            success: function (data) {
+                $('#tblUserModuleRoles').empty();
+                let idx = 1;
+                data.ums.forEach(um => {
+                    let tr = '<tr id="' + um._id + '">';
+                    tr += '<td>' + (idx++) + '</td>';
+                    tr += '<td>' + um.user.username + '</td>';
+                    tr += '<td>' + um.user.fullname + '</td>';
+                    tr += '<td>' + um.user.phone + '</td>';
+                    tr += '<td><button class="btn btn-xs btn-danger" name="deleteRole"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
+                    tr += '</tr>';
+                    $('#tblUserModuleRoles').append(tr);
+                })
+            }
+        })
+    }
 
 
     function LoadStaffs() {
@@ -83,9 +161,9 @@
                 authorization: "Bearer " + localStorage.getItem('accessToken'),
             },
             success: function (data) {
-                $('#select-staff').empty();               
-                data.users.forEach(u=>{
-                    let opt =  '<option value="'+u._id+'">'+u.fullname+'</option>';
+                $('#select-staff').empty();
+                data.users.forEach(u => {
+                    let opt = '<option value="' + u._id + '">' + u.fullname + '</option>';
                     $('#select-staff').append(opt);
                 })
                 $('#select-staff').selectpicker();

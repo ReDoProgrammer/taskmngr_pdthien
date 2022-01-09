@@ -108,6 +108,7 @@ const apiAdminStatus = require('./BE/API/admin/api-status');
 const apiAdminStyle = require('./BE/API/admin/api-style');
 const apiAdminUserGroup = require('./BE/API/admin/api-user-group');
 const apiAdminUserGroupWage = require('./BE/API/admin/api-user-group-wage');
+const apiAdminUserModuleRole = require('./BE/API/admin/api-user-module');
 
 
 
@@ -202,6 +203,7 @@ app.use('/admin/status',apiAdminStatus);//trạng thái của đơn hàng, tạm
 app.use('/admin/style',apiAdminStyle);//style này tạm thời chưa sử dụng tới
 app.use('/admin/user-group',apiAdminUserGroup);//quản lý nhóm nhân viên: người nhà, người dưng,....
 app.use('/admin/user-group-wage',apiAdminUserGroupWage);//quản lý tiền công của từng nhóm nhân viên dựa theo kĩ năng làm việc: editor, Q.A
+app.use('/admin/user-module',apiAdminUserModuleRole);//quản lý quyền truy cập module của từng user
 
 
 
