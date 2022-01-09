@@ -2,7 +2,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Add or update user type</h5>
+        <h5 class="modal-title font-weight-bold text-info">Add or update user group</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -19,7 +19,7 @@
               placeholder="Description" />
           </div>
         </div>
-        <div class="card text-white bg-secondary mb-3">
+        <!-- <div class="card text-white bg-secondary mb-3">
           <div class="card-header">Skill & wage</div>
           <div class="card-body">
             <table class="table">
@@ -43,16 +43,17 @@
               <button type="submit" class="btn btn-info col-md-2" id="btnAddNewLine">
                 Add New wage
               </button>
-            </div>
+            </div> 
           </div>
-        </div>
+        </div> -->
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
           Close
         </button>
         <button type="button" class="btn btn-primary" id="btnSubmit">
-          Submit All
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>
+          Submit
         </button>
       </div>
     </div>
@@ -74,16 +75,7 @@
   $("#btnSubmit").click(function () {
     let name = $("#txtName").val().trim();
     let description = $("#txtDescription").val().trim();
-
-    let wages = [];
-
-    $("#tblWages  > tr").each(function (index, tr) {
-      let level = $(this).closest("tr").data("level");
-      let skill = $(this).closest("tr").data("skill");
-      let td = $(this).find("td").eq(3);
-      let wage = { skill, level, wage: parseFloat(td.text()) };
-      wages.push(wage);
-    });
+  
 
     if (ugId.length > 0) {//case update user type
       $.ajax({
@@ -95,8 +87,7 @@
         data: {
           id: ugId,
           name,
-          description,
-          wages
+          description         
         },
         success: function (data, textStatus, xhr) {
           alert(data.msg);
@@ -116,38 +107,11 @@
         },
         data: {
           name,
-          description,
-          wages,
+          description          
         },
         success: function (data, textStatus, xhr) {
-          let ws = wages.map(x => {
-            var o = {};
-            o = x;
-            o.user_group = data.ug._id
-            return o;
-          });
-
-          //thêm các thông tin liên quan tới tiền công của nhóm nhân viên này
-          $.ajax({
-            url: '/admin/user-group-wage',
-            type: 'post',
-            headers: {
-              authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-              wages
-            },
-            success: function (data) {
-              alert(data.msg);
+          alert(data.msg);
               $("#modalUserType").modal("hide");
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-              alert(jqXHR.responseJSON.msg);
-            },
-          })
-
-
-
           ugId = "";
         },
         error: function (jqXHR, textStatus, errorThrown) {
