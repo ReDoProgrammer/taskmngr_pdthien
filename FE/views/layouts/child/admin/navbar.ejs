@@ -1,4 +1,60 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-default ">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+        aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">BambooPhoto</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="/admin">Home</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+            aria-expanded="false">Category <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li> <a class="dropdown-item" href="/admin/customer">Customer</a></li>
+            <li> <a class="dropdown-item" href="/admin/customer-style">Customer Style</a></li>
+            <li> <a class="dropdown-item" href="/admin/staff">Staff</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+            aria-expanded="false">Setting <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li> <a class="dropdown-item" href="/admin/setting/bank">Bank list</a></li>
+            <li><a class="dropdown-item" href="/admin/setting/color-mode">Color mode</a></li>
+            <li> <a class="dropdown-item" href="/admin/setting/style">Style</a></li>
+            <li><a class="dropdown-item" href="/admin/setting/job-level">Job level</a></li>
+            <li><a class="dropdown-item" href="/admin/setting/skill">Skill</a></li>
+            <li> <a class="dropdown-item" href="/admin/setting/file-format">File format</a></li>
+            <li> <a class="dropdown-item" href="/admin/setting/staff-level">Staff level</a></li>
+            <li> <a class="dropdown-item" href="/admin/setting/cloud">Cloud</a></li>
+            <li> <a class="dropdown-item" href="/admin/setting/size">Size</a></li>
+            <li><a class="dropdown-item" href="/admin/setting/user-type">User Group</a></li>
+            <li> <a class="dropdown-item" href="/admin/setting/module">Module</a></li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <button class="btn btn-sm btn-danger" id="btnLogout">
+          <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
+        </button>
+      </ul>
+    </div>
+    <!--/.nav-collapse -->
+  </div>
+  <!--/.container-fluid -->
+</nav>
+
+
+
+
+<!-- <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand" href="#">Admin Panel</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,32 +92,32 @@
           <a class="dropdown-item" href="/admin/setting/color-mode">Color mode</a>
           <a class="dropdown-item" href="/admin/setting/style">Style</a>
           <a class="dropdown-item" href="/admin/setting/job-level">Job level</a>
-          <!-- <a class="dropdown-item" href="/admin/setting/national-style">National style</a> -->
-          <a class="dropdown-item" href="/admin/setting/skill">Skill</a>
-          <!-- <a class="dropdown-item" href="/admin/setting/status">Status</a> -->
-          <a class="dropdown-item" href="/admin/setting/file-format">File format</a>
-          <!-- <a class="dropdown-item" href="/admin/setting/level">Level</a> -->
-          <a class="dropdown-item" href="/admin/setting/staff-level">Staff level</a>
-          <a class="dropdown-item" href="/admin/setting/cloud">Cloud</a>
-          <a class="dropdown-item" href="/admin/setting/size">Size</a>
-          <a class="dropdown-item" href="/admin/setting/user-type">User Group</a>
-          <a class="dropdown-item" href="/admin/setting/module">Module</a>
+          <a class="dropdown-item" href="/admin/setting/national-style">National style</a> -->
+<!-- <a class="dropdown-item" href="/admin/setting/skill">Skill</a> -->
+<!-- <a class="dropdown-item" href="/admin/setting/status">Status</a> -->
+<!-- <a class="dropdown-item" href="/admin/setting/file-format">File format</a> -->
+<!-- <a class="dropdown-item" href="/admin/setting/level">Level</a> -->
+<!-- <a class="dropdown-item" href="/admin/setting/staff-level">Staff level</a> -->
+<!-- <a class="dropdown-item" href="/admin/setting/cloud">Cloud</a> -->
+<!-- <a class="dropdown-item" href="/admin/setting/size">Size</a> -->
+<!-- <a class="dropdown-item" href="/admin/setting/user-type">User Group</a> -->
+<!-- <a class="dropdown-item" href="/admin/setting/module">Module</a> -->
 
-        </div>
-      </li>
+<!-- </div> -->
+<!-- </li> -->
 
 
-    </ul>
+<!-- </ul>
     <form class="form-inline my-2 my-lg-0">
       <button class="btn btn-sm btn-danger" id="btnLogout">
         <i class="fa fa-sign-out" aria-hidden="true"></i>
       </button>
     </form>
-  </div>
-</nav>
+  </div> -->
+<!-- </nav> -->
 
 <script>
-  $('#btnLogout').on('click',function(e){
+  $('#btnLogout').on('click', function (e) {
     e.preventDefault();
     localStorage.removeItem('accessToken');
     window.location.href = '/admin/login';

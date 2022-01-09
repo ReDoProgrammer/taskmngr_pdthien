@@ -35,6 +35,24 @@ router.get('/', authenticateAdminToken, (req, res) => {
     })
 })
 
+router.get('/list',authenticateAdminToken,(req,res)=>{
+  User
+  .find({})
+  .exec()
+  .then(users=>{
+    return res.status(200).json({
+      msg:`Load all users successfully!`,
+      users
+    })
+  })
+  .catch(err=>{
+    console.log(`Can not load all users with error: ${new Error(err.message)}`);
+    return res.status(500).json({
+      msg:`Can not load all users with error: ${new Error(err.message)}`
+    })
+  })
+})
+
 router.get('/detail',authenticateAdminToken,(req,res)=>{
   let {userId} = req.query;
   User

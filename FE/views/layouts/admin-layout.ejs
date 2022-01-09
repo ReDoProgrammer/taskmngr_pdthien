@@ -8,20 +8,23 @@
     <%-include('child/common')%>
 
 
-    <title>Hello, world!</title>
+    <title>Admin panel - <%- title %> - BambooPhoto Admin dashboard</title>
   </head>
   <body>   
    
     <%-include('child/admin/navbar')%>
-    <div class="container" id="content">
-        <div class="card mt-1">
-            <h5 class="card-header">
-              <span><i class="fa fa-home" aria-hidden="true"></i></span>
+    <div class="container-fluid" id="content">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+              <h3 class = "panel-title">
+                <span><i class="fa fa-home" aria-hidden="true"></i></span>
               Administrator Dasboard -
-              <span class="text-info"> <%- title %></span>
+              <span class="text-white font-weight-bold"> <%- title %></span>
+              </h3>
+              
              
-            </h5>
-            <div class="card-body">
+            </div>
+            <div class="panel-body">
                 <%-body%>
             </div>
           </div>
@@ -55,5 +58,8 @@
   table {
   height: 500px;
   overflow-y: scroll;
+}
+.mt-1{
+  margin-left: 10px;
 }
 </style>
