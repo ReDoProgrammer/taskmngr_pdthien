@@ -1,10 +1,12 @@
 const router = require('express').Router();
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 const User = require('../../models/user-model');
-
+const UserModule = require('../../models/user-module-model');
+const Module = require('../../models/module-model');
 const jwt = require("jsonwebtoken");
 
 let refershTokens = [];
+
 
 
 router.get('/', authenticateAdminToken, (req, res) => {
@@ -227,56 +229,125 @@ router.delete('/',authenticateAdminToken,(req,res)=>{
 router.post("/login", (req, res) => {
   let { username, password } = req.body;
 
-
-  User.findOne({ username: username }, function (err, user) {
-    if (err) {
-      return res.status(500).json({
-        msg: `Hệ thống gặp lỗi khi xác thực tài khoản ${err.message}`,
-      });
-    }
-    if (user) {//if username exist
-      if (!user.is_admin) {
-        return res.status(500).json({
-          msg: `Your account can not access this module!!`,
+  Promise.all([getModule,checkAccount(username,password)])
+  .then(result =>{   
+    checkRole(result[1]._id,result[0]._id)
+    .then(chk=>{
+    
+      if(chk){
+        let user = result[1];        
+        let u = {
+          _id: user._id,
+          is_admin: true
+        };
+  
+        const accessToken = generateAccessToken(u);
+        const refreshToken = jwt.sign(u, process.env.REFRESH_TOKEN_SECRET);
+  
+        refershTokens.push(refreshToken);
+        return res.status(200).json({
+          msg: 'Admin login successfully!',
+          url: '/admin',
+          accessToken: accessToken,
+          refreshToken: refreshToken
         });
+
       }
+      
+    })
+    .catch(err=>{
+      return res.status(err.code).json({
+        msg: err.message
+      })
+    })
+  })
+  .catch(err=>{
+    console.log(err);
+  })
+
+ 
+});
+
+
+const checkRole = (userId,moduleId)=>{
+  return new Promise((resolve,reject)=>{
+    UserModule
+    .countDocuments({module:moduleId,user:userId})
+    .exec()
+    .then(count=>{
+      if(count == 0){
+        return reject({
+          code:404,
+          msg:`Can not found user module role`
+        })
+      }
+      return resolve(true)
+    })
+    .catch(err=>{
+      return reject({
+        code:500,
+        msg:`Can not check user role with error: ${new Error(err.message)}`
+      })
+    })
+  })
+}
+
+const getModule = new Promise((resolve,reject)=>{
+  Module
+  .findOne({name:'ADMIN'})
+  .exec()
+  .then(module=>{
+    return resolve(module)
+  })
+  .catch(err=>{
+    return reject({
+      code:500,
+      msg:`Can not get admin module with error: ${new Error(err.message)}`
+    });
+  })
+})
+
+const checkAccount = (username,password)=>{
+  return new Promise((resolve,reject)=>{
+    User
+    .findOne({username:username})
+    .exec()
+    .then(user=>{
+      if(!user){
+        return reject({
+          code: 404,
+          msg:`Username not found`
+        })
+      }
+
       user.ComparePassword(password, function (err, isMatch) {
         if (err) {
-          return res.status(500).json({
-            msg: `Could not authenticate this account: ${err.message}`,
-          });
+          return reject({
+            code:403,
+            msg:`Can not check password with error: ${new Error(err.message)}`
+          })
         }
         if (isMatch) {
-
-          let u = {
-            _id: user._id,
-            is_admin: user.is_admin
-          };
-          const accessToken = generateAccessToken(u);
-          const refreshToken = jwt.sign(u, process.env.REFRESH_TOKEN_SECRET);
-
-          refershTokens.push(refreshToken);
-          return res.status(200).json({
-            msg: 'Admin login successfully!',
-            url: '/admin',
-            accessToken: accessToken,
-            refreshToken: refreshToken
-          });
+          return resolve(user);         
         } else {
-          return res.status(401).json({
+          return reject({
+            code:403,
             msg: 'Admin password not match!'
           })
         }
-
       });
-    } else {
-      return res.status(401).json({
-        msg: "Account not found. Please try again",
-      });
-    }
-  });
-});
 
+
+
+    })
+    .catch(err=>{
+      return reject({
+        code:500,
+        msg: new Error(err.message)
+      });
+    })
+  })
+}
 
 function generateAccessToken(user) {
   return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "72h" });

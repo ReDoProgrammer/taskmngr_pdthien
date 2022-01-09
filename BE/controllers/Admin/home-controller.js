@@ -60,7 +60,9 @@ const initAdministrator = new Promise((resolve, reject) => {
       return resolve(user)
     })
     .catch((err) => {
-      return reject(new Error(err.message))
+      return reject({
+        error: new Error(err.message)
+      })
     });
 
 })
@@ -81,7 +83,9 @@ const initModule = new Promise((resolve, reject) => {
       return resolve(mods)
     })
     .catch(err => {
-      return reject(err)
+      return reject({
+        error: new Error(err.message)
+      })
     })
 
 })
@@ -96,7 +100,9 @@ const initUserModule = (userId, moduleId) => {
         return resolve(um)
       })
       .catch(err => {
-        return reject(new Error(err.message))
+        return reject({
+          error: new Error(err.message)
+        })
       })
   })
 }
