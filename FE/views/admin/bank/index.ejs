@@ -1,10 +1,10 @@
-<button type="button" class="btn btn-dark" id="btnAddNew">
+<button type="button" class="btn btn-primary" id="btnAddNew">
     <span>
       <i class="fa fa-plus" aria-hidden="true"></i>
     </span>
     Add New
   </button>
-  <table class="table mt-2">
+  <table class="table mt-2 table-striped">
     <thead class="thead-dark">
       <tr>
         <th scope="col">#</th>
@@ -45,7 +45,7 @@
             tr += '<td>' + bank.description + '</td>';           
   
             tr += '<td class="text-right"><button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
-            tr += '<button class="btn btn-sm btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
+            tr += '<button class="btn btn-sm btn-danger ml-1" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
             tr += '</tr>';
             $('#tblData').append(tr);
           });
@@ -114,10 +114,10 @@
         data: {
           id: bankId
         },
-        success: function (data, textStatus, xhr) {
+        success: function (data, textStatus, xhr) {         
           $('#modalBank').modal();
-          $('#txtName').val(data.cloud.name);
-          $('#txtDescription').val(data.cloud.description);         
+          $('#txtName').val(data.bank.name);
+          $('#txtDescription').val(data.bank.description);         
         }, error: function (jqXHR, textStatus, errorThrown) {
           alert(jqXHR.responseJSON.msg);
         }

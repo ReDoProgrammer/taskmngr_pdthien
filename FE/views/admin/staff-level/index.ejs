@@ -1,10 +1,10 @@
-<button type="button" class="btn btn-dark" id="btnAddNew">
+<button type="button" class="btn btn-primary" id="btnAddNew">
   <span>
     <i class="fa fa-plus" aria-hidden="true"></i>
   </span>
   Add New
 </button>
-<table class="table mt-2">
+<table class="table table-striped mt-2">
   <thead class="thead-dark">
     <tr>
       <th scope="col">#</th>
@@ -41,7 +41,7 @@
          
 
           tr += '<td class="text-right"><button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
-          tr += '<button class="btn btn-sm btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
+          tr += '<button class="btn btn-sm btn-danger ml-1" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
           tr += '</tr>';
           $('#tblData').append(tr);
         });
@@ -78,7 +78,7 @@
     var r = confirm("Vui lòng xác nhận xóa level " + $(this).closest("tr").data('name') + "?");
     if (r == true) {
       $.ajax({
-        url: '/admin/local-level',
+        url: '/admin/staff-level',
         type: 'delete',
         headers: {
           authorization: "Bearer " + localStorage.getItem('accessToken'),
@@ -103,7 +103,7 @@
     levelId = $(this).closest("tr").attr("id");
 
     $.ajax({
-      url: "/admin/local-level/detail",
+      url: "/admin/staff-level/detail",
       type: "get",
       headers: {
         authorization: "Bearer " + localStorage.getItem('accessToken'),

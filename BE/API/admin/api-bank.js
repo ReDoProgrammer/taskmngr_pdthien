@@ -50,7 +50,7 @@ router.get('/detail', authenticateAdminToken, (req, res) => {
                 error: new Error(err.message)
             });
         }
-        if (bank) {
+        if (bank) {           
             return res.status(200).json({
                 msg: 'Get bank info successfully!',
                 bank: bank

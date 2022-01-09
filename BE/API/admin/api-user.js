@@ -233,7 +233,7 @@ router.post("/login", (req, res) => {
   .then(result =>{   
     checkRole(result[1]._id,result[0]._id)
     .then(chk=>{
-    
+      console.log(result[1]);
       if(chk){
         let user = result[1];        
         let u = {
