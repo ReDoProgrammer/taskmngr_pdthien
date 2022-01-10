@@ -2,128 +2,107 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body">
-        <div class="card text-white bg-secondary mb-1">
-          <div class="card-header">Role</div>
-          <div class="card-body">
-            <div class="form-check form-check-inline col-md-1">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_dc" value="option1">
-              <label class="form-check-label" for="inlineRadio1">DC</label>
-            </div>
-            <div class="form-check form-check-inline col-md-1">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_sale" value="option1">
-              <label class="form-check-label" for="inlineRadio1">Sale</label>
-            </div>
-            <div class="form-check form-check-inline col-md-2">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_tla" value="option1">
-              <label class="form-check-label" for="inlineRadio1">TLA</label>
+        <div class="panel panel-primary">
+          <div class="panel-heading"><i class="fa fa-user" aria-hidden="true"></i> Add or update staff</div>
+          <div class="panel-body">
+
+            <div class="form-row">
+              <div class="form-group col-md-3 col-xs-6">
+                <label for="recipient-name" class="col-form-label">Group:</label>
+                <select name="" id="usertype" class="form-control"></select>
+              </div>
+              <div class="form-group col-md-3 col-xs-6">
+                <label for="recipient-name" class="col-form-label">Username:</label>
+                <input type="text" class="form-control" id="txtUsername" />
+              </div>
+
+              <div class="form-group col-md-3 col-xs-6">
+                <label for="recipient-name" class="col-form-label">Password:</label>
+                <input type="password" class="form-control" id="txtPassword" value="123" />
+              </div>
+
+              <div class="form-group col-md-3 col-xs-6">
+                <label for="recipient-name" class="col-form-label">Confirm Password:</label>
+                <input type="password" class="form-control" id="txtConfirmPassword" value="123" />
+              </div>
             </div>
 
-            <div class="form-check form-check-inline col-md-1">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_qa" value="option1">
-              <label class="form-check-label" for="inlineRadio1">Q.A</label>
+
+
+
+
+
+            <div class="form-row">
+
+              <div class="form-group col-md-3 col-xs-6">
+                <label for="recipient-name" class="col-form-label">Fullname:</label>
+                <input type="text" class="form-control" id="txtFullname" />
+              </div>
+              <div class="form-group col-md-3 col-xs-6">
+                <label for="recipient-name" class="col-form-label">Phone:</label>
+                <input type="text" class="form-control" id="txtPhone" />
+              </div>
+
+              <div class="form-group col-md-6 col-xs-12">
+                <label for="recipient-name" class="col-form-label">Email:</label>
+                <input type="email" class="form-control" id="txtEmail" />
+              </div>
             </div>
-            <div class="form-check form-check-inline col-md-1">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_editor" value="option1">
-              <label class="form-check-label" for="inlineRadio1">Editor</label>
+
+            <div class="form-row">
+              <div class="form-group col-md-3 col-xs-6">
+                <label for="recipient-name" class="col-form-label">ID Card:</label>
+                <input type="text" class="form-control" id="txtIDNo" />
+              </div>
+              <div class="form-group col-md-3 col-xs-6">
+                <label for="recipient-name" class="col-form-label">Issued by:</label>
+                <input type="text" class="form-control" id="txtIssuedBy" />
+              </div>
+
+              <div class="form-group col-md-5 col-xs-4">
+                <label for="recipient-name" class="col-form-label">Address:</label>
+                <input type="text" class="form-control" id="txtAddress" />
+              </div>
+              <div class="form-group col-md-1 col-xs-2">
+                <label for="recipient-name" class="col-form-label">Active:</label>
+                <div class="form-group form-check mt-1 text-center">
+                  <input type="checkbox" class="form-check-input" id="is_active" checked />
+                  <label class="form-check-label" for="exampleCheck1"></label>
+                </div>
+              </div>
             </div>
-            <div class="form-check form-check-inline col-md-2">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="is_accountant" value="option1">
-              <label class="form-check-label" for="inlineRadio1">Accountant</label>
+
+
+
+            <hr>
+            <div class="form-row">
+              <div class="form-group col-md-6 col-xs-12">
+                <label for="recipient-name" class="col-form-label">Bank:</label>
+                <select name="" id="slBanks" class="form-control"></select>
+              </div>
+              <div class="form-group col-md-3 col-xs-6">
+                <label for="recipient-name" class="col-form-label">Account Number:</label>
+                <input type="text" class="form-control" id="txtBankNo" />
+              </div>
+              <div class="form-group col-md-3 col-xs-6">
+                <label for="recipient-name" class="col-form-label">Account holder:</label>
+                <input type="text" class="form-control" id="txtBankHolder" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="col-sm-12 col-xs-12 mt-2">
+                <label id="errMessage" class="text-warning font-weight-bold">1243</label>
+              </div>
             </div>
           </div>
         </div>
-        <div class="card text-white bg-secondary mb-3">
-          <div class="card-body">
-            <form>
-              <div class="form-row">
-                <div class="form-group col-md-4">
-                  <label for="recipient-name" class="col-form-label">Group:</label>
-                  <select name="" id="usertype" class="form-control"></select>
-                </div>
-                <div class="form-group col-md-4">
-                  <label for="recipient-name" class="col-form-label">Fullname:</label>
-                  <input type="text" class="form-control" id="txtFullname" />
-                </div>
-                <div class="form-group col-md-4">
-                  <label for="recipient-name" class="col-form-label">Phone:</label>
-                  <input type="text" class="form-control" id="txtPhone" />
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group col-md-3">
-                  <label for="recipient-name" class="col-form-label">Email:</label>
-                  <input type="email" class="form-control" id="txtEmail" />
-                </div>
-                <div class="form-group col-md-3">
-                  <label for="recipient-name" class="col-form-label">Username:</label>
-                  <input type="text" class="form-control" id="txtUsername" />
-                </div>
-
-                <div class="form-group col-md-3">
-                  <label for="recipient-name" class="col-form-label">Password:</label>
-                  <input type="password" class="form-control" id="txtPassword" value="123" />
-                </div>
-
-                <div class="form-group col-md-3">
-                  <label for="recipient-name" class="col-form-label">Confirm Password:</label>
-                  <input type="password" class="form-control" id="txtConfirmPassword" value="123" />
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group col-md-3">
-                  <label for="recipient-name" class="col-form-label">ID Card:</label>
-                  <input type="text" class="form-control" id="txtIDNo" />
-                </div>
-                <div class="form-group col-md-3">
-                  <label for="recipient-name" class="col-form-label">Issued by:</label>
-                  <input type="text" class="form-control" id="txtIssuedBy" />
-                </div>
-
-                <div class="form-group col-md-5">
-                  <label for="recipient-name" class="col-form-label">Address:</label>
-                  <input type="text" class="form-control" id="txtAddress" />
-                </div>
-                <div class="form-group col-md-1">
-                  <label for="recipient-name" class="col-form-label">Active:</label>
-                  <div class="form-group form-check mt-1 text-center">
-                    <input type="checkbox" class="form-check-input" id="is_active" checked />
-                    <label class="form-check-label" for="exampleCheck1"></label>
-                  </div>
-                </div>
-              </div>
-              <hr>
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label for="recipient-name" class="col-form-label">Bank:</label>
-                  <select name="" id="slBanks" class="form-control"></select>
-                </div>
-                <div class="form-group col-md-3">
-                  <label for="recipient-name" class="col-form-label">Account Number:</label>
-                  <input type="text" class="form-control" id="txtBankNo" />
-                </div>
-                <div class="form-group col-md-3">
-                  <label for="recipient-name" class="col-form-label">Account holder:</label>
-                  <input type="text" class="form-control" id="txtBankHolder" />
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="col-sm-12 mt-2">
-                  <label id="errMessage" class="text-warning font-weight-bold">1243</label>
-                </div>
-              </div>
-
-            </form>
-          </div>
-        </div>
-
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
           Close
         </button>
         <button type="button" class="btn btn-primary" id="btnSubmit">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>
           Submit
         </button>
       </div>
@@ -183,9 +162,9 @@
           $('#slBanks option:selected').val(data.user.bank);
           $('#txtBankNo').val(data.user.bank_no);
           $('#txtBankHolder').val(data.user.bank_holder);
-          if(is_readonly){
+          if (is_readonly) {
             $('#btnSubmit').hide();
-          }else{
+          } else {
             $('#btnSubmit').show();
           }
         }, error: function (jqXHR, textStatus, errorThrown) {
@@ -198,21 +177,8 @@
 
 
   $("#btnSubmit").click(function () {
-
-    let is_dc = $('#is_dc').is(':checked');
-    let is_sale = $('#is_sale').is(':checked');
-    let is_tla = $('#is_tla').is(':checked');
-    let is_qa = $('#is_qa').is(':checked');
-    let is_editor = $('#is_editor').is(':checked');
-    let is_accountant = $('#is_accountant').is(':checked');
-
-
-    if (!is_dc && !is_sale && !is_tla && !is_qa && !is_editor && !is_accountant) {
-      $('#errMessage').text('Please choose employee role!!');
-      $('#errMessage').show(200);
-      return;
-    }
-
+   
+   
     let user_type = $('#usertype option:selected').val();
 
 
@@ -261,13 +227,7 @@
           is_active,
           bank,
           bank_no,
-          bank_holder,
-          is_dc,
-          is_sale,
-          is_tla,
-          is_qa,
-          is_editor,
-          is_accountant
+          bank_holder       
         },
         success: function (data, textStatus, xhr) {
           alert(data.msg);
@@ -321,7 +281,7 @@
 
 
   $(document).ready(function () {
-    LoadUserType();
+    LoadUserGroup();
     LoadSkill();
     LoadBanks();
   });
@@ -350,10 +310,10 @@
   }
 
 
-  function LoadUserType() {
+  function LoadUserGroup() {
     $("#usertype").empty();
     $.ajax({
-      url: "/admin/user-type/list",
+      url: "/admin/user-group/list",
       type: "get",
       data: {},
       success: function (data, textStatus, xhr) {

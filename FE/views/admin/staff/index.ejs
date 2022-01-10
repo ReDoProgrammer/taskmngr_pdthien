@@ -1,22 +1,21 @@
 <div class="row">
-  <div class="col-md-7">
+  <div class="col-md-8 col-sm-5 col-xs-12">
     <nav aria-label="Page navigation example">
       <ul class="pagination" id="paginantion"></ul>
     </nav>
   </div>
-  <div class="col-md-3 text-right">
-    <!-- Another variation with a button -->
+  <div class="col-md-3 col-sm-5 col-xs-12 text-right">
     <div class="input-group">
-      <input type="text" class="form-control" placeholder="Search this blog" id="txtSearch" />
-      <div class="input-group-append">
-        <button class="btn btn-secondary" type="button" id="btnSearch">
-          <i class="fa fa-search"></i>
+      <input type="text" class="form-control" placeholder="Seach staff" id="txtSearch" />
+      <div class="input-group-btn">
+        <button class="btn btn-info" type="submit" id="btnSearch">
+          <i class="fa fa-search" aria-hidden="true"></i>
         </button>
       </div>
     </div>
   </div>
-  <div class="col-md-2">
-    <button class="btn btn-info" id="btnAddStaff">
+  <div class="col-md-1 col-sm-2 col-xs-12">
+    <button class="btn btn-primary" id="btnAddStaff">
       <span>
         <i class="fa fa-plus" aria-hidden="true"></i>
       </span>
@@ -25,7 +24,7 @@
   </div>
 </div>
 <div class="table-striped">
-  <table class="table mt-1 text-nowrap">
+  <table class="table table-striped mt-1 text-nowrap">
     <thead class="thead-light">
       <tr>
         <th scope="col">#</th>
@@ -33,7 +32,6 @@
         <th scope="col">Phone</th>
         <th scope="col">Email</th>
         <th scope="col">Address</th>
-        <th scope="col">Role</th>
         <th scope="col">Status</th>
         <th></th>
       </tr>
@@ -143,20 +141,11 @@
           data.users.forEach(user => {
             let tr = '<tr id="' + user._id + '">';
             tr += '<td>' + (idx++) + '</td>';
-            tr += '<td class = "font-weight-bold text-info"><a href ="' + user._id + '" class="table_row">' + user.fullname + '</a></td>';
+            tr += '<td class = "font-weight-bold text-info">' + user.fullname + '</td>';
             tr += '<td>' + user.phone + '</td>';
             tr += '<td>' + user.email + '</td>';
             tr += '<td>' + user.address + '</td>';
 
-            tr += '<td class="text-info font-italic">';
-            if (user.is_admin) tr += 'Administrator';
-            else if (user.is_dc) tr += 'DC';
-            else if (user.is_sale) tr += 'Sale';
-            else if (user.is_tla) tr += 'TLA';
-            else if (user.is_qa) tr += 'Q.A'
-            else if (user.is_editor) tr += 'Editor';
-            else if (user.is_accountant) tr += 'Accountant'
-            tr += '</td>';
 
             if (user.is_active) {
               tr += '<td class="text-success">Active</td>';
@@ -164,11 +153,11 @@
               tr += '<td class="text-danger">Unactive</td>';
             }
 
-            tr += '<td>';
-            tr += '<button class="btn btn-sm btn-info mr-1" name="btnUserInfo"><i class="fa fa-info-circle" aria-hidden="true"></i></button>';
+            tr += '<td class="text-right">';
+            tr += '<button class="btn btn-sm btn-info" name="btnUserInfo"><i class="fa fa-info-circle" aria-hidden="true"></i></button>';
             if (!user.is_admin) {
-              tr += '<button class="btn btn-sm btn-warning mr-1" name="btnEditUser"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
-              tr += '<button class="btn btn-sm btn-danger" name="btnDelUser"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+              tr += '<button class="btn btn-sm btn-warning ml-1" name="btnEditUser"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+              tr += '<button class="btn btn-sm btn-danger ml-1" name="btnDelUser"><i class="fa fa-trash" aria-hidden="true"></i></button>';
             }
             tr += '</td>';
 
