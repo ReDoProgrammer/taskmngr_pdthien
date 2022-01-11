@@ -7,24 +7,27 @@
                     <div class="panel-body">
 
                         <div class="form-row">
-                            <div class="form-group col-md-4 col-xs-4">
+                            <div class="form-group col-md-3 col-xs-4">
                                 <label for="recipient-name" class="col-form-label">Skill:</label>
                                 <select name="" id="slSkills" class="form-control"></select>
                             </div>
-                            <div class="form-group col-md-4 col-xs-4">
+                            <div class="form-group col-md-3 col-xs-3">
                                 <label for="recipient-name" class="col-form-label">Staff level:</label>
                                 <select name="" id="sllStaffLevels" class="form-control"></select>
                             </div>
-                            <div class="form-group col-md-3 col-xs-2">
+                            <div class="form-group col-md-3 col-xs-3">
                                 <label for="recipient-name" class="col-form-label">Wage:</label>
                                 <input type="text" class="form-control text-right" id="txtWage" value="0" />
                             </div>
 
-                            <div class="form-group col-md-1 col-xs-2">
-                                <label for="recipient-name" class="col-form-label"></label>
-                                <button class="btn btn-sm btn-warning mt-1" id="btnAddWage">
+                            <div class="form-group col-md-3 col-xs-3 text-right">
+                                <label for="recipient-name" class="col-form-label"></label><br>
+                                <button class="btn btn-sm btn-success mt-1" id="btnSubmitWage">
                                     <i class="fa fa-plus" aria-hidden="true"></i>
                                     Add
+                                </button>
+                                <button class="btn btn-sm btn-secondary mt-1" id="btnCancel">
+                                    Cancel
                                 </button>
                             </div>
 
@@ -33,10 +36,9 @@
                         <table class="table table-striped mt-2">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th scope="col">#</th>
                                     <th scope="col">Level</th>
                                     <th scope="col">Skill</th>
-                                    <th scope="col">Wage</th>
+                                    <th scope="col" class="text-right">Wage</th>
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
@@ -59,17 +61,82 @@
         </div>
 
         <script>
+            var _id = '';
             $(document).ready(function () {
                 LoadSkills();
                 LoadStaffLevels();
                 $('#lblError').hide();
             })
 
-            $('#btnAddWage').click(function () {
+            $('#btnCancel').click(function(){
+                _id  = '';
+                $('#txtWage').val(0);
+                $('#btnSubmitWage').html('<i class="fa fa-plus" aria-hidden="true"></i>Add');
+                $('#btnSubmitWage').addClass('btn-success').removeClass('btn-warning');
+            })
+            
+            $("#tblWages").on("click", "button[name='updateWage']", function () {
+                 _id = $(this).closest("tr").attr("id");
+                $.ajax({
+                    url:'/admin/user-group-wage/detail',
+                    type:'get',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem('accessToken'),
+                    },
+                    data:{
+                        _id
+                    },
+                    success:function(data){                        
+                        $('#slSkills').val(data.w.skill);
+                        $('#slStaffLevels').val(data.w.skill);
+                        $('#txtWage').val(data.w.wage);
+                        $('#btnSubmitWage').html('<i class="fa fa-refresh" aria-hidden="true"></i> Update');
+                        $('#btnSubmitWage').addClass('btn-warning').removeClass('btn-success');
+                    }
+                })
+            })
+
+
+
+
+            $('#modalWage').on('shown.bs.modal', function (e) {
+                LoadWages();
+            })
+
+
+
+            $('#btnSubmitWage').click(function () {
                 let skill = $('#slSkills option:selected').val();
                 let level = $('#sllStaffLevels option:selected').val();
-                let wage = parseFloat($('#txtWage').val());             
-                $.ajax({
+                let wage = parseFloat($('#txtWage').val());
+                console.log('wage id: ',_id);
+                if(_id.trim().length>0){//update exist record
+                    $.ajax({
+                    url: '/admin/user-group-wage',
+                    type: 'put',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem('accessToken'),
+                    },
+                    data: {
+                        _id,
+                        user_group: ugId,
+                        skill,
+                        level,
+                        wage
+                    },
+                    success: function (data) {
+                        alert(data.msg);
+                        LoadWages();
+                        $('#btnCancel').click();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('#lblError').text(jqXHR.responseJSON.msg);
+                        $('#lblError').show();
+                    }
+
+                })
+                }else{
+                    $.ajax({
                     url: '/admin/user-group-wage',
                     type: 'post',
                     headers: {
@@ -82,19 +149,53 @@
                         wage
                     },
                     success: function (data) {
+                        alert(data.msg);
                         LoadWages();
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
                         $('#lblError').text(jqXHR.responseJSON.msg);
                         $('#lblError').show();
-                    },
+                    }
 
                 })
+                }
+                
 
             })
 
-            function LoadWages(){
-                console.log('successfully!');
+            function LoadWages() {
+                $.ajax({
+                    url: '/admin/user-group-wage',
+                    type: 'get',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem('accessToken'),
+                    },
+                    data: {
+                        ugId
+                    },
+                    success: function (data) {
+                        $('#tblWages').empty();
+                        data.wages.forEach(w => {
+                            let tr = '<tr id = "' + w._id + '">';
+                            tr += '<td>' + w.level.name + '</td>';
+                            tr += '<td>' + w.skill.name + '</td>';
+                            tr += '<td class="text-warning font-weight-bold text-right">' + w.wage + '</td>';
+                            tr +=
+                                '<td class="text-right"><button class="btn btn-xs btn-warning ml-1" name="updateWage"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+                            tr +=
+                                '<button class="btn btn-xs btn-danger ml-1" name="deleteWage"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
+
+
+                            tr += "</tr>";
+                            tr += '</tr>';
+                            $('#tblWages').append(tr);
+                        })
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('#lblError').text(jqXHR.responseJSON.msg);
+                        $('#lblError').show();
+                    }
+                })
             }
 
             $("#txtWage").on("keypress keyup blur", function (event) {

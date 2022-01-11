@@ -24,7 +24,7 @@ router.delete('/', authenticateAdminToken, (req, res) => {
 
 router.post('/', authenticateAdminToken, (req, res) => {
     let { user_group, skill, level, wage } = req.body;
-
+   
     if(wage<=0){
         return res.status(403).json({
             msg:`Wage value not valid!`
@@ -68,7 +68,36 @@ router.post('/', authenticateAdminToken, (req, res) => {
 
 })
 
-router.get('/detail', authenticateAdminToken, (req, res) => {
+router.put('/',authenticateAdminToken,(req,res)=>{
+    
+    let {_id,user_group,level,skill} = req.body;
+    Wage
+    .findByIdAndUpdate(_id,{
+        user_group,
+        level,
+        skill,
+        wage
+    },
+    {new:true},
+    (err,w)=>{
+        if(err){
+            return res.status(500).json({
+                msg:`Can not update wage with error: ${new Error(err.message)}`
+            })
+        }
+        if(!w){
+            return res.status(404).json({
+                msg:`Wage not found`
+            })
+        }
+        return res.status(200).json({
+            msg:`Update wage successfully!`,
+            w
+        })
+    })
+})
+
+router.get('/', authenticateAdminToken, (req, res) => {
     let { ugId } = req.query;
     Wage.find({ user_group: ugId })
         .populate('level', 'name -_id')
@@ -86,6 +115,24 @@ router.get('/detail', authenticateAdminToken, (req, res) => {
                 msg: `Can not load user group wages with error: ${new Error(err.message)}`
             })
         })
+})
+
+router.get('/detail',authenticateAdminToken,(req,res)=>{
+    let {_id} = req.query;
+    Wage
+    .findById(_id)
+    .exec()
+    .then(w=>{
+        return res.status(200).json({
+            msg:`Get wage detail successfully!`,
+            w
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not get wage detail with error: ${new Error(err.message)}`
+        })
+    })
 })
 
 module.exports = router;
