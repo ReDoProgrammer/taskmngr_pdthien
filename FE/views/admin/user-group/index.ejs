@@ -16,11 +16,17 @@
   <tbody id="tblData"></tbody>
 </table>
 
+
+<%-include('modal')%>
+  <%-include('detail')%>
+    <%-include('wageModal')%>
+
+
 <script>
   var ugId = "";
 
   $("#tblData").on("click", "button[name='wage']", function () {
-    let ugId = $(this).closest("tr").attr("id");
+    ugId = $(this).closest("tr").attr("id");
     $('#modalWage').modal();
   });
 
@@ -169,6 +175,3 @@
   });
 </script>
 
-<%-include('modal')%>
-  <%-include('detail')%>
-    <%-include('wageModal')%>
