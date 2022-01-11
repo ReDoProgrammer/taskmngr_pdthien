@@ -47,6 +47,7 @@
         
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        alert(111)
         $("#error_msg").text(jqXHR.responseJSON.msg);
         $("#alert_msg").show();
       }

@@ -26,7 +26,8 @@ function authenticateToken(req, res, next) {
 function authenticateAdminToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
-  if (token == null) {
+
+  if (!token) {
     console.log('token is null');
     return res.status(401).json({
       msg:`Vui lòng đăng nhập để thực hiện thao tác này`,
@@ -39,11 +40,7 @@ function authenticateAdminToken(req, res, next) {
     if (err)
       return res.status(403).json({
         msg:`Lỗi xác thực tài khoản ${err.message}`
-      });
-
-    // if(!user.is_admin) return res.status(403).json({
-    //   msg:`Bạn không có quyền truy cập chức năng này`
-    // });
+      });  
     req.user = user;   
     next();
   });

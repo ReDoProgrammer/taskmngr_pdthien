@@ -29,7 +29,9 @@
     $.ajax({
       url: "/admin/user-group/list",
       type: "get",
-      data: {},
+      headers: {
+        authorization: "Bearer " + localStorage.getItem('accessToken'),
+      },    
       success: function (data, textStatus, xhr) {
         let idx = 1;
         data.uts.forEach((ut) => {
@@ -43,7 +45,7 @@
           tr +=
             '<button class="btn btn-sm btn-danger ml-1" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button>';
 
-            tr +=
+          tr +=
             '<button class="btn btn-sm btn-primary ml-2" name="wage"><i class="fa fa-bars" aria-hidden="true"></i></button></td>';
           tr += "</tr>";
           $("#tblData").append(tr);
@@ -63,11 +65,7 @@
     LoadData();
   });
 
-  //sự kiện modal shown --> set các giá trị mặc định cho component trên form
-  $(document).on("show.bs.modal", ".modal", function () {
-    $("#txtName").val("");
-    $("#txtDescription").val("");
-  });
+
 
   //sự kiện load lại hàm ds level khi modal đc đóng lại
   $(document).on("hidden.bs.modal", "#modalUserType", function () {
@@ -173,4 +171,4 @@
 
 <%-include('modal')%>
   <%-include('detail')%>
-  <%-include('wageModal')%>
+    <%-include('wageModal')%>

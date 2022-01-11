@@ -2,7 +2,7 @@ const router = require('express').Router();
 const Skill = require('../../models/skill-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
-router.delete('/', authenticateAdminToken, (req, res) => {
+router.delete('/',  (req, res) => {
     let id = req.body.id;
     Skill.findOneAndDelete({ _id: id }, (err, level) => {
         if (err) {
@@ -25,7 +25,7 @@ router.delete('/', authenticateAdminToken, (req, res) => {
     })
 })
 
-router.get('/', (req, res) => {
+router.get('/',authenticateAdminToken, (req, res) => {
     Skill.find({}, (err, skills) => {
         if (err) {
             return res.status(500).json({
