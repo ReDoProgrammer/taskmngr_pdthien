@@ -68,30 +68,62 @@
                 $('#lblError').hide();
             })
 
-            $('#btnCancel').click(function(){
-                _id  = '';
+            $("#tblWages").on("click", "button[name='deleteWage']", function () {
+                let _id = $(this).closest("tr").attr("id");
+                var r = confirm(
+                    "Are you sure want to delete this wage?"
+                );
+                if (r) {
+                    $.ajax({
+                        url: '/admin/user-group-wage',
+                        type: 'delete',
+                        headers: {
+                            authorization: "Bearer " + localStorage.getItem('accessToken'),
+                        },
+                        data: {
+                            _id
+                        },
+                        success: function (data) {
+                            alert(data.msg);
+                            LoadWages();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            $('#lblError').text(jqXHR.responseJSON.msg);
+                            $('#lblError').show();
+                        }
+
+                    })
+                }
+            })
+
+            $('#btnCancel').click(function () {
+                _id = '';
                 $('#txtWage').val(0);
                 $('#btnSubmitWage').html('<i class="fa fa-plus" aria-hidden="true"></i>Add');
                 $('#btnSubmitWage').addClass('btn-success').removeClass('btn-warning');
             })
-            
+
             $("#tblWages").on("click", "button[name='updateWage']", function () {
-                 _id = $(this).closest("tr").attr("id");
+                _id = $(this).closest("tr").attr("id");
                 $.ajax({
-                    url:'/admin/user-group-wage/detail',
-                    type:'get',
+                    url: '/admin/user-group-wage/detail',
+                    type: 'get',
                     headers: {
                         authorization: "Bearer " + localStorage.getItem('accessToken'),
                     },
-                    data:{
+                    data: {
                         _id
                     },
-                    success:function(data){                        
+                    success: function (data) {
                         $('#slSkills').val(data.w.skill);
                         $('#slStaffLevels').val(data.w.skill);
                         $('#txtWage').val(data.w.wage);
                         $('#btnSubmitWage').html('<i class="fa fa-refresh" aria-hidden="true"></i> Update');
                         $('#btnSubmitWage').addClass('btn-warning').removeClass('btn-success');
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('#lblError').text(jqXHR.responseJSON.msg);
+                        $('#lblError').show();
                     }
                 })
             })
@@ -109,57 +141,57 @@
                 let skill = $('#slSkills option:selected').val();
                 let level = $('#sllStaffLevels option:selected').val();
                 let wage = parseFloat($('#txtWage').val());
-                console.log('wage id: ',_id);
-                if(_id.trim().length>0){//update exist record
+                console.log('wage id: ', _id);
+                if (_id.trim().length > 0) {//update exist record
                     $.ajax({
-                    url: '/admin/user-group-wage',
-                    type: 'put',
-                    headers: {
-                        authorization: "Bearer " + localStorage.getItem('accessToken'),
-                    },
-                    data: {
-                        _id,
-                        user_group: ugId,
-                        skill,
-                        level,
-                        wage
-                    },
-                    success: function (data) {
-                        alert(data.msg);
-                        LoadWages();
-                        $('#btnCancel').click();
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        $('#lblError').text(jqXHR.responseJSON.msg);
-                        $('#lblError').show();
-                    }
+                        url: '/admin/user-group-wage',
+                        type: 'put',
+                        headers: {
+                            authorization: "Bearer " + localStorage.getItem('accessToken'),
+                        },
+                        data: {
+                            _id,
+                            user_group: ugId,
+                            skill,
+                            level,
+                            wage
+                        },
+                        success: function (data) {
+                            alert(data.msg);
+                            LoadWages();
+                            $('#btnCancel').click();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            $('#lblError').text(jqXHR.responseJSON.msg);
+                            $('#lblError').show();
+                        }
 
-                })
-                }else{
+                    })
+                } else {
                     $.ajax({
-                    url: '/admin/user-group-wage',
-                    type: 'post',
-                    headers: {
-                        authorization: "Bearer " + localStorage.getItem('accessToken'),
-                    },
-                    data: {
-                        user_group: ugId,
-                        skill,
-                        level,
-                        wage
-                    },
-                    success: function (data) {
-                        alert(data.msg);
-                        LoadWages();
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        $('#lblError').text(jqXHR.responseJSON.msg);
-                        $('#lblError').show();
-                    }
+                        url: '/admin/user-group-wage',
+                        type: 'post',
+                        headers: {
+                            authorization: "Bearer " + localStorage.getItem('accessToken'),
+                        },
+                        data: {
+                            user_group: ugId,
+                            skill,
+                            level,
+                            wage
+                        },
+                        success: function (data) {
+                            alert(data.msg);
+                            LoadWages();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            $('#lblError').text(jqXHR.responseJSON.msg);
+                            $('#lblError').show();
+                        }
 
-                })
+                    })
                 }
-                
+
 
             })
 

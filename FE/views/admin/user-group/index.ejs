@@ -99,7 +99,7 @@
         success: function (data, textStatus, xhr) {
           //xóa các thông tin tiền công liên quan tới nhóm nhân viên vừa xóa
           $.ajax({
-            url: '/admin/user-group-wage',
+            url: '/admin/user-group-wage/delete-many',
             type: 'delete',
             headers: {
               authorization: "Bearer " + localStorage.getItem("accessToken"),

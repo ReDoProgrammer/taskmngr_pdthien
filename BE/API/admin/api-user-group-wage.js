@@ -3,15 +3,32 @@ const Wage = require('../../models/wage-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 
+router.delete('/delete-many',authenticateAdminToken,(req,res)=>{
+    let {ugId} = req.body;
+    Wage
+    .deleteMany({user_group:ugId})
+    .exec()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`Delete wages successfully!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not delete these wages with error: ${new Error(err.message)}`
+        })
+    })
+})
+
+
 
 router.delete('/', authenticateAdminToken, (req, res) => {
-    let { ugId } = req.body;
-    console.log('user group id: ', ugId);
-    Wage.deleteMany({ user_group: ugId })
+    let { _id } = req.body;
+    Wage.findByIdAndDelete( _id )
         .exec()
         .then(_ => {
             return res.status(200).json({
-                msg: `Delete user group wages successfully!`
+                msg: `Delete user group wage successfully!`
             })
         })
         .catch(err => {
