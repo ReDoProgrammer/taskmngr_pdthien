@@ -70,7 +70,7 @@ router.post('/', authenticateAdminToken, (req, res) => {
 
 router.put('/',authenticateAdminToken,(req,res)=>{
     
-    let {_id,user_group,level,skill} = req.body;
+    let {_id,user_group,level,skill,wage} = req.body;
     Wage
     .findByIdAndUpdate(_id,{
         user_group,
