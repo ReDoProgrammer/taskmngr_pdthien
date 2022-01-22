@@ -27,7 +27,7 @@ const wageSchema = new Schema({
 });
 
 wageSchema.index({
-    user_type:1,
+    user_group:1,
     skill:1,
     level:1
 },{

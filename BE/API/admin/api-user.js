@@ -128,7 +128,7 @@ router.post('/', authenticateAdminToken, (req, res) => {
   u.save()
     .then(user => {
       return res.status(201).json({
-        msg: 'New user was created successfully!',
+        msg: 'New user has been created successfully!',
         user: user
       })
     })
@@ -230,10 +230,10 @@ router.post("/login", (req, res) => {
   let { username, password } = req.body;
 
   Promise.all([getModule,checkAccount(username,password)])
-  .then(result =>{   
+  .then(result =>{  
+    console.log(result); 
     checkRole(result[1]._id,result[0]._id)
-    .then(chk=>{
-      console.log(result[1]);
+    .then(chk=>{      
       if(chk){
         let user = result[1];        
         let u = {

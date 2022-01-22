@@ -141,7 +141,7 @@
                 let skill = $('#slSkills option:selected').val();
                 let level = $('#sllStaffLevels option:selected').val();
                 let wage = parseFloat($('#txtWage').val());
-                console.log('wage id: ', _id);
+              
                 if (_id.trim().length > 0) {//update exist record
                     $.ajax({
                         url: '/admin/user-group-wage',
@@ -156,8 +156,8 @@
                             level,
                             wage
                         },
-                        success: function (data) {
-                            alert(data.msg);
+                        success: function (data) {   
+                            alert(data.msg);                       
                             LoadWages();
                             $('#btnCancel').click();
                         },
@@ -180,8 +180,7 @@
                             level,
                             wage
                         },
-                        success: function (data) {
-                            alert(data.msg);
+                        success: function (data) {                          
                             LoadWages();
                         },
                         error: function (jqXHR, textStatus, errorThrown) {

@@ -18,34 +18,7 @@
             <input type="text" name="txtDescription" id="txtDescription" class="form-control"
               placeholder="Description" />
           </div>
-        </div>
-        <!-- <div class="card text-white bg-secondary mb-3">
-          <div class="card-header">Skill & wage</div>
-          <div class="card-body">
-            <table class="table">
-              <thead>
-                <tr class="row">
-                  <th scope="col" class="col-md-1">#</th>
-                  <th scope="col" class="col-md-4">Skill</th>
-                  <th scope="col" class="col-md-3">Level</th>
-                  <th scope="col" class="col-md-2">Wage</th>
-                  <th scope="col" class="col-md-2"></th>
-                </tr>
-              </thead>
-              <tbody id="tblWages"></tbody>
-            </table>
-            <div class="form-inline form-row">
-              <select name="" id="slSkill" class="form-control col-md-3"></select>
-              <select name="" id="slLevel" class="form-control col-md-3 ml-1"></select>
-
-              <input type="text" id="txtWage" class="form-control col-md-2 ml-1 mr-1 text-right" value="0" />
-
-              <button type="submit" class="btn btn-info col-md-2" id="btnAddNewLine">
-                Add New wage
-              </button>
-            </div> 
-          </div>
-        </div> -->
+        </div>        
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -70,6 +43,9 @@
 
   $(document).on("show.bs.modal", ".modal", function () {
     $("#tblWages").empty();
+    $('#txtName').val('');
+    $('#txtDescription').val('');
+
   });
 
   $("#btnSubmit").click(function () {

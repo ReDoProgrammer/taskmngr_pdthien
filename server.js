@@ -230,7 +230,7 @@ app.use("/admin/setting/status", adminStatusController);
 app.use("/admin/setting/style", adminStyleController);
 app.use("/admin/setting/skill", adminSkillController);
 
-app.use('/admin/setting/user-type',adminUserGroupController);
+app.use('/admin/setting/user-group',adminUserGroupController);
 
 
 app.use("/admin/staff", adminStaffController);
