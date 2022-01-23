@@ -22,6 +22,10 @@ const moduleSchema = new Schema({
     status:{
         type:Boolean,
         default:true
+    },
+    appling_wage:{
+        type:Boolean,
+        default:false
     }    
     
 });

@@ -70,13 +70,13 @@ const initAdministrator = new Promise((resolve, reject) => {
 const initModule = new Promise((resolve, reject) => {
 
   let modules = [
-    { name: 'ADMIN', description: 'Administrator' },
-    { name: 'SALE', description: 'Quản lý đơn hàng' },
-    { name: 'TLA', description: 'Quản lý phân luồng công việc' },
-    { name: 'DC', description: 'Quản lý đầu ra' },
-    { name: 'EDITOR', description: 'Nhân viên chỉnh sửa ảnh' },
-    { name: 'QA', description: 'Nhân viên kiểm định' },
-    { name: 'ACCOUNTANT', description: 'Kế toán' },
+    { name: 'ADMIN', description: 'Administrator',appling_wage:false },
+    { name: 'SALE', description: 'Quản lý đơn hàng',appling_wage:false },
+    { name: 'TLA', description: 'Quản lý phân luồng công việc',appling_wage:false },
+    { name: 'DC', description: 'Quản lý đầu ra',appling_wage:true },
+    { name: 'EDITOR', description: 'Nhân viên chỉnh sửa ảnh',appling_wage:true },
+    { name: 'QA', description: 'Nhân viên kiểm định',appling_wage:true },
+    { name: 'ACCOUNTANT', description: 'Kế toán',appling_wage:false },
   ]
   Module.insertMany(modules)
     .then(mods => {
