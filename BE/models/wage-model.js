@@ -10,10 +10,10 @@ const wageSchema = new Schema({
         required:true,
         ref:'user_group'
     },
-    skill:{
+    module:{
         type:Schema.Types.ObjectId,
         required:true,
-        ref:'skill'
+        ref:'module'
     },
     level:{
         type:Schema.Types.ObjectId,
@@ -28,7 +28,7 @@ const wageSchema = new Schema({
 
 wageSchema.index({
     user_group:1,
-    skill:1,
+    module:1,
     level:1
 },{
     unique:true

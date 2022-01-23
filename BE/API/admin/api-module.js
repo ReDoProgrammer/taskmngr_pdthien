@@ -42,6 +42,23 @@ router.get('/list',authenticateAdminToken, (req, res) => {
 });
 
 
+router.get('/list-appling-wage',authenticateAdminToken,(req,res)=>{
+    Module
+    .find({appling_wage:true})
+    .exec()
+    .then(ms=>{       
+        return res.status(200).json({
+            msg:`Load appling modules successfully!`,
+            ms
+        })
+    })
+    .catch(err=>{
+        console.log(`Can not load appling modules with error: ${new Error(err.message)}`);
+        return res.status(500).json({
+            msg:`Can not load appling modules with error: ${new Error(err.message)}`
+        })
+    })
+})
 
 
 router.post('/', authenticateAdminToken, (req, res) => {

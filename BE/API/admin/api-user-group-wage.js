@@ -40,8 +40,8 @@ router.delete('/', authenticateAdminToken, (req, res) => {
 })
 
 router.post('/', authenticateAdminToken, (req, res) => {
-    let { user_group, skill, level, wage } = req.body;
-   
+    let { user_group, module, level, wage } = req.body;
+   console.log({ user_group, module, level, wage });
     if(wage<=0){
         return res.status(403).json({
             msg:`Wage value not valid!`
@@ -49,12 +49,12 @@ router.post('/', authenticateAdminToken, (req, res) => {
     }
 
     Wage
-        .countDocuments({ user_group, skill, level })
+        .countDocuments({ user_group, module, level })
         .then(count => {
             if (count == 0) {
                 let w = new Wage({
                     user_group,
-                    skill,
+                    module,
                     level,
                     wage
                 })
@@ -118,9 +118,10 @@ router.get('/', authenticateAdminToken, (req, res) => {
     let { ugId } = req.query;
     Wage.find({ user_group: ugId })
         .populate('level', 'name -_id')
-        .populate('skill', 'name -_id')
+        .populate('module', 'name -_id')
         .exec()
         .then(wages => {
+            console.log(wages);
             return res.status(200).json({
                 msg: 'Load user group wages successfully',
                 wages
