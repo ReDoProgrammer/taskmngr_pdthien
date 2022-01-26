@@ -66,8 +66,7 @@ router.get('/detail', authenticateAdminToken, (req, res) => {
 
 router.post('/', authenticateAdminToken, (req, res) => {
     let { name, description } = req.body;
-
-    console.log({ name, description });
+   
     //ràng buộc dữ liệu cho đầu vào tên level
     if (name.length == 0) {
         return res.status(403).json({
