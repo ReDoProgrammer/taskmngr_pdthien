@@ -33,7 +33,7 @@ router.get('/', (req, res) => {
                 msg: 'load levels list failed'
             });
         }
-
+        
         return res.status(200).json({
             msg: 'Load levels list successfully!',
             nss: nss

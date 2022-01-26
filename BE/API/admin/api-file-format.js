@@ -43,7 +43,7 @@ router.get('/', (req, res) => {
 router.get('/type',(req,res)=>{
     let {is_input} = req.query;
 
-    FileFormat.find({is_input:is_input}, (err, ffs) => {
+    FileFormat.find({}, (err, ffs) => {
         if (err) {
             return res.status(500).json({
                 msg: `Lấy danh sách định dạng file ${is_input==true?'đầu vào':'đầu ra'} thất bại!`

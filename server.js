@@ -195,7 +195,7 @@ app.use('/admin/file-format',apiAdminFileFormat);//quản lý thông tin định
 app.use('/admin/job-level',apiAdminJobLevel);//quản lý thông tin danh sách level, khác với apiAdminCustomerLevel
 app.use('/admin/level',apiAdminLevel);//quản lý thông tin level --- tạm thời bị dư thừa, k xài tới
 app.use('/admin/module',apiAdminModule);// quản lý danh sách module của web
-app.use('/admin/national-style',apiAdminNationalStyle);//quản lý thông tin style của khách hàng theo quốc gia
+//app.use('/admin/national-style',apiAdminNationalStyle);//quản lý thông tin style của khách hàng theo quốc gia
 app.use('/admin/size',apiAdminSize);//quản lý thông tin kích thước file hình ảnh 
 app.use('/admin/skill',apiAdminSkill);//quản lý thông tin kỹ năng của nhân viên: Q.C, Editor,...
 app.use('/admin/staff-level',apiAdminStaffLevel);//quản lý level của nhân viên, phân loại nhân viên: người mới, tập sự, học việc,...

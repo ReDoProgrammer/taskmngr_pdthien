@@ -1,38 +1,57 @@
-<div class="row mt-2">
-  <div class="col-md-6">
-    <select name="" id="slLevel" class="form-control"></select>
+<div class="panel panel-primary mt-2">
+  <div class="panel-heading font-weight-bold">
+    <i class="fa fa-info-circle" aria-hidden="true"></i>
+    Contract info
   </div>
-  <div class="colmd-4">
-    <input
-      type="text"
-      class="form-control text-right"
-      id="txtPrice"
-      placeholder="Level price"
-      value="0"
-      name="price"
-    />
-  </div>
-  <div class="col-md-2">
-    <button class="btn btn-info" id="btnAddNewLevel">
-      <span>
-        <i class="fa fa-plus" aria-hidden="true"></i>
-      </span>
-      Add new level
-    </button>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-xs-12 form-group">
+            <label for="">Job level</label>
+            <select name="" id="slLevel" class="form-control"></select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4 col-sm-4 col-xs-4">
+            <label for="">Price ($):</label>
+          </div>
+          <div class="col-md-4 col-sm-4 col-xs-4">
+            <input type="text" class="form-control text-right" id="txtPrice" placeholder="Level price" value="0"
+              name="price" />
+          </div>
+          <div class="col-md-4 col-sm-4 col-xs-4">
+            <button class="btn btn-primary" id="btnAddNewLevel">
+              <span>
+                <i class="fa fa-plus" aria-hidden="true"></i>
+              </span>
+              Add new level
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-8 col-sm-6 col-xs-12">
+        <table class="table mt-2">
+          <thead>
+            <tr class="form-row">
+              <th scope="col" class="col-md-1">#</th>
+              <th scope="col" class="col-md-8">Level</th>
+              <th scope="col" class="col-md-2">Price ($)</th>
+              <th scope="col" class="col-md-1"></th>
+            </tr>
+          </thead>
+          <tbody id="tblData"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 
-<table class="table mt-2">
-  <thead>
-    <tr class="form-row">
-      <th scope="col" class="col-md-1">#</th>
-      <th scope="col" class="col-md-8">Level</th>
-      <th scope="col" class="col-md-2">Price ($)</th>
-      <th scope="col" class="col-md-1"></th>
-    </tr>
-  </thead>
-  <tbody id="tblData"></tbody>
-</table>
+
+
+
+
+
 
 
 <script>
@@ -49,7 +68,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      success: function (data, textStatus, xhr) {       
+      success: function (data, textStatus, xhr) {
         $("#slLevel").empty();
         data.jl.forEach((lv) => {
           let opt = '<option value="' + lv._id + '">' + lv.name + "</option>";
@@ -91,7 +110,7 @@
     //nếu đã tồn tại thì không cho thêm
     let exist = false;
     $("table > tbody  > tr").each(function (index, tr) {
-      let id = tr["id"];     
+      let id = tr["id"];
       if (levelId === id) {
         alert("This level already exist!");
         exist = true;

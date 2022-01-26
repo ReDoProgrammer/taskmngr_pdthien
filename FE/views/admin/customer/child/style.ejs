@@ -1,159 +1,102 @@
-<div class="card bg-dark text-white mt-2">
-  <div class="card-header">Style list</div>
-  <div class="card-body">
-    <form>
-      <div class="form-row">
-        <div class="form-group col-md-2">
-          <label for="">Output</label>
-          <select name="" id="slOutput" class="form-control"></select>
-        </div>
-        <div class="form-group col-md-3">
-          <label for="">Size</label>
-          <select name="" id="slSize" class="form-control">
-            <option value="">Orginal</option>
-            <option value="">3600px < 3Mb</option>
-          </select>
-        </div>
-        <div class="form-group col-md-2">
-          <label for="">Color mode</label>
-          <select name="" id="slColorMode" class="form-control">
-            <option value="">RGB</option>
-            <option value="">Adobe 1998</option>
-          </select>
-        </div>
-        <div class="form-group col-md-2">
-          <div class="form-check mb-2">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              value=""
-              id="ckbAlign"
-            />
-            <label class="form-check-label" for="defaultCheck1"> Align </label>
-          </div>
-          <input
-            type="text"
-            name=""
-            id="txtAlign"
-            class="form-control"
-            placeholder="Align note"
-          />
-        </div>
-        <div class="form-group col-md-3">
-          <label for="">Cloud</label>
-          <select name="" id="slCloud" class="form-control">
-            <option value="">Google Driver</option>
-            <option value="">Dropbox</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group col-md-3">
-          <label for="">National Style</label>
-          <select name="" id="slNationalStyle" class="form-control">
-            <option value="">US Style</option>
-          </select>
-        </div>
-        <div class="form-group col-md-9">
-          <label for="">Remark</label>
-          <input
-            type="text"
-            name=""
-            id="txtRemark"
-            class="form-control"
-            placeholder="Customer's remark"
-          />
-        </div>
-      </div>
-      <div class="card bg-dark">
-        <div class="card-header">Special requests</div>
-        <div class="card-body">
-          <div class="form-row container">
-            <div class="form-group col-md-3">
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  value=""
-                  id="ckbTV"
-                />
-                <label class="form-check-label" for="defaultCheck1"> TV </label>
-              </div>
-              <input
-                type="text"
-                name=""
-                id="txtTV"
-                class="form-control"
-                placeholder="TV note"
-              />
-            </div>
+<div class="panel panel-info">
+  <div class="panel-heading font-weight-bold">Style list</div>
+  <div class="panel-body">
 
-            <div class="form-group col-md-3">
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  value=""
-                  id="ckbGrass"
-                />
-                <label class="form-check-label" for="defaultCheck1">
-                  Grass
-                </label>
-              </div>
-              <input
-                type="text"
-                name=""
-                id="txtGrass"
-                class="form-control"
-                placeholder="Grass note"
-              />
-            </div>
-
-            <div class="form-group col-md-3">
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  value=""
-                  id="ckbSky"
-                />
-                <label class="form-check-label" for="defaultCheck1">
-                  Sky
-                </label>
-              </div>
-              <input
-                type="text"
-                name=""
-                id="txtSky"
-                class="form-control"
-                placeholder="Sky note"
-              />
-            </div>
-
-            <div class="form-group col-md-3">
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  value=""
-                  id="ckbFire"
-                />
-                <label class="form-check-label" for="defaultCheck1">
-                  Fire
-                </label>
-              </div>
-              <input
-                type="text"
-                name=""
-                id="txtFire"
-                class="form-control"
-                placeholder="Fire note"
-              />
-            </div>
-          </div>
-        </div>
+    <div class="form-row">
+      <div class="form-group col-md-2">
+        <label for="">Output</label>
+        <select name="" id="slOutput" class="form-control"></select>
       </div>
-    </form>
+      <div class="form-group col-md-3">
+        <label for="">Size</label>
+        <select name="" id="slSize" class="form-control"></select>
+      </div>
+      <div class="form-group col-md-2">
+        <label for="">Color mode</label>
+        <select name="" id="slColorMode" class="form-control">
+          <option value="">RGB</option>
+          <option value="">Adobe 1998</option>
+        </select>
+      </div>
+
+      <div class="form-group col-md-2">
+        <label for="">Cloud</label>
+        <select name="" id="slCloud" class="form-control">
+          <option value="">Google Driver</option>
+          <option value="">Dropbox</option>
+        </select>
+      </div>
+
+      <div class="form-group col-md-3">
+        <label for="">National Style</label>
+        <select name="" id="slNationalStyle" class="form-control">
+          <option value="">US Style</option>
+        </select>
+      </div>
+
+
+    </div>
+
+    <div class="form-row mt-2">
+      <div class="form-group col-md-2">
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" value="" id="ckbAlign" />
+          <label class="form-check-label" for="defaultCheck1"> Align </label>
+        </div>
+        <input type="text" name="" id="txtAlign" class="form-control" placeholder="Align note" />
+      </div>
+
+
+      <div class="form-group col-md-2">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="ckbTV" />
+          <label class="form-check-label" for="defaultCheck1"> TV </label>
+        </div>
+        <input type="text" name="" id="txtTV" class="form-control" placeholder="TV note" />
+      </div>
+
+      <div class="form-group col-md-2">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="ckbGrass" />
+          <label class="form-check-label" for="defaultCheck1">
+            Grass
+          </label>
+        </div>
+        <input type="text" name="" id="txtGrass" class="form-control" placeholder="Grass note" />
+      </div>
+
+      <div class="form-group col-md-3">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="ckbSky" />
+          <label class="form-check-label" for="defaultCheck1">
+            Sky
+          </label>
+        </div>
+        <input type="text" name="" id="txtSky" class="form-control" placeholder="Sky note" />
+      </div>
+
+      <div class="form-group col-md-3">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="ckbFire" />
+          <label class="form-check-label" for="defaultCheck1">
+            Fire
+          </label>
+        </div>
+        <input type="text" name="" id="txtFire" class="form-control" placeholder="Fire note" />
+      </div>
+
+    </div>
+
+    <div class="form-row">
+
+      <div class="form-group col-md-12">
+        <label for="">Remark</label>
+        <input type="text" name="" id="txtRemark" class="form-control" placeholder="Customer's remark" />
+      </div>
+    </div>
+
+
+
   </div>
 </div>
 
@@ -293,6 +236,9 @@
     $.ajax({
       url: "/admin/cloud",
       type: "get",
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
       success: function (data, textStatus, xhr) {
         $("#slCloud").empty();
         data.clouds.forEach((cl) => {
@@ -308,12 +254,15 @@
 
   function LoadNationalStyle() {
     $.ajax({
-      url: "/admin/national-style",
+      url: "/admin/style",
       type: "get",
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
       success: function (data, textStatus, xhr) {
         $("#slNationalStyle").empty();
-        data.nss.forEach((ns) => {
-          let opt = '<option value="' + ns._id + '">' + ns.name + "</option>";
+        data.styles.forEach((s) => {
+          let opt = '<option value="' + s._id + '">' + s.name + "</option>";
           $("#slNationalStyle").append(opt);
         });
       },

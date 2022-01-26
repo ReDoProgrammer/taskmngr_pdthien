@@ -25,7 +25,7 @@ router.delete('/',authenticateAdminToken,(req,res)=>{
     })
 })
 
-router.get('/',(req,res)=>{
+router.get('/',authenticateAdminToken,(req,res)=>{
     Style.find({},(err,styles)=>{
         if(err){
             return res.status(500).json({
