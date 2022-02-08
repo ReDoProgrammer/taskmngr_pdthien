@@ -328,11 +328,10 @@ const checkAccount = (username, password) => {
 
        
 
-        if(user.is_active){
+        if(!user.is_active){
           return reject({
             code:403,
-            msg:`Your account is banned!`,
-            error: `Your account is not actived`
+            msg:`Your account is banned!`            
           })
         }
 
