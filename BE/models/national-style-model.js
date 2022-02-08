@@ -14,10 +14,7 @@ const nationalStyleSchema = new Schema({
     description:{
       type:String
        
-    },
-   
-
-    
+    } 
 });
 
 
