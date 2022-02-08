@@ -20,19 +20,22 @@
     </div>
   </div>
 </div>
-<table class="table mt-1">
-  <thead class="thead-dark">
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Customer</th>
-      <th scope="col">Phone</th>
-      <th scope="col">Email</th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody id="tblData"></tbody>
-</table>
+<div class="table-responsive">
+  <table class="table table-striped mt-1">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Customer</th>
+        <th scope="col">Phone</th>
+        <th scope="col">Email</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="tblData"></tbody>
+  </table>
+</div>
+
 
 <nav aria-label="Page navigation example" class="mt-2">
   <ul class="pagination" id="pagination">
@@ -74,7 +77,7 @@
 
         });
 
-      
+
 
 
         function LoadCustomer(customerId) {
@@ -191,14 +194,14 @@
             success: function (data, textStatus, xhr) {
               $('#tblLevelList').empty();
               let idx = 1;
-              data.cl.forEach(i=>{
-                
+              data.cl.forEach(i => {
+
                 let tr = '<tr>';
-                  tr+= '<td>'+(idx++)+'</td>';
-                  tr+= '<td class="font-weight-bold text-danger">'+i.level.name+'</td>';
-                  tr+= '<td class="text-warning text-right">'+i.price+'</td>';
-                  tr+= '</tr>';
-                  $('#tblLevelList').append(tr);
+                tr += '<td>' + (idx++) + '</td>';
+                tr += '<td class="font-weight-bold text-danger">' + i.level.name + '</td>';
+                tr += '<td class="text-warning text-right">' + i.price + '</td>';
+                tr += '</tr>';
+                $('#tblLevelList').append(tr);
               })
 
             },
