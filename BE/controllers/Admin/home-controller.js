@@ -36,8 +36,6 @@ router.get("/init", (req, res) => {
       })
     })
 
-
-
 });
 
 
@@ -70,6 +68,7 @@ const initAdministrator = () => {
   })
 
 
+
 }
 
 const initModule = () => {
@@ -94,20 +93,22 @@ const initModule = () => {
 
 }
 
+
+
 const initUserModule = (userId, moduleId) => {
   return new Promise((resolve, reject) => {
     let usermodule = new UserModule();
     usermodule.user = userId;
     usermodule.module = moduleId;
-    usermodule.save()
-      .then(um => {
-        return resolve(um)
-      })
-      .catch(err => {
+
+    UserModule.create(usermodule, (err, um) => {
+      if (err) {
         return reject({
           error: new Error(err.message)
         })
-      })
+      }
+      return resolve(um)
+    })
   })
 }
 

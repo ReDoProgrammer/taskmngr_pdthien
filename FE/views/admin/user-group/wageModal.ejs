@@ -7,25 +7,29 @@
                     <div class="panel-body">
 
                         <div class="form-row">
-                            <div class="form-group col-md-3 col-xs-4">
+                            <div class="form-group col-md-3 col-sm-3 col-xs-4">
                                 <label for="recipient-name" class="col-form-label">Role:</label>
                                 <select name="" id="slRoles" class="form-control"></select>
                             </div>
-                            <div class="form-group col-md-3 col-xs-3">
+                            <div class="form-group col-md-3 col-sm-3 col-xs-4">
                                 <label for="recipient-name" class="col-form-label">Staff level:</label>
                                 <select name="" id="sllStaffLevels" class="form-control"></select>
                             </div>
-                            <div class="form-group col-md-3 col-xs-3">
+                            <div class="form-group col-md-2 col-sm-2 col-xs-4">
                                 <label for="recipient-name" class="col-form-label">Wage:</label>
                                 <input type="text" class="form-control text-right" id="txtWage" value="0" />
                             </div>
 
-                            <div class="form-group col-md-3 col-xs-3 text-right">
+                            <div class="form-group col-md-2 col-sm-2 col-xs-6 text-right">
                                 <label for="recipient-name" class="col-form-label"></label><br>
                                 <button class="btn btn-sm btn-success mt-1" id="btnSubmitWage">
                                     <i class="fa fa-plus" aria-hidden="true"></i>
                                     Add
-                                </button>
+                                </button>                               
+                            </div>
+
+                            <div class="form-group col-md-2 col-sm-2 col-xs-6">
+                                <label for="recipient-name" class="col-form-label"></label><br>
                                 <button class="btn btn-sm btn-secondary mt-1" id="btnCancel">
                                     Cancel
                                 </button>
@@ -133,6 +137,9 @@
 
             $('#modalWage').on('shown.bs.modal', function (e) {
                 LoadWages();
+                $('#lblError').text('');
+                $('#lblError').hide();
+                $('#txtWage').text('0');
             })
 
 
@@ -160,6 +167,7 @@
                             alert(data.msg);                       
                             LoadWages();
                             $('#btnCancel').click();
+                            $('#txtWage').text('0');
                         },
                         error: function (jqXHR, textStatus, errorThrown) {
                             $('#lblError').text(jqXHR.responseJSON.msg);
@@ -182,6 +190,7 @@
                         },
                         success: function (data) {                          
                             LoadWages();
+                            $('#txtWage').text('0');
                         },
                         error: function (jqXHR, textStatus, errorThrown) {
                             $('#lblError').text(jqXHR.responseJSON.msg);

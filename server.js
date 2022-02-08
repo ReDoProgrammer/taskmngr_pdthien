@@ -66,11 +66,11 @@ const adminStaffController = require("./BE/controllers/Admin/staff-controller");
 const adminUserGroupController = require('./BE/controllers/Admin/user-group-controller');
 
 
-/*
+// /*
 
-define sale controllers
+// define sale controllers
 
-*/
+// */
 const saleAuthController = require('./BE/controllers/Sale/sale-authenticate-controller');
 
 
@@ -125,9 +125,9 @@ app.use('/sale/customer',saleCustomerController);
 const saleJobController = require('./BE/controllers/Sale/sale-job-controller');
 app.use('/sale/job',saleJobController);
 
-/*
-  SALE API CONTROLLERS
-*/
+// /*
+//   SALE API CONTROLLERS
+// */
 const apiSaleAuth = require('./BE/API/Sale/api-auth');
 app.use('/sale',apiSaleAuth);
 
@@ -138,9 +138,9 @@ app.use('/sale/customer',apiSaleCustomer);
 const apiSaleJob = require('./BE/API/Sale/api-sale-job');
 app.use('/sale/job',apiSaleJob);
 
-/*
-  TLA Controllers
-*/
+// /*
+//   TLA Controllers
+// */
 
 
 const TLAAuth = require('./BE/controllers/TLA/authentication-controller');
@@ -153,9 +153,9 @@ const TLACustomerController = require('./BE/controllers/TLA/customer-controller'
 app.use('/tla/customer',TLACustomerController);
 
 
-/*
-  TLA API CONTROLLERS
-*/
+// /*
+//   TLA API CONTROLLERS
+// */
 
 const apiTLAAuth = require('./BE/API/TLA/api-auth');
 app.use('/tla',apiTLAAuth);
@@ -195,7 +195,7 @@ app.use('/admin/file-format',apiAdminFileFormat);//quản lý thông tin định
 app.use('/admin/job-level',apiAdminJobLevel);//quản lý thông tin danh sách level, khác với apiAdminCustomerLevel
 app.use('/admin/level',apiAdminLevel);//quản lý thông tin level --- tạm thời bị dư thừa, k xài tới
 app.use('/admin/module',apiAdminModule);// quản lý danh sách module của web
-//app.use('/admin/national-style',apiAdminNationalStyle);//quản lý thông tin style của khách hàng theo quốc gia
+app.use('/admin/national-style',apiAdminNationalStyle);//quản lý thông tin style của khách hàng theo quốc gia
 app.use('/admin/size',apiAdminSize);//quản lý thông tin kích thước file hình ảnh 
 app.use('/admin/skill',apiAdminSkill);//quản lý thông tin kỹ năng của nhân viên: Q.C, Editor,...
 app.use('/admin/staff-level',apiAdminStaffLevel);//quản lý level của nhân viên, phân loại nhân viên: người mới, tập sự, học việc,...
@@ -209,7 +209,7 @@ app.use('/admin/user-module',apiAdminUserModuleRole);//quản lý quyền truy c
 
 
 
-//USING ADMIN CONTROLLERS
+// //USING ADMIN CONTROLLERS
 
 app.use("/admin", adminHomeController);
 app.use("/admin", adminAccountController);

@@ -8,34 +8,34 @@ router.delete('/', authenticateAdminToken, (req, res) => {
     NationalStyle.findOneAndDelete({ _id: id }, (err, ns) => {
         if (err) {
             return res.status(500).json({
-                msg: 'Xóa style theo quốc gia thất bại!',
+                msg: `Can not delete national style with error: ${new Error(err.message)}`,
                 error: new Error(err.message)
             });
         }
 
         if (ns) {
             return res.status(200).json({
-                msg: 'Xóa style theo quốc gia thành công!'
+                msg: `National style has been deleted successfully!`
             });
         } else {
             return res.status(404).json({
-                msg: 'Lỗi không tìm thấy style theo quốc gia tương ứng!'
+                msg: `National style not found`
             });
         }
 
     })
 })
 
-router.get('/', (req, res) => {
+router.get('/',authenticateAdminToken, (req, res) => {
     NationalStyle.find({}, (err, nss) => {
         if (err) {
             return res.status(500).json({
-                msg: 'load levels list failed'
+                msg: `Load national styles list failed with error: ${new Error(err.message)}`
             });
         }
         
         return res.status(200).json({
-            msg: 'Load levels list successfully!',
+            msg: 'Load national styles list successfully!',
             nss: nss
         });
     });
@@ -46,18 +46,18 @@ router.get('/detail', authenticateAdminToken, (req, res) => {
     NationalStyle.findById(id, (err, ns) => {
         if (err) {
             return res.status(500).json({
-                msg: 'Lấy thông tin style theo quốc gia thất bại!',
+                msg: `Can not get national style detail with error: ${new Error(err.message)}`,
                 error: new Error(err.message)
             });
         }
         if (ns) {
             return res.status(200).json({
-                msg: 'Lấy thông tin style theo quốc gia thành công!',
+                msg: `Load national style detail successfully`,
                 ns: ns
             })
         } else {
             return res.status(404).json({
-                msg: 'Không tìm thấy style theo quốc gia tương ứng!'
+                msg: `National style not found`
             });
         }
     })
@@ -66,11 +66,11 @@ router.get('/detail', authenticateAdminToken, (req, res) => {
 
 router.post('/', authenticateAdminToken, (req, res) => {
     let { name, description } = req.body;
-
+   
     //ràng buộc dữ liệu cho đầu vào tên level
     if (name.length == 0) {
         return res.status(403).json({
-            msg: 'Vui lòng nhập tên style theo quốc gia'
+            msg: 'National style name can not be blank'
         });
     }
 
@@ -81,13 +81,13 @@ router.post('/', authenticateAdminToken, (req, res) => {
     ns.save()
         .then(ns => {
             return res.status(201).json({
-                msg: 'Thêm mới style theo quốc gia thành công!',
+                msg: 'National style has been added successfully!',
                 ns: ns
             });
         })
         .catch(err => {
             return res.status(500).json({
-                msg: 'Thêm mới style theo quốc gia thất bại!',
+                msg: `Can not add national style with error: ${new Error(err.message)}`,
                 error: new Error(err.message)
             });
         })
@@ -99,7 +99,7 @@ router.put('/', authenticateAdminToken, (req, res) => {
     //ràng buộc dữ liệu cho đầu vào tên level
     if (name.length == 0) {
         return res.status(403).json({
-            msg: 'Vui lòng nhập tên style theo quốc gia!'
+            msg: 'National style name can not be blank!'
         });
     }
 
@@ -111,19 +111,19 @@ router.put('/', authenticateAdminToken, (req, res) => {
     }, { new: true }, (err, ns) => {
         if (err) {
             return res.status(500).json({
-                msg: 'Cập nhật thông tin style theo quốc gia thất bại!',
+                msg: `Update national style failed with error: ${new Error(err.message)}`,
                 error: new Error(err.message)
             });
         }
 
         if (ns) {
             return res.status(200).json({
-                msg: 'Cập nhật thông tin style theo quốc gia thành công!',
+                msg: 'Update national style successfully!',
                 ns: ns
             });
         } else {
             return res.status(500).json({
-                msg: 'Cập nhật thông tin style theo quốc gia thất bại!'
+                msg: `Update national style failed with error: ${new Error(err.message)}`
             });
         }
     })
