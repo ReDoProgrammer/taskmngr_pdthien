@@ -12,6 +12,7 @@ let refershTokens = [];
 router.get('/', authenticateAdminToken, (req, res) => {
   let { search, page } = req.query;
   User.find({
+    username:{$ne:'admin'},
     $or: [
       { fullname: { "$regex": search, "$options": "i" } },
       { email: { "$regex": search, "$options": "i" } },
@@ -39,7 +40,7 @@ router.get('/', authenticateAdminToken, (req, res) => {
 
 router.get('/list', authenticateAdminToken, (req, res) => {
   User
-    .find({})
+    .find({username:{$ne:'admin'}})
     .exec()
     .then(users => {
       return res.status(200).json({

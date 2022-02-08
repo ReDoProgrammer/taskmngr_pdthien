@@ -24,7 +24,7 @@ router.get('/detail',authenticateAdminToken,(req,res)=>{
 
 router.get('/list',authenticateAdminToken, (req, res) => {
     Module
-        .find({})
+        .find({name:{$ne:'ADMIN'}})
         .exec()
         .then(modules => {
             return res.status(200).json({
