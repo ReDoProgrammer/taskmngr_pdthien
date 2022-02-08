@@ -46,13 +46,13 @@
           tr += "<td class='font-weight-bold text-info'>" + ut.name + "</td>";
           tr += "<td>" + ut.description + "</td>";
           tr +=
-            '<td class="text-right"><button class="btn btn-sm btn-info" name="detail"><i class="fa fa-eye" aria-hidden="true"></i></button>';
-          tr += '<button class="btn btn-sm btn-warning ml-1" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+            '<td class="text-right"><button class="btn btn-xs btn-info" name="wage"><i class="fa fa-bars" aria-hidden="true"></i></button>';
+            
+          tr += '<button class="btn btn-xs btn-warning ml-2" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
           tr +=
-            '<button class="btn btn-sm btn-danger ml-1" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+            '<button class="btn btn-xs btn-danger ml-1" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
 
-          tr +=
-            '<button class="btn btn-sm btn-primary ml-2" name="wage"><i class="fa fa-bars" aria-hidden="true"></i></button></td>';
+         
           tr += "</tr>";
           $("#tblData").append(tr);
         });
@@ -81,7 +81,7 @@
 
   $("#tblData").on("click", "button[name='delete']", function () {
     var r = confirm(
-      "Vui lòng xác nhận xóa user type " +
+      "Are you sure want to delete " +
       $(this).closest("tr").data("name") +
       "?"
     );
