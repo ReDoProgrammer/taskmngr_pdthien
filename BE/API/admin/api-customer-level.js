@@ -8,7 +8,7 @@ router.get('/',authenticateAdminToken,(req,res)=>{
    
     CustomerLevel
     .find({customer:customerId})
-   // .populate('level')
+   .populate('level')
     .exec()
     .then(cl=>{
         console.log(cl);

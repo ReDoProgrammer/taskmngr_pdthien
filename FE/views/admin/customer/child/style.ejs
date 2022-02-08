@@ -3,43 +3,43 @@
   <div class="panel-body">
 
     <div class="form-row">
-      <div class="form-group col-md-2">
-        <label for="">Output</label>
-        <select name="" id="slOutput" class="form-control"></select>
-      </div>
-      <div class="form-group col-md-3">
-        <label for="">Size</label>
-        <select name="" id="slSize" class="form-control"></select>
-      </div>
-      <div class="form-group col-md-2">
-        <label for="">Color mode</label>
-        <select name="" id="slColorMode" class="form-control">
-          <option value="">RGB</option>
-          <option value="">Adobe 1998</option>
-        </select>
-      </div>
-
-      <div class="form-group col-md-2">
-        <label for="">Cloud</label>
-        <select name="" id="slCloud" class="form-control">
-          <option value="">Google Driver</option>
-          <option value="">Dropbox</option>
-        </select>
-      </div>
-
-      <div class="form-group col-md-3">
+      <div class="form-group col-md-3 col-sm-3 col-xs-12">
         <label for="">National Style</label>
         <select name="" id="slNationalStyle" class="form-control">
           <option value="">US Style</option>
         </select>
       </div>
 
+      <div class="form-group col-md-2 col-sm-3 col-xs-12">
+        <label for="">Output</label>
+        <select name="" id="slOutput" class="form-control"></select>
+      </div>
+      <div class="form-group col-md-3 col-sm-6 col-xs-12">
+        <label for="">Size</label>
+        <select name="" id="slSize" class="form-control"></select>
+      </div>
+
+      <div class="form-group col-md-2 col-sm-6 col-xs-12">
+        <label for="">Color mode</label>
+        <select name="" id="slColorMode" class="form-control"> </select>
+      </div>
+
+      <div class="form-group col-md-2 col-sm-6 col-xs-12">
+        <label for="">Cloud</label>
+        <select name="" id="slCloud" class="form-control"></select>
+      </div>
 
     </div>
 
+
+
+
+
+
     <div class="form-row mt-2">
-      <div class="form-group col-md-2">
-        <div class="form-check mb-2">
+
+      <div class="form-group col-md-3 col-sm-6 col-xs-12">
+        <div class="form-check">
           <input class="form-check-input" type="checkbox" value="" id="ckbAlign" />
           <label class="form-check-label" for="defaultCheck1"> Align </label>
         </div>
@@ -47,7 +47,8 @@
       </div>
 
 
-      <div class="form-group col-md-2">
+
+      <div class="form-group col-md-2 col-sm-6 col-xs-12">
         <div class="form-check">
           <input class="form-check-input" type="checkbox" value="" id="ckbTV" />
           <label class="form-check-label" for="defaultCheck1"> TV </label>
@@ -55,7 +56,7 @@
         <input type="text" name="" id="txtTV" class="form-control" placeholder="TV note" />
       </div>
 
-      <div class="form-group col-md-2">
+      <div class="form-group col-md-3 col-sm-4 col-xs-12">
         <div class="form-check">
           <input class="form-check-input" type="checkbox" value="" id="ckbGrass" />
           <label class="form-check-label" for="defaultCheck1">
@@ -65,7 +66,7 @@
         <input type="text" name="" id="txtGrass" class="form-control" placeholder="Grass note" />
       </div>
 
-      <div class="form-group col-md-3">
+      <div class="form-group col-md-2 col-sm-4 col-xs-12">
         <div class="form-check">
           <input class="form-check-input" type="checkbox" value="" id="ckbSky" />
           <label class="form-check-label" for="defaultCheck1">
@@ -75,7 +76,7 @@
         <input type="text" name="" id="txtSky" class="form-control" placeholder="Sky note" />
       </div>
 
-      <div class="form-group col-md-3">
+      <div class="form-group col-md-2 col-sm-4 col-xs-12">
         <div class="form-check">
           <input class="form-check-input" type="checkbox" value="" id="ckbFire" />
           <label class="form-check-label" for="defaultCheck1">
@@ -260,7 +261,6 @@
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       success: function (data, textStatus, xhr) {
-        console.log(data);
         $("#slNationalStyle").empty();
         data.nss.forEach((s) => {
           let opt = '<option value="' + s._id + '">' + s.name + "</option>";

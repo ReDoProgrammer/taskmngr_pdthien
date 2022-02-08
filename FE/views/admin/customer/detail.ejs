@@ -2,97 +2,65 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Customer detail</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <h5 class="modal-title font-weight-bold text-info">Customer detail</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                    class="btn btn-sm btn-danger">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <div class="form-row">
-                    <div class="form-group col-md-2">
-                        <label for="">Fullname:</label>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label id="fullname" class="text-info font-weight-bold"></label>
-                    </div>
-                    <div class="form-group col-md-2 text-right">
-                        <label>Phone:</label>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label id="phone" class="text-info font-weight-bold"></label>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="col-md-2">
-                        <label for="">Local storage:</label>
-                    </div>
-                    <div class="col-md-4">
-                        <a href="http://" id="local_storage">Local storage</a>
-                    </div>
-                    <div class="col-md-2 text-right">
-                        <label>Cloud storage:</label>
-                    </div>
-                    <div class="col-md-4">
-                        <a href="http://" id="cloud_storage">Cloud storage</a>
-                    </div>
-                </div>
 
-                <div class="form-row">
-                    <div class="form-group col-md-2">
-                        <label for="">Email:</label>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label id="email" class="text-info font-weight-bold"></label>
-                    </div>
-                    <div class="form-group col-md-2 text-right">
-                        <label>Address:</label>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label id="address" class="text-info font-weight-bold"></label>
-                    </div>
-                </div>
-                <hr>
-
-                <div class="card bg-dark text-white mt-2">
-                    <div class="card-header">Style list</div>
-                    <div class="card-body">
-                        <div class="form-row">
-                            <label for="" class="text-info col-md-2">Output</label>
-                            <label id="output" class="text-warning font-weight-bold col-md-2"></label>
-                            <label for="" class="text-info col-md-2 text-right">Size</label>
-                            <label id="size" class="text-warning font-weight-bold col-md-2"></label>
-                            <label for="" class="text-info col-md-2 text-right">Color mode</label>
-                            <label id="color_mode" class="text-warning font-weight-bold col-md-2"></label>
-                        </div>
-                        <div class="form-row">
-                            <label for="" class="text-info col-md-2">Align</label>
-                            <label id="align" class="text-warning font-weight-bold col-md-2"></label>
-                            <label for="" class="text-info col-md-2 text-right">Cloud</label>
-                            <label id="cloud" class="text-warning font-weight-bold col-md-2"></label>
-                        </div>
-
-                        <div class="form-row">
-                            <label for="" class="text-info col-md-2">National style</label>
-                            <label id="national_style" class="text-warning font-weight-bold col-md-2"></label>
-                            <label for="" class="text-info col-md-2 text-right">Remark</label>
-                            <label id="remark" class="text-warning font-weight-bold col-md-6"></label>
-                        </div>
-                        <hr class="text-danger">
-                        <div class="card bg-dark text-white mt-2">
-                            <div class="card-header">Special requests</div>
-                            <div class="form-row">
-                                <label for="" class="col-md-2 text-info text-right">TV</label>
-                                <label id="tv" class="col-md-4 text-success">XX</label>
-                                <label for="" class="col-md-2 text-info text-right">Grass</label>
-                                <label id="grass" class="col-md-4 text-danger">XX</label>
+                <div class="panel panel-info">
+                    <div class="panel-heading text-info">Basic information</div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="form-group col-md-1 col-sm-2 col-xs-3">
+                                <label>Fullname:</label>
                             </div>
-                            <div class="form-row">
-                                <label for="" class="col-md-2 text-info text-right">Sky</label>
-                                <label id="sky" class="col-md-4 text-danger">XX</label>
-                                <label for="" class="col-md-2 text-info text-right">Fire</label>
-                                <label id="fire" class="col-md-4 text-danger">XX</label>
+                            <div class="form-group col-md-5 col-sm-4 col-xs-9">
+                                <label id="fullname" class="text-info font-weight-bold"></label>
                             </div>
-                            <div class="card-body">
+
+                            <div class="form-group col-md-1 col-sm-2 col-xs-3">
+                                <label>Phone:</label>
+                            </div>
+                            <div class="form-group col-md-5 col-sm-4 col-xs-9">
+                                <label id="phone" class="text-info font-weight-bold"></label>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group col-md-1 col-sm-2 col-xs-3">
+                                <label>Email:</label>
+                            </div>
+                            <div class="form-group col-md-5 col-sm-4 col-xs-9">
+                                <label id="email" class="text-info font-weight-bold"></label>
+                            </div>
+
+                            <div class="form-group col-md-1 col-sm-2 col-xs-3">
+                                <label>Address:</label>
+                            </div>
+                            <div class="form-group col-md-5 col-sm-4 col-xs-9">
+                                <label id="address" class="text-info font-weight-bold"></label>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row">
+                            <div class="col-md-2  col-xs-4">
+                                <label>Local storage:</label>
+                            </div>
+                            <div class="col-md-10  col-xs-8">
+                                <a href="http://" id="local_storage">Local storage</a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2 col-xs-4">
+                                <label>Online storage:</label>
+                            </div>
+                            <div class="col-md-10 col-xs-8">
+                                <a href="http://" id="local_storage">Local storage</a>
                             </div>
                         </div>
                     </div>
@@ -100,25 +68,84 @@
 
 
 
-                <table class="table table-dark">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Level name</th>
-                            <th scope="col" class="text-center">Price($)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tblLevelList">
-                    </tbody>
-                </table>
+
+
+                <div class="panel panel-info bg-dark text-white mt-2">
+                    <div class="panel-heading">Style list</div>
+                    <div class="panel-body">
+
+                        <label class="text-info col-md-3 col-sm-4 col-xs-4">National style</label>
+                        <label id="national_style"
+                            class="text-warning font-weight-bold col-md-3 col-sm-8 col-xs-8"></label>
+
+
+                        <label class="text-info col-md-3 col-sm-4 col-xs-4">Output</label>
+                        <label id="output" class="text-warning font-weight-bold col-md-3 col-sm-8 col-xs-8"></label>
+
+                        <label class="text-info col-md-3 col-sm-4 col-xs-4">Size</label>
+                        <label id="size" class="text-warning font-weight-bold col-md-3 col-sm-8 col-xs-8"></label>
+
+                        <label class="text-info col-md-3 col-sm-4 col-xs-4">Color mode</label>
+                        <label id="color_mode" class="text-warning font-weight-bold col-md-3 col-sm-8 col-xs-8"></label>
+
+                        <label class="text-info col-md-3 col-sm-4 col-xs-4">Align</label>
+                        <label id="align" class="text-warning font-weight-bold col-md-3 col-sm-8 col-xs-8"></label>
+
+
+                        <label class="text-info col-md-3 col-sm-4 col-xs-4">Cloud</label>
+                        <label id="cloud" class="text-warning font-weight-bold col-md-3 col-sm-8 col-xs-8"></label>
+
+
+
+                        <label class="text-info col-md-3 col-sm-4 col-xs-4">Remark</label>
+                        <label id="remark" class="text-warning font-weight-bold col-md-3 col-sm-8 col-xs-8"></label>
+
+
+
+                    </div>
+                </div>
+
+                <div class="panel panel-danger bg-dark text-white mt-2">
+                    <div class="panel-heading">Special requests</div>
+
+                    <div class="panel-body">
+
+                        <label class="col-md-2 col-sm-2 col-xs-2 text-info ">TV</label>
+                        <label id="tv" class="col-md-4 col-sm-4 col-xs-4 text-success">XX</label>
+
+                        <label class="col-md-2 col-sm-2 col-xs-2 text-info ">Grass</label>
+                        <label id="grass" class="col-md-4 col-sm-4 col-xs-4 text-danger">XX</label>
+
+                        <label class="col-md-2 col-sm-2 col-xs-2 text-info ">Sky</label>
+                        <label id="sky" class="col-md-4  col-sm-4 col-xs-4 text-danger">XX</label>
+
+                        <label class="col-md-2 col-sm-2 col-xs-2 text-info ">Fire</label>
+                        <label id="fire" class="col-md-4 col-sm-4 col-xs-4 text-danger">XX</label>
+
+                    </div>
+
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Contract info
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Level name</th>
+                                    <th scope="col" class="text-center">Price($)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblLevelList">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
             </div>
         </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
     </div>
 </div>
-</div>
-
-

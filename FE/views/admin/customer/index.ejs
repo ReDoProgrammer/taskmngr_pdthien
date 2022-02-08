@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-md-2">
+  <div class="col-md-2 col-sm-4 col-xs-6">
     <a href="/admin/customer/create" class="btn btn-primary">
       <span>
         <i class="fa fa-plus" aria-hidden="true"></i>
@@ -8,7 +8,7 @@
     </a>
   </div>
 
-  <div class="col-md-offset-7 col-md-3 text-right">
+  <div class="col-md-offset-7 col-md-3 text-right col-sm-offset-2 col-sm-6 col-xs-6">
     <!-- Another variation with a button -->
     <div class="input-group">
       <input type="text" class="form-control" placeholder="Seach customer" id="txtSearch" />
@@ -74,21 +74,7 @@
 
         });
 
-        function LoadCustomerLevels(customerId) {
-          $.ajax({
-            url: '/customer-level',
-            type: 'get',
-            headers: {
-              authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-              customerId
-            },
-            success: function (data) {
-              console.log(data);
-            }
-          })
-        }
+      
 
 
         function LoadCustomer(customerId) {
@@ -203,8 +189,17 @@
               customerId
             },
             success: function (data, textStatus, xhr) {
-              console.log(data);
-
+              $('#tblLevelList').empty();
+              let idx = 1;
+              data.cl.forEach(i=>{
+                
+                let tr = '<tr>';
+                  tr+= '<td>'+(idx++)+'</td>';
+                  tr+= '<td class="font-weight-bold text-danger">'+i.level.name+'</td>';
+                  tr+= '<td class="text-warning text-right">'+i.price+'</td>';
+                  tr+= '</tr>';
+                  $('#tblLevelList').append(tr);
+              })
 
             },
             error: function (jqXHR, textStatus, errorThrown) {

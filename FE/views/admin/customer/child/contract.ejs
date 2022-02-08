@@ -68,7 +68,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      success: function (data, textStatus, xhr) {
+      success: function (data, textStatus, xhr) {      
         $("#slLevel").empty();
         data.jl.forEach((lv) => {
           let opt = '<option value="' + lv._id + '">' + lv.name + "</option>";
