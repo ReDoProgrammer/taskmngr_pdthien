@@ -299,8 +299,7 @@ const getModule = new Promise((resolve, reject) =>  {
     Module
       .findOne({ name: 'ADMIN' })
       .exec()
-      .then(module => {
-        console.log(module);
+      .then(module => {      
         return resolve(module)
       })
       .catch(err => {
