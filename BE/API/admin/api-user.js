@@ -229,134 +229,143 @@ router.delete('/', authenticateAdminToken, (req, res) => {
 router.post("/login", (req, res) => {
   let { username, password } = req.body;
 
-  // Promise.all([getModule, checkAccount(username, password)])
-  //   .then(result => {     
+  Promise.all([getModule, checkAccount(username, password)])
+    .then(result => {     
 
-  //     checkRole(result[1]._id, result[0]._id)
-  //       .then(chk => {
-  //         console.log(chk);
-  //         if (chk) {
-  //           let user = result[1];
-  //           let u = {
-  //             _id: user._id,
-  //             is_admin: true
-  //           };
+      checkRole(result[1]._id, result[0]._id)
+        .then(chk => {          
+          if (chk) {
+            let user = result[1];
+            let u = {
+              _id: user._id,
+              is_admin: true
+            };
 
-  //           const accessToken = generateAccessToken(u);
-  //           const refreshToken = jwt.sign(u, process.env.REFRESH_TOKEN_SECRET);
+            const accessToken = generateAccessToken(u);
+            const refreshToken = jwt.sign(u, process.env.REFRESH_TOKEN_SECRET);
 
-  //           refershTokens.push(refreshToken);
-  //           return res.status(200).json({
-  //             msg: 'Admin login successfully!',
-  //             url: '/admin',
-  //             accessToken: accessToken,
-  //             refreshToken: refreshToken
-  //           });
+            refershTokens.push(refreshToken);
+            return res.status(200).json({
+              msg: 'Admin login successfully!',
+              url: '/admin',
+              accessToken: accessToken,
+              refreshToken: refreshToken
+            });
 
-  //         }
+          }
 
-  //       })
-  //       .catch(err => {
-  //         return res.status(err.code).json({
-  //           msg: err.message
-  //         })
-  //       })
-  //   })
-  //   .catch(err => {
-  //     return res.status(500).json({
-  //       msg:`Login failed with error: ${new Error(err.message)}`
-  //     })
-  //   })
+        })
+        .catch(err => {
+          return res.status(err.code).json({
+            msg: err.message
+          })
+        })
+    })
+    .catch(err => {
+      return res.status(err.code).json({
+        msg:`${new Error(err.msg)}`
+      })
+    })
 
 
 });
 
 
-// const checkRole = (userId, moduleId) => {
-//   return new Promise((resolve, reject) => {
-//     UserModule
-//       .countDocuments({ module: moduleId, user: userId })
-//       .exec()
-//       .then(count => {
-//         if (count == 0) {
-//           return reject({
-//             code: 404,
-//             msg: `Can not found user module role`
-//           })
-//         }
-//         return resolve(true)
-//       })
-//       .catch(err => {
-//         return reject({
-//           code: 500,
-//           msg: `Can not check user role with error: ${new Error(err.message)}`
-//         })
-//       })
-//   })
-// }
+const checkRole = (userId, moduleId) => {
+  return new Promise((resolve, reject) => {
+    UserModule
+      .countDocuments({ module: moduleId, user: userId })
+      .exec()
+      .then(count => {
+        if (count == 0) {
+          return reject({
+            code: 404,
+            msg: `Can not found user module role`
+          })
+        }
+        return resolve(true)
+      })
+      .catch(err => {
+        return reject({
+          code: 500,
+          msg: `Can not check user role with error: ${new Error(err.message)}`
+        })
+      })
+  })
+}
 
-// const getModule = new Promise((resolve, reject) =>  {
+const getModule = new Promise((resolve, reject) =>  {
   
-//     Module
-//       .findOne({ name: 'ADMIN' })
-//       .exec()
-//       .then(module => {
-//         console.log(module);
-//         return resolve(module)
-//       })
-//       .catch(err => {
-//         return reject({
-//           code: 500,
-//           msg: `Can not get admin module with error: ${new Error(err.message)}`
-//         });
-//       })
-//   })
+    Module
+      .findOne({ name: 'ADMIN' })
+      .exec()
+      .then(module => {
+        console.log(module);
+        return resolve(module)
+      })
+      .catch(err => {
+        return reject({
+          code: 500,
+          msg: `Can not get admin module with error: ${new Error(err.message)}`
+        });
+      })
+  })
 
 
 
-// const checkAccount = (username, password) => {
-//   return new Promise((resolve, reject) => {
-//     User
-//       .findOne({ username: username })
-//       .exec()
-//       .then(user => {
-//         if (!user) {
-//           return reject({
-//             code: 404,
-//             msg: `Username not found`
-//           })
-//         }
+const checkAccount = (username, password) => {
+  return new Promise((resolve, reject) => {
+    User
+      .findOne({ username: username })
+      .exec()
+      .then(user => {
+        if (!user) {
+          return reject({
+            code: 404,
+            msg: `Username not found`
+          })
+        }
 
-//         user.ComparePassword(password, function (err, isMatch) {
-//           if (err) {
-//             return reject({
-//               code: 403,
-//               msg: `Can not check password with error: ${new Error(err.message)}`
-//             })
-//           }
-//           if (isMatch) {
-//             return resolve(user);
-//           } else {
-//             return reject({
-//               code: 403,
-//               msg: 'Admin password not match!'
-//             })
-//           }
-//         });
+       
+
+        if(user.is_active){
+          return reject({
+            code:403,
+            msg:`Your account is banned!`,
+            error: `Your account is not actived`
+          })
+        }
+
+        user.ComparePassword(password, function (err, isMatch) {
+          if (err) {
+            return reject({
+              code: 403,
+              msg: `Can not check password with error: ${new Error(err.message)}`
+            })
+          }
+          if (isMatch) {
+            return resolve(user);
+          } else {
+            return reject({
+              code: 403,
+              msg: 'Admin password not match!'
+            })
+          }
+        });
 
 
 
-//       })
-//       .catch(err => {
-//         return reject({
-//           code: 500,
-//           msg: new Error(err.message)
-//         });
-//       })
-//   })
-// }
+      })
+      .catch(err => {
+        return reject({
+          code: 500,
+          msg: new Error(err.message)
+        });
+      })
+  })
+}
 
 function generateAccessToken(user) {
-  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "72h" });
+  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "8h" });
 }
 module.exports = router;
