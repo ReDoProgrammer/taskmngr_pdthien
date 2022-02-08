@@ -19,7 +19,7 @@ router.get('/', authenticateAdminToken, (req, res) => {
       { username: { "$regex": search, "$options": "i" } },
     ]
   })
-    
+
     .exec()
     .then(users => {
       let result = users.slice(process.env.PAGE_SIZE * (page - 1), process.env.PAGE_SIZE);
@@ -37,46 +37,46 @@ router.get('/', authenticateAdminToken, (req, res) => {
     })
 })
 
-router.get('/list',authenticateAdminToken,(req,res)=>{
+router.get('/list', authenticateAdminToken, (req, res) => {
   User
-  .find({})
-  .exec()
-  .then(users=>{
-    return res.status(200).json({
-      msg:`Load all users successfully!`,
-      users
+    .find({})
+    .exec()
+    .then(users => {
+      return res.status(200).json({
+        msg: `Load all users successfully!`,
+        users
+      })
     })
-  })
-  .catch(err=>{
-    console.log(`Can not load all users with error: ${new Error(err.message)}`);
-    return res.status(500).json({
-      msg:`Can not load all users with error: ${new Error(err.message)}`
+    .catch(err => {
+      console.log(`Can not load all users with error: ${new Error(err.message)}`);
+      return res.status(500).json({
+        msg: `Can not load all users with error: ${new Error(err.message)}`
+      })
     })
-  })
 })
 
-router.get('/detail',authenticateAdminToken,(req,res)=>{
-  let {userId} = req.query;
+router.get('/detail', authenticateAdminToken, (req, res) => {
+  let { userId } = req.query;
   User
-  .findById(userId)
-  .exec()
-  .then(user=>{
-    if(user == null){
-      return res.status(404).json({
-        msg:`User not found`
+    .findById(userId)
+    .exec()
+    .then(user => {
+      if (user == null) {
+        return res.status(404).json({
+          msg: `User not found`
+        })
+      }
+      return res.status(200).json({
+        msg: `Get user info successfully!!!`,
+        user
       })
-    }
-    return res.status(200).json({
-      msg:`Get user info successfully!!!`,
-      user
     })
-  })
-  .catch(err=>{
-    return res.status(500).json({
-      msg:`Can not get user info with error: ${new Error(err.message)}`,
-      error: new Error(err.message)
+    .catch(err => {
+      return res.status(500).json({
+        msg: `Can not get user info with error: ${new Error(err.message)}`,
+        error: new Error(err.message)
+      })
     })
-  })
 })
 
 router.post('/', authenticateAdminToken, (req, res) => {
@@ -203,23 +203,23 @@ router.put('/', authenticateAdminToken, (req, res) => {
   })
 })
 
-router.delete('/',authenticateAdminToken,(req,res)=>{
-  let {userId} = req.body;
-  User.findByIdAndDelete(userId,(err,user)=>{
-    if(err){
+router.delete('/', authenticateAdminToken, (req, res) => {
+  let { userId } = req.body;
+  User.findByIdAndDelete(userId, (err, user) => {
+    if (err) {
       return res.status(500).json({
-        msg:`Delete user failed with error: ${new Error(err.message)}`,
+        msg: `Delete user failed with error: ${new Error(err.message)}`,
         error: new Error(err.message)
-      })     
+      })
     }
-    if(user == null){
+    if (user == null) {
       return res.status(404).json({
-        msg:`User not found!`
+        msg: `User not found!`
       })
     }
 
     return res.status(200).json({
-      msg:`User has been deleted!`
+      msg: `User has been deleted!`
     })
   })
 })
@@ -229,125 +229,132 @@ router.delete('/',authenticateAdminToken,(req,res)=>{
 router.post("/login", (req, res) => {
   let { username, password } = req.body;
 
-  Promise.all([getModule,checkAccount(username,password)])
-  .then(result =>{  
-    console.log(result); 
-    checkRole(result[1]._id,result[0]._id)
-    .then(chk=>{      
-      if(chk){
-        let user = result[1];        
-        let u = {
-          _id: user._id,
-          is_admin: true
-        };
-  
-        const accessToken = generateAccessToken(u);
-        const refreshToken = jwt.sign(u, process.env.REFRESH_TOKEN_SECRET);
-  
-        refershTokens.push(refreshToken);
-        return res.status(200).json({
-          msg: 'Admin login successfully!',
-          url: '/admin',
-          accessToken: accessToken,
-          refreshToken: refreshToken
-        });
+  // Promise.all([getModule, checkAccount(username, password)])
+  //   .then(result => {     
 
-      }
-      
-    })
-    .catch(err=>{
-      return res.status(err.code).json({
-        msg: err.message
-      })
-    })
-  })
-  .catch(err=>{
-    console.log(err);
-  })
+  //     checkRole(result[1]._id, result[0]._id)
+  //       .then(chk => {
+  //         console.log(chk);
+  //         if (chk) {
+  //           let user = result[1];
+  //           let u = {
+  //             _id: user._id,
+  //             is_admin: true
+  //           };
 
- 
+  //           const accessToken = generateAccessToken(u);
+  //           const refreshToken = jwt.sign(u, process.env.REFRESH_TOKEN_SECRET);
+
+  //           refershTokens.push(refreshToken);
+  //           return res.status(200).json({
+  //             msg: 'Admin login successfully!',
+  //             url: '/admin',
+  //             accessToken: accessToken,
+  //             refreshToken: refreshToken
+  //           });
+
+  //         }
+
+  //       })
+  //       .catch(err => {
+  //         return res.status(err.code).json({
+  //           msg: err.message
+  //         })
+  //       })
+  //   })
+  //   .catch(err => {
+  //     return res.status(500).json({
+  //       msg:`Login failed with error: ${new Error(err.message)}`
+  //     })
+  //   })
+
+
 });
 
 
-const checkRole = (userId,moduleId)=>{
-  return new Promise((resolve,reject)=>{
-    UserModule
-    .countDocuments({module:moduleId,user:userId})
-    .exec()
-    .then(count=>{
-      if(count == 0){
-        return reject({
-          code:404,
-          msg:`Can not found user module role`
-        })
-      }
-      return resolve(true)
-    })
-    .catch(err=>{
-      return reject({
-        code:500,
-        msg:`Can not check user role with error: ${new Error(err.message)}`
-      })
-    })
-  })
-}
+// const checkRole = (userId, moduleId) => {
+//   return new Promise((resolve, reject) => {
+//     UserModule
+//       .countDocuments({ module: moduleId, user: userId })
+//       .exec()
+//       .then(count => {
+//         if (count == 0) {
+//           return reject({
+//             code: 404,
+//             msg: `Can not found user module role`
+//           })
+//         }
+//         return resolve(true)
+//       })
+//       .catch(err => {
+//         return reject({
+//           code: 500,
+//           msg: `Can not check user role with error: ${new Error(err.message)}`
+//         })
+//       })
+//   })
+// }
 
-const getModule = new Promise((resolve,reject)=>{
-  Module
-  .findOne({name:'ADMIN'})
-  .exec()
-  .then(module=>{
-    return resolve(module)
-  })
-  .catch(err=>{
-    return reject({
-      code:500,
-      msg:`Can not get admin module with error: ${new Error(err.message)}`
-    });
-  })
-})
-
-const checkAccount = (username,password)=>{
-  return new Promise((resolve,reject)=>{
-    User
-    .findOne({username:username})
-    .exec()
-    .then(user=>{
-      if(!user){
-        return reject({
-          code: 404,
-          msg:`Username not found`
-        })
-      }
-
-      user.ComparePassword(password, function (err, isMatch) {
-        if (err) {
-          return reject({
-            code:403,
-            msg:`Can not check password with error: ${new Error(err.message)}`
-          })
-        }
-        if (isMatch) {
-          return resolve(user);         
-        } else {
-          return reject({
-            code:403,
-            msg: 'Admin password not match!'
-          })
-        }
-      });
+// const getModule = new Promise((resolve, reject) =>  {
+  
+//     Module
+//       .findOne({ name: 'ADMIN' })
+//       .exec()
+//       .then(module => {
+//         console.log(module);
+//         return resolve(module)
+//       })
+//       .catch(err => {
+//         return reject({
+//           code: 500,
+//           msg: `Can not get admin module with error: ${new Error(err.message)}`
+//         });
+//       })
+//   })
 
 
 
-    })
-    .catch(err=>{
-      return reject({
-        code:500,
-        msg: new Error(err.message)
-      });
-    })
-  })
-}
+// const checkAccount = (username, password) => {
+//   return new Promise((resolve, reject) => {
+//     User
+//       .findOne({ username: username })
+//       .exec()
+//       .then(user => {
+//         if (!user) {
+//           return reject({
+//             code: 404,
+//             msg: `Username not found`
+//           })
+//         }
+
+//         user.ComparePassword(password, function (err, isMatch) {
+//           if (err) {
+//             return reject({
+//               code: 403,
+//               msg: `Can not check password with error: ${new Error(err.message)}`
+//             })
+//           }
+//           if (isMatch) {
+//             return resolve(user);
+//           } else {
+//             return reject({
+//               code: 403,
+//               msg: 'Admin password not match!'
+//             })
+//           }
+//         });
+
+
+
+//       })
+//       .catch(err => {
+//         return reject({
+//           code: 500,
+//           msg: new Error(err.message)
+//         });
+//       })
+//   })
+// }
 
 function generateAccessToken(user) {
   return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "72h" });
