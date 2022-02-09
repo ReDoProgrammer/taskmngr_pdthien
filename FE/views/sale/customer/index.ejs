@@ -63,8 +63,7 @@
                 data: {
                     id: $(this).closest("tr").attr("id")
                 },
-                success: function (data) {
-                    console.log(data);
+                success: function (data) {                    
                     $('#lblCustomerFullname').text(data.customer.firstname + ' ' + data.customer.lastname);
                     $('#lblCustomerPhone').text(data.customer.phone);
                     $('#lblCustomerEmail').text(data.customer.email);
@@ -91,7 +90,7 @@
                     data.customers.forEach(cus => {
                         let tr = '<tr id = "' + cus._id + '">';
                         tr += '<td>' + (idx++) + '</td>';
-                        tr += '<td class="font-weight-bold">' + cus.firstname + ' ' + cus.lastname + '</td>';
+                        tr += '<td class="font-weight-bold text-info">' + cus.firstname + ' ' + cus.lastname + '</td>';
                         tr += '<td>' + cus.phone + '</td>';
                         tr += '<td>' + cus.email + '</td>';
                         tr += '<td class="text-right"><button class="btn-sm btn-primary" name="btnAddJob"><i class="fa fa-plus" aria-hidden="true"></i> Add job</button></td>'

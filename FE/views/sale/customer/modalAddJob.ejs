@@ -2,12 +2,13 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-body">
-        <div class="card text-white bg-dark">
-          <div class="card-header"><i class="fa fa-plus" aria-hidden="true"></i> Add a new job</div>
-          <div class="card-body">
+        <div class="panel panel-primary text-white bg-dark">
+          <div class="panel-heading text-info font-weight-bold"><i class="fa fa-plus" aria-hidden="true"></i> Add a new
+            job</div>
+          <div class="panel-body">
             <div class="row form-group">
               <div class="col-sm-4">Customer:</div>
-              <div class="col-sm-8 font-weight-bold text-warning" id="lblCustomerFullname"></div>
+              <div class="col-sm-8 font-weight-bold text-info" id="lblCustomerFullname"></div>
             </div>
             <div class="row form-group">
               <div class="col-sm-4">Phone:</div>
@@ -45,15 +46,17 @@
               </div>
             </div>
 
-            <div class="row form-group">
-              <label for="">Intruction:</label>
-              <textarea name="" id="txaIntruction" rows="2" class="form-control"></textarea>
+            <div class="row">
+              <div class="col-sm-12 form-group">
+                <label for="">Intruction:</label>
+                <textarea name="" id="txaIntruction" rows="2" class="form-control"></textarea>
+              </div>
             </div>
 
 
 
             <div class="form-group text-right">
-              <button type="button" class="btn btn-sm btn-warning" id="btnSubmitJob">Submit job</button>
+              <button type="button" class="btn btn-sm btn-primary" id="btnSubmitJob">Submit job</button>
               <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
             </div>
           </div>
@@ -76,7 +79,7 @@
     let delivery_date = $('#txtDeliveryDate').val();
     let intruction = $('#txaIntruction').val();
 
-   
+
     $.ajax({
       url: '/sale/job',
       type: 'post',
@@ -84,13 +87,13 @@
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       data: { customer, name, source_link, received_date, delivery_date, intruction },
-      success:function(data){
+      success: function (data) {
         alert(data.msg);
         $('#addJobModal').modal('hide');
         customerId = "";
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        alert(jqXHR.responseJSON.msg);       
+        alert(jqXHR.responseJSON.msg);
       },
     })
   })
