@@ -52,6 +52,29 @@ router.get('/detail',authenticateTLAToken,(req,res)=>{
     })
 })
 
+router.put('/change-status',authenticateTLAToken,(req,res)=>{
+    let {jobId,status} = req.body;
+    Job.findByIdAndUpdate(jobId,{
+        status
+    },{new:true},(err,job)=>{
+        if(err){
+            return res.status(500).json({
+                msg:`Can not update job status with error: ${new Error(err.message)}`
+            })
+        }
+        
+        if(!job){
+            return res.status(404).json({
+                msg:`Job not found to update status`
+            })
+        }
+        return res.status(200).json({
+            msg:`Update job status successfully!`,
+            job
+        })
+    })
+})
+
 
 
 module.exports = router;

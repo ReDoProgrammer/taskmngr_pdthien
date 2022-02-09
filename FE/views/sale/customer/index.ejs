@@ -54,6 +54,12 @@
 
         $(document).on("click", "button[name='btnAddJob']", function () {
             customerId = $(this).closest("tr").attr("id");
+            $('#txtName').val('');
+            $('#txtLinkSource').val('');
+            $('#txtReceivedDate').val('');
+            $('#txtDeliveryDate').val('');
+            $('#txaIntruction').val('');
+
             $.ajax({
                 url: '/sale/customer/detail',
                 type: 'get',

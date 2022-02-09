@@ -75,6 +75,7 @@
                 },
                 success: function (data, textStatus, xhr) {
                     let idx = 1;
+                    $('#tblData').empty();
                     data.jobs.forEach(job => {
 
                         let tr = '<tr id = "' + job._id + '" data-customer="' + job.customer._id + '" >';
