@@ -2,52 +2,56 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body text-dark">
-        <div class="card mb-3">
-          <div class="card-header font-weight-bold">Summary</div>
-          <div class="card-body">
+        <div class="panel panel-info mb-3">
+          <div class="panel-heading font-weight-bold">Summary</div>
+          <div class="panel-body">
             <div class="row">
-              <div class="col-md-3">
+              <div class="col-md-2">
                 <label class="font-weight-bold">Job name:</label>
               </div>
-              <div class="col-md-9">
+              <div class="col-md-10">
                 <label id="name_case" class="font-weight-bold font-italic"></label>
               </div>
             </div>
             <div class="row">
-              <div class="col-md-3">
+              <div class="col-md-2">
                 <label class="font-weight-bold">Remark:</label>
               </div>
-              <div class="col-md-9">
+              <div class="col-md-10">
                 <label id="customer_remark" class="text-warning"></label>
               </div>
             </div>
 
             <div class="row">
-              <div class="col-md-3">
+              <div class="col-md-2">
                 <label class="font-weight-bold">Intruction:</label>
               </div>
-              <div class="col-md-9">
+              <div class="col-md-10">
                 <label id="job_intruction" class="text-warning"></label>
               </div>
             </div>
           </div>
         </div>
 
-        <table class="table mt-1 table-striped bg-white text-dark">
-          <thead class="thead-dark">
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Level</th>
-              <th scope="col">Remark</th>            
-              <th scope="col">Editor</th>
-              <th scope="col">Q.C</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="tblTasks"></tbody>
-        </table>
+        <div class="table-responsive mt-2">
+          <table class="table mt-1 table-striped bg-white text-dark">
+            <thead class="thead-dark">
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Level</th>
+                <th scope="col">Remark</th>            
+                <th scope="col">Editor</th>
+                <th scope="col">Q.C</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tblTasks"></tbody>
+          </table>
+        </div>
 
-        <hr />
+        
+
+
         <div class="form-row" id="divLevel">
 
           <div class="col-sm-3">
@@ -100,10 +104,7 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
           Close
-        </button>
-        <button type="button" class="btn btn-primary" id="btnSubmit">
-          Submit task
-        </button>
+        </button>       
       </div>
     </div>
   </div>
@@ -318,8 +319,8 @@
 
           tr += '<td class="text-right">';
 
-          tr += '<button class="btn btn-sm btn-secondary" name="btnAssignStaff"><i class="fa fa-plus" aria-hidden="true"></i> Assign staff</button>';
-          tr += '<button class="ml-1 btn btn-sm btn-danger" name="btnDelTask"><i class="fa fa-trash text-white" aria-hidden="true"></i></button>';
+          tr += '<button class="btn btn-xs btn-primary" name="btnAssignStaff"><i class="fa fa-plus" aria-hidden="true"></i> Assign staff</button>';
+          tr += '<button class="ml-1 btn btn-xs btn-danger" name="btnDelTask"><i class="fa fa-trash text-white" aria-hidden="true"></i></button>';
           tr += '</td>';
           tr += "</tr>";
 
