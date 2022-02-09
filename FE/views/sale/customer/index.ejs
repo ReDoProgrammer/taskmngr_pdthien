@@ -1,33 +1,36 @@
 <div class="row">
-    <div class="col-md-9">
+    <div class="col-md-9 col-sm-6 col-xs-6">
         <nav aria-label="Page navigation example" class="mt-2">
             <ul class="pagination" id="pagination"></ul>
         </nav>
     </div>
-    <div class="col-md-3 text-right">
+    <div class="col-md-3 text-right col-sm-6 col-xs-6">
         <!-- Another variation with a button -->
         <div class="input-group">
-            <input type="text" class="form-control" placeholder="Search this blog" />
-            <div class="input-group-append">
-                <button class="btn btn-secondary" type="button">
-                    <i class="fa fa-search"></i>
+            <input type="text" class="form-control" placeholder="Seach customer" id="txtSearch" />
+            <div class="input-group-btn">
+                <button class="btn btn-info" type="submit" id="btnSearch">
+                    <i class="fa fa-search" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
     </div>
 </div>
-<table class="table mt-1 table-striped">
-    <thead class="thead-dark">
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">Customer</th>
-            <th scope="col">Phone</th>
-            <th scope="col">Email</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody id="tblData" class="bg-white text-dark"></tbody>
-</table>
+<div class="table-responsive-sm">
+    <table class="table mt-1 table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Customer</th>
+                <th scope="col">Phone</th>
+                <th scope="col">Email</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="tblData"></tbody>
+    </table>
+</div>
+
 <nav aria-label="...">
     <ul class="pagination pagination-sm">
         <li class="page-item disabled">
@@ -52,17 +55,17 @@
         $(document).on("click", "button[name='btnAddJob']", function () {
             customerId = $(this).closest("tr").attr("id");
             $.ajax({
-                url:'/sale/customer/detail',
-                type:'get',
+                url: '/sale/customer/detail',
+                type: 'get',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem("accessToken"),
                 },
-                data:{
-                    id:$(this).closest("tr").attr("id")
+                data: {
+                    id: $(this).closest("tr").attr("id")
                 },
-                success:function(data){
+                success: function (data) {
                     console.log(data);
-                    $('#lblCustomerFullname').text(data.customer.firstname+' '+data.customer.lastname);
+                    $('#lblCustomerFullname').text(data.customer.firstname + ' ' + data.customer.lastname);
                     $('#lblCustomerPhone').text(data.customer.phone);
                     $('#lblCustomerEmail').text(data.customer.email);
                 }
@@ -84,14 +87,14 @@
                 },
                 success: function (data) {
                     $('#tblData').empty();
-                    let idx = 1;                   
+                    let idx = 1;
                     data.customers.forEach(cus => {
                         let tr = '<tr id = "' + cus._id + '">';
                         tr += '<td>' + (idx++) + '</td>';
                         tr += '<td class="font-weight-bold">' + cus.firstname + ' ' + cus.lastname + '</td>';
                         tr += '<td>' + cus.phone + '</td>';
                         tr += '<td>' + cus.email + '</td>';
-                        tr += '<td class="text-right"><button class="btn-sm btn-warning" name="btnAddJob"><i class="fa fa-plus text-success" aria-hidden="true"></i> Add job</button></td>'
+                        tr += '<td class="text-right"><button class="btn-sm btn-primary" name="btnAddJob"><i class="fa fa-plus" aria-hidden="true"></i> Add job</button></td>'
                         tr += '</tr>';
                         $('#tblData').append(tr);
                     });
