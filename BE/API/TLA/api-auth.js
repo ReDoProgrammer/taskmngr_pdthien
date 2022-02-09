@@ -50,7 +50,7 @@ router.post("/login", (req, res) => {
 
       if (isMatch) {
         getTLAModule
-          .then(result => {
+          .then(result => {           
             getRole(result.mod._id, user._id)
               .then(_ => {
                 
@@ -109,7 +109,7 @@ const getRole = (moduleId, userId) => {
           code: 500,
           msg: `Can not check user module role with error: ${new Error(err.message)}`
         })
-      }
+      }    
       if (count == 0) {
         return reject({
           code: 403,
@@ -125,7 +125,7 @@ const getRole = (moduleId, userId) => {
 }
 
 const getTLAModule = new Promise((resolve, reject) => {
-  Module.find({ name: 'TLA' })
+  Module.findOne({ name: 'TLA' })
     .exec()
     .then(mod => {
       return resolve({
