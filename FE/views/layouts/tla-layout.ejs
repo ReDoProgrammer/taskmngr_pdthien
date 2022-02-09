@@ -1,46 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
 
-    <%-include('child/common')%>
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <%-include('child/common')%>
     <title>TLA Dashboard - BamBoo Photo</title>
-  </head>
-  <body>   
-    <%- include('child/TLA/navbar') %>
-    <div class="container-fluid mt-10">
-     
-    
-        <div class="card text-white bg-secondary  mt-5" style="margin-top: 50px; display: block;">
-          <div class="card-header font-weight-bold"><%=title%></div>
-          <div class="card-body" style="min-height: 500px !important;">
-            <%-body%>
-          </div>
-          <div class="card-footer bg-dark" id="footer">
-            <h6>BambooPhoto - TLA Module</h6>
-          </div>
+</head>
+
+<body>
+  <%- include('child/TLA/navbar') %>
+    <div class="container-fluid mt-2">
+      <div class="panel panel-primary">
+        <div class="panel-heading font-weight-bold">TLA - <%=title%>
         </div>
-      
+        <div class="panel-body" style="min-height: 500px !important;">
+          <%-body%>
+        </div>
+        <div class="panel-footer bg-dark" id="footer">
+          <h6>BambooPhoto - TLA Module</h6>
+        </div>
+      </div>
+
     </div>
-  </body>
+</body>
+
 </html>
 
-<style>
 
-    #footer{
-    left:0;
-    right:0;
-     position:fixed;
-     bottom:0px;
-     z-index:300;
-     box-shadow: 9px 1px 10px 0px #242424;
-     padding-bottom:2px; 
-     background-color:#ffffff;
-    }
 
-</style>

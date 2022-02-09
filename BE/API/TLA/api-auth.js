@@ -55,8 +55,7 @@ router.post("/login", (req, res) => {
               .then(_ => {
                 
                 let u = {
-                  _id: user._id,
-                  is_tla: true
+                  _id: user._id                 
                 };
 
                 const accessToken = generateAccessToken(u);

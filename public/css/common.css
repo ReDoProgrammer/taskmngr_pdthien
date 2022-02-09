@@ -1,0 +1,33 @@
+.ml-1{ 
+  margin-left: 3px !important;
+}
+.ml-2{ 
+  margin-left: 10px !important;
+}
+.mt-1{
+  margin-top: 7px !important;
+}
+.mt-2{
+  margin-top: 10px !important;
+}
+
+.mt-3{
+  margin-top: 15px !important;
+}
+
+
+.font-weight-bold{
+  font-weight: bold;
+}
+
+
+#footer{
+  left:0;
+  right:0;
+   position:fixed;
+   bottom:0px;
+   z-index:300;
+   box-shadow: 9px 1px 10px 0px #242424;
+   padding-bottom:2px; 
+   background-color:#ffffff;
+  }

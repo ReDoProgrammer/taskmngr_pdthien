@@ -1,6 +1,8 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const UserModule = require('../BE/models/user-module-model');
+const _MODULE = 'TLA';
+const Module = require('../BE/models/module-model');
 
 function authenticateTLAToken(req, res, next) {
   const authHeader = req.headers["authorization"];
@@ -19,21 +21,30 @@ function authenticateTLAToken(req, res, next) {
 
     }
 
-    UserModule
-      .countDocuments({ user: user._id }, (err, count) => {
-        if (err) {
-          return res.status(500).json({
-            msg: `Can not check user module with error: ${new Error(err.message)}`
-          })
-        }
+    getModuleId
+      .then(mod => {
+        UserModule
+          .countDocuments({ user: user._id, module: mod._id }, (err, count) => {
+            if (err) {
+              return res.status(500).json({
+                msg: `Can not check user module with error: ${new Error(err.message)}`
+              })
+            }
 
-        if (count == 0) {
-          return res.status(403).json({
-            msg: `You can not access this module`
-          })
-        }
-        req.user = user;
-        next();
+            if (count == 0) {
+              return res.status(403).json({
+                msg: `You can not access this module`
+              })
+            }
+            req.user = user;
+            next();
+          })     
+
+      })
+      .catch(err => {
+        return res.status(err.code).json({
+          msg: err.msg
+        })
       })
 
 
@@ -47,3 +58,29 @@ function authenticateTLAToken(req, res, next) {
 module.exports = {
   authenticateTLAToken
 }
+
+
+const getModuleId = new Promise((resolve, reject) => {
+  Module
+    .findOne({ name: _MODULE })
+    .exec()
+    .then(mod => {
+      if (!mod) {
+        return reject({
+          code: 404,
+          msg: `Module not found`
+        })
+      }
+      return resolve({
+        code: 200,
+        msg: `Module found`,
+        mod
+      })
+    })
+    .catch(err => {
+      return reject({
+        code: 500,
+        msg: `Can not get module with error: ${new Error(err.message)}`
+      })
+    })
+})
