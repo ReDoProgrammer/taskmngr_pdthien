@@ -22,9 +22,9 @@ function authenticateTLAToken(req, res, next) {
     }
 
     getModuleId
-      .then(mod => {
+      .then(result => {
         UserModule
-          .countDocuments({ user: user._id, module: mod._id }, (err, count) => {
+          .countDocuments({ user: user._id, module: result.mod._id }, (err, count) => {
             if (err) {
               return res.status(500).json({
                 msg: `Can not check user module with error: ${new Error(err.message)}`

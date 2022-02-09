@@ -2,6 +2,9 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const _MODULE = 'SALE';
 const Module = require('../BE/models/module-model');
+const UserModule = require('../BE/models/user-module-model');
+
+
 function authenticateSaleToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -20,9 +23,10 @@ function authenticateSaleToken(req, res, next) {
     }
 
     getModuleId
-      .then(mod => {
+      .then(result => {
+        
         UserModule
-          .countDocuments({ user: user._id, module: mod._id }, (err, count) => {
+          .countDocuments({ user: user._id, module: result.mod._id }, (err, count) => {
             if (err) {
               return res.status(500).json({
                 msg: `Can not check user module with error: ${new Error(err.message)}`
@@ -34,12 +38,14 @@ function authenticateSaleToken(req, res, next) {
                 msg: `You can not access this module`
               })
             }
+
             req.user = user;
             next();
           })     
 
       })
       .catch(err => {
+        console.log(err);
         return res.status(err.code).json({
           msg: err.msg
         })
@@ -60,7 +66,7 @@ const getModuleId = new Promise((resolve, reject) => {
   Module
     .findOne({ name: _MODULE })
     .exec()
-    .then(mod => {
+    .then(mod => {     
       if (!mod) {
         return reject({
           code: 404,
