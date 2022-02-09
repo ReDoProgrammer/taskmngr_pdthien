@@ -1,5 +1,5 @@
-<div class="row">
-    <div class="offset-md-7 col-md-2">
+<div class="row mt-2">
+    <div class="col-md-offset-7 col-md-2 col-sm-offset-5 col-sm-3 col-xs-6">
         <select name="" id="" class="form-control">
             <option value="">Open</option>
             <option value="">Processing</option>
@@ -10,21 +10,19 @@
         </select>
     </div>
 
-    <div class="col-md-3 text-right">
-        <!-- Another variation with a button -->
+    <div class="col-md-3 col-sm-4 col-xs-6 text-right">
         <div class="input-group">
-            <input type="text" class="form-control" placeholder="Search ..." />
-            <div class="input-group-append">
-                <button class="btn btn-warning" type="button">
-                    <i class="fa fa-search text-danger"></i>
+            <input type="text" class="form-control" placeholder="Seach job..." id="txtSearch" />
+            <div class="input-group-btn">
+                <button class="btn btn-warning" type="submit" id="btnSearch">
+                    <i class="fa fa-search" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<div class="tableFixHead" id="tblMaster">
-
+<div class="tableFixHead table-responsive">
     <table class="table mt-1 table-striped bg-white text-dark">
         <thead class="thead-dark">
             <tr>
@@ -44,7 +42,7 @@
 </div>
 
 <script type='text/javascript'
-  src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
+    src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
 
 
 <%-include('assign-job-modal')%>
@@ -53,7 +51,7 @@
         var search = '';
         var page = 1;
         var jobId = '';
-        
+
 
         $(document).ready(function () {
             LoadJob();
@@ -76,11 +74,12 @@
                 },
                 success: function (data, textStatus, xhr) {
                     let idx = 1;
+                    console.log(data);
                     data.jobs.forEach(job => {
                         let tr = '<tr id = "' + job._id + '">';
                         tr += '<td>' + (idx++) + '</td>'
-                        tr += '<td>' + job.customer.firstname + ' ' + job.customer.lastname + '</td>';
-                        tr += '<td>' + job.name + '</td>';
+                        tr += '<td class="text-info font-weight-bold">' + job.customer.firstname + ' ' + job.customer.lastname + '</td>';
+                        tr += '<td class="text-warning">' + job.name + '</td>';
                         tr += '<td>' + job.intruction + '</td>';
                         tr += "<td>" + new Date(job.received_date).toLocaleString() + "</td>";
                         tr += "<td>" + new Date(job.delivery_date).toLocaleString() + "</td>";
@@ -106,7 +105,7 @@
                                 break;
                         }
                         tr += '</i></td>';
-                        tr += '<td class="font-weight-bold"><button class="btn btn-sm btn-info" name="assign-job"><i class="fa fa-tasks text-warning" aria-hidden="true"></i> Assign level</button></td>'
+                        tr += '<td class="font-weight-bold text-right"><button class="btn btn-sm btn-primary" name="assign-job"><i class="fa fa-tasks" aria-hidden="true"></i> Assign level</button></td>'
                         tr += '</tr>';
                         $('#tblData').append(tr);
                     })
@@ -132,7 +131,7 @@
                 },
                 success: function (data, textStatus, xhr) {
 
-                    $('#assignJobModal').modal();                    
+                    $('#assignJobModal').modal();
 
                     $('#customer_fullname').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
                     $('#name_case').text(data.job.name);
@@ -202,18 +201,18 @@
 
 
 
-    
-        function LoadLevels(){
+
+        function LoadLevels() {
             $.ajax({
-                url:'/tla/level',
-                type:'get',
+                url: '/tla/level',
+                type: 'get',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem("accessToken"),
                 },
-                success:function(data){
+                success: function (data) {
                     console.log(data);
-                    data.levels.forEach(l=>{
-                       
+                    data.levels.forEach(l => {
+
                     })
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -221,7 +220,7 @@
                 }
             })
         }
-    
+
     </script>
 
 
@@ -235,7 +234,7 @@
             overflow-y: auto;
         }
 
-        
+
 
 
         .tableFixHead thead th {

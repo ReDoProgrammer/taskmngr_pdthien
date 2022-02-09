@@ -1,20 +1,18 @@
 
+<ul class="nav nav-tabs">
+  <li class="active font-weight-bold"><a data-toggle="tab" href="#job-list">Job list</a></li>
+  <li class="font-weight-bold"><a data-toggle="tab" href="#task-list">Task list</a></li>  
+</ul>
 
-<ul class="nav nav-pills" id="pills-tab" role="tablist">
-    <li class="nav-item">
-      <a class="nav-link active text-white font-weight-bold" id="pills-jobs-tab" data-toggle="pill" href="#pills-jobs" role="tab" aria-controls="pills-jobs" aria-selected="true">Jobs list</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link text-white font-weight-bold" id="pills-tasks-tab" data-toggle="pill" href="#pills-tasks" role="tab" aria-controls="pills-tasks" aria-selected="false">Levels list</a>
-    </li>
-    
-  </ul>
-  <div class="tab-content" id="pills-tabContent">
-    <div class="tab-pane fade show active" id="pills-jobs" role="tabpanel" aria-labelledby="pills-jobs-tab">
-        <%-include('jobs-list')%>
-    </div>
-    <div class="tab-pane fade" id="pills-tasks" role="tabpanel" aria-labelledby="pills-tasks-tab">
-        <%-include('tasks-list')%>
-    </div>   
+<div class="tab-content">
+  <div id="job-list" class="tab-pane fade in active">
+    <%-include('jobs-list')%>
   </div>
+  <div id="task-list" class="tab-pane fade">
+    <%-include('tasks-list')%>
+  </div>  
+</div>
+
+
+
 
