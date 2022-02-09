@@ -107,7 +107,13 @@
                                 break;
                         }
                         tr += '</i></td>';
-                        tr += '<td class="font-weight-bold text-right"><button class="btn btn-sm btn-primary" name="assign-job"><i class="fa fa-tasks" aria-hidden="true"></i> Assign level</button></td>'
+                        
+                        if(job.status == -1 || job.status == 0){
+                            tr += '<td class="font-weight-bold text-right"><button class="btn btn-sm btn-primary" name="assign-job"><i class="fa fa-tasks" aria-hidden="true"></i> Assign level</button></td>'
+                        }else{
+                            tr+= '<td></td>';
+                        }
+                        
                         tr += '</tr>';
                         $('#tblData').append(tr);
                     })
