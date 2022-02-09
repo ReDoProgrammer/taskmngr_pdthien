@@ -1,7 +1,9 @@
 const router = require('express').Router();
 const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const Task = require('../../models/task-model');
-const moment = require('moment');
+const CustomerLevel = require('../../models/customer-level-model');
+const Wage = require('../../models/wage-model');
+const Job = require('../../models/job-model');
 
 router.get('/list', authenticateTLAToken, (req, res) => {
     let { jobId } = req.query;
@@ -58,23 +60,48 @@ router.get('/detail', authenticateTLAToken, (req, res) => {
 
 router.post('/', authenticateTLAToken, (req, res) => {
     let { job, level, remark } = req.body;
+
+    getCustomerIdFromJob(job)
+    .then(result=>{
+        
+        getCustomerLevelPrice(result.customerId,level)
+        .then(result=>{
+            console.log(result);
+        })
+        .catch(err=>{
+            return res.status(err.code).json({
+                msg:err.msg
+            })
+        })
+    })
+    .catch(err=>{
+        return res.status(err.code).json({
+            msg:err.msg
+        })
+    })
+
+
+
     let task = new Task({
         job,
         level,
         remark
     });
-    task.save()
-        .then(_ => {
-            return res.status(201).json({
-                msg: `Task has been created`
-            })
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not create task with error: ${new Error(err.message)}`,
-                error: new Error(err.message)
-            })
-        })
+
+
+
+    // task.save()
+    //     .then(_ => {
+    //         return res.status(201).json({
+    //             msg: `Task has been created`
+    //         })
+    //     })
+    //     .catch(err => {
+    //         return res.status(500).json({
+    //             msg: `Can not create task with error: ${new Error(err.message)}`,
+    //             error: new Error(err.message)
+    //         })
+    //     })
 
 })
 
@@ -145,5 +172,85 @@ router.delete('/', authenticateTLAToken, (req, res) => {
 
 module.exports = router;
 
+const getCustomerIdFromJob = (jobId)=>{
+    return new Promise((resolve,reject)=>{
+        Job
+        .findById(jobId)
+        .exec()
+        .then(j=>{            
+            if(!j){
+                return reject({
+                    code:404,
+                    msg:`Job not found`
+                })
+            }
+            return resolve({
+                code:200,
+                msg:`Job found`,
+                customerId:j.customer
+            })
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not get job with error: ${new Error(err.message)}`
+            })
+        })
+    })
+}
 
+const getWage = (userGroupId,moduleId)=>{
+    return new Promise((resolve,reject)=>{
+        Wage
+        .findOne({user_group:userGroupId,module:moduleId})
+        .exec()
+        .then(w=>{
+            if(!w){
+                return reject({
+                    code:404,
+                    msg:`Wage not found`                   
+                })
+            }
+            return resolve({
+                code:200,
+                msg:`Wage found`,
+                w
+            })
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not get wage with error: ${new Error(err.message)}`
+            })
+        })
+    })
+}
+
+
+const getCustomerLevelPrice = (customerId,levelId)=>{
+    return new Promise((resolve,reject)=>{
+        CustomerLevel.findOne({customer:customerId,level:levelId})
+        .exec()
+        .then(cl=>{
+            console.log(cl,customerId,levelId);
+            if(!cl){
+                return reject({
+                    code:404,
+                    msg:`Customer level not found`
+                })
+            }
+            return resolve({
+                code:200,
+                msg:`Customer level found`,
+                cl
+            })
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Customer level can not found with error: ${new Error(err.message)}`
+            })
+        })
+    })
+}
 

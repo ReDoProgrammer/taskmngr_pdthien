@@ -12,11 +12,21 @@ const taskSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'job-level'
     },
+    level_price:{
+        //lưu thông tin đơn giá của level để tính cho khách hàng
+        type:Number,
+        default:0
+    },
 
     qa: {
         //lưu id của nhân viên Q.A
         type: Schema.Types.ObjectId,
         ref: 'user'
+    },
+    qa_wage:{
+        //lưu tiền công của Q.A
+        type:Number,
+        default:0
     },
     qa_assigned:{
         //true: task này đc TLA assign trực tiếp cho 1 nhân viên làm Q.A 
@@ -28,6 +38,11 @@ const taskSchema = new Schema({
         //lưu id nhân viên làm Editor
         type: Schema.Types.ObjectId,
         ref: 'user'
+    },
+    editor_wage:{
+        //lưu tiền công của editor
+        type:Number,
+        default:0
     },
     editor_assigned:{
         //khi true <=> task này đc TLA assign trực tiếp cho 1 nhân viên làm Editor
