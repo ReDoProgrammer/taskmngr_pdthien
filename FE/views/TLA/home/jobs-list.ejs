@@ -51,6 +51,7 @@
         var search = '';
         var page = 1;
         var jobId = '';
+        var customerId = '';
 
 
         $(document).ready(function () {
@@ -74,9 +75,9 @@
                 },
                 success: function (data, textStatus, xhr) {
                     let idx = 1;
-                    console.log(data);
                     data.jobs.forEach(job => {
-                        let tr = '<tr id = "' + job._id + '">';
+
+                        let tr = '<tr id = "' + job._id + '" data-customer="' + job.customer._id + '" >';
                         tr += '<td>' + (idx++) + '</td>'
                         tr += '<td class="text-info font-weight-bold">' + job.customer.firstname + ' ' + job.customer.lastname + '</td>';
                         tr += '<td class="text-warning">' + job.name + '</td>';
@@ -119,7 +120,8 @@
 
 
         $(document).on("click", "button[name='assign-job']", function () {
-            jobId = $(this).closest("tr").attr("id");
+            jobId = $(this).closest('tr').attr('id');
+            customerId = $(this).closest('tr').data('customer');
             $.ajax({
                 url: '/tla/job/detail',
                 type: 'get',
@@ -222,39 +224,3 @@
         }
 
     </script>
-
-
-    <style>
-        .tableFixHead {
-            overflow: auto;
-        }
-
-        #tblMaster {
-            height: 500px;
-            overflow-y: auto;
-        }
-
-
-
-
-        .tableFixHead thead th {
-            position: sticky;
-            top: 0;
-            z-index: 1;
-        }
-
-        /* Just common table stuff. Really. */
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        th,
-        td {
-            padding: 8px 16px;
-        }
-
-        th {
-            background: #eee;
-        }
-    </style>

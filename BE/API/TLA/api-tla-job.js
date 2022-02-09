@@ -6,7 +6,7 @@ const Job = require('../../models/job-model');
 router.get('/list',authenticateTLAToken,(req,res)=>{
     let {page,search} = req.query;
     Job.find({})
-    .populate('customer','firstname lastname remark -_id')
+    .populate('customer','firstname lastname remark')
     .exec()
     .then(jobs=>{
         
@@ -24,6 +24,7 @@ router.get('/list',authenticateTLAToken,(req,res)=>{
 })
 
 router.get('/detail',authenticateTLAToken,(req,res)=>{
+
     let {id} = req.query;
     Job.findById(id)
     .populate({path:'customer',populate:({path:'cloud', select:'name -_id'})})   
@@ -33,6 +34,11 @@ router.get('/detail',authenticateTLAToken,(req,res)=>{
     .populate({path:'customer',populate:({path:'size',select:'name -_id'})})        
     .exec()
     .then(job=>{
+        if(!job){
+            return res.status(404).json({
+                msg:`Job not found!`
+            })
+        }
         return res.status(200).json({
             msg:'Get job detail successfully!',
             job:job

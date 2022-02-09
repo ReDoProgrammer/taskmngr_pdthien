@@ -189,11 +189,12 @@
 
   $("#assignJobModal").on('shown.bs.modal', function (e) {
     LoadTasks();
+    LoadJobLevels();
   });
 
 
   $(document).ready(function () {
-    LoadJobLevels();
+   
     LoadStaffs();
     $('#divAssign').hide();
 
@@ -260,14 +261,19 @@
   }
 
   function LoadJobLevels() {
+    
     $.ajax({
       url: '/tla/job-level',
       type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      success: function (data) {
+      data:{
+        customerId
+      },
 
+      success: function (data) {
+        $('#slJobLevels').empty();
         data.jl.forEach(j => {
           let opt = '<option value="' + j._id + '">' + j.name + '</option>';
           $('#slJobLevels').append(opt);
