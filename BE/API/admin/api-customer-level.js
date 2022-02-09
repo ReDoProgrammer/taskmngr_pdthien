@@ -10,8 +10,7 @@ router.get('/',authenticateAdminToken,(req,res)=>{
     .find({customer:customerId})
    .populate('level')
     .exec()
-    .then(cl=>{
-        console.log(cl);
+    .then(cl=>{       
         return res.status(200).json({
             msg:'Load customer levels successfully',
             cl
