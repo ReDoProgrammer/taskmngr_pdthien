@@ -142,9 +142,7 @@
   var taskId = '';
 
 
-  $('#btnAssign').on('click', function () {
-
-
+  $('#btnAssignEditor').on('click', function () {
 
     $.ajax({
       url: '/tla/task/',
@@ -218,6 +216,8 @@
 
   $(document).ready(function () {
     $('#divAssign').hide();
+    LoadEditor();
+    LoadQA();
   })
 
   function ChangeJobStatus(jobId, status) {
@@ -255,9 +255,7 @@
     $('#divAssign').show(500);
     $('#divLevel').hide(100);
     $("button[name='btnAssignStaff']").hide(100);
-    $("button[name='btnDelTask']").hide(100);
-    LoadEditor(taskId);
-    LoadQA(taskId);
+    $("button[name='btnDelTask']").hide(100);   
   })
 
   $(document).on("click", "button[name='btnDelTask']", function () {
@@ -290,16 +288,13 @@
 
 
 
-  function LoadEditor(levelId) {
+  function LoadEditor() {
     $.ajax({
       url: '/tla/user/list-editor',
       type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        levelId
-      },
+      },     
       success: function (data) {
         $('#slEditor').empty();
         data.editors.forEach(e => {
@@ -315,16 +310,13 @@
     })
   }
 
-  function LoadQA(levelId) {
+  function LoadQA() {
     $.ajax({
       url: '/tla/user/list-qa',
       type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        levelId
-      },
+      },      
       success: function (data) {
         $('#slQA').empty();
         data.qas.forEach(q => {
