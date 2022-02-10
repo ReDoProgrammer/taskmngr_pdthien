@@ -74,16 +74,12 @@
         <div id="divAssign">
 
           <div class="row mt-3">
-            <div class="col-sm-2">Editor:</div>
+            <div class="col-sm-2 font-weight-bold">Editor:</div>
             <div class="col-sm-7">
-              <select class="form-control selectpicker" id="select-staff" data-live-search="true">
-                <option data-tokens="china">China</option>
-                <option data-tokens="malayasia">Malayasia</option>
-                <option data-tokens="singapore">Singapore</option>
-              </select>
+              <select class="form-control selectpicker" id="slEditor" data-live-search="true"></select>
             </div>
             <div class="col-sm-2">
-              <button class="btn btn-sm btn-success" id="btnAssign">
+              <button class="btn btn-sm btn-success" id="btnAssignEditor">
                 <i class="fa fa-plus"></i> Assign Editor
               </button>
             </div>
@@ -95,16 +91,12 @@
           </div>
 
           <div class="row mt-3">
-            <div class="col-sm-2">Q.A:</div>
+            <div class="col-sm-2 font-weight-bold">Q.A:</div>
             <div class="col-sm-7">
-              <select class="form-control selectpicker" id="select-staff" data-live-search="true">
-                <option data-tokens="china">China</option>
-                <option data-tokens="malayasia">Malayasia</option>
-                <option data-tokens="singapore">Singapore</option>
-              </select>
+              <select class="form-control selectpicker" id="slQA" data-live-search="true"></select>
             </div>
             <div class="col-sm-2">
-              <button class="btn btn-sm btn-success" id="btnAssign">
+              <button class="btn btn-sm btn-success" id="btnAssignQA">
                 <i class="fa fa-plus"></i> Assign Q.A
               </button>
             </div>
@@ -143,10 +135,7 @@
 
 
   $('#btnAssign').on('click', function () {
-    if (!$('#ckbQA').is(":checked") && !$('#ckbEditor').is(":checked")) {
-      $('#msgError').text('Vui lòng chọn tác vụ Editor hoặc Q.A cho nhân viên này!!!');
-      return;
-    }
+
 
 
     $.ajax({
@@ -221,7 +210,8 @@
 
   $(document).ready(function () {
 
-    LoadStaffs();
+    LoadEditor();
+    LoadQA();
     $('#divAssign').hide();
 
   })
@@ -290,18 +280,43 @@
 
 
 
-  function LoadStaffs() {
+  function LoadEditor() {
     $.ajax({
-      url: '/tla/user/list',
+      url: '/tla/user/list-editor',
       type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       success: function (data) {
-        data.users.forEach(u => {
-          let opt = '<option value="' + u._id + '">' + u.fullname + '</option>';
-          $('#slStaffs').append(opt);
+        $('#slEditor').empty();
+        data.editors.forEach(e => {
+          let opt = '<option value="' + e._id + '">' + e.fullname + '</option>';
+          $('#slEditor').append(opt);
         })
+        $('#slEditor').selectpicker();
+        $('#slEditor').selectpicker('refresh');
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $('#msgError').text(jqXHR.responseJSON.msg);
+      },
+    })
+  }
+
+  function LoadQA() {
+    $.ajax({
+      url: '/tla/user/list-qa',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      success: function (data) {
+        $('#slQA').empty();
+        data.qas.forEach(q => {
+          let opt = '<option value="' + q._id + '">' + q.fullname + '</option>';
+          $('#slQA').append(opt);
+        })
+        $('#slQA').selectpicker();
+        $('#slQA').selectpicker('refresh');
       },
       error: function (jqXHR, textStatus, errorThrown) {
         $('#msgError').text(jqXHR.responseJSON.msg);
