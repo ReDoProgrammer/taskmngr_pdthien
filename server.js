@@ -60,7 +60,6 @@ const adminStaffLevelController = require("./BE/controllers/Admin/staff-level-co
 
 const adminNationalStyleController = require('./BE/controllers/Admin/national-style-controller');
 const adminSizeController = require('./BE/controllers/Admin/size-controller');
-const adminSkillController = require("./BE/controllers/Admin/skill-controller");
 const adminStatusController = require("./BE/controllers/Admin/status-controller");
 const adminStaffController = require("./BE/controllers/Admin/staff-controller");
 const adminUserGroupController = require('./BE/controllers/Admin/user-group-controller');
@@ -102,7 +101,6 @@ const apiAdminStaffLevel = require('./BE/API/admin/api-staff-level');
 const apiAdminModule = require('./BE/API/admin/api-module');
 const apiAdminNationalStyle = require('./BE/API/admin/api-national-style');
 const apiAdminSize = require('./BE/API/admin/api-size');
-const apiAdminSkill = require('./BE/API/admin/api-skill');
 const apiAdminUser = require('./BE/API/admin/api-user');
 const apiAdminStatus = require('./BE/API/admin/api-status');
 const apiAdminStyle = require('./BE/API/admin/api-style');
@@ -197,7 +195,6 @@ app.use('/admin/level',apiAdminLevel);//quản lý thông tin level --- tạm th
 app.use('/admin/module',apiAdminModule);// quản lý danh sách module của web
 app.use('/admin/national-style',apiAdminNationalStyle);//quản lý thông tin style của khách hàng theo quốc gia
 app.use('/admin/size',apiAdminSize);//quản lý thông tin kích thước file hình ảnh 
-app.use('/admin/skill',apiAdminSkill);//quản lý thông tin kỹ năng của nhân viên: Q.C, Editor,...
 app.use('/admin/staff-level',apiAdminStaffLevel);//quản lý level của nhân viên, phân loại nhân viên: người mới, tập sự, học việc,...
 app.use('/admin/status',apiAdminStatus);//trạng thái của đơn hàng, tạm thời không sử dụng tới
 app.use('/admin/style',apiAdminStyle);//style này tạm thời chưa sử dụng tới
@@ -228,7 +225,7 @@ app.use('/admin/setting/national-style',adminNationalStyleController);
 app.use("/admin/setting/size", adminSizeController);
 app.use("/admin/setting/status", adminStatusController);
 app.use("/admin/setting/style", adminStyleController);
-app.use("/admin/setting/skill", adminSkillController);
+
 
 app.use('/admin/setting/user-group',adminUserGroupController);
 

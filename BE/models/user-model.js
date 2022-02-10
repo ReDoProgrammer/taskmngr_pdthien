@@ -4,9 +4,22 @@ const bcrypt = require("bcrypt");
 const SALT_WORK_FACTOR = 10;
 
 const UserSchema = new Schema({
-  user_type:{
+  user_group:{
+    /**
+     * Lưu thông tin nhóm của nhân viên
+     * Ví dụ: relationship, employee,golden member
+     * 
+     */
     type: Schema.Types.ObjectId,
-    ref:'user_type'
+    ref:'user_group'
+  },
+  user_level:{
+    /*
+      Lưu trữ thông tin trình độ của nhân viên
+      Ví dụ: Fresher, intership, junior...
+    */
+    type: Schema.Types.ObjectId,
+    ref:'staff_level'
   },
   username: { 
     type: String, 

@@ -23,22 +23,28 @@
     </button>
   </div>
 </div>
-<div class="table-striped">
-  <table class="table table-striped mt-1 text-nowrap">
-    <thead class="thead-light">
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">Fullname</th>
-        <th scope="col">Phone</th>
-        <th scope="col">Email</th>
-        <th scope="col">Address</th>
-        <th scope="col">Status</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody id="tblUsers"></tbody>
-  </table>
+
+<div class="table-responsive">
+  <div class="table-striped">
+    <table class="table table-striped mt-1 text-nowrap">
+      <thead class="thead-light">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Fullname</th>
+          <th scope="col">Phone</th>
+          <th scope="col">Email</th>
+          <th scope="col">Address</th>
+          <th scope="col">Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tblUsers"></tbody>
+    </table>
+  </div>
+
 </div>
+
+
 
 
 <%-include('modal')%>
@@ -50,7 +56,7 @@
     is_readonly = false;
     $(document).ready(() => {
       $("#direction").val("Employee Management");
-      LoadUsers();
+      LoadUsers();     
     });
 
     $(document).on("click", "button[name='btnEditUser']", function () {
@@ -125,6 +131,7 @@
       LoadUsers();
     })
 
+
     function LoadUsers() {
       $.ajax({
         url: '/admin/user',
@@ -168,6 +175,7 @@
             $('#tblUsers').append(tr);
           })
         }, error: function (jqXHR, textStatus, errorThrown) {
+          console.log(jqXHR.responseJSON);
           alert(jqXHR.responseJSON.msg);
         }
       })

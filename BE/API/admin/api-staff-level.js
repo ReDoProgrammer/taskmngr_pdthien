@@ -1,6 +1,9 @@
 const router = require('express').Router();
 const StaffLevel = require('../../models/staff-level-model');
+const UserGroup = require('../../models/user-group-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
+
+
 
 router.delete('/', authenticateAdminToken, (req, res) => {
     let id = req.body.id;
@@ -39,6 +42,42 @@ router.get('/', (req, res) => {
         });
     });
 });
+
+
+router.get('/list-by-user-group', (req, res) => {
+    let {groupId} = req.query;
+    UserGroup
+    .findById(groupId)
+    .then(g=>{
+        if(!g){
+            return res.status(404).json({
+                msg:`User group not fond`
+            })
+        }
+
+        console.log(g);
+
+        StaffLevel.find({}, (err, levels) => {
+            if (err) {
+                return res.status(500).json({
+                    msg: 'load levels list failed'
+                });
+            }
+    
+            return res.status(200).json({
+                msg: 'Load levels list successfully!',
+                levels: levels
+            });
+        });
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not get user group by id with error: ${new Error(err.message)}`
+        })
+    })
+    
+});
+
 
 router.get('/detail', authenticateAdminToken, (req, res) => {
     let { id } = req.query;

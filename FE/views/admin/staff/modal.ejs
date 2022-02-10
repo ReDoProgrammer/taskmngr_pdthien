@@ -6,25 +6,23 @@
           <div class="panel-heading"><i class="fa fa-user" aria-hidden="true"></i> Add or update staff</div>
           <div class="panel-body">
 
-            <div class="form-row">
-              <div class="form-group col-md-3 col-xs-6">
+            <div class="row">
+              <div class="form-group col-md-4 col-xs-12">
                 <label for="recipient-name" class="col-form-label">Group:</label>
-                <select name="" id="usertype" class="form-control"></select>
-              </div>
-              <div class="form-group col-md-3 col-xs-6">
-                <label for="recipient-name" class="col-form-label">Username:</label>
-                <input type="text" class="form-control" id="txtUsername" />
+                <select name="" id="slUserGroup" class="form-control"></select>
               </div>
 
-              <div class="form-group col-md-3 col-xs-6">
-                <label for="recipient-name" class="col-form-label">Password:</label>
-                <input type="password" class="form-control" id="txtPassword" value="123" />
+              <div class="form-group col-md-4 col-xs-12">
+                <label for="recipient-name" class="col-form-label">Staff level:</label>
+                <select name="" id="slUserLevel" class="form-control"></select>
               </div>
 
-              <div class="form-group col-md-3 col-xs-6">
-                <label for="recipient-name" class="col-form-label">Confirm Password:</label>
-                <input type="password" class="form-control" id="txtConfirmPassword" value="123" />
+
+              <div class="form-group col-md-4 col-xs-12">
+                <label for="recipient-name" class="col-form-label">Fullname:</label>
+                <input type="text" class="form-control" id="txtFullname" />
               </div>
+             
             </div>
 
 
@@ -32,24 +30,39 @@
 
 
 
-            <div class="form-row">
+            <div class="row">
 
-              <div class="form-group col-md-3 col-xs-6">
-                <label for="recipient-name" class="col-form-label">Fullname:</label>
-                <input type="text" class="form-control" id="txtFullname" />
+              <div class="form-group col-md-4 col-xs-12">
+                <label for="recipient-name" class="col-form-label">Username:</label>
+                <input type="text" class="form-control" id="txtUsername" />
               </div>
-              <div class="form-group col-md-3 col-xs-6">
+
+              <div class="form-group col-md-4 col-xs-12">
+                <label for="recipient-name" class="col-form-label">Password:</label>
+                <input type="password" class="form-control" id="txtPassword" value="123" />
+              </div>
+
+              <div class="form-group col-md-4 col-xs-12">
+                <label for="recipient-name" class="col-form-label">Confirm Password:</label>
+                <input type="password" class="form-control" id="txtConfirmPassword" value="123" />
+              </div>
+              
+            </div>
+
+
+            <div class="row">
+              <div class="form-group col-md-4 col-xs-12">
                 <label for="recipient-name" class="col-form-label">Phone:</label>
                 <input type="text" class="form-control" id="txtPhone" />
               </div>
 
-              <div class="form-group col-md-6 col-xs-12">
+              <div class="form-group col-md-8 col-xs-12">
                 <label for="recipient-name" class="col-form-label">Email:</label>
                 <input type="email" class="form-control" id="txtEmail" />
               </div>
             </div>
 
-            <div class="form-row">
+            <div class="row">
               <div class="form-group col-md-3 col-xs-6">
                 <label for="recipient-name" class="col-form-label">ID Card:</label>
                 <input type="text" class="form-control" id="txtIDNo" />
@@ -59,7 +72,7 @@
                 <input type="text" class="form-control" id="txtIssuedBy" />
               </div>
 
-              <div class="form-group col-md-5 col-xs-4">
+              <div class="form-group col-md-5 col-xs-10">
                 <label for="recipient-name" class="col-form-label">Address:</label>
                 <input type="text" class="form-control" id="txtAddress" />
               </div>
@@ -75,7 +88,7 @@
 
 
             <hr>
-            <div class="form-row">
+            <div class="row">
               <div class="form-group col-md-6 col-xs-12">
                 <label for="recipient-name" class="col-form-label">Bank:</label>
                 <select name="" id="slBanks" class="form-control"></select>
@@ -89,7 +102,7 @@
                 <input type="text" class="form-control" id="txtBankHolder" />
               </div>
             </div>
-            <div class="form-row">
+            <div class="row">
               <div class="col-sm-12 col-xs-12 mt-2">
                 <label id="errMessage" class="text-warning font-weight-bold">1243</label>
               </div>
@@ -144,7 +157,7 @@
           }
 
 
-          $('#usertype').val(data.user.user_type);
+          $('#slUserGroup').val(data.user.user_type);
 
 
           $('#txtFullname').val(data.user.fullname);
@@ -179,7 +192,7 @@
   $("#btnSubmit").click(function () {
    
    
-    let user_type = $('#usertype option:selected').val();
+    let user_type = $('#slUserGroup option:selected').val();
 
 
 
@@ -281,8 +294,7 @@
 
 
   $(document).ready(function () {
-    LoadUserGroup();
-    LoadSkill();
+    LoadUserGroup();   
     LoadBanks();
   });
 
@@ -311,7 +323,7 @@
 
 
   function LoadUserGroup() {
-    $("#usertype").empty();
+    $("#slUserGroup").empty();
     $.ajax({
       url: "/admin/user-group/list",
       type: "get",
@@ -320,8 +332,12 @@
         let idx = 1;
         data.uts.forEach((ut) => {
           let opt = '<option value="' + ut._id + '">' + ut.name + "</option>";
-          $("#usertype").append(opt);
+          $("#slUserGroup").append(opt);
         });
+
+        LoadUserLevels($('#slUserGroup option:selected').val());
+
+
       },
       error: function (jqXHR, textStatus, errorThrown) {
         alert(jqXHR.responseJSON.msg);
@@ -332,39 +348,7 @@
 
 
 
-  function LoadSkill() {
-    $.ajax({
-      url: "/admin/skill",
-      type: "get",
-      headers: {
-              authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-      success: function (data, textStatus, xhr) {
-        let idx = 1;
-        $("#tblSkill").empty();
-        data.skills.forEach((skill) => {
-          let tr = "  <tr>";
-          tr += '        <th scope="row">1</th>';
-          tr += "       <td><input";
-          tr += '          type="checkbox"';
-          tr += '         class="form-check-input"';
-          tr += '        id="is_active"';
-          tr += "      checked";
-          tr += "   />";
-          tr += '  <label class="form-check-label" for="exampleCheck1"';
-          tr += "   >Active</label";
-          tr += " ></td>";
-          tr += "<td></td>";
-          tr += " <td>@mdo</td>";
-          tr += "</tr>      ";
-          $("#tblSkill").append(tr);
-        });
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        alert(jqXHR.responseJSON.msg);
-      },
-    });
-  }
+  
 
   function GenerateUsername(fullname) {
     shortkeys = fullname.split(" ");
@@ -390,4 +374,32 @@
       .replace(/[^\w\-]+/g, "") // loại bỏ các khoảng trắng thừa
       .replace(/\-\-+/g, "-"); // thay thế các kí tự - liên tục bằng 1 kí tự -;
   }
+
+
+
+  function LoadUserLevels(groupId){
+      $.ajax({
+        url:'/admin/staff-level/list-by-user-group',
+        type:'get',
+        headers: {
+          authorization: "Bearer " + localStorage.getItem('accessToken'),
+        },
+        data:{
+          groupId
+        },
+        success:function(data){
+          console.log(data);
+          $('#slUserLevel').empty();
+          data.levels.forEach(l=>{
+            let opt = '<option val="'+l._id+'">'+l.name+'</option>';
+            $('#slUserLevel').append(opt);
+          })
+
+        }, error: function (jqXHR, textStatus, errorThrown) {
+          alert(jqXHR.responseJSON.msg);
+        }
+      })
+    }
+
+    
 </script>

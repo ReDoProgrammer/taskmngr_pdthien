@@ -6,6 +6,12 @@ const Wage = require('../../models/wage-model');
 const Job = require('../../models/job-model');
 const User = require('../../models/user-model');
 
+const _EDITOR = 'EDITOR';
+const _QA = 'QA';
+
+const Module = require('../../models/module-model');
+
+
 router.get('/list', authenticateTLAToken, (req, res) => {
     let { jobId } = req.query;
     Task
@@ -114,15 +120,25 @@ router.post('/', authenticateTLAToken, (req, res) => {
 router.put('/assign-editor', authenticateTLAToken, (req, res) => {
 
     let { taskId, staff } = req.body;
-    getWage(staff)
-    .then(result=>{
-        console.log(result);
-    })
-    .catch(err=>{
-        return res.status(err.code).json({
-            msg: err.msg
+    getModule(_EDITOR)
+        .then(result => {
+            
+            getWage(staff,result.m._id)
+                .then(result => {
+                    console.log(result);
+                })
+                .catch(err => {
+                    return res.status(err.code).json({
+                        msg: err.msg
+                    })
+                })
         })
-    })
+        .catch(err => {
+            return res.status(err.code).json({
+                msg: err.msg
+            })
+        })
+
 
 
     // Task.findById(taskId)
@@ -179,42 +195,69 @@ router.delete('/', authenticateTLAToken, (req, res) => {
 
 module.exports = router;
 
-const getWage = (staffId) =>{
-    return new Promise((resolve,reject)=>{
-        User
-        .findById(staffId)
-        .exec()
-        .then(u=>{
-            if(!u){
-                return reject({
-                    code:404,
-                    msg:`Staff not found!`
-                })
-            }
-            Wage
-            .find({user_group:u.user_type})
+const getModule = (moduleName) => {
+    return new Promise((resolve, reject) => {
+        Module
+            .findOne({ name: moduleName })
             .exec()
-            .then(w=>{
+            .then(m => {
+                if (!m) {
+                    return reject({
+                        code: 404,
+                        msg: `Module not found`
+                    })
+                }
                 return resolve({
-                    code:200,
-                    msg:`Wage found`,
-                    w
+                    code: 200,
+                    msg: `Get module info successfully!`,
+                    m
                 })
             })
-            .catch(err=>{
+            .catch(err => {
                 return reject({
-                    code:500,
-                    msg:`Can not get wage with error: ${new Error(err.message)}`
+                    code: 500,
+                    msg: `Can not get module with error: ${new Error(err.message)}`
                 })
             })
-           
-        })
-        .catch(err=>{
-            return reject({
-                code:500,
-                msg:`Can not get staff with error: ${new Error(err.message)}`
+    })
+}
+
+const getWage = (staffId, moduleId) => {
+    return new Promise((resolve, reject) => {
+        User
+            .findById(staffId)
+            .exec()
+            .then(u => {
+                if (!u) {
+                    return reject({
+                        code: 404,
+                        msg: `Staff not found!`
+                    })
+                }
+                Wage
+                    .find({ user_group: u.user_type })
+                    .exec()
+                    .then(w => {
+                        return resolve({
+                            code: 200,
+                            msg: `Wage found`,
+                            w
+                        })
+                    })
+                    .catch(err => {
+                        return reject({
+                            code: 500,
+                            msg: `Can not get wage with error: ${new Error(err.message)}`
+                        })
+                    })
+
             })
-        })
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not get staff with error: ${new Error(err.message)}`
+                })
+            })
     })
 }
 
