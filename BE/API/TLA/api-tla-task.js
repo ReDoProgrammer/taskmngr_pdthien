@@ -4,6 +4,7 @@ const Task = require('../../models/task-model');
 const CustomerLevel = require('../../models/customer-level-model');
 const Wage = require('../../models/wage-model');
 const Job = require('../../models/job-model');
+const User = require('../../models/user-model');
 
 router.get('/list', authenticateTLAToken, (req, res) => {
     let { jobId } = req.query;
@@ -13,7 +14,7 @@ router.get('/list', authenticateTLAToken, (req, res) => {
         .populate('qa', 'fullname -_id')
         .populate('editor', 'fullname -_id')
         .exec()
-        .then(tasks => {           
+        .then(tasks => {
             return res.status(200).json({
                 tasks,
                 msg: 'Load tasks by job id successfully!'
@@ -66,9 +67,9 @@ router.post('/', authenticateTLAToken, (req, res) => {
             getCustomerLevelPrice(result.customerId, level)
                 .then(result => {
 
-                    if(result.cl.price==0){
+                    if (result.cl.price == 0) {
                         return res.status(403).json({
-                            msg:`Customer level price unit not available!`
+                            msg: `Customer level price unit not available!`
                         })
                     }
 
@@ -110,48 +111,49 @@ router.post('/', authenticateTLAToken, (req, res) => {
 
 })
 
-router.put('/', authenticateTLAToken, (req, res) => {
-    // phần này chỉ dùng khi TLA muốn assign nhiệm vụ Q.A hoặc edit trực tiếp cho nhân viên khi phân job ra thành level
-    /**
-     * XẢY RA 2 TRƯỜNG HỢP NHƯ SAU:
-     * TH1: TLA assign editor/q.a hoặc cả editor và q.a cho cùng 1 nhân viên
-     * TH2: TLA assign editor và q.a cho 2người khác nhau.
-     * => để tránh trường hợp bị đè nếu ở TH2 thì cần tìm kiếm task trước đó và update lại trạng thái, nhân viên đã có 
-     * 
-     */
-    let { taskId, staff, qa, editor } = req.body;
+router.put('/assign-editor', authenticateTLAToken, (req, res) => {
 
-    Task.findById(taskId)
-        .exec()
-        .then(t => {
-            Task.findByIdAndUpdate(taskId,
-                {
-                    qa: (qa == 'true' ? staff : t.qa),
-                    qa_assigned: (qa == 'true' ? true : t.qa_assigned),
-                    editor: (editor == 'true' ? staff : t.editor),
-                    editor_assigned: (editor == 'true' ? true : t.editor_assigned)
-                }, { new: true }, (err, task) => {
-                    if (err) {
-                        return res.status(500).json({
-                            msg: `Assigned staff failed with error: ${new Error(err.message)}`
-                        })
-                    }
-                    if (task == null) {
-                        return res.status(404).json({
-                            msg: `Task not found`
-                        })
-                    }
+    let { taskId, staff } = req.body;
+    getWage(staff)
+    .then(result=>{
+        console.log(result);
+    })
+    .catch(err=>{
+        return res.status(err.code).json({
+            msg: err.msg
+        })
+    })
 
-                    return res.status(200).json({
-                        msg: `Staff has been assigned successfully!`
-                    })
-                })
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not find task by id ${new Error(err.mesaage)}`
-            })
-        })
+
+    // Task.findById(taskId)
+    //     .exec()
+    //     .then(t => {
+    //         Task.findByIdAndUpdate(taskId,
+    //             {
+    //                 editor: staff,
+    //                 editor_assigned: true
+    //             }, { new: true }, (err, task) => {
+    //                 if (err) {
+    //                     return res.status(500).json({
+    //                         msg: `Assigned staff failed with error: ${new Error(err.message)}`
+    //                     })
+    //                 }
+    //                 if (task == null) {
+    //                     return res.status(404).json({
+    //                         msg: `Task not found`
+    //                     })
+    //                 }
+
+    //                 return res.status(200).json({
+    //                     msg: `Staff has been assigned successfully!`
+    //                 })
+    //             })
+    //     })
+    //     .catch(err => {
+    //         return res.status(500).json({
+    //             msg: `Can not find task by id ${new Error(err.mesaage)}`
+    //         })
+    //     })
 
 
 
@@ -176,6 +178,46 @@ router.delete('/', authenticateTLAToken, (req, res) => {
 
 
 module.exports = router;
+
+const getWage = (staffId) =>{
+    return new Promise((resolve,reject)=>{
+        User
+        .findById(staffId)
+        .exec()
+        .then(u=>{
+            if(!u){
+                return reject({
+                    code:404,
+                    msg:`Staff not found!`
+                })
+            }
+            Wage
+            .find({user_group:u.user_type})
+            .exec()
+            .then(w=>{
+                return resolve({
+                    code:200,
+                    msg:`Wage found`,
+                    w
+                })
+            })
+            .catch(err=>{
+                return reject({
+                    code:500,
+                    msg:`Can not get wage with error: ${new Error(err.message)}`
+                })
+            })
+           
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not get staff with error: ${new Error(err.message)}`
+            })
+        })
+    })
+}
+
 
 const getCustomerIdFromJob = (jobId) => {
     return new Promise((resolve, reject) => {

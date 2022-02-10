@@ -145,16 +145,14 @@
   $('#btnAssignEditor').on('click', function () {
 
     $.ajax({
-      url: '/tla/task/',
+      url: '/tla/task/assign-editor',
       type: 'put',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       data: {
         taskId,
-        staff: $('#slStaffs option:selected').val(),
-        editor: $('#ckbEditor').is(":checked"),
-        qa: $('#ckbQA').is(":checked")
+        staff: $('#slEditor option:selected').val()       
       },
       success: function (data) {
         $('#msgError').text(data.msg);
