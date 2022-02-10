@@ -1,3 +1,7 @@
+<script src="/js/bootstrap-select.min.js"></script>
+<link href="/css/bootstrap-select.min.css" rel="stylesheet" />
+
+
 <div class="modal" tabindex="-1" id="assignJobModal">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -50,6 +54,7 @@
         </div>
 
 
+        <hr />
 
 
         <div class="form-row" id="divLevel">
@@ -66,34 +71,53 @@
             </button>
           </div>
         </div>
-        <div class="form-row mt-3" id="divAssign">
-          <div class="col-sm-6">
-            <select name="" id="slStaffs" class="form-control"></select>
+        <div id="divAssign">
+
+          <div class="row mt-3">
+            <div class="col-sm-2">Editor:</div>
+            <div class="col-sm-7">
+              <select class="form-control selectpicker" id="select-staff" data-live-search="true">
+                <option data-tokens="china">China</option>
+                <option data-tokens="malayasia">Malayasia</option>
+                <option data-tokens="singapore">Singapore</option>
+              </select>
+            </div>
+            <div class="col-sm-2">
+              <button class="btn btn-sm btn-success" id="btnAssign">
+                <i class="fa fa-plus"></i> Assign Editor
+              </button>
+            </div>
+            <div class="col-sm-1">
+              <button class="btnCancelAssign btn btn-xs">
+                <i class="fa fa-close text-danger"></i>
+              </button>
+            </div>
           </div>
-          <div class="col-sm-1">Task:</div>
-          <div class="col-sm-1 form-check">
-            <input class="form-check-input" type="checkbox" value="" id="ckbEditor">
-            <label class="form-check-label" for="flexCheckDefault">
-              Editor
-            </label>
+
+          <div class="row mt-3">
+            <div class="col-sm-2">Q.A:</div>
+            <div class="col-sm-7">
+              <select class="form-control selectpicker" id="select-staff" data-live-search="true">
+                <option data-tokens="china">China</option>
+                <option data-tokens="malayasia">Malayasia</option>
+                <option data-tokens="singapore">Singapore</option>
+              </select>
+            </div>
+            <div class="col-sm-2">
+              <button class="btn btn-sm btn-success" id="btnAssign">
+                <i class="fa fa-plus"></i> Assign Q.A
+              </button>
+            </div>
+            <div class="col-sm-1">
+              <button class="btnCancelAssign btn btn-xs">
+                <i class="fa fa-close text-danger"></i>
+              </button>
+            </div>
           </div>
-          <div class="col-sm-1 form-check">
-            <input class="form-check-input" type="checkbox" value="" id="ckbQA">
-            <label class="form-check-label" for="flexCheckDefault">
-              Q.A
-            </label>
-          </div>
-          <div class="col-sm-1">
-            <button class="btn btn-sm btn-warning" id="btnAssign">
-              <i class="fa fa-check" aria-hidden="true"></i> Assign
-            </button>
-          </div>
-          <div class="offset-sm-1 col-sm-1">
-            <button class="btn btn-sm btn-black" id="btnCancelAssign">
-              <i class="fa fa-times text-danger" aria-hidden="true"></i>
-            </button>
-          </div>
+
+
         </div>
+
 
         <div class="form-row">
           <div class="col-sm-12">
@@ -170,7 +194,7 @@
         $('#msgError').show();
         $('#msgError').hide(2000);
         LoadTasks();
-        ChangeJobStatus(jobId,0);
+        ChangeJobStatus(jobId, 0);
         LoadJob();
       },
       error: function (jqXHR, textStatus, errorThrown) {
@@ -224,7 +248,7 @@
 
 
 
-  $('#btnCancelAssign').on('click', function () {
+  $('.btnCancelAssign').on('click', function () {
     $('#divAssign').hide(100);
     $('#divLevel').show(500);
     taskId = '';
