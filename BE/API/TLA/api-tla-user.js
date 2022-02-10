@@ -3,6 +3,8 @@ const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const User = require('../../models/user-model');
 const UserModule = require('../../models/user-module-model');
 const Module = require('../../models/module-model');
+const Wage = require('../../models/wage-model');
+
 const _EDITOR = 'EDITOR';
 const _QA = 'QA';
 
@@ -11,79 +13,87 @@ const _QA = 'QA';
     Hàm load danh sách Editor dựa vào module đã set quyền nhân viên
     Chỉ load những nhân viên Editor có trạng thái hoạt động is_active:true
 */
-router.get('/list-editor',authenticateTLAToken,(req,res)=>{  
-    getModuleId(_EDITOR)
-    .then(result=>{
-        UserModule
-        .find({module:result.m._id})
-        .exec()
-        .then(um=>{
-            let umList = um.map(x=>{
-                return x.user._id
-            });           
+router.get('/list-editor', authenticateTLAToken, (req, res) => {
+    let { levelId } = req.query;
 
-            User
-            .find({_id:{$in:umList},is_active:true})
-            .select('fullname')
-            .exec()           
-            .then(editors=>{
-                return res.status(200).json({
-                    msg:`Load editors list successfully!`,
-                    editors
+    getModuleId(_EDITOR)
+        .then(result => {
+            UserModule
+                .find({ module: result.m._id })
+                .exec()
+                .then(um => {
+                    let umList = um.map(x => {
+                        return x.user._id
+                    });
+
+                    User
+                        .find({ _id: { $in: umList }, is_active: true })
+                        .select('fullname')
+                        .exec()
+                        .then(editors => {
+                            return res.status(200).json({
+                                msg: `Load editors list successfully!`,
+                                editors
+                            })
+                        })
+                        .catch(err => {
+                            return res.status(500).json({
+                                msg: `Can not load editors list with error: ${new Error(err.message)}`
+                            })
+                        })
                 })
-            })
-            .catch(err=>{
-                return res.status(500).json({
-                    msg:`Can not load editors list with error: ${new Error(err.message)}`
+                .catch(err => {
+                    return res.status(500).json({
+                        msg: `Can not load user module with error: ${new Error(err.message)}`
+                    })
                 })
-            })
         })
-        .catch(err=>{
-            return res.status(500).json({
-                msg:`Can not load user module with error: ${new Error(err.message)}`
-            })
-        })
-    })     
 })
 
 /*
     Hàm load danh sách Q.A dựa vào module đã set quyền nhân viên
     Chỉ load những nhân viên Q.A có trạng thái hoạt động is_active:true
+   
 */
 
-router.get('/list-qa',authenticateTLAToken,(req,res)=>{  
-    getModuleId(_QA)
-    .then(result=>{
-        UserModule
-        .find({module:result.m._id})
-        .exec()
-        .then(um=>{
-            let umList = um.map(x=>{
-                return x.user._id
-            });           
+router.get('/list-qa', authenticateTLAToken, (req, res) => {
 
-            User
-            .find({_id:{$in:umList},is_active:true})
-            .select('fullname')
-            .exec()           
-            .then(qas=>{
-                return res.status(200).json({
-                    msg:`Load Q.As list successfully!`,
-                    qas
+    let { levelId } = req.query;
+
+    getModuleId(_QA)
+        .then(result => {
+
+            UserModule
+                .find({ module: result.m._id })
+                .exec()
+                .then(um => {
+                    let umList = um.map(x => {
+                        return x.user._id
+                    });
+
+                    User
+                        .find({ _id: { $in: umList }, is_active: true })
+                        .select('fullname')
+                        .exec()
+                        .then(qas => {
+                            return res.status(200).json({
+                                msg: `Load Q.As list successfully!`,
+                                qas
+                            })
+                        })
+                        .catch(err => {
+                            return res.status(500).json({
+                                msg: `Can not load Q.As list with error: ${new Error(err.message)}`
+                            })
+                        })
                 })
-            })
-            .catch(err=>{
-                return res.status(500).json({
-                    msg:`Can not load Q.As list with error: ${new Error(err.message)}`
+                .catch(err => {
+                    return res.status(500).json({
+                        msg: `Can not load user module with error: ${new Error(err.message)}`
+                    })
                 })
-            })
+
         })
-        .catch(err=>{
-            return res.status(500).json({
-                msg:`Can not load user module with error: ${new Error(err.message)}`
-            })
-        })
-    })     
 })
 
 
@@ -91,27 +101,29 @@ router.get('/list-qa',authenticateTLAToken,(req,res)=>{
 
 module.exports = router;
 
-const getModuleId = (moduleName)=>{
-    return new Promise((resolve,reject)=>{
-        Module.findOne({name:moduleName})
-        .exec()
-        .then(m=>{
-            if(!m){
-                return reject({
-                    code:404,
-                    msg:`Module not found`
+const getModuleId = (moduleName) => {
+    return new Promise((resolve, reject) => {
+        Module.findOne({ name: moduleName })
+            .exec()
+            .then(m => {
+                if (!m) {
+                    return reject({
+                        code: 404,
+                        msg: `Module not found`
+                    })
+                }
+                return resolve({
+                    msg: `Module found!`,
+                    m
                 })
-            }
-            return resolve({
-                msg:`Module found!`,
-                m
             })
-        })
-        .catch(err=>{
-            return reject({
-                code:500,
-                msg:`Can not get module with error: ${new Error(err.message)}`
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not get module with error: ${new Error(err.message)}`
+                })
             })
-        })
     })
 }
+
+
