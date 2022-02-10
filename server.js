@@ -5,14 +5,6 @@ const mongoose = require("mongoose");
 const layout = require("express-ejs-layouts");
 const bodyParser = require("body-parser"); 
 
-app.set("view engine", "ejs"); //set view engine cho nodejs
-app.set("views", "./FE/views"); //set thư mục view cho project
-app.use(express.static("./public")); //set đường dẫn tới thư mục public gồm css,js,bootstrap...
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-app.use(layout); //set layout
-
 mongoose.connect(
   process.env.mongoose,
   {
@@ -26,6 +18,16 @@ mongoose.connect(
   },
   (error) => console.log(error.message)
 );
+
+app.set("view engine", "ejs"); //set view engine cho nodejs
+app.set("views", "./FE/views"); //set thư mục view cho project
+app.use(express.static("./public")); //set đường dẫn tới thư mục public gồm css,js,bootstrap...
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+app.use(layout); //set layout
+
+
 
 //EDITOR CONTROLLERS
 const editorAuthController = require('./BE/API/editor/authenticate');
@@ -96,7 +98,6 @@ const apiAdminCustomer = require('./BE/API/admin/api-customer');
 const apiAdminCustomerLevel = require('./BE/API/admin/api-customer-level');
 const apiAdminFileFormat = require('./BE/API/admin/api-file-format');
 const apiAdminJobLevel = require('./BE/API/admin/api-job-level');
-const apiAdminLevel = require('./BE/API/admin/api-level');
 const apiAdminStaffLevel = require('./BE/API/admin/api-staff-level');
 const apiAdminModule = require('./BE/API/admin/api-module');
 const apiAdminNationalStyle = require('./BE/API/admin/api-national-style');
@@ -191,7 +192,7 @@ app.use('/admin/customer',apiAdminCustomer);//quản lý thông tin khách hàng
 app.use('/admin/customer-level',apiAdminCustomerLevel);//quản lý thông tin các level mặt hàng của khách, liên quan tới thông tin hợp đồng của từng khách hàng
 app.use('/admin/file-format',apiAdminFileFormat);//quản lý thông tin định dạng file hình ảnh xuất cho khách
 app.use('/admin/job-level',apiAdminJobLevel);//quản lý thông tin danh sách level, khác với apiAdminCustomerLevel
-app.use('/admin/level',apiAdminLevel);//quản lý thông tin level --- tạm thời bị dư thừa, k xài tới
+
 app.use('/admin/module',apiAdminModule);// quản lý danh sách module của web
 app.use('/admin/national-style',apiAdminNationalStyle);//quản lý thông tin style của khách hàng theo quốc gia
 app.use('/admin/size',apiAdminSize);//quản lý thông tin kích thước file hình ảnh 
