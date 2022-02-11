@@ -10,10 +10,7 @@ const Schema = mongoose.Schema;
 
 const moduleSchema = new Schema({
     name:{
-        type:String,
-        required:true,
-        index: true,
-        unique: true 
+        type:String       
     },
     description:{
         type:String,
