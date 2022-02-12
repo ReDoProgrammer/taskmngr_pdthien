@@ -2,6 +2,7 @@ const router = require("express").Router();
 const User = require("../../models/user-model");
 const UserModule = require('../../models/user-module-model');
 const Module = require('../../models/module-model');
+const { captureRejectionSymbol } = require("node-cron/src/task");
 
 
 
@@ -38,17 +39,26 @@ router.get("/", (req, res) => {
 });
 
 router.get("/init", (req, res) => {
-  var initRoot = InitRootAccount;
-  initRoot.then(result=>{
-    return res.status(result.code).json({
-      result
+ 
+
+  Promise.all([initRootAccount,initModules])
+  .then(result=>{
+    initRootRole(result[0].root._id,result[1].modules[0]._id)
+    .then(rs=>{
+      return res.stastus(rl.code).json({
+        msg:`Initialize database successfully!`,
+        root: result[0].root,
+        modules: result[1].modules,
+        role: rs.rl
+      })
     })
   })
-  initRoot.catch(err=>{
+  .catch(err=>{
     return res.status(err.code).json({
-      err
+      msg:err.msg
     })
   })
+  
 });
 
 
@@ -58,7 +68,66 @@ router.get("/init", (req, res) => {
 
 module.exports = router;
 
-const InitRootAccount = new Promise((resolve,reject)=>{
+const initRootRole = (userId,moduleId)=>{
+  return new Promise(async (resolve,reject)=>{
+    let role = new UserModule({
+      user:userId,
+      module:moduleId
+    });
+    await role.save()
+    .then(rl=>{
+      return resolve({
+        code:201,
+        msg:`Initialize root account with role successfully!`,
+        rl
+      })
+    })
+    .catch(err=>{
+      return reject({
+        code:500,
+        msg:`Can not initialize root account role with error: ${new Error(err.message)}`
+      })
+    })
+  })
+}
+
+const initModules = new Promise((resolve,reject)=>{
+  Module.countDocuments({}, (err,count)=>{
+    if(err){
+      return reject({
+        code:500,
+        msg:`Can not count modules document with error: ${new Error(err.message)}`
+      })
+    }
+
+    if(count > 0){
+      return reject({
+        code:403,
+        msg:`These modules already exist in database`
+      })
+    }
+
+     Module.insertMany(_MODULES,(err,modules)=>{
+      if(err){
+        return reject({
+          code:500,
+          msg:`Can not initialize modules with error: ${new Error(err.message)}`
+        })
+      }
+  
+      return resolve({
+        code:201,
+        msg:`Initialize modules list successfully!`,
+        modules
+      })
+    })
+
+
+  })
+ 
+})
+
+const initRootAccount = new Promise((resolve,reject)=>{
   User.countDocuments({},async (err,count)=>{
     if(err){
       return reject({
@@ -83,7 +152,7 @@ const InitRootAccount = new Promise((resolve,reject)=>{
       })
     })
     .catch(err=>{
-      return rejecT({
+      return reject({
         code:500,
         msg:`Can not save root account with error: ${new Error(err.message)}`
       })
