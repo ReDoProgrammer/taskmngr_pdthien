@@ -38,9 +38,9 @@
           tr += '<th scope="row">' + (idx++) + '</th>';
           tr += '<td class="text-info font-weight-bold">' + level.name + '</td>';
           tr += '<td>' + level.description + '</td>';
-         
 
-          tr += '<td class="text-right"><button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+          tr += '<td class="text-right"><button class="btn btn-sm btn-info" name="addLevel"><i class="fa fa-bars"></i></button>';
+          tr += '<button class="btn btn-sm btn-warning ml-2" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
           tr += '<button class="btn btn-sm btn-danger ml-1" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
           tr += '</tr>';
           $('#tblData').append(tr);
@@ -72,6 +72,10 @@
     LoadLevels();
   });
 
+
+  $(document).on("click", "button[name='addLevel']", function () {
+    $('#modalLevel').modal();
+  })
 
   $(document).on("click", "button[name='delete']", function () {
 
@@ -129,3 +133,4 @@
 </script>
 
 <%-include('modal')%>
+<%-include('level-modal')%>
