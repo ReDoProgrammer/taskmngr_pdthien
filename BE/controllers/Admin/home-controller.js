@@ -38,12 +38,16 @@ router.get("/", (req, res) => {
 });
 
 router.get("/init", (req, res) => {
-  var initRoot = InitRootAccount();
+  var initRoot = InitRootAccount;
   initRoot.then(result=>{
-    console.log(result);
+    return res.status(result.code).json({
+      result
+    })
   })
   initRoot.catch(err=>{
-    console.log(err);
+    return res.status(err.code).json({
+      err
+    })
   })
 });
 
