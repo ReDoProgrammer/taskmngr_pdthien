@@ -7,7 +7,7 @@ const Module = require('../../models/module-model');
 
 
 
-const modules = [
+const _MODULES = [
   { name: 'ADMIN', description: 'Quản trị viên hệ thống', appling_wage: false },
   { name: 'DC', description: 'Nhân viên kiểm duyệt đầu ra đơn hàng', appling_wage: true },
   { name: 'ACCOUNTANT', description: 'Kế toán', appling_wage: false },
@@ -18,7 +18,7 @@ const modules = [
 
 ]
 
-const rootAccount = {
+const _ROOT_ACCOUNT =new User({
   username:'admin',
   password:'admin',
   fullname:'Administrator',
@@ -27,7 +27,7 @@ const rootAccount = {
   phone:'0911397764',
   email:'redo2011dht@gmail.com',
   address: 'Chư Ty - Đức Cơ - Gia Lai'
-}
+})
 
 router.get("/", (req, res) => {
   res.render("admin/home/index", {
@@ -38,152 +38,53 @@ router.get("/", (req, res) => {
 });
 
 router.get("/init", (req, res) => {
-
-  Promise.all([initModule, initRootAccount])
-    .then(result => {
-      return res.status(200).json({
-        msg:`Initialize database successfully!`,
-        result
-      })
-      console.log(reulst);
-      // initUserModule(result[1].usr._id, result[0].mods[0]._id)
-      //   .then(um => {
-      //     return res.status(201).json({
-      //       msg: 'Initial administrator account successfully',
-      //       um
-      //     })
-      //   })
-      //   .catch(err => {
-      //     console.log(`Can not initialize administrator information with error: ${new Error(err.message)}`);
-      //     return res.status(500).json({
-      //       msg: `Can not init administrator account with error: ${new Error(err.message)}`
-      //     })
-      //   })
-    })
-    .catch(err => {
-      return res.status(err.code).json({
-        msg: `Can not initial administrator account with error: ${new Error(err.message)}`
-      })
-    })
-
+  var initRoot = InitRootAccount();
+  initRoot.then(result=>{
+    console.log(result);
+  })
+  initRoot.catch(err=>{
+    console.log(err);
+  })
 });
+
+
 
 
 
 
 module.exports = router;
 
+const InitRootAccount = new Promise((resolve,reject)=>{
+  User.countDocuments({},async (err,count)=>{
+    if(err){
+      return reject({
+        code:500,
+        msg:`Can not count users with error: ${new Error(err.message)}`
+      })
+    }
 
+    if(count > 0){
+      return reject({
+        code:403,
+        msg:`Account already exist in database`
+      })
+    }
 
-
-function initRootAccount(){
-
-  User.countDocuments({},(err,count)=>{
-
-  })
-
-  rootAccount
-  .save()
-  .then(admin=>{
-    return Promise.resolve({
-      code: 201,
-      msg:`Initialize root account successfully!`,
-      admin
+    await _ROOT_ACCOUNT.save()
+    .then(root=>{
+      return resolve({
+        code:201,
+        msg:`Initialize root account successfully!`,
+        root
+      })
+    })
+    .catch(err=>{
+      return rejecT({
+        code:500,
+        msg:`Can not save root account with error: ${new Error(err.message)}`
+      })
     })
   })
-  .catch(err=>{
-    return Promise.reject({
-      code: 500,
-      msg:`Can not initialize root account with error: ${new Error(err.message)}`
-    })
-  })
-
-
-}
-
-
-
-
-
-initModule =new Promise((resolve,reject)=> {
-  Module.countDocuments({}, async (err, count) => {
-    if (err) {
-      return Promise.reject({
-        code: 500,
-        msg: `Can not initialize with error: ${new Error(err.message)}`
-      })
-    }
-
-    if (count > 0) {
-      return Promise.reject({
-        code: 403,
-        msg: `These Module already exist in database!`
-      })
-    }
-    const options = { ordered: true };
-    try {
-      const result = await Module.insertMany(modules, options);
-      return Promise.resolve({
-        code: 201,
-        msg:`Initializw modules successfully!`,
-        modules:result
-      })
-    } catch (error) {
-      return Promise.reject({
-        code: 500,
-        err: new Error(error.message)
-      })
-    }
-  }
-
-  )
 })
 
 
-
-
-
-
-
-const initUserModule = (userId, moduleId) => {
-  return new Promise((resolve, reject) => {
-
-    UserModule.countDocuments({}, (err, count) => {
-      if (err) {
-        return reject({
-          code: 500,
-          msg: `Can not count user module list with error: ${new Error(err.message)}`,
-          error: new Error(err.message)
-        })
-      }
-
-      if (count > 0) {
-        return reject({
-          code: 403,
-          msg: `These Module already exist in db`
-        })
-      }
-      let usermodule = new UserModule();
-      usermodule.user = userId;
-      usermodule.module = moduleId;
-
-      UserModule.create(usermodule, (err, um) => {
-        if (err) {
-          console.log(`Can not initialize user module with error: ${new Error(err.message)}`);
-          return reject({
-            code: 500,
-            msg: `Can not initialize user module with error: ${new Error(err.message)}`,
-            error: new Error(err.message)
-          })
-        }
-        return resolve({
-          code: 201,
-          msg: `Initialize user module successfully!`,
-          um
-        })
-      })
-
-    })
-
-  })
-}
