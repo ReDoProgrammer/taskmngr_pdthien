@@ -22,7 +22,7 @@ const jobLevel = new Schema({
 });
 
 
-module.exports = mongoose.model('job-level',jobLevel);
+module.exports = mongoose.model('job_level',jobLevel);
 
 
 
