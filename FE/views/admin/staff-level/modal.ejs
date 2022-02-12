@@ -18,7 +18,7 @@
                         <input type="text" name="txtDescription" id="txtDescription" class="form-control"
                             placeholder="Description">
                     </div>
-                </div>                
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -29,6 +29,12 @@
 </div>
 
 <script>
+    //sự kiện modal shown --> set các giá trị mặc định cho component trên form
+    $('#modalLocalLevel').on('shown.bs.modal', function (e) {
+        $('#txtLevel').val('');
+        $('#txtDescription').val('');
+        $('#ckbStatus').prop('checked', true);
+    });
 
     $('#btnSubmit').click(function () {
         let name = $('#txtLevel').val().trim();
@@ -43,7 +49,7 @@
                     authorization: "Bearer " + localStorage.getItem('accessToken'),
                 },
                 data: {
-                    id:levelId,
+                    id: levelId,
                     name,
                     description,
                     status

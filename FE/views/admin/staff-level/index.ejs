@@ -60,12 +60,7 @@
     LoadLevels();
   });
 
-  //sự kiện modal shown --> set các giá trị mặc định cho component trên form
-  $(document).on('show.bs.modal', '.modal', function () {
-    $('#txtLevel').val('');
-    $('#txtDescription').val('');
-    $('#ckbStatus').prop('checked', true);
-  });
+ 
 
   //sự kiện load lại hàm ds level khi modal đc đóng lại
   $(document).on('hidden.bs.modal', '#modalLocalLevel', function () {
@@ -73,13 +68,14 @@
   });
 
 
-  $(document).on("click", "button[name='addLevel']", function () {
-    $('#modalLevel').modal();
+  $(document).on("click", "button[name='addLevel']", function () {  
+    levelId = $(this).closest("tr").attr("id");
+    $('#modalLevel').modal();    
   })
 
   $(document).on("click", "button[name='delete']", function () {
 
-    var r = confirm("Vui lòng xác nhận xóa level " + $(this).closest("tr").data('name') + "?");
+    var r = confirm("Are you sure want to delete " + $(this).closest("tr").data('name') + "?");
     if (r == true) {
       $.ajax({
         url: '/admin/staff-level',
