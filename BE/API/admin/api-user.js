@@ -120,6 +120,7 @@ router.post('/', authenticateAdminToken, (req, res) => {
   });
   u.save()
     .then(user => {
+      console.log('user: ',user);
       return res.status(201).json({
         msg: 'New user has been created successfully!',
         user: user
@@ -157,8 +158,7 @@ router.put('/', authenticateAdminToken, (req, res) => {
     user_group,
     user_level,
     fullname,
-    username,
-    password,
+    username,    
     phone,
     email,
     idNo,
@@ -168,7 +168,7 @@ router.put('/', authenticateAdminToken, (req, res) => {
     bank,
     bank_no,
     bank_holder   
-  }, { new: true }, (err, user) => {
+  }, { new: true }, async (err, user) => {
     if (err) {
       return res.status(500).json({
         msg: `Update employee failed with error: ${new Error(err.message)}`,
@@ -181,7 +181,8 @@ router.put('/', authenticateAdminToken, (req, res) => {
         msg: `Employee not found!!!`
       })
     }
-
+    user.password = password;
+    await user.save();
     return res.status(200).json({
       msg: `Update employee info successfully!!`
     })
