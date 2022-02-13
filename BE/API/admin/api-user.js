@@ -82,7 +82,8 @@ router.get('/detail', authenticateAdminToken, (req, res) => {
 
 router.post('/', authenticateAdminToken, (req, res) => {
   let {
-    user_type,
+    user_group,
+    user_level,
     fullname,
     username,
     password,
@@ -94,19 +95,15 @@ router.post('/', authenticateAdminToken, (req, res) => {
     is_active,
     bank,
     bank_no,
-    bank_holder,
-    is_dc,
-    is_sale,
-    is_tla,
-    is_qa,
-    is_editor,
-    is_accountant
+    bank_holder
+  
   } = req.body;
 
 
 
   let u = new User({
-    user_type,
+    user_group,
+    user_level,
     fullname,
     username,
     password,
@@ -118,13 +115,8 @@ router.post('/', authenticateAdminToken, (req, res) => {
     is_active,
     bank,
     bank_no,
-    bank_holder,
-    is_dc,
-    is_sale,
-    is_tla,
-    is_qa,
-    is_editor,
-    is_accountant
+    bank_holder
+    
   });
   u.save()
     .then(user => {
@@ -143,8 +135,10 @@ router.post('/', authenticateAdminToken, (req, res) => {
 })
 
 router.put('/', authenticateAdminToken, (req, res) => {
-  let { userId,
-    user_type,
+  let { 
+    user_group,
+    user_level,
+    userId,   
     fullname,
     username,
     password,
@@ -156,16 +150,12 @@ router.put('/', authenticateAdminToken, (req, res) => {
     is_active,
     bank,
     bank_no,
-    bank_holder,
-    is_dc,
-    is_sale,
-    is_tla,
-    is_qa,
-    is_editor,
-    is_accountant } = req.body;
+    bank_holder
+    } = req.body;
 
   User.findByIdAndUpdate(userId, {
-    user_type,
+    user_group,
+    user_level,
     fullname,
     username,
     password,
@@ -177,13 +167,7 @@ router.put('/', authenticateAdminToken, (req, res) => {
     is_active,
     bank,
     bank_no,
-    bank_holder,
-    is_dc,
-    is_sale,
-    is_tla,
-    is_qa,
-    is_editor,
-    is_accountant
+    bank_holder   
   }, { new: true }, (err, user) => {
     if (err) {
       return res.status(500).json({

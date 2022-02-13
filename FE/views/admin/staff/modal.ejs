@@ -22,7 +22,7 @@
                 <label for="recipient-name" class="col-form-label">Fullname:</label>
                 <input type="text" class="form-control" id="txtFullname" />
               </div>
-             
+
             </div>
 
 
@@ -46,7 +46,7 @@
                 <label for="recipient-name" class="col-form-label">Confirm Password:</label>
                 <input type="password" class="form-control" id="txtConfirmPassword" value="123" />
               </div>
-              
+
             </div>
 
 
@@ -142,22 +142,10 @@
           userId
         },
         success: function (data) {
-          if (data.user.is_dc) {
-            $('#is_dc').prop('checked', true);
-          } else if (data.user.is_sale) {
-            $('#is_sale').prop('checked', true);
-          } else if (data.user.is_tla) {
-            $('#is_sale').prop('checked', true);
-          } else if (data.user.is_qa) {
-            $('#is_qa').prop('checked', true);
-          } else if (data.user.is_editor) {
-            $('#is_editor').prop('checked', true);
-          } else if (data.user.is_accountant) {
-            $('#is_accountant').prop('checked', true);
-          }
 
 
-          $('#slUserGroup').val(data.user.user_type);
+          $('#slUserGroup').val(data.user.user_group);
+          $('#slUserLevel').val(data.user.user_level);
 
 
           $('#txtFullname').val(data.user.fullname);
@@ -190,11 +178,10 @@
 
 
   $("#btnSubmit").click(function () {
-   
-   
-    let user_type = $('#slUserGroup option:selected').val();
 
 
+    let user_group = $('#slUserGroup option:selected').val();
+    let user_level = $('#slUserLevel option:selected').val();
 
 
     let fullname = $('#txtFullname').val();
@@ -219,6 +206,8 @@
       return;
     }
 
+   
+
     if (userId.length == 0) {
 
       $.ajax({
@@ -228,7 +217,8 @@
           authorization: "Bearer " + localStorage.getItem('accessToken'),
         },
         data: {
-          user_type,
+          user_group,
+          user_level,
           fullname,
           username,
           password,
@@ -240,7 +230,7 @@
           is_active,
           bank,
           bank_no,
-          bank_holder       
+          bank_holder
         },
         success: function (data, textStatus, xhr) {
           alert(data.msg);
@@ -260,7 +250,8 @@
         },
         data: {
           userId,
-          user_type,
+          user_group,
+          user_level,
           fullname,
           username,
           password,
@@ -272,13 +263,7 @@
           is_active,
           bank,
           bank_no,
-          bank_name,
-          is_dc,
-          is_sale,
-          is_tla,
-          is_qa,
-          is_editor,
-          is_accountant
+          bank_holder         
         },
         success: function (data, textStatus, xhr) {
           alert(data.msg);
@@ -294,7 +279,7 @@
 
 
   $(document).ready(function () {
-    LoadUserGroup();   
+    LoadUserGroup();
     LoadBanks();
   });
 
@@ -348,7 +333,7 @@
 
 
 
-  
+
 
   function GenerateUsername(fullname) {
     shortkeys = fullname.split(" ");
@@ -377,29 +362,29 @@
 
 
 
-  function LoadUserLevels(groupId){
-      $.ajax({
-        url:'/admin/staff-level/list-by-user-group',
-        type:'get',
-        headers: {
-          authorization: "Bearer " + localStorage.getItem('accessToken'),
-        },
-        data:{
-          groupId
-        },
-        success:function(data){
-          console.log(data);
-          $('#slUserLevel').empty();
-          data.levels.forEach(l=>{
-            let opt = '<option val="'+l._id+'">'+l.name+'</option>';
-            $('#slUserLevel').append(opt);
-          })
+  function LoadUserLevels(groupId) {
+    $.ajax({
+      url: '/admin/staff-level/list-by-user-group',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem('accessToken'),
+      },
+      data: {
+        groupId
+      },
+      success: function (data) {
+        console.log(data);
+        $('#slUserLevel').empty();
+        data.levels.forEach(l => {
+          let opt = '<option value="' + l._id + '">' + l.name + '</option>';
+          $('#slUserLevel').append(opt);
+        })
 
-        }, error: function (jqXHR, textStatus, errorThrown) {
-          alert(jqXHR.responseJSON.msg);
-        }
-      })
-    }
+      }, error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      }
+    })
+  }
 
-    
+
 </script>
