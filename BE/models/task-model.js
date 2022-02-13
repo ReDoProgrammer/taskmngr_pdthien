@@ -76,7 +76,16 @@ const taskSchema = new Schema({
         //cả tla, sale,admin,dc đều có thể can thiệp
         type: String,
         default: ''
-    }
+    },
+    assigned_date: {
+        type: Date,
+        require: true
+    },
+    deadline: {
+        type: Date,
+        require: true
+    },
+
 
 });
 

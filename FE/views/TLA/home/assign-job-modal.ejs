@@ -18,10 +18,10 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-md-2">
+              <div class="col-md-2 col-sm-2 col-xs-4">
                 <label class="font-weight-bold">Remark:</label>
               </div>
-              <div class="col-md-10">
+              <div class="col-md-10 col-sm-2 col-xs-6">
                 <label id="customer_remark" class="text-warning"></label>
               </div>
             </div>
@@ -41,11 +41,12 @@
           <table class="table mt-1 table-striped bg-white text-dark">
             <thead class="thead-dark">
               <tr>
+
                 <th scope="col">#</th>
                 <th scope="col">Level</th>
                 <th scope="col">Remark</th>
                 <th scope="col">Editor</th>
-                <th scope="col">Q.C</th>
+                <th scope="col">Q.A</th>
                 <th></th>
               </tr>
             </thead>
@@ -57,21 +58,24 @@
         <hr />
 
 
-        <div class="form-row panel panel-primary" id="divLevel">
+        <div class="panel panel-primary" id="divLevel">
           <div class="panel-heading font-w">Add job level</div>
           <div class="panel-body">
 
-            <div class="col-sm-3">
-              <select name="" id="slJobLevels" class="form-control"></select>
+            <div class="row">
+              <div class="col-md-3 col-sm-3 col-xs-12 mt-2">
+                <select name="" id="slJobLevels" class="form-control"></select>
+              </div>
+              <div class="col-md-7 col-sm-7 col-xs-12 mt-2">
+                <input type="text" name="txtRemark" id="txtRemark" class="form-control" placeholder="Level remark">
+              </div>
+              <div class="col-md-7 col-sm-2 col-xs-12 text-center mt-2">
+                <button class="btn btn-info" id="btnAddLevel">
+                  <i class="fa fa-plus" aria-hidden="true"></i>Add
+                </button>
+              </div>
             </div>
-            <div class="col-sm-7">
-              <input type="text" name="txtRemark" id="txtRemark" class="form-control" placeholder="Level remark">
-            </div>
-            <div class="col-sm-2">
-              <button class="btn btn-info" id="btnAddLevel">
-                <i class="fa fa-plus" aria-hidden="true"></i>Add
-              </button>
-            </div>
+
           </div>
 
         </div>
@@ -79,34 +83,35 @@
           <div class="panel-heading font-w">Assign Editor & Q.A</div>
           <div class="panel-body">
 
-            <div class="row mt-3">
-              <div class="col-sm-2 font-weight-bold">Editor:</div>
-              <div class="col-sm-7">
+            <div class="row mt-3">              
+              <div class="col-md-6 col-sm-6 col-xs-12 mt-2">
                 <select class="form-control selectpicker" id="slEditor" data-live-search="true"></select>
               </div>
-              <div class="col-sm-2">
+              <div class="col-md-4 col-sm-3 col-xs-6 mt-2">
                 <button class="btn btn-sm btn-success" id="btnAssignEditor">
                   <i class="fa fa-plus"></i> Assign Editor
                 </button>
               </div>
-              <div class="col-sm-1">
+              <div class="col-md-2 col-sm-3 col-xs-6 text-right mt-2">
                 <button class="btnCancelAssign btn btn-xs">
                   <i class="fa fa-close text-danger"></i>
                 </button>
               </div>
             </div>
 
-            <div class="row mt-3">
-              <div class="col-sm-2 font-weight-bold">Q.A:</div>
-              <div class="col-sm-7">
+
+            <hr/> 
+              
+            <div class="row mt-3">             
+              <div class="col-md-4 col-sm-4 col-xs-6">
                 <select class="form-control selectpicker" id="slQA" data-live-search="true"></select>
               </div>
-              <div class="col-sm-2">
+              <div class="col-md-2 col-sm-3 col-xs-3">
                 <button class="btn btn-sm btn-success" id="btnAssignQA">
                   <i class="fa fa-plus"></i> Assign Q.A
                 </button>
               </div>
-              <div class="col-sm-1">
+              <div class="col-md-2 col-sm-2 col-xs-2 ml-2">
                 <button class="btnCancelAssign btn btn-xs">
                   <i class="fa fa-close text-danger"></i>
                 </button>
@@ -153,7 +158,7 @@
       },
       data: {
         taskId,
-        staff: $('#slEditor option:selected').val()       
+        staff: $('#slEditor option:selected').val()
       },
       success: function (data) {
         $('#msgError').text(data.msg);
@@ -215,7 +220,7 @@
 
   $(document).ready(function () {
     $('#divAssign').hide();
-   
+
   })
 
   function ChangeJobStatus(jobId, status) {
@@ -254,11 +259,11 @@
 
     LoadEditor();
     LoadQA();
-   
+
     $('#divAssign').show(500);
     $('#divLevel').hide(100);
     $("button[name='btnAssignStaff']").hide(100);
-    $("button[name='btnDelTask']").hide(100);   
+    $("button[name='btnDelTask']").hide(100);
   })
 
   $(document).on("click", "button[name='btnDelTask']", function () {
@@ -297,8 +302,8 @@
       type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },    
-      data:{
+      },
+      data: {
         levelId
       },
       success: function (data) {
@@ -322,10 +327,10 @@
       type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },   
-      data:{
+      },
+      data: {
         levelId
-      } ,  
+      },
       success: function (data) {
         $('#slQA').empty();
         data.qas.forEach(q => {
@@ -383,11 +388,14 @@
         jobId
       },
       success: function (data) {
-     
+
         let idx = 1;
         data.tasks.forEach(t => {
-          let tr = '<tr id="' + t._id + '" data-level="'+t.level._id+'">';
+          let tr = '<tr id="' + t._id + '" data-level="' + t.level._id + '">';
+
           tr += "<td>" + idx++ + "</td>";
+
+
           tr += "<td class='font-weight-bold text-info'>" + t.level.name + "</td>";
           tr += "<td>" + t.remark + "</td>";
 
@@ -408,12 +416,11 @@
           else tr += '';
 
 
-
           tr += '<td class="text-right">';
-
           tr += '<button class="btn btn-xs btn-primary" name="btnAssignStaff"><i class="fa fa-plus" aria-hidden="true"></i> Assign staff</button>';
           tr += '<button class="ml-1 btn btn-xs btn-danger" name="btnDelTask"><i class="fa fa-trash text-white" aria-hidden="true"></i></button>';
           tr += '</td>';
+
           tr += "</tr>";
 
           $("#tblTasks").append(tr);

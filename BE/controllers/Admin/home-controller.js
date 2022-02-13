@@ -44,12 +44,12 @@ router.get("/init", (req, res) => {
   Promise.all([initRootAccount,initModules])
   .then(result=>{
     initRootRole(result[0].root._id,result[1].modules[0]._id)
-    .then(rs=>{
+    .then(rs=>{      
       return res.stastus(rl.code).json({
         msg:`Initialize database successfully!`,
         root: result[0].root,
         modules: result[1].modules,
-        role: rs.rl
+        role: rs
       })
     })
   })
