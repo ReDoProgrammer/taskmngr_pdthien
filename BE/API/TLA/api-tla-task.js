@@ -16,7 +16,7 @@ router.get('/list', authenticateTLAToken, (req, res) => {
     let { jobId } = req.query;
     Task
         .find({ job: jobId })
-        .populate('level', 'name -_id')
+        .populate('level', 'name')
         .populate('qa', 'fullname -_id')
         .populate('editor', 'fullname -_id')
         .exec()

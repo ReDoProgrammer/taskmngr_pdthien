@@ -140,6 +140,7 @@
 <script type="text/javascript">
   let idx = 1;
   var taskId = '';
+  var levelId = '';
 
 
   $('#btnAssignEditor').on('click', function () {
@@ -214,8 +215,7 @@
 
   $(document).ready(function () {
     $('#divAssign').hide();
-    LoadEditor();
-    LoadQA();
+   
   })
 
   function ChangeJobStatus(jobId, status) {
@@ -250,6 +250,11 @@
 
   $(document).on("click", "button[name='btnAssignStaff']", function () {
     taskId = $(this).closest("tr").attr("id");
+    levelId = $(this).closest("tr").data('level');
+
+    LoadEditor();
+    LoadQA();
+   
     $('#divAssign').show(500);
     $('#divLevel').hide(100);
     $("button[name='btnAssignStaff']").hide(100);
@@ -292,7 +297,10 @@
       type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },     
+      },    
+      data:{
+        levelId
+      },
       success: function (data) {
         $('#slEditor').empty();
         data.editors.forEach(e => {
@@ -314,7 +322,10 @@
       type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },      
+      },   
+      data:{
+        levelId
+      } ,  
       success: function (data) {
         $('#slQA').empty();
         data.qas.forEach(q => {
@@ -372,9 +383,10 @@
         jobId
       },
       success: function (data) {
+     
         let idx = 1;
         data.tasks.forEach(t => {
-          let tr = '<tr id="' + t._id + '">';
+          let tr = '<tr id="' + t._id + '" data-level="'+t.level._id+'">';
           tr += "<td>" + idx++ + "</td>";
           tr += "<td class='font-weight-bold text-info'>" + t.level.name + "</td>";
           tr += "<td>" + t.remark + "</td>";

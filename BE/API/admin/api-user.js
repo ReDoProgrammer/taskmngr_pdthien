@@ -217,9 +217,10 @@ router.post("/login", (req, res) => {
 
   Promise.all([getModule, checkAccount(username, password)])
     .then(result => {     
-
+      
       checkRole(result[1]._id, result[0]._id)
-        .then(chk => {          
+        .then(chk => {    
+         
           if (chk) {
             let user = result[1];
             let u = {
@@ -241,7 +242,7 @@ router.post("/login", (req, res) => {
           }
 
         })
-        .catch(err => {
+        .catch(err => {         
           return res.status(err.code).json({
             msg: err.message
           })

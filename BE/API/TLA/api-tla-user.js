@@ -4,6 +4,8 @@ const User = require('../../models/user-model');
 const UserModule = require('../../models/user-module-model');
 const Module = require('../../models/module-model');
 const Wage = require('../../models/wage-model');
+const StaffJobLevel = require('../../models/staff-job-level-model');
+
 
 const _EDITOR = 'EDITOR';
 const _QA = 'QA';
@@ -12,11 +14,20 @@ const _QA = 'QA';
 /*
     Hàm load danh sách Editor dựa vào module đã set quyền nhân viên
     Chỉ load những nhân viên Editor có trạng thái hoạt động is_active:true
+    và có staff-job-level tương ứng với joblevel id được truyền vào từ view
 */
 router.get('/list-editor', authenticateTLAToken, (req, res) => {
     let { levelId } = req.query;
-
-    getModuleId(_EDITOR)
+    StaffJobLevel
+    .find({job_lv:levelId})
+    .exec()
+    .then(sjl=>{
+        
+        let staffLevels = sjl.map(x=>{
+            return x.staff_lv
+        })
+        
+        getModuleId(_EDITOR)
         .then(result => {
             UserModule
                 .find({ module: result.m._id })
@@ -27,7 +38,11 @@ router.get('/list-editor', authenticateTLAToken, (req, res) => {
                     });
 
                     User
-                        .find({ _id: { $in: umList }, is_active: true })
+                        .find({ 
+                            _id: { $in: umList }, 
+                            user_level:{$in: staffLevels},
+                            is_active: true 
+                        })
                         .select('fullname')
                         .exec()
                         .then(editors => {
@@ -48,6 +63,14 @@ router.get('/list-editor', authenticateTLAToken, (req, res) => {
                     })
                 })
         })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not load staff job level with job id: ${new Error(err.message)}`
+        })
+    })
+
+ 
 })
 
 /*
@@ -56,23 +79,39 @@ router.get('/list-editor', authenticateTLAToken, (req, res) => {
    
 */
 
-router.get('/list-qa', authenticateTLAToken, (req, res) => {
+router.get('/list-qa', authenticateTLAToken, (req, res) => {  
 
-    let { levelId } = req.query;
+    let { levelId } = req.query;    
 
-    getModuleId(_QA)
+    StaffJobLevel
+    .find({job_lv:levelId})
+    .exec()
+    .then(sjl=>{
+        
+        let staffLevels = sjl.map(x=>{
+            return x.staff_lv
+        })
+
+      
+        
+        getModuleId(_QA)
         .then(result => {
-
+           
             UserModule
                 .find({ module: result.m._id })
                 .exec()
                 .then(um => {
+
                     let umList = um.map(x => {
                         return x.user._id
                     });
 
                     User
-                        .find({ _id: { $in: umList }, is_active: true })
+                        .find({ 
+                            _id: { $in: umList }, 
+                            user_level:{$in: staffLevels},
+                            is_active: true 
+                        })
                         .select('fullname')
                         .exec()
                         .then(qas => {
@@ -92,8 +131,13 @@ router.get('/list-qa', authenticateTLAToken, (req, res) => {
                         msg: `Can not load user module with error: ${new Error(err.message)}`
                     })
                 })
-
         })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not load staff job level with job id: ${new Error(err.message)}`
+        })
+    })
 })
 
 

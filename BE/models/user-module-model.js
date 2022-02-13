@@ -21,7 +21,7 @@ const userModuleSchema = new Schema({
 
 userModuleSchema.index({ user: 1, module: 1 }, { unique: true });
 
-module.exports = mongoose.model('user-module',userModuleSchema);
+module.exports = mongoose.model('user_module',userModuleSchema);
 
 
 
