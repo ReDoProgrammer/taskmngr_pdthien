@@ -17,4 +17,13 @@ router.get('/create',(req,res)=>{
     })
 })
 
+
+router.get('/update',(req,res)=>{
+    res.render('admin/customer/update',{
+        layout:'layouts/admin-layout',
+        title:'Update customer information'
+       
+    })
+})
+
 module.exports = router;

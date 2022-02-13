@@ -74,7 +74,8 @@
         });
 
         $(document).on("click", "button[name='update']", function () {
-
+          customerId = $(this).closest("tr").attr("id");
+          window.location.href = "/admin/customer/update?id="+customerId;
         });
 
 

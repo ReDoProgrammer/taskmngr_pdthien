@@ -6,7 +6,10 @@
         <div class="col-md-12 text-right">
           <button class="btn btn-secondary">Cancel</button>
 
-          <button class="btn btn-success" id="btnSubmit">Submit</button>
+          <button class="btn btn-primary" id="btnSubmit">
+            <i class="fa fa-floppy-o"></i>
+            Submit
+          </button>
         </div>
       </div>
 
@@ -123,5 +126,50 @@
         $(document).on("click", "button[name='delete']", function () {
           levelId = $(this).closest("tr").attr("id");
           $("#" + levelId).remove();
+        });
+      </script>
+
+      <!-- phần liên quan tới hợp đồng job level -->
+      <script>
+        var idx = 1;
+      
+        
+      
+        $("#btnAddNewLevel").click(function () {
+          let levelId = $("#slLevel option:selected").val();
+          let levelName = $("#slLevel option:selected").text();
+          let price = $("#txtPrice").val();
+          if (price <= 0) {
+            alert("Đơn giá không hợp lệ!");
+            return;
+          }
+      
+          //duyệt table xem đã tồn tại level được chọn hay chưa
+          //nếu đã tồn tại thì không cho thêm
+          let exist = false;
+          $("table > tbody  > tr").each(function (index, tr) {
+            let id = tr["id"];
+            if (levelId === id) {
+              alert("This level already exist!");
+              exist = true;
+              return;
+            }
+          });
+      
+          if (!exist) {
+            let tr = '<tr id ="' + levelId + '" class="row">';
+            tr += '<td class="col-md-1">' + idx++ + "</td>";
+            tr += '<td class="col-md-8 text-info">' + levelName + "</td>";
+            tr +=
+              '<td class="col-md-2 text-center text-danger font-weight-bold">' +
+              price +
+              "</td>";
+            tr += '<td class="col-md-1"><button class="btn btn-sm btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
+            tr += "</tr>";
+      
+            $("#tblData").append(tr);
+            $('#txtPrice').val(0);
+          }
+      
         });
       </script>

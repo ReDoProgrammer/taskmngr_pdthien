@@ -1,0 +1,217 @@
+<%-include('child/basic-information')%>
+    <%-include('child/style')%>
+        <%-include('child/contract')%>
+
+            <div class="row mt-2">
+                <div class="col-md-12 text-right">
+                    <button class="btn btn-secondary">Cancel</button>
+
+                    <button class="btn btn-primary" id="btnSubmit">
+                        <i class="fa fa-floppy-o"></i>
+                        Submit
+                    </button>
+                </div>
+            </div>
+
+            <script>
+                var customerId = '';
+                $(document).ready(function () {
+                    customerId = getUrlParameter('id');
+                    LoadCustomer(customerId);
+                    LoadCustomerLevels(customerId);
+                })
+
+                $(document).on("click", "button[name='deleteLevel']", function () {
+                    id = $(this).closest("tr").attr("id");
+                    if (confirm("Are you sure want to delete this customer level?")) {
+                        $.ajax({
+                            url: '/admin/customer-level',
+                            type: 'delete',
+                            headers: {
+                                authorization: "Bearer " + localStorage.getItem("accessToken"),
+                            },
+                            data: {
+                                id
+                            },
+                            success: function (data) {
+                                alert(data.msg);
+                                LoadCustomerLevels(customerId);
+                            }, error: function (jqXHR, textStatus, errorThrown) {
+                                alert(jqXHR.responseJSON.msg);
+                            },
+                        })
+                    }
+
+                })
+
+                $('#btnAddNewLevel').click(function () {
+                    let levelId = $('#slLevel option:selected').val();
+                    let price = parseFloat($('#txtPrice').val());
+
+                    if (price <= 0) {
+
+                        alert('Price not allowed!');
+                        return;
+                    }
+
+                    $.ajax({
+                        url: '/admin/customer-level',
+                        type: 'post',
+                        headers: {
+                            authorization: "Bearer " + localStorage.getItem("accessToken"),
+                        },
+                        data: {
+                            customerId,
+                            levelId,
+                            price
+                        },
+                        success: function (data) {
+                            alert(data.msg);
+                            LoadCustomerLevels(customerId);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert(jqXHR.responseJSON.msg);
+                        }
+
+                    })
+                })
+
+                function LoadCustomer(customerId) {
+                    $.ajax({
+                        url: "/admin/customer/detail",
+                        type: "get",
+                        headers: {
+                            authorization: "Bearer " + localStorage.getItem("accessToken"),
+                        },
+                        data: {
+                            customerId
+                        },
+                        success: function (data, textStatus, xhr) {
+
+                            $('#txtFirstname').val(data.customer.firstname);
+                            $('#txtLastname').val(data.customer.lastname);
+
+                            $('#txtPhone').val(data.customer.phone);
+                            $('#txtEmail').val(data.customer.email);
+                            $('#txtAddress').val(data.customer.address);
+
+                            $('#txtLocalStorage').val(data.customer.local_storage);
+                            $('#txtCloudStorage').val(data.customer.cloud_storage);
+
+
+                            $('#slOutput').val(data.customer.output._id);
+                            $('#slSize').val(data.customer.size._id);
+                            $('#slColorMode').val(data.customer.color_mode._id);
+
+
+
+
+
+
+
+                            $('#slCloud').text(data.customer.cloud._id);
+
+                            $('#slNationalStyle').val(data.customer.national_style._id);
+                            $('#txtRemark').val(data.customer.remark);
+
+
+                            //thiết lập cho các input text ở chế độ cho phép chỉnh sửa nếu các checkbox tương ứng đang được tick
+                            $('#txtAlign').prop('readonly', false);
+                            $('#txtTV').prop('readonly', false);
+                            $('#txtGrass').prop('readonly', false);
+                            $('#txtSky').prop('readonly', false);
+                            $('#txtFire').prop('readonly', false);
+
+
+                            if (data.customer.is_align) {
+                                $('#ckbAlign').prop('checked', true);
+                                $('#txtAlign').val(data.customer.align_note);
+                            } else {
+                                $('#ckbAlign').prop('checked', false);
+                            }
+
+                            if (data.customer.has_TV) {
+                                $('#ckbTV').prop('checked', true);
+                                $('#txtTV').val(data.customer.TV_note);
+                            } else {
+                                $('#ckbTV').prop('checked', false);
+                            }
+
+                            if (data.customer.has_grass) {
+                                $('#ckbGrass').prop('checked', true);
+                                $('#txtGrass').val(data.customer.grass_note);
+                            } else {
+                                $('#ckbGrass').prop('checked', false);
+                            }
+
+                            if (data.customer.has_sky) {
+                                $('#ckbSky').prop('checked', true);
+                                $('#txtSky').val(data.customer.grass_note);
+                            } else {
+                                $('#ckbSky').prop('checked', false);
+                            }
+
+
+                            if (data.customer.has_fire) {
+                                $('#ckbFire').prop('checked', true);
+                                $('#txtFire').val(data.customer.fire_note);
+                            } else {
+                                $('#ckbFire').prop('checked', false);
+                            }
+
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
+                        }
+                    })
+                }
+
+
+                function LoadCustomerLevels(customerId) {
+                    $.ajax({
+                        url: "/admin/customer-level",
+                        type: "get",
+                        headers: {
+                            authorization: "Bearer " + localStorage.getItem("accessToken"),
+                        },
+                        data: {
+                            customerId
+                        },
+                        success: function (data, textStatus, xhr) {
+
+                            $('#tblData').empty();
+                            let idx = 1;
+                            data.cl.forEach(i => {
+
+                                let tr = '<tr id="' + i._id + '">';
+                                tr += '<td>' + (idx++) + '</td>';
+                                tr += '<td class="font-weight-bold text-danger">' + i.level.name + '</td>';
+                                tr += '<td class="text-warning text-right">' + i.price + '</td>';
+                                tr += '<td><button class="btn btn-xs btn-danger" name="deleteLevel"><i class="fa fa-trash-o"></i></button></td>';
+                                tr += '</tr>';
+                                $('#tblData').append(tr);
+                            })
+
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert(jqXHR.responseJSON.msg);
+                        },
+                    });
+                }
+
+                var getUrlParameter = function getUrlParameter(sParam) {
+                    var sPageURL = window.location.search.substring(1),
+                        sURLVariables = sPageURL.split('&'),
+                        sParameterName,
+                        i;
+
+                    for (i = 0; i < sURLVariables.length; i++) {
+                        sParameterName = sURLVariables[i].split('=');
+
+                        if (sParameterName[0] === sParam) {
+                            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                        }
+                    }
+                    return false;
+                };
+            </script>

@@ -14,7 +14,7 @@ const customerLevelModel = new Schema({
     },
     level:{
         type:Schema.Types.ObjectId,
-        ref:'job-level'        
+        ref:'job_level'        
     },
     price:{
         type:Number,

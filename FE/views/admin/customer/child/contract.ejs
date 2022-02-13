@@ -21,11 +21,12 @@
               name="price" />
           </div>
           <div class="col-md-4 col-sm-4 col-xs-4">
-            <button class="btn btn-warning" id="btnAddNewLevel">
+            <button class="btn btn-success" id="btnAddNewLevel">
               <span>
                 <i class="fa fa-plus" aria-hidden="true"></i>
               </span>
-              Add new level
+
+              Add new
             </button>
           </div>
         </div>
@@ -36,7 +37,7 @@
             <tr class="form-row">
               <th scope="col" class="col-md-1">#</th>
               <th scope="col" class="col-md-8">Level</th>
-              <th scope="col" class="col-md-2">Price ($)</th>
+              <th scope="col" class="col-md-2 text-right">Price ($)</th>
               <th scope="col" class="col-md-1"></th>
             </tr>
           </thead>
@@ -50,13 +51,7 @@
 
 
 
-
-
-
-
 <script>
-  var idx = 1;
-
   $(document).ready(function () {
     LoadLevel();
   });
@@ -68,7 +63,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      success: function (data, textStatus, xhr) {      
+      success: function (data, textStatus, xhr) {
         $("#slLevel").empty();
         data.jl.forEach((lv) => {
           let opt = '<option value="' + lv._id + '">' + lv.name + "</option>";
@@ -95,43 +90,5 @@
     ) {
       event.preventDefault();
     }
-  });
-
-  $("#btnAddNewLevel").click(function () {
-    let levelId = $("#slLevel option:selected").val();
-    let levelName = $("#slLevel option:selected").text();
-    let price = $("#txtPrice").val();
-    if (price <= 0) {
-      alert("Đơn giá không hợp lệ!");
-      return;
-    }
-
-    //duyệt table xem đã tồn tại level được chọn hay chưa
-    //nếu đã tồn tại thì không cho thêm
-    let exist = false;
-    $("table > tbody  > tr").each(function (index, tr) {
-      let id = tr["id"];
-      if (levelId === id) {
-        alert("This level already exist!");
-        exist = true;
-        return;
-      }
-    });
-
-    if (!exist) {
-      let tr = '<tr id ="' + levelId + '" class="row">';
-      tr += '<td class="col-md-1">' + idx++ + "</td>";
-      tr += '<td class="col-md-8 text-info">' + levelName + "</td>";
-      tr +=
-        '<td class="col-md-2 text-center text-danger font-weight-bold">' +
-        price +
-        "</td>";
-      tr += '<td class="col-md-1"><button class="btn btn-sm btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
-      tr += "</tr>";
-
-      $("#tblData").append(tr);
-      $('#txtPrice').val(0);
-    }
-
   });
 </script>
