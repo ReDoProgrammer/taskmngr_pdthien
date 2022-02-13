@@ -4,14 +4,14 @@
     <div class="input-group">
       <input type="text" class="form-control" placeholder="Seach any job" id="txtSearch" />
       <div class="input-group-btn">
-          <button class="btn btn-info" type="submit" id="btnSearch">
-              <i class="fa fa-search" aria-hidden="true"></i>
-          </button>
+        <button class="btn btn-info" type="submit" id="btnSearch">
+          <i class="fa fa-search" aria-hidden="true"></i>
+        </button>
       </div>
-  </div>
+    </div>
   </div>
 </div>
-<div class="tableFixHead">
+<div class="table-responsive">
   <table class="table mt-1 table-striped bg-white text-dark">
     <thead class="thead-dark">
       <tr>
@@ -21,7 +21,8 @@
         <th scope="col">Receive date</th>
         <th scope="col">Delivery date</th>
         <th scope="col">Intruction</th>
-        <th scope="col">Status</th>
+        <th scope="col" class="text-center">Images link</th>
+        <th scope="col" class="text-right">Status</th>
       </tr>
     </thead>
     <tbody id="tblData">
@@ -44,7 +45,7 @@
   src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
 
 
-  
+
 <script>
   var search = "";
   var page = 1;
@@ -54,18 +55,18 @@
   });
 
 
-  $('#btnSearch').click(function(){
+  $('#btnSearch').click(function () {
     search = $('#txtSearch').val();
     LoadJobs();
   })
 
 
-  $('#txtSearch').keyup(function(e){
-    if(e.keyCode == 13)
-    {
+
+  $('#txtSearch').keyup(function (e) {
+    if (e.keyCode == 13) {
       $("#btnSearch").click()
     }
-});
+  });
 
 
   function LoadJobs() {
@@ -84,19 +85,40 @@
         // $("#pagination").empty();
         let idx = 1;
         data.jobs.forEach((job) => {
-          let tr = "  <tr id='" + job._id + "'>";
+          let tr = "  <tr id='" + job._id + "' >";
           tr += '<th scope="row">' + idx++ + "</th>";
           tr +=
             " <td class='font-weight-bold'>" + job.customer.firstname + " " + job.customer.lastname + "</td>";
           tr += "<td class='text-info font-weight-bold'>" + job.name + "</td>";
           tr += "<td>" + new Date(job.received_date).toLocaleString() + "</td>";
           tr += "<td>" + new Date(job.delivery_date).toLocaleString() + "</td>";
-          tr += "<td>" + job.intruction + "</td>";
+          tr += "<td class='text-warning'>" + job.intruction + "</td>";
+          tr += "<td class='font-italic font-weight-bold text-center'><a href='" + job.source_link + "' target='_blank'>Link</a></td>";
 
-          tr += "<td class='text-right'>";
-          tr +=
-            '<button class="btn btn-sm btn-info" name="add_job"><i class="fa fa-eye mr-1" aria-hidden="true"></i></button>';
-          tr += "</td>";
+
+          tr += '<td class = "font-weight-bold text-right"><i>';
+          switch (job.status) {
+            case -1:
+              tr += '<span class = "text-warning">Initial</span>';
+              break;
+            case 0:
+              tr += '<span class = "text-info">Processing</span>';
+              break;
+            case 1:
+              tr += '<span class = "text-primary">Upload</span>';
+              break;
+            case 2:
+              tr += '<span class = "text-success">Done</span>';
+              break;
+            case -2:
+              tr += '<span class = "text-danger">Rejected</span>';
+              break;
+            case -3:
+              tr += '<span class = "text-muted">Canceled</span>';
+              break;
+          }
+          tr += '</i></td>';
+
           $("#tblData").append(tr);
         });
 
@@ -114,76 +136,5 @@
     });
   }
 
-  $(document).on("click", "button[name='add_job']", function () {
-    customerId = $(this).closest("tr").attr("id");
-    $.ajax({
-      url: "/sale/customer/detail",
-      type: "get",
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        customerId,
-      },
-      success: function (data, textStatus, xhr) {
-        $("#customer_fullname").text(
-          data.customer.firstname + " " + data.customer.lastname
-        );
-        $("#customer_phone").text(data.customer.phone);
-        $("#customer_email").text(data.customer.email);
-        $("#customer_address").text(data.customer.address);
-        $("#customer_cloud").text(data.customer.cloud.name);
 
-        $("#receive_date").datetimepicker({
-          format: "DD/MM/YYYY HH:mm",
-          pickDate: false,
-          pickSeconds: false,
-          pick12HourFormat: false,
-        });
-
-        $("#deadline").datetimepicker({
-          format: "DD/MM/YYYY HH:mm",
-          pickDate: false,
-          pickSeconds: false,
-          pick12HourFormat: false,
-        });
-        $("#receive_date").val("");
-        $("#txtDeadline").val("");
-        $("#txtSourceLink").val("");
-        $("#txaIntruction").val("");
-        $("#modalJob").modal();
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
-      },
-    });
-  });
 </script>
-
-<style>
-  .tableFixHead {
-    overflow: auto;
-    height: 500px;
-  }
-
-  .tableFixHead thead th {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-
-  /* Just common table stuff. Really. */
-  table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-
-  th,
-  td {
-    padding: 8px 16px;
-  }
-
-  th {
-    background: #eee;
-  }
-</style>
