@@ -69,9 +69,7 @@ router.post('/', authenticateAdminToken, (req, res) => {
 
 
 router.delete('/',authenticateAdminToken,(req,res)=>{
-    let {id} = req.body;
-    console.log(id);
-
+    let {id} = req.body;    
     CustomerLevel.findByIdAndDelete(id,(err,cl)=>{
         if(err){
             return res.status(500).json({
