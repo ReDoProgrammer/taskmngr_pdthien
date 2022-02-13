@@ -17,10 +17,12 @@ router.get('/list', authenticateTLAToken, (req, res) => {
     Task
         .find({ job: jobId })
         .populate('level', 'name')
+        // .populate('job')
         .populate('qa', 'fullname -_id')
         .populate('editor', 'fullname -_id')
         .exec()
         .then(tasks => {
+            console.log(tasks)
             return res.status(200).json({
                 tasks,
                 msg: 'Load tasks by job id successfully!'
@@ -46,6 +48,7 @@ router.get('/', authenticateTLAToken, (req, res) => {
             }
         )
         .populate('level')
+        .populate('job')
         .exec()
         .then(tasks => {
             return res.status(200).json({
