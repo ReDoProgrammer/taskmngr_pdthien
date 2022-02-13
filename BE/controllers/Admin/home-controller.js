@@ -45,7 +45,7 @@ router.get("/init", (req, res) => {
   .then(result=>{
     initRootRole(result[0].root._id,result[1].modules[0]._id)
     .then(rs=>{      
-      return res.stastus(rs.rl.code).json({
+      return res.status(rs.rl.code).json({
         msg:`Initialize database successfully!`,
         root: result[0].root,
         modules: result[1].modules,
