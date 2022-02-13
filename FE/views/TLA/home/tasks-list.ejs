@@ -18,7 +18,7 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Job</th>
-                <th scope="col">Assigned date</th>
+                <th scope="col">Begin date</th>
                 <th scope="col">Deadline</th>               
                 <th scope="col" class="text-center">Editor</th>
                 <th scope="col" class="text-center">Q.A</th>
@@ -60,14 +60,14 @@
                 page
             },
             success: function (data) {
-                console.log(data);
+                
                 let idx = 1;
                 data.tasks.forEach(t => {
                     let tr = '<tr id="' + t._id + '">';
                     tr += '<td>' + (idx++) + '</td>';
                     tr += '<td class="text-danger font-weight-bold">' + t.job.name + '</td>';
-                    tr += '<td>' + t.job.received_date + '</td>';
-                    tr += '<td>' + t.job.delivery_date + '</td>';                  
+                    tr += '<td>' + new Date( t.job.received_date).toLocaleString() + '</td>';
+                    tr += '<td>' +new Date( t.job.delivery_date).toLocaleString()  + '</td>';                  
                                       
 
 
