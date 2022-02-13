@@ -10,7 +10,7 @@ const taskSchema = new Schema({
     },
     level: {
         type: Schema.Types.ObjectId,
-        ref: 'job-level'
+        ref: 'job_level'
     },
     level_price:{
         //lưu thông tin đơn giá của level để tính cho khách hàng

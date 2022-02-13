@@ -27,6 +27,7 @@ router.get('/list', authenticateTLAToken, (req, res) => {
             })
         })
         .catch(err => {
+            console.log(`Can not load task with job ${jobId}`);
             return res.status(500).json({
                 msg: `Can not load task with job ${jobId}`,
                 error: new Error(err.message)
