@@ -115,17 +115,13 @@
                             $('#txtRemark').val(data.customer.remark);
 
 
-                            //thiết lập cho các input text ở chế độ cho phép chỉnh sửa nếu các checkbox tương ứng đang được tick
-                            $('#txtAlign').prop('readonly', false);
-                            $('#txtTV').prop('readonly', false);
-                            $('#txtGrass').prop('readonly', false);
-                            $('#txtSky').prop('readonly', false);
-                            $('#txtFire').prop('readonly', false);
-
-
+                            
+                           
                             if (data.customer.is_align) {
                                 $('#ckbAlign').prop('checked', true);
                                 $('#txtAlign').val(data.customer.align_note);
+                                $('#txtAlign').prop('readonly', false);   
+
                             } else {
                                 $('#ckbAlign').prop('checked', false);
                             }
@@ -133,6 +129,8 @@
                             if (data.customer.has_TV) {
                                 $('#ckbTV').prop('checked', true);
                                 $('#txtTV').val(data.customer.TV_note);
+                                $('#txtTV').prop('readonly', false);
+                          
                             } else {
                                 $('#ckbTV').prop('checked', false);
                             }
@@ -140,6 +138,8 @@
                             if (data.customer.has_grass) {
                                 $('#ckbGrass').prop('checked', true);
                                 $('#txtGrass').val(data.customer.grass_note);
+                                $('#txtGrass').prop('readonly', false);
+                           
                             } else {
                                 $('#ckbGrass').prop('checked', false);
                             }
@@ -147,6 +147,8 @@
                             if (data.customer.has_sky) {
                                 $('#ckbSky').prop('checked', true);
                                 $('#txtSky').val(data.customer.grass_note);
+                                $('#txtSky').prop('readonly', false);
+                            
                             } else {
                                 $('#ckbSky').prop('checked', false);
                             }
@@ -155,6 +157,7 @@
                             if (data.customer.has_fire) {
                                 $('#ckbFire').prop('checked', true);
                                 $('#txtFire').val(data.customer.fire_note);
+                                $('#txtFire').prop('readonly', false);
                             } else {
                                 $('#ckbFire').prop('checked', false);
                             }
@@ -198,6 +201,57 @@
                         },
                     });
                 }
+
+                // chỉ cho phép chỉnh sửa các text box tương ứng với các checkbox khi checkbox đc tick
+                $("#ckbAlign").change(function() {
+                    if(this.checked) {
+                        $('#txtAlign').val('');
+                        $('#txtAlign').prop('readonly', false);  
+                    }else{
+                        $('#txtAlign').val('');
+                        $('#txtAlign').prop('readonly', true);  
+                    }
+                });
+
+                $("#ckbTV").change(function() {
+                    if(this.checked) {
+                        $('#txtTV').val('');
+                        $('#txtTV').prop('readonly', false);  
+                    }else{
+                        $('#txtTV').val('');
+                        $('#txtTV').prop('readonly', true);  
+                    }
+                });
+
+                $("#ckbGrass").change(function() {
+                    if(this.checked) {
+                        $('#txtGrass').val('');
+                        $('#txtGrass').prop('readonly', false);  
+                    }else{
+                        $('#txtGrass').val('');
+                        $('#txtGrass').prop('readonly', true);  
+                    }
+                });
+
+                $("#ckbGrass").change(function() {
+                    if(this.checked) {
+                        $('#txtGrass').val('');
+                        $('#txtGrass').prop('readonly', false);  
+                    }else{
+                        $('#txtGrass').val('');
+                        $('#txtGrass').prop('readonly', true);  
+                    }
+                });
+
+                $("#ckbFire").change(function() {
+                    if(this.checked) {
+                        $('#txtFire').val('');
+                        $('#txtFire').prop('readonly', false);  
+                    }else{
+                        $('#txtFire').val('');
+                        $('#txtFire').prop('readonly', true);  
+                    }
+                });
 
                 var getUrlParameter = function getUrlParameter(sParam) {
                     var sPageURL = window.location.search.substring(1),
