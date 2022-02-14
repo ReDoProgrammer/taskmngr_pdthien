@@ -1,4 +1,5 @@
 <script src="/js/bootstrap-select.min.js"></script>
+<script src="/js/common.js"></script>
 <link href="/css/bootstrap-select.min.css" rel="stylesheet" />
 <script type='text/javascript'
   src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
@@ -38,13 +39,15 @@
           </div>
         </div>
 
-        <div class="table-responsive mt-2">
-          <table class="table mt-1 table-striped bg-white text-dark">
+        <div class="table-responsive  table-responsive-sm table-responsive-xs mt-2">
+          <table class="table mt-1 table-striped bg-white text-dark nowrap">
             <thead class="thead-dark">
               <tr>
 
                 <th scope="col">#</th>
                 <th scope="col">Level</th>
+                <th scope="col">Assign date</th>
+                <th scope="col">Deadline</th>
                 <th scope="col">Remark</th>
                 <th scope="col">Editor</th>
                 <th scope="col">Q.A</th>
@@ -412,7 +415,7 @@
         jobId
       },
       success: function (data) {
-
+        console.log(data);
         let idx = 1;
         data.tasks.forEach(t => {
           let tr = '<tr id="' + t._id + '" data-level="' + t.level._id + '">';
@@ -421,6 +424,8 @@
 
 
           tr += "<td class='font-weight-bold text-info'>" + t.level.name + "</td>";
+          tr += "<td>" + convertISODateToTimeFormat(t.assigned_date) + "</td>";
+          tr += "<td>" + convertISODateToTimeFormat(t.deadline) + "</td>";
           tr += "<td>" + t.remark + "</td>";
 
 
@@ -485,6 +490,7 @@
     separator: "/",
     alias: "dd/mm/yyyy hh:mm"
   })
+
 
 
 

@@ -19,3 +19,20 @@ function strToDate(dtStr) {
 
     return newDate;   
 }
+
+function convertISODateToTimeFormat(ISO_Date) {
+  const newDateObj = new Date(ISO_Date);
+  const toMonth = (newDateObj.getMonth() + 1);
+  const toMonthProcess = (toMonth<10?'0':'')+toMonth;
+  const toYear = newDateObj.getFullYear();
+  const toDate = newDateObj.getDate();
+  const toDateProcess = (toDate<10?'0':'')+toDate;
+
+
+  const toHours = newDateObj.getHours();
+  const toHoursProcessed = (toHours < 10 ? '0' : '') + toHours;
+  const toMin = newDateObj.getMinutes();
+  const toMinProcessed = (toMin < 10 ? '0' : '') + toMin;
+  const dateTemplate = `${toDateProcess}/${toMonthProcess}/${toYear} ${toHoursProcessed}:${toMinProcessed}`;
+  return dateTemplate;
+}
