@@ -2,8 +2,6 @@ const router = require("express").Router();
 const User = require("../../models/user-model");
 const UserModule = require('../../models/user-module-model');
 const Module = require('../../models/module-model');
-const { captureRejectionSymbol } = require("node-cron/src/task");
-
 
 
 
@@ -19,14 +17,14 @@ const _MODULES = [
 
 ]
 
-const _ROOT_ACCOUNT =new User({
-  username:'admin',
-  password:'admin',
-  fullname:'Administrator',
-  idNo:'230752538',
-  issued_by:'Gia Lai',
-  phone:'0911397764',
-  email:'redo2011dht@gmail.com',
+const _ROOT_ACCOUNT = new User({
+  username: 'admin',
+  password: 'admin',
+  fullname: 'Administrator',
+  idNo: '230752538',
+  issued_by: 'Gia Lai',
+  phone: '0911397764',
+  email: 'redo2011dht@gmail.com',
   address: 'Chư Ty - Đức Cơ - Gia Lai'
 })
 
@@ -38,126 +36,151 @@ router.get("/", (req, res) => {
   });
 });
 
-router.get("/init", (req, res) => {
- 
+router.get("/init", async (req, res) => {
 
-  Promise.all([initRootAccount,initModules])
-  .then(result=>{
-    initRootRole(result[0].root._id,result[1].modules[0]._id)
-    .then(rs=>{      
-      return res.status(rs.rl.code).json({
-        msg:`Initialize database successfully!`,
-        root: result[0].root,
-        modules: result[1].modules,
-        role: rs.rl
+
+  await Promise.all([initRootAccount, initModules])
+    .then(result => {
+      initRootRole(result[0].root._id, result[1].modules[0]._id)
+        .then(rs => {
+          return res.status(rs.rl.code).json({
+            msg: `Initialize database successfully!`,
+            root: result[0].root,
+            modules: result[1].modules,
+            role: rs.rl
+          })
+        })
+    })
+    .catch(err => {
+      return res.status(err.code).json({
+        msg: err.msg
       })
     })
-  })
-  .catch(err=>{
-    return res.status(err.code).json({
-      msg:err.msg
-    })
-  })
-  
+
 });
-
-
-
 
 
 
 module.exports = router;
 
-const initRootRole = (userId,moduleId)=>{
-  return new Promise(async (resolve,reject)=>{
-    let role = new UserModule({
-      user:userId,
-      module:moduleId
-    });
-    await role.save()
-    .then(rl=>{
-      return resolve({
-        code:201,
-        msg:`Initialize root account with role successfully!`,
-        rl
-      })
-    })
-    .catch(err=>{
+const initRootRole = (userId, moduleId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let role = new UserModule({
+        user: userId,
+        module: moduleId
+      });
+      await role.save()
+        .then(rl => {
+          return resolve({
+            code: 201,
+            msg: `Initialize root account with role successfully!`,
+            rl
+          })
+        })
+        .catch(err => {
+          return reject({
+            code: 500,
+            msg: `Can not initialize root account role with error: ${new Error(err.message)}`
+          })
+        })
+    } catch (error) {
       return reject({
-        code:500,
-        msg:`Can not initialize root account role with error: ${new Error(err.message)}`
+        code: 500,
+        msg: `Cached error in init root role: ${new Error(error.message)}`
       })
-    })
+    }
+
   })
 }
 
-const initModules = new Promise((resolve,reject)=>{
-  Module.countDocuments({}, (err,count)=>{
-    if(err){
-      return reject({
-        code:500,
-        msg:`Can not count modules document with error: ${new Error(err.message)}`
-      })
-    }
 
-    if(count > 0){
-      return reject({
-        code:403,
-        msg:`These modules already exist in database`
-      })
-    }
-
-     Module.insertMany(_MODULES,(err,modules)=>{
-      if(err){
+const initModules = new Promise(async (resolve, reject) => {
+  try {
+    await Module.countDocuments({}, (err, count) => {
+      if (err) {
         return reject({
-          code:500,
-          msg:`Can not initialize modules with error: ${new Error(err.message)}`
+          code: 500,
+          msg: `Can not count modules document with error: ${new Error(err.message)}`
         })
       }
+
+
+      if (count > 0) {
+        return reject({
+          code: 403,
+          msg: `These modules already exist in database`
+        })
+      }else{
+        Module.insertMany(_MODULES, (err, modules) => {
+          if (err) {
+            return reject({
+              code: 500,
+              msg: `Can not initialize modules with error: ${new Error(err.message)}`
+            })
+          }
   
-      return resolve({
-        code:201,
-        msg:`Initialize modules list successfully!`,
-        modules
-      })
+          return resolve({
+            code: 201,
+            msg: `Initialize modules list successfully!`,
+            modules
+          })
+        })
+      }
+
+
+
+      
     })
+  } catch (error) {
+    return reject({
+      code: 500,
+      msg: `Can not init module with catched error: ${new Error(error.message)}`
+    })
+  }
 
-
-  })
- 
 })
 
-const initRootAccount = new Promise((resolve,reject)=>{
-  User.countDocuments({},async (err,count)=>{
-    if(err){
-      return reject({
-        code:500,
-        msg:`Can not count users with error: ${new Error(err.message)}`
-      })
-    }
 
-    if(count > 0){
-      return reject({
-        code:403,
-        msg:`Account already exist in database`
-      })
-    }
 
-    await _ROOT_ACCOUNT.save()
-    .then(root=>{
-      return resolve({
-        code:201,
-        msg:`Initialize root account successfully!`,
-        root
-      })
+const initRootAccount = new Promise(async (resolve, reject) => {
+  try {
+    await User.countDocuments({}, async (err, count) => {
+      if (err) {
+        return reject({
+          code: 500,
+          msg: `Can not count users with error: ${new Error(err.message)}`
+        })
+      }
+
+      if (count > 0) {
+        return reject({
+          code: 403,
+          msg: `Account already exist in database`
+        })
+      }
+
+      await _ROOT_ACCOUNT.save()
+        .then(root => {
+          return resolve({
+            code: 201,
+            msg: `Initialize root account successfully!`,
+            root
+          })
+        })
+        .catch(err => {
+          return reject({
+            code: 500,
+            msg: `Can not save root account with error: ${new Error(err.message)}`
+          })
+        })
     })
-    .catch(err=>{
-      return reject({
-        code:500,
-        msg:`Can not save root account with error: ${new Error(err.message)}`
-      })
+  } catch (error) {
+    reject({
+      code: 500,
+      msg: `Can not init root account with error: ${new Error(error.message)}`
     })
-  })
+  }
 })
 
 
