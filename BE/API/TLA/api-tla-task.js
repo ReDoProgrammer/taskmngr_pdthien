@@ -69,7 +69,7 @@ router.get('/detail', authenticateTLAToken, (req, res) => {
 })
 
 router.post('/', authenticateTLAToken, (req, res) => {
-    let { job, level, remark } = req.body;
+    let {  job,level,assigned_date,deadline,remark } = req.body;
 
     getCustomerIdFromJob(job)
         .then(result => {
@@ -87,7 +87,9 @@ router.post('/', authenticateTLAToken, (req, res) => {
                         job,
                         level,
                         remark,
-                        level_price: result.cl.price
+                        level_price: result.cl.price,
+                        assigned_date,
+                        deadline
                     });
 
                     task.save()

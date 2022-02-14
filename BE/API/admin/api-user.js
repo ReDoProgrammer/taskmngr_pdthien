@@ -119,8 +119,7 @@ router.post('/', authenticateAdminToken, (req, res) => {
     
   });
   u.save()
-    .then(user => {
-      console.log('user: ',user);
+    .then(user => {      
       return res.status(201).json({
         msg: 'New user has been created successfully!',
         user: user

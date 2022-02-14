@@ -230,7 +230,7 @@
               data.result.forEach((customer) => {
                 let tr = "  <tr id='" + customer._id + "'>";
                 tr += '<th scope="row">' + (idx++) + '</th>';
-                tr += " <td>" + customer.firstname + " " + customer.lastname + "</td>";
+                tr += " <td class='font-weight-bold text-info'>" + customer.firstname + " " + customer.lastname + "</td>";
                 tr += "<td>" + customer.phone + "</td>";
                 tr += "<td>" + customer.email + "</td>";
 

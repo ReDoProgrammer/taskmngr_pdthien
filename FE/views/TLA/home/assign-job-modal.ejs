@@ -1,6 +1,7 @@
 <script src="/js/bootstrap-select.min.js"></script>
 <link href="/css/bootstrap-select.min.css" rel="stylesheet" />
-
+<script type='text/javascript'
+  src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
 
 <div class="modal" tabindex="-1" id="assignJobModal">
   <div class="modal-dialog modal-lg">
@@ -59,22 +60,43 @@
 
 
         <div class="panel panel-primary" id="divLevel">
-          <div class="panel-heading font-w">Add job level</div>
+          <div class="panel-heading font-w"> Add job level</div>
           <div class="panel-body">
 
             <div class="row">
-              <div class="col-md-3 col-sm-4 col-xs-12 mt-2">
-                <select name="" id="slJobLevels" class="form-control"></select>
+              <div class="col-md-6 col-sm-12 col-xs-12">
+                <div class="form-group">
+                  <label for="">Job level</label>
+                  <select name="" id="slJobLevels" class="form-control"></select>
+                </div>
+
               </div>
-              <div class="col-md-7 col-sm-6 col-xs-9 mt-2">
+              <div class="col-md-3 col-sm-6 col-xs-6">
+                <div class="form-group">
+                  <label for="">Assign Date</label>
+                  <input type="text" class="inputDate form-control" id="txtAssignDate">
+                </div>
+              </div>
+
+              <div class="col-md-3 col-sm-6 col-xs-6">
+                <div class=" form-group">
+                  <label for="">Deadline</label>
+                  <input type="text" class="inputDate form-control" id="txtDeadline">
+                </div>
+              </div>
+            </div>
+
+            <div class="row mt-2">
+              <div class="col-md-10 col-sm-8 col-xs-8">
                 <input type="text" name="txtRemark" id="txtRemark" class="form-control" placeholder="Level remark">
               </div>
-              <div class="col-md-2 col-sm-2 col-xs-3 text-center mt-2">
+              <div class="col-md-2 col-sm-4 col-xs-4 text-center">
                 <button class="btn btn-info" id="btnAddLevel">
-                  <i class="fa fa-plus" aria-hidden="true"></i>Add
+                  <i class="fa fa-plus" aria-hidden="true"></i>Add job level
                 </button>
               </div>
             </div>
+
 
           </div>
 
@@ -83,7 +105,7 @@
           <div class="panel-heading font-w">Assign Editor & Q.A</div>
           <div class="panel-body">
 
-            <div class="row mt-3">              
+            <div class="row mt-3">
               <div class="col-md-6 col-sm-6 col-xs-12 mt-2">
                 <select class="form-control selectpicker" id="slEditor" data-live-search="true"></select>
               </div>
@@ -100,9 +122,9 @@
             </div>
 
 
-            <hr/> 
-              
-            <div class="row mt-3">             
+            <hr />
+
+            <div class="row mt-3">
               <div class="col-md-4 col-sm-4 col-xs-6">
                 <select class="form-control selectpicker" id="slQA" data-live-search="true"></select>
               </div>
@@ -174,8 +196,10 @@
     let level = $("#slJobLevels option:selected").val();
     let name = $("#slJobLevels option:selected").text();
 
+    let assigned_date = strToDate($('#txtAssignDate').val());
+    let deadline = strToDate($('#txtDeadline').val());
 
-
+    let remark = $('#txtRemark').val();
 
     $.ajax({
       url: '/tla/task',
@@ -185,8 +209,10 @@
       },
       data: {
         job: jobId,
-        level: level,
-        remark: $('#txtRemark').val()
+        level,
+        assigned_date,
+        deadline,
+        remark
       },
       success: function (data) {
         $('#msgError').text(data.msg);
@@ -215,6 +241,8 @@
   $("#assignJobModal").on('shown.bs.modal', function (e) {
     LoadTasks();
     LoadJobLevels();
+
+    $('#txtAssignDate').val(getCurrentTime())
   });
 
 
@@ -372,10 +400,6 @@
   }
 
 
-
-
-
-
   function LoadTasks() {
     $("#tblTasks").empty();
     $.ajax({
@@ -431,6 +455,36 @@
       },
     });
   }
+
+
+  function strToDate(dtStr) {
+    if (!dtStr) return null
+    let dateParts = dtStr.split("/");
+    let timeParts = dateParts[2].split(" ")[1].split(":");
+    dateParts[2] = dateParts[2].split(" ")[0];
+    console.log(dateParts, timeParts);
+    return dateObject = new Date(dateParts[2], dateParts[1] - 1, dateParts[0], timeParts[0], timeParts[1]);
+  }
+
+  function getCurrentTime() {
+    var currentdate = new Date();
+    return currentdate.getDate() + "/"
+      + (currentdate.getMonth() + 1) + "/"
+      + currentdate.getFullYear() + " "
+      + currentdate.getHours() + ":"
+      + currentdate.getMinutes();
+
+
+
+  }
+
+  $('.inputDate').inputmask("datetime", {
+    mask: "1/2/y h:s",
+    placeholder: "dd/mm/yyyy hh:mm",
+    leapday: "-02-29",
+    separator: "/",
+    alias: "dd/mm/yyyy hh:mm"
+  })
 
 
 
