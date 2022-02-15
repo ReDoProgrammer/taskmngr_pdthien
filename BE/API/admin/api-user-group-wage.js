@@ -3,28 +3,28 @@ const Wage = require('../../models/wage-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 
-router.delete('/delete-many',authenticateAdminToken,(req,res)=>{
-    let {ugId} = req.body;
+router.delete('/delete-many', authenticateAdminToken, (req, res) => {
+    let { ugId } = req.body;
     Wage
-    .deleteMany({user_group:ugId})
-    .exec()
-    .then(_=>{
-        return res.status(200).json({
-            msg:`Delete wages successfully!`
+        .deleteMany({ user_group: ugId })
+        .exec()
+        .then(_ => {
+            return res.status(200).json({
+                msg: `Delete wages successfully!`
+            })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not delete these wages with error: ${new Error(err.message)}`
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not delete these wages with error: ${new Error(err.message)}`
+            })
         })
-    })
 })
 
 
 
 router.delete('/', authenticateAdminToken, (req, res) => {
     let { _id } = req.body;
-    Wage.findByIdAndDelete( _id )
+    Wage.findByIdAndDelete(_id)
         .exec()
         .then(_ => {
             return res.status(200).json({
@@ -40,22 +40,31 @@ router.delete('/', authenticateAdminToken, (req, res) => {
 })
 
 router.post('/', authenticateAdminToken, (req, res) => {
-    let { user_group, module, level, wage } = req.body;
-   console.log({ user_group, module, level, wage });
-    if(wage<=0){
+    let {
+        module,
+        user_group,
+        staff_lv,
+        job_lv,
+        wage } = req.body;
+
+
+    if (wage <= 0) {
         return res.status(403).json({
-            msg:`Wage value not valid!`
+            msg: `Wage value not valid!`
         })
     }
 
+
+
     Wage
-        .countDocuments({ user_group, module, level })
+        .countDocuments({ module,  user_group, job_lv, staff_lv })
         .then(count => {
             if (count == 0) {
                 let w = new Wage({
-                    user_group,
                     module,
-                    level,
+                    user_group,
+                    staff_lv,
+                    job_lv,
                     wage
                 })
                 w.save()
@@ -71,7 +80,7 @@ router.post('/', authenticateAdminToken, (req, res) => {
                     })
             } else {
                 return res.status(403).json({
-                    msg:`This wage already exists in database!`
+                    msg: `This wage already exists in database!`
                 })
             }
         })
@@ -85,43 +94,44 @@ router.post('/', authenticateAdminToken, (req, res) => {
 
 })
 
-router.put('/',authenticateAdminToken,(req,res)=>{
-    
-    let {_id,user_group,level,skill,wage} = req.body;
+router.put('/', authenticateAdminToken, (req, res) => {
+
+    let { _id, user_group, level, skill, wage } = req.body;
     Wage
-    .findByIdAndUpdate(_id,{
-        user_group,
-        level,
-        skill,
-        wage
-    },
-    {new:true},
-    (err,w)=>{
-        if(err){
-            return res.status(500).json({
-                msg:`Can not update wage with error: ${new Error(err.message)}`
+        .findByIdAndUpdate(_id, {
+            user_group,
+            level,
+            skill,
+            wage
+        },
+            { new: true },
+            (err, w) => {
+                if (err) {
+                    return res.status(500).json({
+                        msg: `Can not update wage with error: ${new Error(err.message)}`
+                    })
+                }
+                if (!w) {
+                    return res.status(404).json({
+                        msg: `Wage not found`
+                    })
+                }
+                return res.status(200).json({
+                    msg: `Update wage successfully!`,
+                    w
+                })
             })
-        }
-        if(!w){
-            return res.status(404).json({
-                msg:`Wage not found`
-            })
-        }
-        return res.status(200).json({
-            msg:`Update wage successfully!`,
-            w
-        })
-    })
 })
 
 router.get('/', authenticateAdminToken, (req, res) => {
     let { ugId } = req.query;
     Wage.find({ user_group: ugId })
-        .populate('level', 'name -_id')
+        .populate('user_group', 'name -_id')
+        .populate('job_lv', 'name -_id')
+        .populate('staff_lv', 'name -_id')
         .populate('module', 'name -_id')
         .exec()
-        .then(wages => {
-            console.log(wages);
+        .then(wages => {            
             return res.status(200).json({
                 msg: 'Load user group wages successfully',
                 wages
@@ -135,22 +145,22 @@ router.get('/', authenticateAdminToken, (req, res) => {
         })
 })
 
-router.get('/detail',authenticateAdminToken,(req,res)=>{
-    let {_id} = req.query;
+router.get('/detail', authenticateAdminToken, (req, res) => {
+    let { _id } = req.query;
     Wage
-    .findById(_id)
-    .exec()
-    .then(w=>{
-        return res.status(200).json({
-            msg:`Get wage detail successfully!`,
-            w
+        .findById(_id)
+        .exec()
+        .then(w => {
+            return res.status(200).json({
+                msg: `Get wage detail successfully!`,
+                w
+            })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not get wage detail with error: ${new Error(err.message)}`
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not get wage detail with error: ${new Error(err.message)}`
+            })
         })
-    })
 })
 
 module.exports = router;

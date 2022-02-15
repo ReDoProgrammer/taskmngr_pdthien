@@ -7,47 +7,64 @@
                     <div class="panel-body">
 
                         <div class="form-row">
-                            <div class="form-group col-md-3 col-sm-3 col-xs-4">
+                            <div class="form-group col-md-6 col-sm-6 col-xs-12">
                                 <label for="recipient-name" class="col-form-label">Role:</label>
-                                <select name="" id="slRoles" class="form-control"></select>
+                                <select name="" id="slModule" class="form-control"></select>
                             </div>
-                            <div class="form-group col-md-3 col-sm-3 col-xs-4">
+                 
+
+                            <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                                <label for="recipient-name" class="col-form-label">Job level:</label>
+                                <select name="" id="slJobLevel" class="form-control"></select>
+                            </div>                          
+
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6 col-sm-6 col-xs-12">
                                 <label for="recipient-name" class="col-form-label">Staff level:</label>
-                                <select name="" id="sllStaffLevels" class="form-control"></select>
+                                <select name="" id="slStaffLevels" class="form-control"></select>
                             </div>
-                            <div class="form-group col-md-2 col-sm-2 col-xs-4">
+
+                            <div class="form-group col-md-2 col-sm-2 col-xs-6">
                                 <label for="recipient-name" class="col-form-label">Wage:</label>
                                 <input type="text" class="form-control text-right" id="txtWage" value="0" />
                             </div>
 
-                            <div class="form-group col-md-2 col-sm-2 col-xs-6 text-right">
+                            <div class="form-group col-md-2 col-sm-2 col-xs-4 text-right">
                                 <label for="recipient-name" class="col-form-label"></label><br>
                                 <button class="btn btn-sm btn-success mt-1" id="btnSubmitWage">
-                                    <i class="fa fa-plus" aria-hidden="true"></i>
-                                    Add
-                                </button>                               
+                                    <i class="fa fa-floppy-o"></i>
+                                     Save
+                                </button>
                             </div>
 
-                            <div class="form-group col-md-2 col-sm-2 col-xs-6">
+                            <div class="form-group col-md-2 col-sm-2 col-xs-2">
                                 <label for="recipient-name" class="col-form-label"></label><br>
                                 <button class="btn btn-sm btn-secondary mt-1" id="btnCancel">
                                     Cancel
                                 </button>
                             </div>
-
                         </div>
+
+                        <hr />
+
 
                         <table class="table table-striped mt-2">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th scope="col">Module</th>
-                                    <th scope="col">Level</th>                                   
+                                    <th>#</th>
+                                    <th scope="col">Role</th>                                   
+                                    <th scope="col">Job Level</th>
+                                    <th scope="col">Staff Level</th>
                                     <th scope="col" class="text-right">Wage</th>
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
                             <tbody id="tblWages"></tbody>
                         </table>
+
+
 
                         <div class="form-row">
                             <div class="col-md-12 col-xs-12 text-danger font-weight-bold" id="lblError"></div>
@@ -67,8 +84,8 @@
         <script>
             var _id = '';
             $(document).ready(function () {
-                LoadRoles();
-                LoadStaffLevels();
+                LoadModule();            
+                LoadJobLevels();
                 $('#lblError').hide();
             })
 
@@ -119,7 +136,7 @@
                         _id
                     },
                     success: function (data) {
-                        $('#slRoles').val(data.w.skill);
+                        $('#slModule').val(data.w.skill);
                         $('#slStaffLevels').val(data.w.skill);
                         $('#txtWage').val(data.w.wage);
                         $('#btnSubmitWage').html('<i class="fa fa-refresh" aria-hidden="true"></i> Update');
@@ -145,10 +162,43 @@
 
 
             $('#btnSubmitWage').click(function () {
-                let module = $('#slRoles option:selected').val();
-                let level = $('#sllStaffLevels option:selected').val();
+                let module = $('#slModule option:selected').val();
+               
+                let staff_lv = $('#slStaffLevels option:selected').val();
+                let job_lv = $('#slJobLevel option:selected').val();
                 let wage = parseFloat($('#txtWage').val());
+
+                if (typeof module === "undefined") {
+                   $('#lblError').text('(*) No acceptable module!');
+                   $('#lblError').show().delay(3000).fadeOut();
+                   return;
+                }
+
               
+               
+
+
+                if (typeof job_lv === "undefined") {
+                   $('#lblError').text('(*) No acceptable job level!');
+                   $('#lblError').show().delay(3000).fadeOut();
+                   return;
+                }
+
+                if (typeof staff_lv === "undefined") {                    
+                   $('#lblError').text('(*) No acceptable staff level!');
+                   $('#lblError').show().delay(3000).fadeOut();
+                   return;
+                }
+
+                if(wage == 0 || isNaN(wage)){
+                    $('#lblError').text('(*) No acceptable wage!');
+                   $('#lblError').show().delay(3000).fadeOut();
+                   return;
+                }
+             
+
+               
+
                 if (_id.trim().length > 0) {//update exist record
                     $.ajax({
                         url: '/admin/user-group-wage',
@@ -163,8 +213,8 @@
                             level,
                             wage
                         },
-                        success: function (data) {   
-                            alert(data.msg);                       
+                        success: function (data) {
+                            alert(data.msg);
                             LoadWages();
                             $('#btnCancel').click();
                             $('#txtWage').text('0');
@@ -182,19 +232,20 @@
                         headers: {
                             authorization: "Bearer " + localStorage.getItem('accessToken'),
                         },
-                        data: {
-                            user_group: ugId,
+                        data: {                         
                             module,
-                            level,
-                            wage
+                            user_group:ugId,
+                            staff_lv,
+                            job_lv,
+                            wage                            
                         },
-                        success: function (data) {                          
+                        success: function (data) {
                             LoadWages();
                             $('#txtWage').text('0');
                         },
                         error: function (jqXHR, textStatus, errorThrown) {
-                            $('#lblError').text(jqXHR.responseJSON.msg);
-                            $('#lblError').show();
+                            $('#lblError').text(jqXHR.responseJSON.msg);                           
+                            $('#lblError').show().delay(3000).fadeOut();
                         }
 
                     })
@@ -215,11 +266,14 @@
                     },
                     success: function (data) {
                         $('#tblWages').empty();
+                        let idx = 1;
                         data.wages.forEach(w => {
                             let tr = '<tr id = "' + w._id + '">';
-                            tr += '<td class="font-weight-bold text-info">' + w.module.name + '</td>';
-                            tr += '<td class="text-warning font-weight-bold">' + w.level.name + '</td>';
-                           
+                                tr+= '<td>'+(idx++)+'</td>';
+                            tr += '<td class="font-weight-bold text-info">' + w.module.name + '</td>';                           
+                            tr += '<td class="text-warning font-weight-bold">' + w.job_lv.name + '</td>';
+                            tr += '<td class="text-warning font-weight-bold">' + w.staff_lv.name + '</td>';
+
                             tr += '<td class="text-danger font-weight-bold text-right">' + w.wage + '</td>';
                             tr +=
                                 '<td class="text-right"><button class="btn btn-xs btn-warning ml-1" name="updateWage"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
@@ -248,24 +302,51 @@
             });
 
 
-            function LoadStaffLevels() {
+
+            $( "#slJobLevel" ).change(function() {
+                LoadStaffLevels($('#slJobLevel option:selected').val());
+            })
+
+           
+
+            function LoadJobLevels() {
                 $.ajax({
-                    url: '/admin/staff-level',
+                    url: '/admin/job-level',
                     type: 'get',
                     headers: {
                         authorization: "Bearer " + localStorage.getItem('accessToken'),
                     },
                     success: function (data) {
-                        $('#sllStaffLevels').empty();
-                        data.levels.forEach(l => {
+                        data.jl.forEach(l => {
                             let opt = '<option value="' + l._id + '">' + l.name + '</option>';
-                            $('#sllStaffLevels').append(opt);
+                            $('#slJobLevel').append(opt);
+                        })
+                        LoadStaffLevels($('#slJobLevel option:selected').val());
+                    }
+                })
+            }
+
+            function LoadStaffLevels(jobLevelId) {
+                $.ajax({
+                    url: '/admin/staff-level/list-by-job-level',
+                    type: 'get',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem('accessToken'),
+                    },
+                    data:{
+                        jobLevelId
+                    },
+                    success: function (data) {
+                        $('#slStaffLevels').empty();
+                        data.sl.forEach(l => {
+                            let opt = '<option value="' + l._id + '">' + l.name + '</option>';
+                            $('#slStaffLevels').append(opt);
                         })
                     }
                 })
             }
 
-            function LoadRoles() {
+            function LoadModule() {
 
                 $.ajax({
                     url: '/admin/module/list-appling-wage',
@@ -273,11 +354,11 @@
                     headers: {
                         authorization: "Bearer " + localStorage.getItem('accessToken'),
                     },
-                    success: function (data) {                      
-                        $('#slRoles').empty();
+                    success: function (data) {
+                        $('#slModule').empty();
                         data.ms.forEach(s => {
                             let opt = '<option value="' + s._id + '">' + s.name + '</option>';
-                            $('#slRoles').append(opt);
+                            $('#slModule').append(opt);
                         })
                     }
                 })
