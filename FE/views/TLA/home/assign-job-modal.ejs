@@ -122,12 +122,12 @@
                   <i class="fa fa-close text-danger"></i>
                 </button>
               </div>
+              <hr />
             </div>
 
 
-            <hr />
 
-            <div class="row mt-3" id="divQA">
+            <div class="row" id="divQA">
               <div class="col-md-6 col-sm-6 col-xs-12 mt-2">
                 <select class="form-control selectpicker" id="slQA" data-live-search="true"></select>
               </div>
@@ -173,6 +173,33 @@
   let idx = 1;
   var taskId = '';
   var levelId = '';
+
+  $('#btnAssignQA').on('click', function () {
+
+    $.ajax({
+      url: '/tla/task/assign-qa',
+      type: 'put',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        taskId,
+        levelId,
+        staff: $('#slQA option:selected').val()
+      },
+      success: function (data) {
+        $('#msgError').text(data.msg);
+        $('#msgError').show().delay(3000).fadeOut();
+        $(".btnCancelAssign").click();
+        LoadTasks();
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $('#msgError').text(jqXHR.responseJSON.msg);
+        $('#msgError').show().delay(3000).fadeOut();
+      },
+    })
+  })
+
 
 
   $('#btnAssignEditor').on('click', function () {
@@ -318,15 +345,15 @@
     taskId = $(this).closest("tr").attr("id");
     levelId = $(this).closest("tr").data('level');
 
-    if($(this).closest("tr").data('editor') ==0){
+    if ($(this).closest("tr").data('editor') == 0) {
       $('#divEditor').show();
-    }else{
+    } else {
       $('#divEditor').hide();
     }
 
-    if($(this).closest("tr").data('qa') ==0){
+    if ($(this).closest("tr").data('qa') == 0) {
       $('#divQA').show();
-    }else{
+    } else {
       $('#divQA').hide();
     }
 
@@ -463,8 +490,8 @@
         data.tasks.forEach(t => {
           let tr = '<tr id="' + t._id + '" data-level="' + t.level._id + '" data-editor="';
           tr += t.editor_assigned ? 1 : 0;
-          tr += '" data-qa="' ; 
-          tr+= t.qa_assigned ? 1 : 0;
+          tr += '" data-qa="';
+          tr += t.qa_assigned ? 1 : 0;
           tr += '">';
 
           tr += "<td>" + idx++ + "</td>";

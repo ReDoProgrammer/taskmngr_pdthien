@@ -186,11 +186,52 @@ router.put('/assign-editor', authenticateTLAToken, (req, res) => {
             })
         })
 
+})
 
+router.put('/assign-qa', authenticateTLAToken, (req, res) => {
 
+    let { taskId, levelId, staff } = req.body;
+    getModule(_QA)
+        .then(result => {
 
+            getWage(staff, levelId, result.m._id)
+                .then(result => {                    
+                    Task.findByIdAndUpdate(taskId,
+                        {
+                            qa: staff,
+                            qa_assigned: true,
+                            qa_wage: result.w.wage,
+                            status:0 //task có trạng thái đang được qa xử lý
 
+                        }, { new: true }, (err, task) => {
+                            if (err) {
+                                return res.status(500).json({
+                                    msg: `Assigned staff failed with error: ${new Error(err.message)}`
+                                })
+                            }
+                            if (task == null) {
+                                return res.status(404).json({
+                                    msg: `Task not found`
+                                })
+                            }
 
+                            return res.status(200).json({
+                                msg: `Staff has been assigned successfully!`
+                            })
+                        })
+                })
+                .catch(err => {
+                    console.log(err.msg);
+                    return res.status(err.code).json({
+                        msg: err.msg
+                    })
+                })
+        })
+        .catch(err => {
+            return res.status(err.code).json({
+                msg: err.msg
+            })
+        })
 
 })
 
