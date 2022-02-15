@@ -51,6 +51,7 @@ router.post("/", authenticateSaleToken, (req, res) => {
     intruction,
   } = req.body;
 
+  
 
   let job = new Job({
     name,

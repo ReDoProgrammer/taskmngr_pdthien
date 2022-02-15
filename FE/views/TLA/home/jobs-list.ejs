@@ -42,6 +42,8 @@
     </table>
 </div>
 
+<script src="/js/common.js"></script>
+
 <script type='text/javascript'
     src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
 
@@ -91,8 +93,8 @@
                         tr += '<td class="text-info font-weight-bold">' + job.customer.firstname + ' ' + job.customer.lastname + '</td>';
                         tr += '<td class="text-warning">' + job.name + '</td>';
                         tr += '<td>' + job.intruction + '</td>';
-                        tr += "<td>" + new Date(job.received_date).toLocaleString() + "</td>";
-                        tr += "<td>" + new Date(job.delivery_date).toLocaleString() + "</td>";
+                        tr += "<td>" + convertISODateToTimeFormat(job.received_date) + "</td>";
+                        tr += "<td>" +convertISODateToTimeFormat(job.delivery_date) + "</td>";
                         tr += '<td class = "font-weight-bold"><i>';
                         switch (job.status) {
                             case -1:

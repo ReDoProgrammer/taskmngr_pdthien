@@ -76,24 +76,24 @@
               </div>
               <div class="col-md-3 col-sm-6 col-xs-6">
                 <div class="form-group">
-                  <label for="">Assign Date</label>
+                  <label for="">Assign Date<span class="text-danger font-weight-bold">(*)</span>: </label>
                   <input type="text" class="inputDate form-control" id="txtAssignDate">
                 </div>
               </div>
 
               <div class="col-md-3 col-sm-6 col-xs-6">
                 <div class=" form-group">
-                  <label for="">Deadline</label>
+                  <label for="">Deadline<span class="text-danger font-weight-bold">(*)</span>:</label>
                   <input type="text" class="inputDate form-control" id="txtDeadline">
                 </div>
               </div>
             </div>
 
             <div class="row mt-2">
-              <div class="col-md-10 col-sm-8 col-xs-8">
+              <div class="col-md-10 col-sm-8 col-xs-7">
                 <input type="text" name="txtRemark" id="txtRemark" class="form-control" placeholder="Level remark">
               </div>
-              <div class="col-md-2 col-sm-4 col-xs-4 text-center">
+              <div class="col-md-2 col-sm-4 col-xs-5 text-center">
                 <button class="btn btn-info" id="btnAddLevel">
                   <i class="fa fa-plus" aria-hidden="true"></i>Add job level
                 </button>
@@ -147,6 +147,8 @@
 
 
         </div>
+
+
 
 
         <div class="form-row">
@@ -204,6 +206,29 @@
 
     let remark = $('#txtRemark').val();
 
+    // validateion component inputs
+
+    if (isNaN(assigned_date) || assigned_date === null || isNaN(deadline) || deadline == null) {
+      $('#msgError').text('(*) Assign date or deadline is invalid!');
+      $('#msgError').show().delay(3000).fadeOut();
+      return;
+    }
+
+
+    if (deadline < new Date($.now())) {
+      $('#msgError').text('(*) deadline must be later than current time!');
+      $('#msgError').show().delay(3000).fadeOut();
+      return;
+    }
+
+    if (deadline <= assigned_date) {
+      $('#msgError').text('(*) deadline must be greater than assign date!');
+      $('#msgError').show().delay(3000).fadeOut();
+      return;
+    }
+
+
+
     $.ajax({
       url: '/tla/task',
       type: 'post',
@@ -226,7 +251,8 @@
         LoadJob();
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        alert(jqXHR.responseJSON.msg);
+        $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
+        $('#msgError').show().delay(3000).fadeOut();
       },
     })
 
