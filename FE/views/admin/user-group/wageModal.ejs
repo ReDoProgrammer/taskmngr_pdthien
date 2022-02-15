@@ -135,10 +135,12 @@
                     data: {
                         _id
                     },
-                    success: function (data) {
-                        $('#slModule').val(data.w.skill);
-                        $('#slStaffLevels').val(data.w.skill);
+                    success: function (data) {                      
+                        $('#slModule').val(data.w.module);
+                        $('#slUserGroup').val(data.w.user_group);
+                        $('#slStaffLevels').val(data.w.staff_lv);
                         $('#txtWage').val(data.w.wage);
+
                         $('#btnSubmitWage').html('<i class="fa fa-refresh" aria-hidden="true"></i> Update');
                         $('#btnSubmitWage').addClass('btn-warning').removeClass('btn-success');
                     },
@@ -207,11 +209,11 @@
                             authorization: "Bearer " + localStorage.getItem('accessToken'),
                         },
                         data: {
-                            _id,
-                            user_group: ugId,
-                            module,
-                            level,
-                            wage
+                            _id,                        
+                            user_group:ugId,
+                            staff_lv,
+                            job_lv,
+                            wage     
                         },
                         success: function (data) {
                             alert(data.msg);

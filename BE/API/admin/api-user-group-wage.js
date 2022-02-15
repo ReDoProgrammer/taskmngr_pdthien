@@ -57,7 +57,7 @@ router.post('/', authenticateAdminToken, (req, res) => {
 
 
     Wage
-        .countDocuments({ module,  user_group, job_lv, staff_lv })
+        .countDocuments({ module, user_group, job_lv, staff_lv })
         .then(count => {
             if (count == 0) {
                 let w = new Wage({
@@ -96,12 +96,16 @@ router.post('/', authenticateAdminToken, (req, res) => {
 
 router.put('/', authenticateAdminToken, (req, res) => {
 
-    let { _id, user_group, level, skill, wage } = req.body;
+    let { _id,
+        user_group,
+        staff_lv,
+        job_lv,
+        wage } = req.body;
     Wage
         .findByIdAndUpdate(_id, {
             user_group,
-            level,
-            skill,
+            staff_lv,
+            job_lv,
             wage
         },
             { new: true },
@@ -131,7 +135,7 @@ router.get('/', authenticateAdminToken, (req, res) => {
         .populate('staff_lv', 'name -_id')
         .populate('module', 'name -_id')
         .exec()
-        .then(wages => {            
+        .then(wages => {
             return res.status(200).json({
                 msg: 'Load user group wages successfully',
                 wages
