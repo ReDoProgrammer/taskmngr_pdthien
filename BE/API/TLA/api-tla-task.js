@@ -22,7 +22,6 @@ router.get('/list', authenticateTLAToken, (req, res) => {
         .populate('editor', 'fullname -_id')
         .exec()
         .then(tasks => {
-            console.log(tasks)
             return res.status(200).json({
                 tasks,
                 msg: 'Load tasks by job id successfully!'
@@ -75,7 +74,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
         .findById(job)
         .exec()
         .then(j => {
-           
+
             if (new Date(deadline) > j.delivery_date) {
                 return res.status(403).json({
                     msg: `Staff's deadline can not be later than job's deadline!`
@@ -144,13 +143,35 @@ router.post('/', authenticateTLAToken, (req, res) => {
 
 router.put('/assign-editor', authenticateTLAToken, (req, res) => {
 
-    let { taskId, staff } = req.body;
+    let { taskId, levelId, staff } = req.body;
     getModule(_EDITOR)
         .then(result => {
 
-            getWage(staff, taskId, result.m._id)
-                .then(result => {
-                    console.log('wage: ', result);
+            getWage(staff, levelId, result.m._id)
+                .then(result => {                    
+                    Task.findByIdAndUpdate(taskId,
+                        {
+                            editor: staff,
+                            editor_assigned: true,
+                            editor_wage: result.w.wage,
+                            status:0 //task có trạng thái đang được editor xử lý
+
+                        }, { new: true }, (err, task) => {
+                            if (err) {
+                                return res.status(500).json({
+                                    msg: `Assigned staff failed with error: ${new Error(err.message)}`
+                                })
+                            }
+                            if (task == null) {
+                                return res.status(404).json({
+                                    msg: `Task not found`
+                                })
+                            }
+
+                            return res.status(200).json({
+                                msg: `Staff has been assigned successfully!`
+                            })
+                        })
                 })
                 .catch(err => {
                     console.log(err.msg);
@@ -167,35 +188,7 @@ router.put('/assign-editor', authenticateTLAToken, (req, res) => {
 
 
 
-    // Task.findById(taskId)
-    //     .exec()
-    //     .then(t => {
-    //         Task.findByIdAndUpdate(taskId,
-    //             {
-    //                 editor: staff,
-    //                 editor_assigned: true
-    //             }, { new: true }, (err, task) => {
-    //                 if (err) {
-    //                     return res.status(500).json({
-    //                         msg: `Assigned staff failed with error: ${new Error(err.message)}`
-    //                     })
-    //                 }
-    //                 if (task == null) {
-    //                     return res.status(404).json({
-    //                         msg: `Task not found`
-    //                     })
-    //                 }
 
-    //                 return res.status(200).json({
-    //                     msg: `Staff has been assigned successfully!`
-    //                 })
-    //             })
-    //     })
-    //     .catch(err => {
-    //         return res.status(500).json({
-    //             msg: `Can not find task by id ${new Error(err.mesaage)}`
-    //         })
-    //     })
 
 
 
@@ -248,51 +241,69 @@ const getModule = (moduleName) => {
     })
 }
 
-const getWage = (staffId, taskId, moduleId) => {
+const getWage = (staffId, job_lv, moduleId) => {
     return new Promise((resolve, reject) => {
-        User.findById(staffId)
-            .exec()
-            .then(user => {
-                if (!user) {
-                    return reject({
-                        code: 404,
-                        msg: `Staff not found in get wage function in tla task api`
-                    })
-                }
-                Wage
-                    .findOne({
-                        user_group: user.user_group,
-                        module: moduleId,
-                        level: taskId
-                    })
-                    .exec()
-                    .then(w => {
-                        if (!w) {
-                            return reject({
-                                code: 404,
-                                msg: `Wage not found!`
-                            })
-                        }
-
-                        return resolve({
-                            code: 200,
-                            msg: `Wage found`,
-                            w
-                        })
-                    })
-                    .catch(err => {
-                        return reject({
-                            code: 500,
-                            msg: `Can not get wage with error: ${new Error(err.message)}`
-                        })
-                    })
+        getUser(staffId)
+        .then(result=>{
+            Wage
+            .findOne({
+                module:moduleId,
+                job_lv,
+                staff_lv:result.u.user_level,
+                user_group:result.u.user_group
             })
-            .catch(err => {
+            .exec()
+            .then(w=>{
+               if(!w){
+                   return reject({
+                       code:404,
+                       msg:`Can not get wage with this job level and this user group. Please set this wage in user group module first!`
+                   })
+               }
+               return resolve({
+                   code:200,
+                   msg:`Get wage successfully!`,
+                   w
+               })
+            })
+            .catch(err=>{
+                console.log(`Can not get wage with error: ${new Error(err.message)}`);
                 return reject({
-                    code: 500,
-                    msg: `Can not get user by id in get wage function in tla task api with error: ${new Error(err.message)}`
+                    code:500,
+                    msg:`Can not get wage with error: ${new Error(err.message)}`
                 })
             })
+        })
+        .catch(err=>{
+            return reject(err)
+        })
+    })
+}
+
+const getUser = (staffId)=>{
+    return new Promise((resolve,reject)=>{
+        User
+        .findById(staffId)
+        .exec()
+        .then(u=>{
+            if(!u){
+                return reject({
+                    code:404,
+                    msg:`Staff not found`
+                })
+            }
+            return resolve({
+                code:200,
+                msg:`Staff found`,
+                u
+            })
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not get staff info with error: ${new Error(err.message)}`
+            })
+        })
     })
 }
 

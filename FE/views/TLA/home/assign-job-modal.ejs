@@ -108,7 +108,7 @@
           <div class="panel-heading font-w">Assign Editor & Q.A</div>
           <div class="panel-body">
 
-            <div class="row mt-3">
+            <div class="row mt-3" id="divEditor">
               <div class="col-md-6 col-sm-6 col-xs-12 mt-2">
                 <select class="form-control selectpicker" id="slEditor" data-live-search="true"></select>
               </div>
@@ -127,7 +127,7 @@
 
             <hr />
 
-            <div class="row mt-3">
+            <div class="row mt-3" id="divQA">
               <div class="col-md-6 col-sm-6 col-xs-12 mt-2">
                 <select class="form-control selectpicker" id="slQA" data-live-search="true"></select>
               </div>
@@ -185,14 +185,18 @@
       },
       data: {
         taskId,
+        levelId,
         staff: $('#slEditor option:selected').val()
       },
       success: function (data) {
         $('#msgError').text(data.msg);
+        $('#msgError').show().delay(3000).fadeOut();
+        $(".btnCancelAssign").click();
         LoadTasks();
       },
       error: function (jqXHR, textStatus, errorThrown) {
         $('#msgError').text(jqXHR.responseJSON.msg);
+        $('#msgError').show().delay(3000).fadeOut();
       },
     })
   })
@@ -313,6 +317,19 @@
   $(document).on("click", "button[name='btnAssignStaff']", function () {
     taskId = $(this).closest("tr").attr("id");
     levelId = $(this).closest("tr").data('level');
+
+    if($(this).closest("tr").data('editor') ==0){
+      $('#divEditor').show();
+    }else{
+      $('#divEditor').hide();
+    }
+
+    if($(this).closest("tr").data('qa') ==0){
+      $('#divQA').show();
+    }else{
+      $('#divQA').hide();
+    }
+
 
     LoadEditor();
     LoadQA();
@@ -444,7 +461,11 @@
         console.log(data);
         let idx = 1;
         data.tasks.forEach(t => {
-          let tr = '<tr id="' + t._id + '" data-level="' + t.level._id + '">';
+          let tr = '<tr id="' + t._id + '" data-level="' + t.level._id + '" data-editor="';
+          tr += t.editor_assigned ? 1 : 0;
+          tr += '" data-qa="' ; 
+          tr+= t.qa_assigned ? 1 : 0;
+          tr += '">';
 
           tr += "<td>" + idx++ + "</td>";
 
@@ -472,7 +493,9 @@
 
 
           tr += '<td class="text-right">';
-          tr += '<button class="btn btn-xs btn-primary" name="btnAssignStaff"><i class="fa fa-plus" aria-hidden="true"></i> Assign staff</button>';
+          if (!(t.editor_assigned && t.qa_assigned)) {
+            tr += '<button class="btn btn-xs btn-primary" name="btnAssignStaff"><i class="fa fa-plus" aria-hidden="true"></i> Assign staff</button>';
+          }
           tr += '<button class="ml-1 btn btn-xs btn-danger" name="btnDelTask"><i class="fa fa-trash text-white" aria-hidden="true"></i></button>';
           tr += '</td>';
 
@@ -483,6 +506,7 @@
       },
       error: function (jqXHR, textStatus, errorThrown) {
         $('#msgError').text(jqXHR.responseJSON.msg);
+        $('#msgError').show().delay(3000).fadeOut();
       },
     });
   }
