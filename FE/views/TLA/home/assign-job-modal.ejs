@@ -462,26 +462,8 @@
   }
 
 
-  function strToDate(dtStr) {
-    if (!dtStr) return null
-    let dateParts = dtStr.split("/");
-    let timeParts = dateParts[2].split(" ")[1].split(":");
-    dateParts[2] = dateParts[2].split(" ")[0];
-    console.log(dateParts, timeParts);
-    return dateObject = new Date(dateParts[2], dateParts[1] - 1, dateParts[0], timeParts[0], timeParts[1]);
-  }
-
-  function getCurrentTime() {
-    var currentdate = new Date();
-    return currentdate.getDate() + "/"
-      + (currentdate.getMonth() + 1) + "/"
-      + currentdate.getFullYear() + " "
-      + currentdate.getHours() + ":"
-      + currentdate.getMinutes();
 
 
-
-  }
 
   $('.inputDate').inputmask("datetime", {
     mask: "1/2/y h:s",
