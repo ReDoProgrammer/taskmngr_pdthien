@@ -68,8 +68,7 @@
           search
         },
         success: function (data) {
-          $('#tbdTasks').empty();
-          console.log(data.tasks);
+          $('#tbdTasks').empty();       
           let idx = 1;
           data.tasks.forEach(t => {
             let tr = '<tr id="' + t._id + '">';
@@ -92,7 +91,7 @@
              -3: DC reject
            */
 
-            tr += '<td>';
+            tr += '<td class="font-italic text-success">';
             switch (t.status) {
 
               case 0: tr += 'Processing'; break;
@@ -107,8 +106,12 @@
             tr += '</td>';
 
             tr += '<td class="text-right">';
-            tr += '<button class="btn btn-xs btn-info">';
+            tr += '<button class="btn btn-xs btn-info" name="btnTaskInfo">';
             tr += '<i class="fa fa-info"></i> Detail';
+            tr += '</button>';
+           
+            tr += '<button class="btn btn-xs btn-primary ml-2" name="btnSubmitTask">';
+            tr += '<i class="fa fa-send-o"></i> Submit';
             tr += '</button>';
             tr += '</td>';
 

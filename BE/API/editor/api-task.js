@@ -48,8 +48,11 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
 
         )
         .exec()
-        .then(task => {
-            console.log(task);
+        .then(task => {            
+            return res.status(200).json({
+                msg:`Load task detail successfully!`,
+                task
+            })
         })
         .catch(err => {
             return res.status(500).json({

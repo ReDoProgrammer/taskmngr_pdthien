@@ -1,20 +1,79 @@
 <div class="modal" tabindex="-1" role="dialog" id="modalTaskDetail">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-body">
-                <div class="card text-white bg-dark">
-                    <div class="card-header"><i class="fa fa-info-circle" aria-hidden="true"></i> Job description</div>
-                    <div class="card-body">
+                <div class="panel panel-primary text-white bg-dark">
+                    <div class="panel-heading"><i class="fa fa-info-circle" aria-hidden="true"></i> Job description
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                <label for="">Job name:</label>
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-8">
+                                <label id="lblJobName" class="text-info font-weight-bold"></label>
+                            </div>
+                      
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                <label for="">Job level:</label>
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-8">
+                                <label id="lblLevelName" class="text-info font-weight-bold"></label>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-md-2 co-sm-2 col-xs-4">
+                                <label for="">Assigne date:</label>
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-8">
+                                <label id="lblAssignDate"></label>
+                            </div>                       
+                            <div class="col-md-2 co-sm-2 col-xs-4">
+                                <label for="">Deadline:</label>
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-8">
+                                <label id="lblDeadline"></label>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                               <label for="">Intruction:</label>
+                            </div>
+
+                            <div class="col-md-10 col-sm-10 col-xs-8">
+                                <label id="lblIntruction"></label>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                               <label for="">Remark:</label>
+                            </div>
+
+                            <div class="col-md-10 col-sm-10 col-xs-8">
+                                <label id="lblRemark"></label>
+                            </div>
+                        </div>
+
+
+                        <div class="panel panel-info mt-2">
+                            <div class="panel-heading">Job style info</div>
+                            <div class="panel-body">
+
+                            </div>
+                        </div>
 
 
 
 
 
 
-
-
+                    </div>
+                    <div class="panel-footer">
                         <div class="form-group text-right">
-                            <button type="button" class="btn btn-sm btn-warning" id="btnSubmitJob">Submit job</button>
                             <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
                         </div>
                     </div>
@@ -25,8 +84,10 @@
 </div>
 
 
+<script src="/js/common.js"></script>
+
 <script>
-    $("#modalTaskDetail").on('shown.bs.modal', function (e) {        
+    $("#modalTaskDetail").on('shown.bs.modal', function (e) {
         $.ajax({
             url: '/task/detail',
             type: 'get',
@@ -38,6 +99,12 @@
             },
             success: function (data) {
                 console.log(data);
+                $('#lblJobName').text(data.task.job.name);
+                $('#lblLevelName').text(data.task.level.name);
+                $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.assigned_date));
+                $('#lblDeadline').text(convertISODateToTimeFormat(data.task.deadline));
+                $('#lblIntruction').text(data.task.job.intruction);
+                $('#lblRemark').text(data.task.remark);
             }, error: function (request, status, error) {
                 alert(request.responseJSON.msg)
                 window.location.href = '/editor/default';
