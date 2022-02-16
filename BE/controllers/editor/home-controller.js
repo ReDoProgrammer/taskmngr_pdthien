@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-router.get('/default',(req,res)=>{  
+router.get('/login',(req,res)=>{  
     res.render('editor/default',{
         layout:'layouts/auth-layout',
         title:'Editor authentication - Bamboo Photo'
