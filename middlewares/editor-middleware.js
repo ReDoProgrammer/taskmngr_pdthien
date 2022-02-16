@@ -1,7 +1,7 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const _MODULE = 'EDITOR';
-const getModuleId = require('../middlewares/common');
+const {getModuleId} = require('../middlewares/common');
 
 function authenticateEditorToken(req, res, next) {
   const authHeader = req.headers["authorization"];
@@ -22,6 +22,7 @@ function authenticateEditorToken(req, res, next) {
 
     getModuleId(_MODULE)
       .then(result => {
+        console.log(result);
         UserModule
           .countDocuments({ user: user._id, module: result.mod._id }, (err, count) => {
             if (err) {
