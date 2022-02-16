@@ -38,7 +38,7 @@ const customerSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'size'
     },
-    color_mode:{
+    color:{
         type:Schema.Types.ObjectId,
         ref:'color_mode'
     },
@@ -54,7 +54,7 @@ const customerSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'cloud'
     },
-    national_style:{
+    national:{
         type:Schema.Types.ObjectId,
         ref:'national_style'
     },
