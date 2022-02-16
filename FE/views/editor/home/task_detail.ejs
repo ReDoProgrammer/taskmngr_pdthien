@@ -14,7 +14,7 @@
                             <div class="col-md-4 col-sm-4 col-xs-8">
                                 <label id="lblJobName" class="text-info font-weight-bold"></label>
                             </div>
-                      
+
                             <div class="col-md-2 col-sm-2 col-xs-4">
                                 <label for="">Job level:</label>
                             </div>
@@ -29,7 +29,7 @@
                             </div>
                             <div class="col-md-4 col-sm-4 col-xs-8">
                                 <label id="lblAssignDate"></label>
-                            </div>                       
+                            </div>
                             <div class="col-md-2 co-sm-2 col-xs-4">
                                 <label for="">Deadline:</label>
                             </div>
@@ -38,9 +38,11 @@
                             </div>
                         </div>
 
-                        <div class="row">
+                        <hr />
+
+                        <div class="row mt-2">
                             <div class="col-md-2 col-sm-2 col-xs-4">
-                               <label for="">Intruction:</label>
+                                <label for="">Intruction:</label>
                             </div>
 
                             <div class="col-md-10 col-sm-10 col-xs-8">
@@ -50,7 +52,7 @@
 
                         <div class="row">
                             <div class="col-md-2 col-sm-2 col-xs-4">
-                               <label for="">Remark:</label>
+                                <label for="">Remark:</label>
                             </div>
 
                             <div class="col-md-10 col-sm-10 col-xs-8">
@@ -59,12 +61,35 @@
                         </div>
 
 
+
                         <div class="panel panel-info mt-2">
                             <div class="panel-heading">Job style info</div>
                             <div class="panel-body">
+                                <div class="row">
+                                    <div class="form-group col-md-3 col-sm-6 col-xs-12">
+                                        <label for="">Align:</label>
+                                        <div id="divAlign" class="font-weight-bold mt-1"></div>
+                                    </div>
+                                    <div class="form-group col-md-3 col-sm-6 col-xs-12">
+                                        <label for="">Sky:</label>
+                                        <div id="divSky" class=" font-weight-bold mt-1"></div>
+                                    </div>
+                                    <div class="form-group col-md-3 col-sm-6 col-xs-12">
+                                        <label for="">Fire:</label>
+                                        <div id="divFire" class="font-weight-bold mt-1"></div>
+                                    </div>
+                                    <div class="form-group col-md-3 col-sm-6 col-xs-12">
+                                        <label for="">TV:</label>
+                                        <div id="divTV" class=" font-weight-bold mt-1"></div>
+                                    </div>
+                                </div>
+                                <hr/>
 
+                                <div class="row"></div>
                             </div>
                         </div>
+
+
 
 
 
@@ -105,6 +130,34 @@
                 $('#lblDeadline').text(convertISODateToTimeFormat(data.task.deadline));
                 $('#lblIntruction').text(data.task.job.intruction);
                 $('#lblRemark').text(data.task.remark);
+
+
+                if (data.task.job.customer.is_align) {
+                    $('#divAlign').html('<i class="fa fa-check-square-o"></i>  <span class="text-warning">' + data.task.job.customer.align_note+'</span>');
+                } else {
+                    $('#divAlign').html('<i class="fa fa-square-o"></i>');
+                }
+
+
+                if (data.task.job.customer.has_sky) {
+                    $('#divSky').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.task.job.customer.sky_note+'</span>');
+                } else {
+                    $('#divSky').html('<i class="fa fa-square-o"></i>');
+                }
+
+
+                if (data.task.job.customer.has_TV) {
+                    $('#divTV').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.task.job.customer.TV_note+'</span>');
+                } else {
+                    $('#divTV').html('<i class="fa fa-square-o"></i>');
+                }
+
+
+                if (data.task.job.customer.has_fire) {
+                    $('#divFire').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.task.job.customer.fire_note+'</span>');
+                } else {
+                    $('#divFire').html('<i class="fa fa-square-o"></i>');
+                }
             }, error: function (request, status, error) {
                 alert(request.responseJSON.msg)
                 window.location.href = '/editor/default';

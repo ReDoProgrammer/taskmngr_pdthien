@@ -1,5 +1,7 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
+const Customer = require('../../models/customer-model');
+
 const { authenticateEditorToken } = require("../../../middlewares/editor-middleware");
 
 
@@ -42,13 +44,24 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
                 },
                 populate: {
                     path: 'color_mode'                  
+                },               
+                populate: {
+                    path: 'output'                  
+                },
+                populate: {
+                    path: 'cloud'                  
                 }
             }
         }
 
         )
         .exec()
-        .then(task => {            
+        .then(task => {     
+            if(!task){
+                return res.status(404).json({
+                    msg:`Task not found!`
+                })
+            }       
             return res.status(200).json({
                 msg:`Load task detail successfully!`,
                 task
@@ -98,3 +111,4 @@ router.put('/', authenticateEditorToken, (req, res) => {
 
 
 module.exports = router;
+
