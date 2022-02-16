@@ -86,6 +86,14 @@ const taskSchema = new Schema({
         require: true
     },
 
+    editor_done:{
+        type:Date
+    },
+    qa_done:{
+        type:Date
+    }
+
+
 
 });
 

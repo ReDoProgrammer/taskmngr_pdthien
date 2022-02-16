@@ -1,11 +1,33 @@
-<div class="table-responsive">
+<div class="row">
+  <div class="col-md-offset-6 col-md-5 col-sm-offset-4 col-sm-6 col-xs-9 mt-2">
+      <!-- Another variation with a button -->
+      <div class="input-group">
+          <input type="text" class="form-control" placeholder="Seach your job..." id="txtSearch" />
+          <div class="input-group-btn">
+              <button class="btn btn-info" type="submit" id="btnSearch">
+                  <i class="fa fa-search" aria-hidden="true"></i>
+              </button>
+          </div>
+      </div>
+  </div>
+
+  <div class="col-md-1 col-sm-2 col-xs-3 mt-2 text-right">
+    <button class="btn btn-success" id="btnGetJob">
+      <i class="fa fa-plus"></i> Get job
+    </button>
+  </div>
+</div>
+
+
+<div class="table-responsive mt-2">
   <table class="table table-striped">
     <thead class="thead-dark">
       <tr>
-        <th scope="col">#</th>
-        <th scope="col">Job</th>
+        <th scope="col">#</th>       
         <th scope="col">Level</th>
         <th scope="col">Deadline</th>
+        <th>Local</th>
+        <th>Cloud</th>
         <th scope="col">Intruction</th>
         <th scope="col">Remark</th>
         <th scope="col"></th>
@@ -18,9 +40,13 @@
 
 <%-include('task_detail')%>
 
+<script src="/js/common.js"></script>
   <script>
+    var page  =1;
+    var search = '';
+
     $(document).ready(function () {
-      LoadAssignedTasks();
+      LoadTask();
     })
 
     var taskId = '';
@@ -31,10 +57,7 @@
     })
 
 
-    var page = 1;
-    var search = '';
-
-    function LoadAssignedTasks() {
+    function LoadTask() {
       $.ajax({
         url: '/task',
         type: 'get',
@@ -52,10 +75,9 @@
           data.tasks.forEach(t => {
             let tr = '<tr id="' + t._id + '">';
 
-            tr += '<td>' + (idx++) + '</td>';
-            tr += '<td class="font-weight-bold">' + t.job.name + '</td>';
-            tr += '<td>' + t.level.name + '</td>';
-            tr += '<td class="text-danger">' + ConvertTimeStamp(t.job.delivery_date) + '</td>';
+            tr += '<td>' + (idx++) + '</td>';           
+            tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
+            tr += '<td class="text-danger">' + convertISODateToTimeFormat(t.deadline) + '</td>';
 
 
 
