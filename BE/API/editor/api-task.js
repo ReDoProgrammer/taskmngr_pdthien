@@ -10,7 +10,7 @@ router.get('/', authenticateEditorToken, (req, res) => {
     editor:req.user._id
    })
    .populate('level','name -_id')
-   .populate('job','source_link intruction -_id')
+   .populate('job') //,'source_link intruction -_id'
    .exec()
    .then(tasks =>{
        return res.status(200).json({

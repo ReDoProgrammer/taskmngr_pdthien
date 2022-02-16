@@ -1,14 +1,14 @@
 <div class="row">
   <div class="col-md-offset-6 col-md-5 col-sm-offset-4 col-sm-6 col-xs-9 mt-2">
-      <!-- Another variation with a button -->
-      <div class="input-group">
-          <input type="text" class="form-control" placeholder="Seach your job..." id="txtSearch" />
-          <div class="input-group-btn">
-              <button class="btn btn-info" type="submit" id="btnSearch">
-                  <i class="fa fa-search" aria-hidden="true"></i>
-              </button>
-          </div>
+    <!-- Another variation with a button -->
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="Seach your job..." id="txtSearch" />
+      <div class="input-group-btn">
+        <button class="btn btn-info" type="submit" id="btnSearch">
+          <i class="fa fa-search" aria-hidden="true"></i>
+        </button>
       </div>
+    </div>
   </div>
 
   <div class="col-md-1 col-sm-2 col-xs-3 mt-2 text-right">
@@ -23,13 +23,12 @@
   <table class="table table-striped">
     <thead class="thead-dark">
       <tr>
-        <th scope="col">#</th>       
+        <th scope="col">#</th>
         <th scope="col">Level</th>
         <th scope="col">Deadline</th>
-        <th>Local</th>
-        <th>Cloud</th>
-        <th scope="col">Intruction</th>
         <th scope="col">Remark</th>
+        <th scope="col">Source</th>
+        <th scope="col">Status</th>
         <th scope="col"></th>
       </tr>
     </thead>
@@ -40,9 +39,9 @@
 
 <%-include('task_detail')%>
 
-<script src="/js/common.js"></script>
+  <script src="/js/common.js"></script>
   <script>
-    var page  =1;
+    var page = 1;
     var search = '';
 
     $(document).ready(function () {
@@ -75,20 +74,45 @@
           data.tasks.forEach(t => {
             let tr = '<tr id="' + t._id + '">';
 
-            tr += '<td>' + (idx++) + '</td>';           
+            tr += '<td>' + (idx++) + '</td>';
             tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
             tr += '<td class="text-danger">' + convertISODateToTimeFormat(t.deadline) + '</td>';
-
-
-
-            tr += '<td>' + t.job.intruction + '</td>';
             tr += '<td>' + t.remark + '</td>';
 
-            tr += '<td class="text-right">';
-            if (t.status == -1) {
-              tr += '<button class="btn btn-sm btn-info" name="btnTaskInfo"><i class="fa fa-info-circle" aria-hidden="true"></i></button>';
+            tr += '<td> <a href="' + t.job.source_link + '" target="_blank">Link</a></td>';
+
+            /*
+            
+             0: Editor đang xử lý
+             1: editor done
+             2: QA ok
+             3: DC ok --> job ok
+             -1: khởi tạo
+             -2: Q.A reject            
+             -3: DC reject
+           */
+
+            tr += '<td>';
+            switch (t.status) {
+
+              case 0: tr += 'Processing'; break;
+              case 1: tr += 'Editor done'; break;
+              case 2: tr += 'Q.A ok'; break;
+              case 3: tr += 'DC ok'; break;
+              case -1: tr += 'Initial'; break;
+              case -2: tr += 'Q.A reject'; break;
+              case -3: tr += 'DC reject'; break;
+
             }
-            tr += '<button class="ml-1 btn btn-sm btn-success" name="btnGetTask"><i class="fa fa-check" aria-hidden="true"></i></button></td>';
+            tr += '</td>';
+
+            tr += '<td class="text-right">';
+            tr += '<button class="btn btn-xs btn-info">';
+            tr += '<i class="fa fa-info"></i> Detail';
+            tr += '</button>';
+            tr += '</td>';
+
+
 
             tr += '</tr>';
             $('#tbdTasks').append(tr);
