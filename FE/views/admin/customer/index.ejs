@@ -93,6 +93,7 @@
             },
             success: function (data, textStatus, xhr) {
 
+              console.log(data);
               $('#modalCustomerDetail').modal();
               $('#fullname').text(data.customer.firstname + ' ' + data.customer.lastname);
               $('#phone').text(data.customer.phone);
@@ -105,7 +106,7 @@
 
               $('#output').text(data.customer.output.name);
               $('#size').text(data.customer.size.name);
-              $('#color_mode').text(data.customer.color_mode.name);
+              $('#color_mode').text(data.customer.color.name);
 
               if (data.customer.is_align) {
                 if (data.customer.align_note.length > 0) {
@@ -123,7 +124,7 @@
 
               $('#cloud').text(data.customer.cloud.name);
 
-              $('#national_style').text(data.customer.national_style.name);
+              $('#national_style').text(data.customer.nation.name);
               $('#remark').text(data.customer.remark);
 
 
