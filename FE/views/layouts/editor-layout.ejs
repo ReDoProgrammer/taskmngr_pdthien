@@ -8,24 +8,21 @@
 
   <%-include('child/common')%>
 
-  <title>Hello, world!</title>
+    <title>Editor dashboard!</title>
 </head>
 
-<body> 
-  <div class="container-fluid mt-10">
-   
-      <%- include('child/editor/navbar') %>
-
-        <div class="card">
-          <div class="card-header">Header</div>
-          <div class="card-body" style="min-height: 600px">
-            <%- body %>          
-          </div>
-          <div class="card-footer">
-            <%- include('child/editor/footer') %>
-          </div>
+<body>
+  <div class="container-fluid mt-2">
+    <%- include('child/editor/navbar') %>
+      <div class="panel panel-primary">
+        <div class="panel-heading">Header</div>
+        <div class="panel-body" style="min-height: 600px">
+          <%- body %>
         </div>
-    
+        <div class="panel-footer">
+          <%- include('child/editor/footer') %>
+        </div>
+      </div>
   </div>
 </body>
 
