@@ -2,7 +2,7 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const _MODULE = 'SALE';
 const UserModule = require('../BE/models/user-module-model');
-const getModuleId = require('../middlewares/common');
+const {getModuleId} = require('../middlewares/common');
 
 function authenticateSaleToken(req, res, next) {
   const authHeader = req.headers["authorization"];
