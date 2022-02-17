@@ -125,43 +125,27 @@
 
 
               //special requests
-              if (data.customer.has_TV) {
-                if (data.customer.TV_note.length > 0) {
-                  $('#tv').text(data.customer.TV_note);
-                } else {
-                  $('#tv').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                }
+              if (data.customer.has_TV) {               
+                  $('#tv').html('<i class="fa fa-check-square-o"></i>  '+data.customer.TV_note);                
               } else {
                 $('#tv').html('<i class="fa fa-square-o text-warning" aria-hidden="true"></i>');
               }
 
-              if (data.customer.has_grass) {
-                if (data.customer.grass_note.length > 0) {
-                  $('#grass').text(data.customer.grass_note);
-                } else {
-                  $('#grass').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                }
+              if (data.customer.has_grass) {               
+                  $('#grass').html('<i class="fa fa-check-square-o"></i> '+data.customer.grass_note);                
               } else {
                 $('#grass').html('<i class="fa fa-square-o text-warning" aria-hidden="true"></i>');
               }
 
-              if (data.customer.has_sky) {
-                if (data.customer.sky_note.length > 0) {
-                  $('#sky').text(data.customer.sky_note);
-                } else {
-                  $('#sky').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                }
+              if (data.customer.has_sky) {               
+                  $('#sky').html('<i class="fa fa-check-square-o"></i> '+data.customer.sky_note);               
               } else {
                 $('#sky').html('<i class="fa fa-square-o text-warning" aria-hidden="true"></i>');
               }
 
 
-              if (data.customer.has_fire) {
-                if (data.customer.fire_note.length > 0) {
-                  $('#fire').text(data.customer.fire_note);
-                } else {
-                  $('#fire').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                }
+              if (data.customer.has_fire) {               
+                  $('#fire').html('<i class="fa fa-check-square-o"></i> '+data.customer.fire_note);               
               } else {
                 $('#fire').html('<i class="fa fa-square-o text-warning" aria-hidden="true"></i>');
               }
