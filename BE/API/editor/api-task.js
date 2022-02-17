@@ -33,6 +33,9 @@ router.get('/', authenticateEditorToken, (req, res) => {
 router.get('/detail', authenticateEditorToken, (req, res) => {
     let { taskId } = req.query;
 
+
+  
+
     Task.findById(taskId)
         .populate('level', 'name')
         .populate('job')
@@ -43,9 +46,10 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
                     msg: `Task not found!`
                 })
             }
-           
+          
             getCustomer(task.job.customer)
                 .then(result => {
+                    console.log(result);
                     return res.status(200).json({
                         msg: `Load task detail successfully!`,
                         task,

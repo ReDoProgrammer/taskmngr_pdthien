@@ -2,10 +2,12 @@
   <%-include('child/style')%>
     <%-include('child/contract')%>
 
-      <div class="row mt-2">
-        <div class="col-md-12 text-right">
+      <div class="row">
+        <div class="col-md-9 col-sm-12 col-xs-12 mt-2 text-right">
+          <label for="" class="text-danger font-weight-bold" id="lblError"></label>
+        </div>
+        <div class="col-md-3 col-sm-12 col-xs-12 text-right mt-2">
           <button class="btn btn-secondary">Cancel</button>
-
           <button class="btn btn-primary" id="btnSubmit">
             <i class="fa fa-floppy-o"></i>
             Submit
@@ -17,30 +19,41 @@
         $("#btnSubmit").click(function () {
           let firstname = $("#txtFirstname").val().trim();
           if (firstname.length == 0) {
-            alert("Please enter firstname");
+            $('#lblError').text("Firstname can not be blank");
+            $('#lblError').show().delay(5000).fadeOut();
             return;
           }
           let lastname = $("#txtLastname").val().trim();
           if (lastname.length == 0) {
-            alert("Please enter lastname");
+            $('#lblError').text("Lastname can not be blank");
+            $('#lblError').show().delay(5000).fadeOut();
             return;
           }
 
           let email = $("#txtEmail").val().trim();
           if (email.length == 0) {
-            alert("email can not be blank");
+            $('#lblError').text("Email can not be blank");
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+          }
+
+          if (!isEmail(email)) {
+            $('#lblError').text("Email is not valid");
+            $('#lblError').show().delay(5000).fadeOut();
             return;
           }
 
           let password = $("#txtPassword").val();
           let confirmpassword = $("#txtConfirmPassword").val();
           if (password.length == 0 || confirmpassword.length == 0) {
-            alert("password can not be empty");
+            $('#lblError').text("Password can not be blank");
+            $('#lblError').show().delay(5000).fadeOut();
             return;
           }
 
           if (password !== confirmpassword) {
-            alert("Password and confirm password not match!");           
+            $('#lblError').text("Password and confirm password not match!");
+            $('#lblError').show().delay(5000).fadeOut();
             return;
           }
 
@@ -75,9 +88,14 @@
           $("table > tbody  > tr").each(function (index, tr) {
             let level = tr["id"];
             let price = parseFloat($(this).find("td").eq(2).text());
-            let item = { level,price };            
+            let item = { level, price };
             levels.push(item);
           });
+
+          if (levels.length == 0) {
+            $('#lblError').text("Job levels list can not be empty!");
+            $('#lblError').show().delay(5000).fadeOut();
+          }
 
           $.ajax({
             url: "/admin/customer",
@@ -113,11 +131,13 @@
               levels,
             },
             success: function (data, textStatus, xhr) {
-              alert(data.msg);             
+              alert(data.msg);
               $(location).attr("href", data.url);
             },
             error: function (jqXHR, textStatus, errorThrown) {
-              alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);             
+              $('#lblError').text(jqXHR.responseJSON.msg);
+              $('#lblError').show().delay(5000).fadeOut();
+
             },
           });
         });
@@ -133,34 +153,34 @@
       <!-- phần liên quan tới hợp đồng job level -->
       <script>
         var idx = 1;
-      
-        
-      
+
+
+
         $("#btnAddNewLevel").click(function () {
           let levelId = $("#slLevel option:selected").val();
           let levelName = $("#slLevel option:selected").text();
           let price = $("#txtPrice").val();
           if (price <= 0) {
-            
+
             $('#lblMsg').text("(*) Price is not accepted!");
             $('#lblMsg').show().delay(3000).fadeOut();
-            
+
             return;
           }
-      
+
           //duyệt table xem đã tồn tại level được chọn hay chưa
           //nếu đã tồn tại thì không cho thêm
           let exist = false;
           $("table > tbody  > tr").each(function (index, tr) {
             let id = tr["id"];
-            if (levelId === id) {            
+            if (levelId === id) {
               $('#lblMsg').text("(*) This level already exist!");
               $('#lblMsg').show().delay(3000).fadeOut();
               exist = true;
               return;
             }
           });
-      
+
           if (!exist) {
             let tr = '<tr id ="' + levelId + '">';
             tr += '<td >' + idx++ + "</td>";
@@ -171,10 +191,16 @@
               "</td>";
             tr += '<td class="text-right"><button class="btn btn-xs btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
             tr += "</tr>";
-      
+
             $("#tblData").append(tr);
             $('#txtPrice').val(0);
           }
-      
+
         });
+
+
+        function isEmail(email) {
+          var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+          return regex.test(email);
+        }
       </script>
