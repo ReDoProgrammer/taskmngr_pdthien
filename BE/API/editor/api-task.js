@@ -43,7 +43,7 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
                     path: 'size'                   
                 },
                 populate: {
-                    path: 'color_mode'                  
+                    path: 'color'                  
                 },               
                 populate: {
                     path: 'output'                  

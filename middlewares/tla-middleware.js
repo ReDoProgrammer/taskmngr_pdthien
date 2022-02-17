@@ -2,7 +2,7 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const UserModule = require('../BE/models/user-module-model');
 const _MODULE = 'TLA';
-const getModuleId = require('../middlewares/common');
+const {getModuleId} = require('../middlewares/common');
 
 function authenticateTLAToken(req, res, next) {
   const authHeader = req.headers["authorization"];
