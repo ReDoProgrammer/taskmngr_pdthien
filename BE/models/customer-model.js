@@ -22,14 +22,7 @@ const customerSchema = new Schema({
     address:{
         type:String
     },
-    local_storage:{
-        type:String,
-        default:''
-    },    
-    cloud_storage:{
-        type:String,
-        default:''
-    },    
+   
     output:{
         type:Schema.Types.ObjectId,
         ref:'file_format'

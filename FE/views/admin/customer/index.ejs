@@ -92,16 +92,12 @@
               customerId
             },
             success: function (data, textStatus, xhr) {
-
-              console.log(data);
+            
               $('#modalCustomerDetail').modal();
               $('#fullname').text(data.customer.firstname + ' ' + data.customer.lastname);
               $('#phone').text(data.customer.phone);
               $('#email').text(data.customer.email);
-              $('#address').text(data.customer.address);
-
-              $('#local_storage').attr("href", data.customer.local_storage);
-              $('#cloud_storage').attr("href", data.customer.cloud_storage);
+              $('#address').text(data.customer.address);            
 
 
               $('#output').text(data.customer.output.name);
@@ -237,11 +233,11 @@
 
                 tr += "<td class='text-right'>";
                 tr +=
-                  '<button class="btn btn-sm btn-info" name="view"><i class="fa fa-eye" aria-hidden="true"></i></button>';
+                  '<button class="btn btn-xs btn-info" name="view"><i class="fa fa-eye" aria-hidden="true"></i></button>';
                 tr +=
-                  '<button class="btn btn-sm btn-warning ml-2" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+                  '<button class="btn btn-xs btn-warning ml-2" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
                 tr +=
-                  '<button class="btn btn-sm btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                  '<button class="btn btn-xs btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button>';
                 tr += "</td>";
                 $('#tblData').append(tr);
               });

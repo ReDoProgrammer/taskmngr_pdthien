@@ -21,6 +21,168 @@
                     LoadCustomerLevels(customerId);
                 })
 
+                $("#btnSubmit").click(function () {
+                    let firstname = $("#txtFirstname").val().trim();
+                    if (firstname.length == 0) {
+                        $('#lblError').text("Firstname can not be blank");
+                        $('#lblError').show().delay(5000).fadeOut();
+                        return;
+                    }
+                    let lastname = $("#txtLastname").val().trim();
+                    if (lastname.length == 0) {
+                        $('#lblError').text("Lastname can not be blank");
+                        $('#lblError').show().delay(5000).fadeOut();
+                        return;
+                    }
+
+                    let email = $("#txtEmail").val().trim();
+                    if (email.length == 0) {
+                        $('#lblError').text("Email can not be blank");
+                        $('#lblError').show().delay(5000).fadeOut();
+                        return;
+                    }
+
+                    if (!isEmail(email)) {
+                        $('#lblError').text("Email is not valid");
+                        $('#lblError').show().delay(5000).fadeOut();
+                        return;
+                    }
+
+                    let password = $("#txtPassword").val();
+                    let confirmpassword = $("#txtConfirmPassword").val();
+                    if (password.length == 0 || confirmpassword.length == 0) {
+                        $('#lblError').text("Password can not be blank");
+                        $('#lblError').show().delay(5000).fadeOut();
+                        return;
+                    }
+
+                    if (password !== confirmpassword) {
+                        $('#lblError').text("Password and confirm password not match!");
+                        $('#lblError').show().delay(5000).fadeOut();
+                        return;
+                    }
+
+                    let phone = $("#txtPhone").val().trim();
+
+                    let address = $("#txtAddress").val().trim();
+
+                    let output = $("#slOutput option:selected").val();
+                    let size = $("#slSize option:selected").val();
+                    let color = $("#slColorMode option:selected").val();
+                    let is_align = $("#ckbAlign").is(":checked") ? true : false;
+
+                    let align_note = $("#txtAlign").val().trim();
+                    let cloud = $("#slCloud option:selected").val();
+                    let nation = $("#slNationalStyle option:selected").val();
+                    let remark = $("#txtRemark").val().trim();
+
+                    let has_TV = $("#ckbTV").is(":checked") ? true : false;
+                    let TV_note = $("#txtTV").val().trim();
+                    let has_grass = $("#ckbGrass").is(":checked") ? true : false;
+                    let grass_note = $("#txtGrass").val().trim();
+                    let has_sky = $("#ckbSky").is(":checked") ? true : false;
+                    let sky_note = $("#txtSky").val().trim();
+                    let has_fire = $("#ckbFire").is(":checked") ? true : false;
+                    let fire_note = $("#txtFire").val().trim();
+
+
+                    //validate as if option selected
+                    if (typeof nation === 'undefined') {
+                        $('#lblError').text("No national style has been selected. Please set national style list first!");
+                        $('#lblError').show().delay(5000).fadeOut();
+                        return;
+                    }
+
+                    if (typeof output === 'undefined') {
+                        $('#lblError').text("No output has been selected. Please set ouput list first!");
+                        $('#lblError').show().delay(5000).fadeOut();
+                        return;
+                    }
+
+
+
+                    if (typeof size === 'undefined') {
+                        $('#lblError').text("No size has been selected. Please set size list first!");
+                        $('#lblError').show().delay(5000).fadeOut();
+                        return;
+                    }
+
+                    if (typeof color === 'undefined') {
+                        $('#lblError').text("No color mod has been selected. Please set color mode list first!");
+                        $('#lblError').show().delay(5000).fadeOut();
+                        return;
+                    }
+
+                    if (typeof cloud === 'undefined') {
+                        $('#lblError').text("No cloud has been selected. Please set cloud list first!");
+                        $('#lblError').show().delay(5000).fadeOut();
+                        return;
+                    }
+
+
+
+
+
+
+
+                    let levels = [];
+
+                    $("table > tbody  > tr").each(function (index, tr) {
+                        let level = tr["id"];
+                        let price = parseFloat($(this).find("td").eq(2).text());
+                        let item = { level, price };
+                        levels.push(item);
+                    });
+
+                    if (levels.length == 0) {
+                        $('#lblError').text("Job levels list can not be empty!");
+                        $('#lblError').show().delay(5000).fadeOut();
+                    }
+
+                    $.ajax({
+                        url: "/admin/customer",
+                        type: "put",
+                        headers: {
+                            authorization: "Bearer " + localStorage.getItem("accessToken"),
+                        },
+                        data: {
+                            customerId,
+                            firstname,
+                            lastname,
+                            email,
+                            password,
+                            phone,
+                            address,
+                            output,
+                            size,
+                            color,
+                            is_align,
+                            align_note,
+                            cloud,
+                            nation,
+                            remark,
+                            has_TV,
+                            TV_note,
+                            has_grass,
+                            grass_note,
+                            has_sky,
+                            sky_note,
+                            has_fire,
+                            fire_note,
+                            levels,
+                        },
+                        success: function (data, textStatus, xhr) {
+                            alert(data.msg);
+                            $(location).attr("href", data.url);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            $('#lblError').text(jqXHR.responseJSON.msg);
+                            $('#lblError').show().delay(5000).fadeOut();
+
+                        },
+                    });
+                });
+
                 $(document).on("click", "button[name='deleteLevel']", function () {
                     id = $(this).closest("tr").attr("id");
                     if (confirm("Are you sure want to delete this customer level?")) {
@@ -87,6 +249,7 @@
                             customerId
                         },
                         success: function (data, textStatus, xhr) {
+                            console.log(data);
 
                             $('#txtFirstname').val(data.customer.firstname);
                             $('#txtLastname').val(data.customer.lastname);
@@ -95,13 +258,10 @@
                             $('#txtEmail').val(data.customer.email);
                             $('#txtAddress').val(data.customer.address);
 
-                            $('#txtLocalStorage').val(data.customer.local_storage);
-                            $('#txtCloudStorage').val(data.customer.cloud_storage);
-
 
                             $('#slOutput').val(data.customer.output._id);
                             $('#slSize').val(data.customer.size._id);
-                            $('#slColorMode').val(data.customer.color_mode._id);
+                            $('#slColorMode').val(data.customer.color._id);
 
 
 
@@ -111,16 +271,16 @@
 
                             $('#slCloud').text(data.customer.cloud._id);
 
-                            $('#slNationalStyle').val(data.customer.national_style._id);
+                            $('#slNationalStyle').val(data.customer.nation._id);
                             $('#txtRemark').val(data.customer.remark);
 
 
-                            
-                           
+
+
                             if (data.customer.is_align) {
                                 $('#ckbAlign').prop('checked', true);
                                 $('#txtAlign').val(data.customer.align_note);
-                                $('#txtAlign').prop('readonly', false);   
+                                $('#txtAlign').prop('readonly', false);
 
                             } else {
                                 $('#ckbAlign').prop('checked', false);
@@ -130,7 +290,7 @@
                                 $('#ckbTV').prop('checked', true);
                                 $('#txtTV').val(data.customer.TV_note);
                                 $('#txtTV').prop('readonly', false);
-                          
+
                             } else {
                                 $('#ckbTV').prop('checked', false);
                             }
@@ -139,7 +299,7 @@
                                 $('#ckbGrass').prop('checked', true);
                                 $('#txtGrass').val(data.customer.grass_note);
                                 $('#txtGrass').prop('readonly', false);
-                           
+
                             } else {
                                 $('#ckbGrass').prop('checked', false);
                             }
@@ -148,7 +308,7 @@
                                 $('#ckbSky').prop('checked', true);
                                 $('#txtSky').val(data.customer.grass_note);
                                 $('#txtSky').prop('readonly', false);
-                            
+
                             } else {
                                 $('#ckbSky').prop('checked', false);
                             }
@@ -203,53 +363,53 @@
                 }
 
                 // chỉ cho phép chỉnh sửa các text box tương ứng với các checkbox khi checkbox đc tick
-                $("#ckbAlign").change(function() {
-                    if(this.checked) {
+                $("#ckbAlign").change(function () {
+                    if (this.checked) {
                         $('#txtAlign').val('');
-                        $('#txtAlign').prop('readonly', false);  
-                    }else{
+                        $('#txtAlign').prop('readonly', false);
+                    } else {
                         $('#txtAlign').val('');
-                        $('#txtAlign').prop('readonly', true);  
+                        $('#txtAlign').prop('readonly', true);
                     }
                 });
 
-                $("#ckbTV").change(function() {
-                    if(this.checked) {
+                $("#ckbTV").change(function () {
+                    if (this.checked) {
                         $('#txtTV').val('');
-                        $('#txtTV').prop('readonly', false);  
-                    }else{
+                        $('#txtTV').prop('readonly', false);
+                    } else {
                         $('#txtTV').val('');
-                        $('#txtTV').prop('readonly', true);  
+                        $('#txtTV').prop('readonly', true);
                     }
                 });
 
-                $("#ckbGrass").change(function() {
-                    if(this.checked) {
+                $("#ckbGrass").change(function () {
+                    if (this.checked) {
                         $('#txtGrass').val('');
-                        $('#txtGrass').prop('readonly', false);  
-                    }else{
+                        $('#txtGrass').prop('readonly', false);
+                    } else {
                         $('#txtGrass').val('');
-                        $('#txtGrass').prop('readonly', true);  
+                        $('#txtGrass').prop('readonly', true);
                     }
                 });
 
-                $("#ckbGrass").change(function() {
-                    if(this.checked) {
+                $("#ckbGrass").change(function () {
+                    if (this.checked) {
                         $('#txtGrass').val('');
-                        $('#txtGrass').prop('readonly', false);  
-                    }else{
+                        $('#txtGrass').prop('readonly', false);
+                    } else {
                         $('#txtGrass').val('');
-                        $('#txtGrass').prop('readonly', true);  
+                        $('#txtGrass').prop('readonly', true);
                     }
                 });
 
-                $("#ckbFire").change(function() {
-                    if(this.checked) {
+                $("#ckbFire").change(function () {
+                    if (this.checked) {
                         $('#txtFire').val('');
-                        $('#txtFire').prop('readonly', false);  
-                    }else{
+                        $('#txtFire').prop('readonly', false);
+                    } else {
                         $('#txtFire').val('');
-                        $('#txtFire').prop('readonly', true);  
+                        $('#txtFire').prop('readonly', true);
                     }
                 });
 

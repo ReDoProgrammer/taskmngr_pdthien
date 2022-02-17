@@ -43,7 +43,15 @@ const jobSchema = new Schema({
         */
         type: Number,
         default: -1
-    }
+    },
+    local_storage:{
+        type:String,
+        default:''
+    },    
+    cloud_storage:{
+        type:String,
+        default:''
+    },    
 
 });
 
