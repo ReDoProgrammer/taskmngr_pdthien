@@ -1,7 +1,8 @@
 require('dotenv').config();
-
+const bcrypt = require("bcrypt");
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const SALT_WORK_FACTOR = 10;
 
 
 const customerSchema = new Schema({
@@ -15,6 +16,9 @@ const customerSchema = new Schema({
         type:String,
         required:true,
         unique:true
+    },
+    password:{
+
     },
     phone:{
         type:String
@@ -92,6 +96,38 @@ const customerSchema = new Schema({
         ref:'customer_level'
     }]    
 });
+
+customerSchema.pre("save", function (next) {
+    var customer = this; 
+  
+  
+    // generate a salt
+    bcrypt.genSalt(SALT_WORK_FACTOR, function (err, salt) {
+      if (err) return next(err);
+  
+      // hash the password using our new salt
+      bcrypt.hash(customer.password, salt, function (err, hash) {
+        if (err) return next(err);
+  
+        // only hash the password if it has been modified (or is new)
+        if (customer.isModified("password")) {
+          customer.password = hash;
+          return next();
+        }
+  
+        // override the cleartext password with the hashed one
+        customer.password = hash;
+        next();
+      });
+    });
+  });
+  
+  customerSchema.methods.ComparePassword = function (candidatePassword, cb) {
+    bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
+      if (err) return cb(err);
+      cb(null, isMatch);
+    });
+  };
 
 
 module.exports = mongoose.model('customer',customerSchema);
