@@ -3,9 +3,11 @@
         <%-include('child/contract')%>
 
             <div class="row mt-2">
-                <div class="col-md-12 text-right">
+                <div class="col-md-9 col-sm-12 col-xs-12 mt-1">
+                    <label id="lblError" class="text-danger"></label>
+                </div>
+                <div class="col-md-3 col-sm-12 col-xs-12 mt-1 text-right">
                     <button class="btn btn-secondary">Cancel</button>
-
                     <button class="btn btn-primary" id="btnSubmit">
                         <i class="fa fa-floppy-o"></i>
                         Submit
@@ -13,6 +15,7 @@
                 </div>
             </div>
 
+            <script src="/js/common.js"></script>
             <script>
                 var customerId = '';
                 $(document).ready(function () {
@@ -22,6 +25,7 @@
                 })
 
                 $("#btnSubmit").click(function () {
+
                     let firstname = $("#txtFirstname").val().trim();
                     if (firstname.length == 0) {
                         $('#lblError').text("Firstname can not be blank");
@@ -138,6 +142,10 @@
                         $('#lblError').text("Job levels list can not be empty!");
                         $('#lblError').show().delay(5000).fadeOut();
                     }
+
+
+
+                
 
                     $.ajax({
                         url: "/admin/customer",
@@ -269,7 +277,7 @@
 
 
 
-                            $('#slCloud').text(data.customer.cloud._id);
+                            $('#slCloud').val(data.customer.cloud._id);
 
                             $('#slNationalStyle').val(data.customer.nation._id);
                             $('#txtRemark').val(data.customer.remark);

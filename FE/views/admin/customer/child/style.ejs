@@ -242,6 +242,7 @@
       },
       success: function (data, textStatus, xhr) {
         $("#slCloud").empty();
+        console.log(data);
         data.clouds.forEach((cl) => {
           let opt = '<option value="' + cl._id + '">' + cl.name + "</option>";
           $("#slCloud").append(opt);

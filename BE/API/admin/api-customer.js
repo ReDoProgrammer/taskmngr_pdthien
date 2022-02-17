@@ -217,7 +217,56 @@ router.post("/", authenticateAdminToken, (req, res) => {
 });
 
 router.put("/", authenticateAdminToken, (req, res) => {
- 
+  let { customerId,
+    firstname,
+    lastname,
+    email,
+    password,
+    phone,
+    address,
+    output,
+    size,
+    color,
+    is_align,
+    align_note,
+    cloud,
+    nation,
+    remark,
+    has_TV,
+    TV_note,
+    has_grass,
+    grass_note,
+    has_sky,
+    sky_note,
+    has_fire,
+    fire_note,
+    levels} = req.body;
+
+    
+    console.log( customerId,
+      firstname,
+      lastname,
+      email,
+      password,
+      phone,
+      address,
+      output,
+      size,
+      color,
+      is_align,
+      align_note,
+      cloud,
+      nation,
+      remark,
+      has_TV,
+      TV_note,
+      has_grass,
+      grass_note,
+      has_sky,
+      sky_note,
+      has_fire,
+      fire_note,
+      levels);
 });
 
 
