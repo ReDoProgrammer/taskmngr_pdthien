@@ -14,18 +14,17 @@ router.get("/list", authenticateSaleToken, (req, res) => {
     .populate({
       path: 'customer',
 
-      match: {
-        $or: [
-          { firstname: { "$regex": search, "$options": "i" } }
-        ]
-      }
+      // match: {
+      //   $or: [
+      //     { firstname: { "$regex": search, "$options": "i" } }
+      //   ]
+      // }
 
     })
 
     .exec()
     .then((jobs) => {
       let result = jobs.slice(process.env.PAGE_SIZE * (page - 1), process.env.PAGE_SIZE);
-      console.log('tasklist: ',result);
       return res.status(200).json({
         msg: 'Load jobs list successfully!',
         pages: jobs.length % process.env.PAGE_SIZE == 0 ? jobs.length / process.env.PAGE_SIZE : Math.floor(jobs.length / process.env.PAGE_SIZE) + 1,

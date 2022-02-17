@@ -16,10 +16,12 @@ router.get('/list',authenticateSaleToken,(req,res)=>{
     .populate('size','name -_id')
     .populate('color','name -_id')
     .populate('cloud','name -_id')
+
     .populate('nation','name -_id')
     .exec()
-    .then(customers=>{  
-        console.log(customers);
+    .then(customers=>{          
+        console.log('aaa:',customers);
+
         let result = customers.slice(process.env.PAGE_SIZE*(page-1),process.env.PAGE_SIZE);   
         return res.status(200).json({
           msg:'Load customers successfully!',

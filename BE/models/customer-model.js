@@ -54,7 +54,7 @@ const customerSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'cloud'
     },
-    national:{
+    nation:{
         type:Schema.Types.ObjectId,
         ref:'national_style'
     },

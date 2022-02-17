@@ -6,25 +6,25 @@ const { authenticateEditorToken } = require("../../../middlewares/editor-middlew
 
 
 router.get('/', authenticateEditorToken, (req, res) => {
-   let {page,search} = req.query;
-   Task
-   .find({
-    editor:req.user._id
-   })
-   .populate('level','name -_id')
-   .populate('job') //,'source_link intruction -_id'
-   .exec()
-   .then(tasks =>{
-       return res.status(200).json({
-           msg:`Load your tasks list successfully!`,
-           tasks
-       })
-   })
-   .catch(err=>{
-       return res.status(500).json({
-           msg:`Can not load your tasks list with error: ${new Error(err.message)}`
-       })
-   })
+    let { page, search } = req.query;
+    Task
+        .find({
+            editor: req.user._id
+        })
+        .populate('level', 'name -_id')
+        .populate('job') //,'source_link intruction -_id'
+        .exec()
+        .then(tasks => {
+            return res.status(200).json({
+                msg: `Load your tasks list successfully!`,
+                tasks
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not load your tasks list with error: ${new Error(err.message)}`
+            })
+        })
 
 
 })
@@ -35,37 +35,30 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
 
     Task.findById(taskId)
         .populate('level', 'name')
-        .populate({
-            path: 'job',
-            populate: {
-                path: 'customer',             
-                populate: {
-                    path: 'size'                   
-                },
-                populate: {
-                    path: 'color'                  
-                },               
-                populate: {
-                    path: 'output'                  
-                },
-                populate: {
-                    path: 'cloud'                  
-                }
-            }
-        }
-
-        )
+        .populate('job')
         .exec()
-        .then(task => {     
-            if(!task){
+        .then(task => {
+            if (!task) {
                 return res.status(404).json({
-                    msg:`Task not found!`
+                    msg: `Task not found!`
                 })
-            }       
-            return res.status(200).json({
-                msg:`Load task detail successfully!`,
-                task
-            })
+            }
+           
+            getCustomer(task.job.customer)
+                .then(result => {
+                    return res.status(200).json({
+                        msg: `Load task detail successfully!`,
+                        task,
+                        customer: result.customer
+                    })
+                })
+                .catch(err => {
+                    return res.status(err.code).json({
+                        msg: err.msg
+                    })
+                })
+
+           
         })
         .catch(err => {
             return res.status(500).json({
@@ -111,4 +104,41 @@ router.put('/', authenticateEditorToken, (req, res) => {
 
 
 module.exports = router;
+
+const getCustomer = (customerId) => {
+    return new Promise((resolve, reject) => {
+        Customer.findById(customerId)
+            .populate({
+                path: 'levels',
+                populate: { path: 'level' }
+            })
+            .populate('output', 'name')
+            .populate('size', 'name')
+            .populate('color', 'name')
+            .populate('cloud', 'name')
+            .populate('nation', 'name')
+            .exec((err, customer) => {
+                if (err) {
+                    return reject({
+                        code: 500,
+                        msg: `Can not get customer by id with error: ${new Error(err.message)}`
+                    });
+                }
+                if (!customer) {
+                    return reject({
+                        code: 404,
+                        msg: `Customer not found!`
+                    });
+                }
+
+                return resolve({
+                    code: 200,
+                    msg: `Get customer by id successfully`,
+                    customer
+                });
+
+            });
+    })
+
+}
 

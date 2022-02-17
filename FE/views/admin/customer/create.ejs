@@ -53,12 +53,12 @@
 
           let output = $("#slOutput option:selected").val();
           let size = $("#slSize option:selected").val();
-          let color_mode = $("#slColorMode option:selected").val();
+          let color = $("#slColorMode option:selected").val();
           let is_align = $("#ckbAlign").is(":checked") ? true : false;
 
           let align_note = $("#txtAlign").val().trim();
           let cloud = $("#slCloud option:selected").val();
-          let national_style = $("#slNationalStyle option:selected").val();
+          let nation = $("#slNationalStyle option:selected").val();
           let remark = $("#txtRemark").val().trim();
 
           let has_TV = $("#ckbTV").is(":checked") ? true : false;
@@ -96,11 +96,11 @@
               cloud_storage,
               output,
               size,
-              color_mode,
+              color,
               is_align,
               align_note,
               cloud,
-              national_style,
+              nation,
               remark,
               has_TV,
               TV_note,

@@ -72,9 +72,9 @@ router.get("/detail", authenticateAdminToken, (req, res) => {
     })
     .populate('output', 'name')
     .populate('size', 'name')
-    .populate('color_mode', 'name')
+    .populate('color', 'name')
     .populate('cloud', 'name')
-    .populate('national_style', 'name')
+    .populate('nation', 'name')
     .exec((err, customer) => {
       if (err) {
         return res.status(500).json({
@@ -108,11 +108,11 @@ router.post("/", authenticateAdminToken, (req, res) => {
     cloud_storage,
     output,
     size,
-    color_mode,
+    color,
     is_align,
     align_note,
     cloud,
-    national_style,
+    nation,
     remark,
     has_TV,
     TV_note,
@@ -176,11 +176,11 @@ router.post("/", authenticateAdminToken, (req, res) => {
         cloud_storage,
         output,
         size,
-        color_mode,
+        color,
         is_align,
         align_note,
         cloud,
-        national_style,
+        nation,
         remark,
         has_TV,
         TV_note,
