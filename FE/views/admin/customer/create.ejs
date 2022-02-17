@@ -83,6 +83,46 @@
           let has_fire = $("#ckbFire").is(":checked") ? true : false;
           let fire_note = $("#txtFire").val().trim();
 
+
+          //validate as if option selected
+          if(typeof nation === 'undefined'){
+            $('#lblError').text("No national style has been selected. Please set national style list first!");
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+          }
+
+          if(typeof output === 'undefined'){
+            $('#lblError').text("No output has been selected. Please set ouput list first!");
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+          }
+
+         
+
+          if(typeof size === 'undefined'){
+            $('#lblError').text("No size has been selected. Please set size list first!");
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+          }
+
+          if(typeof color === 'undefined'){
+            $('#lblError').text("No color mod has been selected. Please set color mode list first!");
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+          }
+
+          if(typeof cloud === 'undefined'){
+            $('#lblError').text("No cloud has been selected. Please set cloud list first!");
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+          }
+        
+        
+
+
+
+
+
           let levels = [];
 
           $("table > tbody  > tr").each(function (index, tr) {
