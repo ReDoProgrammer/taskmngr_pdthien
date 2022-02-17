@@ -98,8 +98,7 @@ router.get("/detail", authenticateAdminToken, (req, res) => {
 router.post("/", authenticateAdminToken, (req, res) => {
   let {
     firstname,
-    lastname,
-    username,
+    lastname,    
     password,
     phone,
     email,
@@ -164,8 +163,7 @@ router.post("/", authenticateAdminToken, (req, res) => {
     } else {
       let customer = new Customer({
         firstname,
-        lastname,
-        username,
+        lastname,       
         password,
         phone,
         email,
@@ -219,44 +217,11 @@ router.post("/", authenticateAdminToken, (req, res) => {
 });
 
 router.put("/", authenticateAdminToken, (req, res) => {
-  let { id, name, description, is_input } = req.body;
-
-  //ràng buộc dữ liệu cho đầu vào tên level
-  if (name.length == 0) {
-    return res.status(403).json({
-      msg: "Vui lòng nhập tên định dạng file",
-    });
-  }
-
-  Customer.findOneAndUpdate(
-    { _id: id },
-    {
-      name,
-      description,
-      is_input,
-    },
-    { new: true },
-    (err, ff) => {
-      if (err) {
-        return res.status(500).json({
-          msg: "Cập nhật thông tin định dạng file thất bại!",
-          error: new Error(err.message),
-        });
-      }
-
-      if (ff) {
-        return res.status(200).json({
-          msg: "Cập nhật thông tin định dạng file thành công!",
-          ff: ff,
-        });
-      } else {
-        return res.status(500).json({
-          msg: "Cập nhật thông tin định dạng file thất bại!",
-        });
-      }
-    }
-  );
+ 
 });
+
+
+module.exports = router;
 
 var insert_levels = (levels, customerId) => {
   return new Promise(async (resolve, reject) => {
@@ -279,5 +244,3 @@ var insert_levels = (levels, customerId) => {
     });
   })
 }
-
-module.exports = router;
