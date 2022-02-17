@@ -82,7 +82,7 @@ router.get("/detail", authenticateAdminToken, (req, res) => {
           error: new Error(err.message),
         });
       }
-      if (customer) {      
+      if (customer) {
         return res.status(200).json({
           msg: "Get customer detail successfully!",
           customer: customer,
@@ -98,11 +98,11 @@ router.get("/detail", authenticateAdminToken, (req, res) => {
 router.post("/", authenticateAdminToken, (req, res) => {
   let {
     firstname,
-    lastname,    
+    lastname,
     password,
     phone,
     email,
-    address,  
+    address,
     output,
     size,
     color,
@@ -163,11 +163,11 @@ router.post("/", authenticateAdminToken, (req, res) => {
     } else {
       let customer = new Customer({
         firstname,
-        lastname,       
+        lastname,
         password,
         phone,
         email,
-        address,        
+        address,
         output,
         size,
         color,
@@ -239,11 +239,12 @@ router.put("/", authenticateAdminToken, (req, res) => {
     has_sky,
     sky_note,
     has_fire,
-    fire_note,
-    levels} = req.body;
+    fire_note
+  } = req.body;
 
-    
-    console.log( customerId,
+
+  Customer
+    .findByIdAndUpdate(customerId, {
       firstname,
       lastname,
       email,
@@ -265,8 +266,27 @@ router.put("/", authenticateAdminToken, (req, res) => {
       has_sky,
       sky_note,
       has_fire,
-      fire_note,
-      levels);
+      fire_note
+    }, { new: true }, (err, customer) => {
+      if (err) {
+        return res.status(500).json({
+          msg: `Update customer failed with error: ${new Error(err.message)}`
+        })
+      }
+      if (!customer) {
+        return res.status(404).json({
+          msg: `Customer not found!`
+        })
+      }
+
+      return res.status(200).json({
+        msg: `Update customer successfully!`,
+        customer,
+        url:'/admin/customer'
+      })
+    })
+
+
 });
 
 
@@ -293,3 +313,5 @@ var insert_levels = (levels, customerId) => {
     });
   })
 }
+
+
