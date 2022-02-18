@@ -7,7 +7,7 @@
           <label for="" class="text-danger font-weight-bold" id="lblError"></label>
         </div>
         <div class="col-md-3 col-sm-12 col-xs-12 text-right mt-2">
-          <button class="btn btn-secondary">Cancel</button>
+          <button class="btn btn-secondary" id="btnCancel">Cancel</button>
           <button class="btn btn-primary" id="btnSubmit">
             <i class="fa fa-floppy-o"></i>
             Submit
@@ -19,6 +19,10 @@
       <script src="/js/common.js"></script>
 
       <script>
+        $('#btnCancel').click(function () {
+          $(location).attr("href", '/admin/customer');
+        })
+
         $("#btnSubmit").click(function () {
           let firstname = $("#txtFirstname").val().trim();
           if (firstname.length == 0) {
@@ -62,7 +66,7 @@
 
           let phone = $("#txtPhone").val().trim();
 
-          let address = $("#txtAddress").val().trim();        
+          let address = $("#txtAddress").val().trim();
 
           let output = $("#slOutput option:selected").val();
           let size = $("#slSize option:selected").val();
@@ -85,39 +89,39 @@
 
 
           //validate as if option selected
-          if(typeof nation === 'undefined'){
+          if (typeof nation === 'undefined') {
             $('#lblError').text("No national style has been selected. Please set national style list first!");
             $('#lblError').show().delay(5000).fadeOut();
             return;
           }
 
-          if(typeof output === 'undefined'){
+          if (typeof output === 'undefined') {
             $('#lblError').text("No output has been selected. Please set ouput list first!");
             $('#lblError').show().delay(5000).fadeOut();
             return;
           }
 
-         
 
-          if(typeof size === 'undefined'){
+
+          if (typeof size === 'undefined') {
             $('#lblError').text("No size has been selected. Please set size list first!");
             $('#lblError').show().delay(5000).fadeOut();
             return;
           }
 
-          if(typeof color === 'undefined'){
+          if (typeof color === 'undefined') {
             $('#lblError').text("No color mod has been selected. Please set color mode list first!");
             $('#lblError').show().delay(5000).fadeOut();
             return;
           }
 
-          if(typeof cloud === 'undefined'){
+          if (typeof cloud === 'undefined') {
             $('#lblError').text("No cloud has been selected. Please set cloud list first!");
             $('#lblError').show().delay(5000).fadeOut();
             return;
           }
-        
-        
+
+
 
 
 
@@ -149,7 +153,7 @@
               email,
               password,
               phone,
-              address,             
+              address,
               output,
               size,
               color,
@@ -237,5 +241,5 @@
         });
 
 
-       
+
       </script>

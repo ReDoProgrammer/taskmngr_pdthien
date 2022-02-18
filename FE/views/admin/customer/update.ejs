@@ -7,7 +7,7 @@
                     <label id="lblError" class="text-danger"></label>
                 </div>
                 <div class="col-md-3 col-sm-12 col-xs-12 mt-1 text-right">
-                    <button class="btn btn-secondary">Cancel</button>
+                    <button class="btn btn-secondary" id="btnCancel">Cancel</button>
                     <button class="btn btn-primary" id="btnSubmit">
                         <i class="fa fa-floppy-o"></i>
                         Submit
@@ -23,6 +23,10 @@
                     LoadCustomer(customerId);
                     LoadCustomerLevels(customerId);
                     $('#txtEmail').prop('readonly', true);
+                })
+
+                $('#btnCancel').click(function(){                   
+                    $(location).attr("href", '/admin/customer');
                 })
 
                 $("#btnSubmit").click(function () {
@@ -123,11 +127,6 @@
                         $('#lblError').show().delay(5000).fadeOut();
                         return;
                     }
-
-
-
-
-
 
 
                     let levels = [];
