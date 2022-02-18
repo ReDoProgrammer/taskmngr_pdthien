@@ -103,14 +103,20 @@
 
             </div>
 
-            <div class="row ">
-              <div class="col-md-10 col-sm-8 col-xs-12 mt-2">
-                <input type="text" name="txtRemark" id="txtRemark" class="form-control" placeholder="Level remark">
-              </div>
-              <div class="col-md-2 col-sm-4 col-xs-12 text-center mt-2">
-                <button class="btn btn-info" id="btnAddLevel">
-                  <i class="fa fa-plus" aria-hidden="true"></i>Add job level
-                </button>
+            <div class="row mt-2">
+              <div class="form-group">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                  <label for="">Level remark:</label>
+                  <input type="text" name="txtRemark" id="txtRemark" class="form-control" placeholder="Level remark">
+                </div>     
+              </div>         
+            </div>
+
+            <div class="row mt-2">
+              <div class="col-md-12 col-sm-12 col-xs-12 text-center">               
+                  <button class="btn btn-info" id="btnAddLevel">
+                    <i class="fa fa-plus" aria-hidden="true"></i>Add job level
+                  </button>               
               </div>
             </div>
 
@@ -530,8 +536,8 @@
           tr += "<td class='font-weight-bold text-info'>" + t.level.name + "</td>";
           tr += "<td>" + convertISODateToTimeFormat(t.assigned_date) + "</td>";
           tr += "<td>" + convertISODateToTimeFormat(t.deadline) + "</td>";
-          tr+= '<td> <a href="'+t.local_storage+'">Link</a></td>';
-          tr+= '<td> <a href="'+t.cloud_storage+'">Link</a></td>';
+          tr+= '<td> <a href="'+t.local_storage+'" class="aLocalLink">Link</a></td>';
+          tr+= '<td> <a href="'+t.cloud_storage+'" target="_blank">Link</a></td>';
           tr += "<td>" + t.remark + "</td>";
 
 
