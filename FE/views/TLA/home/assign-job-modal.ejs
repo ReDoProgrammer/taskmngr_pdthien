@@ -48,6 +48,8 @@
                 <th scope="col">Level</th>
                 <th scope="col">Assign date</th>
                 <th scope="col">Deadline</th>
+                <th scope="col">Local</th>
+                <th scope="col">Cloud</th>
                 <th scope="col">Remark</th>
                 <th scope="col">Editor</th>
                 <th scope="col">Q.A</th>
@@ -297,6 +299,8 @@
         level,
         assigned_date,
         deadline,
+        local_storage,
+        cloud_storage,
         remark
       },
       success: function (data) {
@@ -526,6 +530,8 @@
           tr += "<td class='font-weight-bold text-info'>" + t.level.name + "</td>";
           tr += "<td>" + convertISODateToTimeFormat(t.assigned_date) + "</td>";
           tr += "<td>" + convertISODateToTimeFormat(t.deadline) + "</td>";
+          tr+= '<td> <a href="'+t.local_storage+'">Link</a></td>';
+          tr+= '<td> <a href="'+t.cloud_storage+'">Link</a></td>';
           tr += "<td>" + t.remark + "</td>";
 
 

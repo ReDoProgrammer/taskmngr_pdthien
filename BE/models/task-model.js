@@ -93,6 +93,14 @@ const taskSchema = new Schema({
     },
     qa_done:{
         type:Date
+    },
+    local_storage:{
+        type:String,
+        require:true
+    },
+    cloud_storage:{
+        type:String,
+        require:true
     }
 
 
