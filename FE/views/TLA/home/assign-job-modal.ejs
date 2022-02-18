@@ -89,11 +89,23 @@
               </div>
             </div>
 
-            <div class="row mt-2">
-              <div class="col-md-10 col-sm-8 col-xs-7">
+            <div class="row">
+              <div class="form-group col-md-6 col-sm-6 col-xs-12  mt-2">
+                <label for="">Local storage <span class="text-danger">(*)</span>:</label>
+                <input type="text" name="" id="txtLocalStorage" class="form-control" placeholder="Local storage">
+              </div>
+              <div class="form-group col-md-6 col-sm-6 col-xs-12  mt-2">
+                <label for="">Cloud storage <span class="text-danger">(*)</span>:</label>
+                <input type="text" name="" id="txtCloudStorage" class="form-control" placeholder="Cloud storage">
+              </div>
+
+            </div>
+
+            <div class="row ">
+              <div class="col-md-10 col-sm-8 col-xs-12 mt-2">
                 <input type="text" name="txtRemark" id="txtRemark" class="form-control" placeholder="Level remark">
               </div>
-              <div class="col-md-2 col-sm-4 col-xs-5 text-center">
+              <div class="col-md-2 col-sm-4 col-xs-12 text-center mt-2">
                 <button class="btn btn-info" id="btnAddLevel">
                   <i class="fa fa-plus" aria-hidden="true"></i>Add job level
                 </button>
@@ -168,7 +180,6 @@
 
 
 
-
 <script type="text/javascript">
   let idx = 1;
   var taskId = '';
@@ -235,6 +246,9 @@
     let assigned_date = strToDate($('#txtAssignDate').val());
     let deadline = strToDate($('#txtDeadline').val());
 
+    let local_storage = $('#txtLocalStorage').val();
+    let cloud_storage = $('#txtCloudStorage').val();
+
     let remark = $('#txtRemark').val();
 
     // validateion component inputs
@@ -254,6 +268,18 @@
 
     if (deadline <= assigned_date) {
       $('#msgError').text('(*) deadline must be greater than assign date!');
+      $('#msgError').show().delay(3000).fadeOut();
+      return;
+    }
+
+    if (local_storage.trim().length == 0) {
+      $('#msgError').text('(*) Please set local storage!');
+      $('#msgError').show().delay(3000).fadeOut();
+      return;
+    }
+
+    if (!isValidHttpUrl(cloud_storage)) {
+      $('#msgError').text('(*) Please set cloud storage!');
       $('#msgError').show().delay(3000).fadeOut();
       return;
     }
