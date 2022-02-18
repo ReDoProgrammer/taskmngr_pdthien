@@ -22,6 +22,7 @@
                     customerId = getUrlParameter('id');
                     LoadCustomer(customerId);
                     LoadCustomerLevels(customerId);
+                    $('#txtEmail').prop('readonly', true);
                 })
 
                 $("#btnSubmit").click(function () {
@@ -156,8 +157,7 @@
                         data: {
                             customerId,
                             firstname,
-                            lastname,
-                            email,
+                            lastname,                          
                             password,
                             phone,
                             address,
@@ -358,7 +358,7 @@
                                 tr += '<td>' + (idx++) + '</td>';
                                 tr += '<td class="font-weight-bold text-danger">' + i.level.name + '</td>';
                                 tr += '<td class="text-warning text-right">' + i.price + '</td>';
-                                tr += '<td><button class="btn btn-xs btn-danger" name="deleteLevel"><i class="fa fa-trash-o"></i></button></td>';
+                                tr += '<td class="text-right"><button class="btn btn-xs btn-danger" name="deleteLevel"><i class="fa fa-trash-o"></i></button></td>';
                                 tr += '</tr>';
                                 $('#tblData').append(tr);
                             })
