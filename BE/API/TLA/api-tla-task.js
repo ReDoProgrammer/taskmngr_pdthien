@@ -70,7 +70,7 @@ router.get('/detail', authenticateTLAToken, (req, res) => {
 })
 
 router.post('/', authenticateTLAToken, (req, res) => {
-    let { job, level, assigned_date, deadline, local_storage, cloud_storage, remark } = req.body;
+    let { job, level, assigned_date, deadline,input_link, remark } = req.body;
 
     Job
         .findById(job)
@@ -102,8 +102,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
                                 level_price: result.cl.price,
                                 assigned_date,
                                 deadline,
-                                local_storage,
-                                cloud_storage
+                                input_link
                             });
 
                             task.save()

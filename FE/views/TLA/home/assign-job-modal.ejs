@@ -90,7 +90,10 @@
             </div>
 
             <div class="row mt-2">
-              <div class="form-group col-md-6 col-sm-6 col-xs-12"></div>
+              <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                <label for="">Images Link:</label>
+                <input type="text" class="form-control" id="txtInputLink">
+              </div>
             </div>
 
             <div class="row mt-2">
@@ -238,7 +241,7 @@
 
     let assigned_date = strToDate($('#txtAssignDate').val());
     let deadline = strToDate($('#txtDeadline').val());
-
+    let input_link = $('#txtInputLink').val();
     let remark = $('#txtRemark').val();
 
     // validateion component inputs
@@ -275,6 +278,7 @@
         level,
         assigned_date,
         deadline,
+        input_link,
         remark
       },
       success: function (data) {

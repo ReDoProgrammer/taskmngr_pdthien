@@ -17,6 +17,7 @@
         <thead class="thead-dark">
             <tr>
                 <th scope="col">#</th>
+                <th scope="col"></th>
                 <th scope="col">Job</th>
                 <th scope="col">Begin date</th>
                 <th scope="col">Deadline</th>               
@@ -65,6 +66,7 @@
                 data.tasks.forEach(t => {
                     let tr = '<tr id="' + t._id + '">';
                     tr += '<td>' + (idx++) + '</td>';
+                    tr += '<td class="font-weight-bold"><button class="btn btn-xs btn-warning" name="assign-job"><i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</button></td>';
                     tr += '<td class="text-danger font-weight-bold">' + t.job.name + '</td>';
                     tr += '<td>' + convertISODateToTimeFormat( t.job.received_date) + '</td>';
                     tr += '<td>' +convertISODateToTimeFormat( t.job.delivery_date)  + '</td>';                  
