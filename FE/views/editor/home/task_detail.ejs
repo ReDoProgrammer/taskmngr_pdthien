@@ -69,16 +69,14 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-md-2 col-sm-3 col-xs-4">Cloud:</div>
-                                    <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold" id="divCloud"></div>
+                                    <div class="col-md-2 col-sm-3 col-xs-4">Size:</div>
+                                    <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold" id="divSize"></div>
+                                   
                                     <div class="col-md-2 col-sm-3 col-xs-4">Output:</div>
                                     <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold" id="divOutput"></div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-2 col-sm-3 col-xs-4">Size:</div>
-                                    <div class="col-md-10 col-sm-9 col-xs-8 font-weight-bold" id="divSize"></div>
-                                </div>
+                               
 
                                 <hr />
                                 <div class="row">
@@ -130,9 +128,7 @@
                 console.log(data);
 
                 $('#divNationalStyle').html(data.customer.nation.name)
-                $('#divColor').html(data.customer.color.name)
-
-                $('#divCloud').html(data.customer.cloud.name)
+                $('#divColor').html(data.customer.color.name)              
                 $('#divOutput').html(data.customer.output.name)
 
                 $('#divSize').html(data.customer.size.name)
