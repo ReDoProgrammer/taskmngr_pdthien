@@ -44,11 +44,13 @@ const jobSchema = new Schema({
         type: Number,
         default: -1
     },
-    local_storage:{
+    input_link:{
+        //link này chứa hình ảnh source khi sale tạo mới job
         type:String,
         default:''
     },    
-    cloud_storage:{
+    output_link:{
+        //link này chứa hình ảnh output khi eidtor,qa,dc submit done TLA sẽ tổng hợp lại để post lên cho sale giao cho khách
         type:String,
         default:''
     },    

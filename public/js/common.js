@@ -1,16 +1,4 @@
 
-function convertUTCDateToLocalDate(d) {
-  var date = convertUTCDateToLocalDate(new Date(d));
-  var newDate = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
-
-  var offset = date.getTimezoneOffset() / 60;
-  var hours = date.getHours();
-
-  newDate.setHours(hours - offset);
-
-  return newDate;
-}
-
 function convertISODateToTimeFormat(ISO_Date) {
   const newDateObj = new Date(ISO_Date);
   const toMonth = (newDateObj.getMonth() + 1);

@@ -94,11 +94,13 @@ const taskSchema = new Schema({
     qa_done:{
         type:Date
     },
-    local_storage:{
+    input_link:{
+        //link hình ảnh của task khi TLA giao việc cho editor,qa
         type:String,
         require:true
     },
-    cloud_storage:{
+    output_link:{
+        //link thành phẩm sau khi editor đã hoàn thành task của mình và submit done
         type:String,
         require:true
     }

@@ -20,9 +20,9 @@
                 <th scope="col">Job</th>
                 <th scope="col">Begin date</th>
                 <th scope="col">Deadline</th>               
-                <th scope="col" class="text-center">Editor</th>
-                <th scope="col" class="text-center">Q.A</th>
-                <th scope="col" class="text-center">Remark</th>
+                <th scope="col">Editor</th>
+                <th scope="col">Q.A</th>
+                <th scope="col">Remark</th>
                 <th scope="col" class="text-right">Status</th>
             </tr>
         </thead>
@@ -60,18 +60,18 @@
                 page
             },
             success: function (data) {
-                
+                console.log(data);
                 let idx = 1;
                 data.tasks.forEach(t => {
                     let tr = '<tr id="' + t._id + '">';
                     tr += '<td>' + (idx++) + '</td>';
                     tr += '<td class="text-danger font-weight-bold">' + t.job.name + '</td>';
-                    tr += '<td>' + new Date( t.job.received_date).toLocaleString() + '</td>';
-                    tr += '<td>' +new Date( t.job.delivery_date).toLocaleString()  + '</td>';                  
+                    tr += '<td>' + convertISODateToTimeFormat( t.job.received_date) + '</td>';
+                    tr += '<td>' +convertISODateToTimeFormat( t.job.delivery_date)  + '</td>';                  
                                       
 
 
-                    tr += '<td class="text-center">';
+                    tr += '<td>';
                         if(t.editor){
                             tr+= t.editor.fullname
                         }else{
@@ -79,7 +79,7 @@
                         }
                     tr += '</td>';
 
-                    tr += '<td class="text-center">';
+                    tr += '<td>';
                         if(t.qa){
                             tr+= t.qa.fullname
                         }else{

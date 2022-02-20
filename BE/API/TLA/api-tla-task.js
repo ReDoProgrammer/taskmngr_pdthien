@@ -48,6 +48,8 @@ router.get('/', authenticateTLAToken, (req, res) => {
         )
         .populate('level')
         .populate('job')
+        .populate('qa', 'fullname -_id')
+        .populate('editor', 'fullname -_id')
         .exec()
         .then(tasks => {
             return res.status(200).json({
