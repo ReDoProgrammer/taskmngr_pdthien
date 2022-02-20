@@ -7,14 +7,21 @@
                     </div>
                     <div class="panel-body">
 
-                        <div class="form-row">                           
-                            <div class="form-group col-md-10 col-sm-10 col-xs-8">
+                        <div class="form-row">
+                            <div class="form-group col-md-10 col-sm-9 col-xs-8">
+                                <label for="">Task output link <span class="text-danger">(!)</span>:</label>
                                 <input type="text" name="" id="txtLink" class="form-control">
-                            </div>                     
-                            <div class="col-md-2 col-sm-2 col-xs-4 text-center">
-                                <button class="btn btn-success" id="btnSubmitTaskDone">
+                            </div>
+                            
+                            <div class="form-group col-md-2 col-sm-3 col-xs-4">                               
+                                <button class="btn btn-success" id="btnSubmitTaskDone" style="margin-top: 25px;">
                                     Submit done
                                 </button>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <label for="" class="text-danger font-weight-bold" id="lblError"></label>
                             </div>
                         </div>
 
@@ -29,3 +36,32 @@
         </div>
     </div>
 </div>
+
+<script>
+    $('#btnSubmitTaskDone').click(function () {
+        let output_link = $('#txtLink').val();
+        if(output_link.trim().length == 0){
+            $('#lblError').text('(!) Please enter output link');
+            $('#lblError').show().delay(5000).fadeOut();
+        }
+        $.ajax({
+            url: '/task/submit',
+            type: 'put',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                taskId,
+                output_link
+            },
+            success: function(data){
+                alert(data.msg);
+                $('#modalSubmitTask').modal('hide');
+                LoadTask();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+            }
+        })
+    })
+</script>

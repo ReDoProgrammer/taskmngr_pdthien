@@ -71,6 +71,31 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
         })
 })
 
+
+router.put('/submit',authenticateEditorToken,(req,res)=>{
+    let {taskId,output_link} = req.body;
+    Task
+    .findByIdAndUpdate(taskId,{
+        output_link,
+        status:1  
+    },{new:true},(err,task)=>{
+        if(err){
+            return res.status(500).json({
+                msg:`Can not find and update task by id with error: ${new Error(err.message)}`
+            })
+        }
+        if(!task){
+            return res.status(404).json({
+                msg:`Task not found!`
+            })
+        }
+
+        return res.status(200).json({
+            msg:`The task has been submited!`
+        })
+    })
+})
+
 router.put('/', authenticateEditorToken, (req, res) => {
     //----------TÁC VỤ NHẬN LEVEL MỚI ---------------//
     /*

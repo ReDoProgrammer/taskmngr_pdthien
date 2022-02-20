@@ -117,10 +117,12 @@
             tr += '<button class="btn btn-xs btn-info" name="btnTaskInfo">';
             tr += '<i class="fa fa-info"></i> Detail';
             tr += '</button>';
-           
+           if(t.status == 0){
             tr += '<button class="btn btn-xs btn-primary ml-2" name="btnSubmitTask">';
             tr += '<i class="fa fa-send-o"></i> Submit';
             tr += '</button>';
+           }
+          
             tr += '</td>';
 
 
