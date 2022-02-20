@@ -1,6 +1,6 @@
 <div class="row">
   <div class="col-md-1 col-sm-2 col-xs-3 mt-2 text-right">
-    <button class="btn btn-success" id="btnGetJob">
+    <button class="btn btn-success" id="btnGetTask">
       <i class="fa fa-plus"></i> Get job
     </button>
   </div>
@@ -43,12 +43,29 @@
   <script>
     var page = 1;
     var search = '';
+    var taskId = '';
 
     $(document).ready(function () {
       LoadTask();
     })
 
-    var taskId = '';
+
+    $('#btnGetTask').click(function(){
+      $.ajax({
+        url:'/task/get-more',
+        type:'put',
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        success:function(data){
+          console.log(data);
+        }
+      })
+    })
+
+   
+
+
 
     $(document).on("click", "button[name='btnSubmitTask']", function () {
       taskId = $(this).closest("tr").attr("id");

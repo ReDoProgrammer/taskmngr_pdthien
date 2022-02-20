@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
 const Customer = require('../../models/customer-model');
+const Job = require('../../models/job-model');
 
 const { authenticateEditorToken } = require("../../../middlewares/editor-middleware");
 
@@ -34,7 +35,7 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
     let { taskId } = req.query;
 
 
-  
+
 
     Task.findById(taskId)
         .populate('level', 'name')
@@ -46,7 +47,7 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
                     msg: `Task not found!`
                 })
             }
-          
+
             getCustomer(task.job.customer)
                 .then(result => {
                     console.log(result);
@@ -62,7 +63,7 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
                     })
                 })
 
-           
+
         })
         .catch(err => {
             return res.status(500).json({
@@ -72,67 +73,93 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
 })
 
 
-router.put('/submit',authenticateEditorToken,(req,res)=>{
-    let {taskId,output_link} = req.body;
+router.put('/submit', authenticateEditorToken, (req, res) => {
+    let { taskId, output_link } = req.body;
     Task
-    .findByIdAndUpdate(taskId,{
-        output_link,
-        status:1  
-    },{new:true},(err,task)=>{
-        if(err){
-            return res.status(500).json({
-                msg:`Can not find and update task by id with error: ${new Error(err.message)}`
-            })
-        }
-        if(!task){
-            return res.status(404).json({
-                msg:`Task not found!`
-            })
-        }
+        .findByIdAndUpdate(taskId, {
+            output_link,
+            status: 1
+        }, { new: true }, (err, task) => {
+            if (err) {
+                return res.status(500).json({
+                    msg: `Can not find and update task by id with error: ${new Error(err.message)}`
+                })
+            }
+            if (!task) {
+                return res.status(404).json({
+                    msg: `Task not found!`
+                })
+            }
 
-        return res.status(200).json({
-            msg:`The task has been submited!`
+            return res.status(200).json({
+                msg: `The task has been submited!`
+            })
         })
-    })
 })
 
-router.put('/', authenticateEditorToken, (req, res) => {
-    //----------TÁC VỤ NHẬN LEVEL MỚI ---------------//
+router.put('/get-more', authenticateEditorToken, (req, res) => {
+    //----------TÁC VỤ NHẬN task MỚI ---------------//
     /*
         TH1: editor đang không xử lý bất kì 1 job nào hoặc các job editor xử lý đã đc giao hết cho khách -> nhận thêm đc 1 level (task) của job mới
         TH2: editor đã xử lý xong(đã submit done) và Q.A chưa submit done, editor có quyền nhận thêm 1 level(task) của job mới. 
         Tuy nhiên khi editor submit done task mới này thì sẽ không được nhận thêm bất cứ 1 task(level) của job mới nào nữa cho tới khi Q.A submit done
+
+        Editor chỉ được phép nhận các task có job level phù hợp với trình độ của mình (staff group)
+
+        Khi thỏa các điều kiện trên thì sẽ nhận được task của job có deadline gần nhất với thời điểm hiện tại
     
     */
-    let { taskId } = req.body;
-    Task.findByIdAndUpdate(taskId,
-        {
-            staff: req.user._id,
-            status: 0,
-            editor: true
-        }, { new: true },
-        (err, task) => {
-            if (err) {
-                return res.status(500).json({
-                    msg: `Get new task failed with error: ${new Error(err.message)}`,
-                    error: new Error(err.message)
+
+
+    Task
+        .find({ editor: req.user._id })
+        .exec()
+        .then(tasks => {
+            if (tasks.length > 0) {
+                let ids = tasks.map(x => {
+                    return x.job
                 })
+                getJobsByIdsList(ids)
+                    .then(jobs => {
+                        console.log(jobs);
+                    })
+                    .catch(err => {
+                        return res.status(err.code).json({
+                            msg: err.msg
+                        })
+                    })
             }
-            if (task == null) {
-                return res.status(404).json({
-                    msg: `Task not found`
-                })
-            }
-            return res.status(200).json({
-                msg: `Task has been got successfully!`
+
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not get task by editor with error: ${new Error(err.message)}`
             })
-        }
-    )
+        })
+
 })
 
 
 
 module.exports = router;
+
+const getJobsByIdsList = (ids) => {
+    return new Promise((resolve, reject) => {
+        Jo
+        b
+            .find({ _id: { $in: ids } })
+            .exec()
+            .then(jobs => {
+                return resolve(jobs)
+            })
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not get jobs list by id array with error: ${new Error(err.message)}`
+                })
+            })
+    })
+}
 
 const getCustomer = (customerId) => {
     return new Promise((resolve, reject) => {
