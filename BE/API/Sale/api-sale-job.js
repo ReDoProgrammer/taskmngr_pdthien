@@ -44,7 +44,7 @@ router.post("/", authenticateSaleToken, (req, res) => {
   let {
     customer,
     name,
-    source_link,
+    input_link,
     received_date,
     delivery_date,
     intruction,
@@ -55,7 +55,7 @@ router.post("/", authenticateSaleToken, (req, res) => {
   let job = new Job({
     name,
     customer,
-    source_link,
+    input_link,
     received_date,
     delivery_date,
     intruction,

@@ -88,13 +88,13 @@
   $('#btnSubmitJob').click(function () {
     let customer = customerId;
     let name = $('#txtName').val();
-    let source_link = $('#txtLinkSource').val();
+    let input_link = $('#txtLinkSource').val();
     let received_date = strToDate($('#txtReceivedDate').val());
     let delivery_date = strToDate($('#txtDeliveryDate').val());
     let intruction = $('#txaIntruction').val();
 
 
-    if(!isValidHttpUrl(source_link)){
+    if(!isValidHttpUrl(input_link)){
       $('#lblError').text('(*) Invalid image link source. Please insert source link to be continue!');
       $('#lblError').show().delay(3000).fadeOut();
       return;
@@ -128,7 +128,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { customer, name, source_link, received_date, delivery_date, intruction },
+      data: { customer, name, input_link, received_date, delivery_date, intruction },
       success: function (data) {
         alert(data.msg);
         $('#addJobModal').modal('hide');

@@ -21,7 +21,8 @@
         <th scope="col">Receive date</th>
         <th scope="col">Delivery date</th>
         <th scope="col">Intruction</th>
-        <th scope="col" class="text-center">Images link</th>
+        <th scope="col" class="text-center">Source link</th>
+        <th scope="col" class="text-center">Product link</th>
         <th scope="col" class="text-right">Status</th>
       </tr>
     </thead>
@@ -93,7 +94,8 @@
           tr += "<td>" + new Date(job.received_date).toLocaleString() + "</td>";
           tr += "<td>" + new Date(job.delivery_date).toLocaleString() + "</td>";
           tr += "<td class='text-warning'>" + job.intruction + "</td>";
-          tr += "<td class='font-italic font-weight-bold text-center'><a href='" + job.source_link + "' target='_blank'>Link</a></td>";
+          tr += "<td class='font-italic font-weight-bold text-center'><a href='" + job.input_link + "' target='_blank'>Link</a></td>";
+          tr += "<td class='font-italic font-weight-bold text-center'><a href='" + job.output_link + "' target='_blank'>Link</a></td>";
 
 
           tr += '<td class = "font-weight-bold text-right"><i>';
