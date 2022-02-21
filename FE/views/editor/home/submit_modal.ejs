@@ -37,6 +37,9 @@
     </div>
 </div>
 
+
+<script src="/js/common.js"></script>
+
 <script>
     $('#btnSubmitTaskDone').click(function () {
         let output_link = $('#txtLink').val();
@@ -52,7 +55,8 @@
             },
             data: {
                 taskId,
-                output_link
+                output_link,
+                editor_done:  getCurrentTime()
             },
             success: function(data){
                 alert(data.msg);
