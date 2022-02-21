@@ -288,6 +288,7 @@
         LoadTasks();
         ChangeJobStatus(jobId, 0);
         LoadJob();
+        $('#txtInputLink').val('');
       },
       error: function (jqXHR, textStatus, errorThrown) {
         $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);

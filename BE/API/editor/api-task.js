@@ -116,18 +116,7 @@ router.put('/get-more', authenticateEditorToken, (req, res) => {
         .exec()
         .then(tasks => {
             if (tasks.length > 0) {
-                let ids = tasks.map(x => {
-                    return x.job
-                })
-                getJobsByIdsList(ids)
-                    .then(jobs => {
-                        console.log(jobs);
-                    })
-                    .catch(err => {
-                        return res.status(err.code).json({
-                            msg: err.msg
-                        })
-                    })
+                
             }
 
         })
@@ -143,23 +132,7 @@ router.put('/get-more', authenticateEditorToken, (req, res) => {
 
 module.exports = router;
 
-const getJobsByIdsList = (ids) => {
-    return new Promise((resolve, reject) => {
-        Jo
-        b
-            .find({ _id: { $in: ids } })
-            .exec()
-            .then(jobs => {
-                return resolve(jobs)
-            })
-            .catch(err => {
-                return reject({
-                    code: 500,
-                    msg: `Can not get jobs list by id array with error: ${new Error(err.message)}`
-                })
-            })
-    })
-}
+
 
 const getCustomer = (customerId) => {
     return new Promise((resolve, reject) => {
