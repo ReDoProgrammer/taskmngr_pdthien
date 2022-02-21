@@ -74,6 +74,12 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
 
 
 router.put('/submit', authenticateEditorToken, (req, res) => {
+    /*
+        - update trạng thái của task
+        - link output của task
+        - thời gian hoàn thành task
+        - số lần chỉnh sửa
+    */
     let { taskId, output_link } = req.body;
     Task
         .findByIdAndUpdate(taskId, {
