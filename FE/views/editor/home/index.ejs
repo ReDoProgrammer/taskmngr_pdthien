@@ -25,8 +25,7 @@
         <th scope="col">#</th>
         <th scope="col">Level</th>
         <th scope="col">Deadline</th>
-        <th scope="col">Remark</th>
-        <th scope="col">Source</th>
+        <th scope="col">Remark</th>     
         <th scope="col">Status</th>
         <th scope="col"></th>
       </tr>
@@ -102,8 +101,7 @@
             tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
             tr += '<td class="text-danger">' + convertISODateToTimeFormat(t.deadline) + '</td>';
             tr += '<td>' + t.remark + '</td>';
-
-            tr += '<td> <a href="' + t.job.source_link + '" target="_blank">Link</a></td>';
+        
 
             /*
             

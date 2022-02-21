@@ -73,34 +73,40 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
 })
 
 
-router.put('/submit', authenticateEditorToken, (req, res) => {
+router.put('/submit', authenticateEditorToken, async (req, res) => {
     /*
         - update trạng thái của task
         - link output của task
         - thời gian hoàn thành task
         - số lần chỉnh sửa
     */
-    let { taskId, output_link } = req.body;
-    Task
-        .findByIdAndUpdate(taskId, {
-            output_link,
-            status: 1
-        }, { new: true }, (err, task) => {
-            if (err) {
-                return res.status(500).json({
-                    msg: `Can not find and update task by id with error: ${new Error(err.message)}`
-                })
-            }
-            if (!task) {
-                return res.status(404).json({
-                    msg: `Task not found!`
-                })
-            }
+    let { taskId, output_link,editor_done } = req.body;
 
-            return res.status(200).json({
-                msg: `The task has been submited!`
-            })
+
+    let task = await Task.findById(taskId);
+    if(!task){
+        return res.status(404).json({
+            msg:`Task not found!`
         })
+    }
+    task.output_link = output_link;
+    task.status = 1;
+    task.edited_time = ++(task.edited_time);
+    task.editor_done = editor_done;
+
+    task
+    .save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`The task has been submited!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not submit task with error: ${new Error(err.message)}`
+        })
+    })
+   
 })
 
 router.put('/get-more', authenticateEditorToken, (req, res) => {

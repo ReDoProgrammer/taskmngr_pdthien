@@ -55,6 +55,16 @@
                             </div>
                         </div>
 
+                        <hr/>
+                        <div class="row mt-2">
+                            <div class="col-md-2 col-sm-2 col-xs-4">Source:</div>
+                            <div class="col-md-10 col-sm-10 col-xs-8" id="lblInputLink"></div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-2 col-sm-2 col-xs-4">Output:</div>
+                            <div class="col-md-10 col-sm-10 col-xs-8" id="lblOutputLink"></div>
+                        </div>
+
 
 
                         <div class="panel panel-info mt-2">
@@ -98,6 +108,9 @@
 
                             </div>
                         </div>
+
+
+
                     </div>
                     <div class="panel-footer">
                         <div class="form-group text-right">
@@ -109,6 +122,7 @@
         </div>
     </div>
 </div>
+
 
 
 <script src="/js/common.js"></script>
@@ -140,6 +154,18 @@
                 $('#lblDeadline').text(convertISODateToTimeFormat(data.task.deadline));
                 $('#lblIntruction').text(data.task.job.intruction);
                 $('#lblRemark').text(data.task.remark);
+
+                if(isValidHttpUrl(data.task.input_link)){
+                    $('#lblInputLink').html('<a href="'+data.task.input_link+'" target="_blank" rel="noopener noreferrer">Link</a>')
+                }else{
+                    $('#lblInputLink').html('<span class="font-weight-bold font-italic">'+data.task.input_link+'</span>');
+                }
+
+                if(isValidHttpUrl(data.task.output_link)){
+                    $('#lblOutputLink').html('<a href="'+data.task.output_link+'" target="_blank" rel="noopener noreferrer">Link</a>')
+                }else{
+                    $('#lblOutputLink').html('<span class="font-weight-bold font-italic">'+data.task.output_link+'</span>');
+                }
 
 
                 if (data.customer.is_align) {

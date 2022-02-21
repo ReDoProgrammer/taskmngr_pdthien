@@ -56,7 +56,7 @@
             data: {
                 taskId,
                 output_link,
-                editor_done:  getCurrentTime()
+                editor_done:  strToDate(getCurrentTime())
             },
             success: function(data){
                 alert(data.msg);
