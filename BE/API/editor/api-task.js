@@ -143,7 +143,7 @@ router.put('/get-more', authenticateEditorToken, (req, res) => {
             getJobLevels(req.user._id)
                 .then(levelIds => {
                     Task
-                    .find({
+                    .findOne({
                         level: {$in: levelIds},// thỏa mãn trình độ ( staff level ) của editor
                         status: -1 // chưa có editor nào nhận
                     })
@@ -151,12 +151,22 @@ router.put('/get-more', authenticateEditorToken, (req, res) => {
                     .limit(1)
                     .exec()
                     .then(task=>{
-                        
                         getModule(_EDITOR)
                         .then(mdl=>{
                             getWage(req.user._id,task.level,mdl.m._id)
                             .then(result=>{
-                                console.log(result);
+                                putTask(req.user._id,task._id,result.w.wage)
+                                .then(t=>{
+                                    return res.status(200).json({
+                                        msg:`Get task successfully!`,
+                                        t
+                                    })
+                                })
+                                .catch(err=>{
+                                    return res.status(err.code).json({
+                                        msg:err.msg
+                                    })
+                                })
                             })
                             .catch(err=>{
                                 console.log(err);
@@ -201,13 +211,30 @@ router.put('/get-more', authenticateEditorToken, (req, res) => {
 module.exports = router;
 
 
-const putTask = (editor, taskId)=>{
+const putTask = (editor, taskId,wage)=>{
     return new Promise((resolve,reject)=>{
         Task
         .findByIdAndUpdate(taskId,{
             editor,
             status: 0,
+            wage           
+        },{new:true},(err,task)=>{
+            if(err){
+                console.log(`Can not put task with error: ${new Error(err.message)}`);
+                return reject({
+                    code:500,
+                    msg:`Can not put task with error: ${new Error(err.message)}`
+                })
+            }
 
+            if(!task){
+                return reject({
+                    code:404,
+                    msg:`Task not found so can not put task!`
+                })                
+            }
+            console.log('task ne: ',task);
+            return resolve(task);
         })
     })
 }
@@ -294,6 +321,7 @@ const getCustomer = (customerId) => {
 
 
 const getWage = (staffId, job_lv, moduleId) => {
+    console.log(staffId,job_lv,moduleId);
     return new Promise((resolve, reject) => {
         getUser(staffId)
         .then(result=>{
