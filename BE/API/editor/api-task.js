@@ -2,6 +2,12 @@ const router = require("express").Router();
 const Task = require("../../models/task-model");
 const Customer = require('../../models/customer-model');
 const Job = require('../../models/job-model');
+const StaffJobLevel = require('../../models/staff-job-level-model');
+const User = require('../../models/user-model');
+const Wage = require('../../models/wage-model');
+const Module = require('../../models/module-model');
+const _EDITOR = 'EDITOR';
+
 
 const { authenticateEditorToken } = require("../../../middlewares/editor-middleware");
 
@@ -80,13 +86,13 @@ router.put('/submit', authenticateEditorToken, async (req, res) => {
         - thời gian hoàn thành task
         - số lần chỉnh sửa
     */
-    let { taskId, output_link,editor_done } = req.body;
+    let { taskId, output_link, editor_done } = req.body;
 
 
     let task = await Task.findById(taskId);
-    if(!task){
+    if (!task) {
         return res.status(404).json({
-            msg:`Task not found!`
+            msg: `Task not found!`
         })
     }
     task.output_link = output_link;
@@ -95,18 +101,18 @@ router.put('/submit', authenticateEditorToken, async (req, res) => {
     task.editor_done = editor_done;
 
     task
-    .save()
-    .then(_=>{
-        return res.status(200).json({
-            msg:`The task has been submited!`
+        .save()
+        .then(_ => {
+            return res.status(200).json({
+                msg: `The task has been submited!`
+            })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not submit task with error: ${new Error(err.message)}`
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not submit task with error: ${new Error(err.message)}`
+            })
         })
-    })
-   
+
 })
 
 router.put('/get-more', authenticateEditorToken, (req, res) => {
@@ -123,26 +129,128 @@ router.put('/get-more', authenticateEditorToken, (req, res) => {
     */
 
 
-    Task
-        .find({ editor: req.user._id })
-        .exec()
-        .then(tasks => {
-            if (tasks.length > 0) {
-                
+    Task.countDocuments({
+        editor: req.user._id,
+        status: { $nin: [0, 1] }
+    })
+        .then(count => {
+            if (count > 0) {
+                return res.status(403).json({
+                    msg: `You can not get more tasks when the current task have been not submited yet!`
+                })
             }
+
+            getJobLevels(req.user._id)
+                .then(levelIds => {
+                    Task
+                    .find({
+                        level: {$in: levelIds},// thỏa mãn trình độ ( staff level ) của editor
+                        status: -1 // chưa có editor nào nhận
+                    })
+                    .sort({deadline: -1})
+                    .limit(1)
+                    .exec()
+                    .then(task=>{
+                        
+                        getModule(_EDITOR)
+                        .then(mdl=>{
+                            getWage(req.user._id,task.level,mdl.m._id)
+                            .then(result=>{
+                                console.log(result);
+                            })
+                            .catch(err=>{
+                                console.log(err);
+                                return res.status(err.code).json({
+                                    msg:err.msg
+                                })
+                            })
+                        })
+                        .catch(err=>{
+                            return res.status(err.code).json({
+                                msg:err.msg
+                            })
+                        })
+                    })
+                    .catch(err=>{
+                        return res.status(500).json({
+                            msg:`Can not get premier task with error: ${new Error(err.message)}`
+                        })
+                    })
+
+                })
+                .catch(err => {
+                    return res.status(err.code).json({
+                        msg: err.msg
+                    })
+                })
 
         })
         .catch(err => {
             return res.status(500).json({
-                msg: `Can not get task by editor with error: ${new Error(err.message)}`
+                msg: `Can not count task document with error: ${new Error(err.message)}`
             })
         })
+
 
 })
 
 
 
+
+
 module.exports = router;
+
+
+const putTask = (editor, taskId)=>{
+    return new Promise((resolve,reject)=>{
+        Task
+        .findByIdAndUpdate(taskId,{
+            editor,
+            status: 0,
+
+        })
+    })
+}
+
+
+
+const getJobLevels = (userId) => {
+    return new Promise((resolve, reject) => {
+        User
+            .findById(userId)
+            .exec()
+            .then(user => {
+                if (!user) {
+                    return reject({
+                        code: 404,
+                        msg: `Staff not found`
+                    })
+                }
+                StaffJobLevel
+                    .find({ staff_lv: user.user_level })
+                    .exec()
+                    .then(levels => {
+                        if (levels.length == 0) {
+                            return reject({
+                                code: 404,
+                                msg: `No job levels available!`
+                            })
+                        }
+                        let lvs = levels.map(x => {
+                            return x.job_lv;
+                        })
+                        return resolve(lvs);
+                    })
+                    .catch(err => {
+                        return reject({
+                            code: 500,
+                            msg: `Can not get job levels with error: ${new Error(err.message)}`
+                        })
+                    })
+
+            })
+    })
+}
 
 
 
@@ -181,5 +289,101 @@ const getCustomer = (customerId) => {
             });
     })
 
+}
+
+
+
+const getWage = (staffId, job_lv, moduleId) => {
+    return new Promise((resolve, reject) => {
+        getUser(staffId)
+        .then(result=>{
+            Wage
+            .findOne({
+                module:moduleId,
+                job_lv,
+                staff_lv:result.u.user_level,
+                user_group:result.u.user_group
+            })
+            .exec()
+            .then(w=>{
+               if(!w){
+                   return reject({
+                       code:404,
+                       msg:`Can not get wage with this job level and this user group. Please set this wage in user group module first!`
+                   })
+               }
+               return resolve({
+                   code:200,
+                   msg:`Get wage successfully!`,
+                   w
+               })
+            })
+            .catch(err=>{
+                console.log(`Can not get wage with error: ${new Error(err.message)}`);
+                return reject({
+                    code:500,
+                    msg:`Can not get wage with error: ${new Error(err.message)}`
+                })
+            })
+        })
+        .catch(err=>{
+            return reject(err)
+        })
+    })
+}
+
+const getUser = (staffId)=>{
+    return new Promise((resolve,reject)=>{
+        User
+        .findById(staffId)
+        .exec()
+        .then(u=>{
+            if(!u){
+                return reject({
+                    code:404,
+                    msg:`Staff not found`
+                })
+            }
+            return resolve({
+                code:200,
+                msg:`Staff found`,
+                u
+            })
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not get staff info with error: ${new Error(err.message)}`
+            })
+        })
+    })
+}
+
+
+const getModule = (moduleName) => {
+    return new Promise((resolve, reject) => {
+        Module
+            .findOne({ name: moduleName })
+            .exec()
+            .then(m => {
+                if (!m) {
+                    return reject({
+                        code: 404,
+                        msg: `Module not found`
+                    })
+                }
+                return resolve({
+                    code: 200,
+                    msg: `Get module info successfully!`,
+                    m
+                })
+            })
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not get module with error: ${new Error(err.message)}`
+                })
+            })
+    })
 }
 
