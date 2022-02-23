@@ -151,6 +151,11 @@ router.put('/get-more', authenticateEditorToken, (req, res) => {
                     .limit(1)
                     .exec()
                     .then(task=>{
+                        if(!task){
+                            return res.status(404).json({
+                                msg:`No task available!`
+                            })
+                        }
                         getModule(_EDITOR)
                         .then(mdl=>{
                             getWage(req.user._id,task.level,mdl.m._id)
@@ -176,6 +181,7 @@ router.put('/get-more', authenticateEditorToken, (req, res) => {
                             })
                         })
                         .catch(err=>{
+                            console.log('err ne: ',err);
                             return res.status(err.code).json({
                                 msg:err.msg
                             })
@@ -335,6 +341,7 @@ const getWage = (staffId, job_lv, moduleId) => {
             .exec()
             .then(w=>{
                if(!w){
+                   console.log(`Can not get wage with this job level and this user group. Please set this wage in user group module first!`);
                    return reject({
                        code:404,
                        msg:`Can not get wage with this job level and this user group. Please set this wage in user group module first!`
@@ -355,7 +362,7 @@ const getWage = (staffId, job_lv, moduleId) => {
             })
         })
         .catch(err=>{
-            return reject(err)
+           return reject(err);
         })
     })
 }
