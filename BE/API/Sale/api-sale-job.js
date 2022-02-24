@@ -2,6 +2,31 @@ const router = require("express").Router();
 const Job = require("../../models/job-model");
 const { authenticateSaleToken } = require("../../../middlewares/sale-middleware");
 
+
+router.get('/detail', authenticateSaleToken, (req, res) => {
+  let { jobId } = req.query;
+  Job
+    .findById(jobId)
+    .populate('customer')
+    .exec()
+    .then(job => {
+      if (!job) {
+        return res.status(404).json({
+          msg: `Job not found!`
+        })
+      }
+      return res.status(200).json({
+        msg: `Get job detail successfully!`,
+        job
+      })
+    })
+    .catch(err => {
+      return res.status(500).json({
+        msg: `Can not get job detail by id with error: ${new Error(err.message)}`
+      })
+    })
+})
+
 router.get("/list", authenticateSaleToken, (req, res) => {
   let { page, search } = req.query;
 
@@ -50,7 +75,7 @@ router.post("/", authenticateSaleToken, (req, res) => {
     intruction,
   } = req.body;
 
-  
+
 
   let job = new Job({
     name,

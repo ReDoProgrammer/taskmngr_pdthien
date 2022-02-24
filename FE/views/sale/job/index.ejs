@@ -24,6 +24,7 @@
         <th scope="col" class="text-center">Source link</th>
         <th scope="col" class="text-center">Product link</th>
         <th scope="col" class="text-right">Status</th>
+        <th scope="col" class="text-right"></th>
       </tr>
     </thead>
     <tbody id="tblData">
@@ -41,15 +42,24 @@
   </ul>
 </nav>
 
+<%-include('edit-job')%>
+
 
 <script type='text/javascript'
   src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
 
 
+<script src="/js/common.js"></script>
 
 <script>
   var search = "";
   var page = 1;
+
+  $(document).on("click", "button[name='edit-job']", function () {
+    jobId = $(this).closest("tr").attr("id");
+    $('#updateJobModal').modal();
+
+  })
 
   $(document).ready(function () {
     LoadJobs();
@@ -94,11 +104,21 @@
           tr += "<td>" + new Date(job.received_date).toLocaleString() + "</td>";
           tr += "<td>" + new Date(job.delivery_date).toLocaleString() + "</td>";
           tr += "<td class='text-warning'>" + job.intruction + "</td>";
-          tr += "<td class='font-italic font-weight-bold text-center'><a href='" + job.input_link + "' target='_blank'>Link</a></td>";
-          tr += "<td class='font-italic font-weight-bold text-center'><a href='" + job.output_link + "' target='_blank'>Link</a></td>";
+
+          if (isValidHttpUrl(job.input_link)) {
+            tr += "<td class='font-italic font-weight-bold text-center'><a href='" + job.input_link + "' target='_blank'>Link</a></td>";
+          } else {
+            tr += '<td>' + job.input_link + '</td>'
+          }
+          if (isValidHttpUrl(job.output_link)) {
+            tr += "<td class='font-italic font-weight-bold text-center'><a href='" + job.output_link + "' target='_blank'>Link</a></td>";
+          } else {
+            tr += '<td>' + job.output_link + '</td>'
+          }
 
 
-          tr += '<td class = "font-weight-bold text-right"><i>';
+
+          tr += '<td class = "font-italic text-right"><i>';
           switch (job.status) {
             case -1:
               tr += '<span class = "text-warning">Initial</span>';
@@ -120,6 +140,10 @@
               break;
           }
           tr += '</i></td>';
+
+          tr += '<td class="text-right"><button class="btn btn-xs btn-warning" name="edit-job"><i class="fa fa-edit"></i></button></td>'
+
+          tr += '</tr>';
 
           $("#tblData").append(tr);
         });

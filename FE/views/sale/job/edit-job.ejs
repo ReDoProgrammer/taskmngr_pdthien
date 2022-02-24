@@ -1,0 +1,165 @@
+<script src="/js/common.js"></script>
+<script type='text/javascript'
+  src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
+
+
+<div class="modal" tabindex="-1" role="dialog" id="updateJobModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="panel panel-primary text-white bg-dark">
+          <div class="panel-heading text-info font-weight-bold">Update job info</div>
+          <div class="panel-body">
+            <div class="row form-group">
+              <div class="col-sm-4">Customer:</div>
+              <div class="col-sm-8 font-weight-bold text-info" id="lblCustomerFullname"></div>
+            </div>
+            <div class="row form-group">
+              <div class="col-sm-4">Phone:</div>
+              <div class="col-sm-8" id="lblCustomerPhone"></div>
+            </div>
+            <div class="row form-group">
+              <div class="col-sm-4">Email:</div>
+              <div class="col-sm-8" id="lblCustomerEmail"></div>
+            </div>
+
+            <hr>
+            <div class="form-group">
+              <label for="">Job name:</label>
+              <input type="text" name="" id="txtName" class="form-control" placeholder="Job name">
+            </div>
+
+            <div class="form-group">
+              <label for="">Link source:</label>
+              <input type="text" name="" id="txtLinkSource" class="form-control" placeholder="Images link">
+            </div>
+
+
+            <div class="row">
+              <div class="col-sm-6">
+                <div class=" form-group">
+                  <label for="">Received Date<span class="text-danger font-weight-bold">(*)</span> :</label>
+                  <input type="text" class="inputDate form-control" id="txtReceivedDate">
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label for="">Delivery Date<span class="text-danger font-weight-bold">(*)</span> :</label>
+                  <input type="text" class="inputDate form-control" id="txtDeliveryDate">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-12 form-group">
+                <label for="">Intruction:</label>
+                <textarea name="" id="txaIntruction" rows="2" class="form-control"></textarea>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12 col-sm-12 col-xs12">
+                <label for="" class="text-danger" id="lblError"></label>
+              </div>
+            </div>
+
+
+
+            <div class="form-group text-right">
+              <button type="button" class="btn btn-sm btn-primary" id="btnSubmitJob">Submit changes</button>
+              <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+ 
+ $("#updateJobModal").on('shown.bs.modal', function (e) {
+    $.ajax({
+        url:'/sale/job/detail',
+        type:'get',
+        headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data:{
+          jobId
+      },
+      success:function(data){
+          console.log(data);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      },
+    })
+})
+  $('#btnSubmitJob').click(function () {
+    let customer = customerId;
+    let name = $('#txtName').val();
+    let input_link = $('#txtLinkSource').val();
+    let received_date = strToDate($('#txtReceivedDate').val());
+    let delivery_date = strToDate($('#txtDeliveryDate').val());
+    let intruction = $('#txaIntruction').val();
+
+
+    // if(!isValidHttpUrl(input_link)){
+    //   $('#lblError').text('(*) Invalid image link source. Please insert source link to be continue!');
+    //   $('#lblError').show().delay(3000).fadeOut();
+    //   return;
+    // }  
+
+  
+    if(isNaN(delivery_date) || delivery_date === null  || isNaN(received_date) || received_date == null){
+      $('#lblError').text('(*) Received date or delivery date is  invalid!');
+      $('#lblError').show().delay(3000).fadeOut();
+      return;
+    }
+    
+
+    if(delivery_date< new Date($.now())){
+      $('#lblError').text('(*) delivery date can not smaller than current time!');
+      $('#lblError').show().delay(3000).fadeOut();
+      return;
+    }
+
+    if(delivery_date <= received_date){
+      $('#lblError').text('(*) delivery date must be greater than received date!');
+      $('#lblError').show().delay(3000).fadeOut();
+      return;
+    }
+
+   
+
+    $.ajax({
+      url: '/sale/job',
+      type: 'post',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: { customer, name, input_link, received_date, delivery_date, intruction },
+      success: function (data) {
+        alert(data.msg);
+        $('#addJobModal').modal('hide');
+        customerId = "";
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      },
+    })
+  })
+
+
+
+  $('.inputDate').inputmask("datetime", {
+    mask: "1/2/y h:s",
+    placeholder: "dd/mm/yyyy hh:mm",
+    leapday: "-02-29",
+    separator: "/",
+    alias: "dd/mm/yyyy hh:mm"
+  })
+</script>
