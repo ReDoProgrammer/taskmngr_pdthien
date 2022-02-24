@@ -27,6 +27,9 @@ app.use(bodyParser.json());
 
 app.use(layout); //set layout
 
+//Q.A CONTROLLERS
+const qaHomeController = require('./BE/controllers/qa/home-controller');
+app.use('/qa',qaHomeController);
 
 
 // //EDITOR CONTROLLERS
