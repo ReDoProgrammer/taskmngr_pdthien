@@ -80,7 +80,7 @@ const adminUserGroupController = require('./BE/controllers/Admin/user-group-cont
 
 // // */
 const saleAuthController = require('./BE/controllers/Sale/sale-authenticate-controller');
-
+app.use('/sale',saleAuthController);
 
 
 const saleHomeController = require('./BE/controllers/Sale/sale-home-controller');
@@ -133,10 +133,10 @@ const saleJobController = require('./BE/controllers/Sale/sale-job-controller');
 app.use('/sale/job',saleJobController);
 
 // // /*
-// //   SALE API CONTROLLERS
+// //   SALE API 
 // // */
 const apiSaleAuth = require('./BE/API/Sale/api-auth');
-app.use('/sale',apiSaleAuth);
+app.use('/sale/auth',apiSaleAuth);
 
 
 const apiSaleCustomer = require('./BE/API/Sale/api-sale-customer');
@@ -165,7 +165,7 @@ app.use('/tla/customer',TLACustomerController);
 // // */
 
 const apiTLAAuth = require('./BE/API/TLA/api-auth');
-app.use('/tla',apiTLAAuth);
+app.use('/tla/auth',apiTLAAuth);
 
 
 const apiTLACustomer = require('./BE/API/TLA/api-tla-customer');
@@ -243,8 +243,8 @@ app.use('/admin/setting/user-group',adminUserGroupController);
 app.use("/admin/staff", adminStaffController);
 app.use("/admin/setting/staff-level", adminStaffLevelController);
 
-//using sale controllers
-app.use('/sale',saleAuthController);
+
+
 
 
 

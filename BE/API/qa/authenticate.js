@@ -2,6 +2,8 @@ const router = require('express').Router();
 const User = require('../../models/user-model');
 const jwt = require("jsonwebtoken");
 const _MODULE = 'QA';
+const {authenticateQAToken} = require('../../../middlewares/qa-middleware');
+
 const {
   generateAccessToken,
   getRole,
@@ -87,6 +89,28 @@ router.post("/login", (req, res) => {
       }
 
     });
+  })
+})
+
+router.get('/',authenticateQAToken,(req,res)=>{
+  User
+  .findById(req.user._id)
+  .exec()
+  .then(user=>{
+    if(!user){
+      return res.status(404).json({
+        msg:`User not found!`
+      })      
+    }
+    return res.status(200).json({
+      msg:`Get user profile successfully!`,
+      fullname: user.fullname
+    })
+  })
+  .catch(err=>{
+    return res.status(500).json({
+      msg:`Can not get user profile with error: ${new Error(err.message)}`
+    })
   })
 })
 

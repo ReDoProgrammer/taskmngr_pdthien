@@ -3,7 +3,7 @@
 		let username = $('#txtUsername').val();
 		let password = $('#txtPassword').val();
 		$.ajax({
-			url: '/sale/login',
+			url: '/sale/auth/login',
 			type: 'post',
 			data: {
 				username,

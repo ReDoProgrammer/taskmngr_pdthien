@@ -8,7 +8,8 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="/admin">BambooPhoto</a>
+      <a class="navbar-brand" href="/admin">Admin module- Hello: <span id="spUser"
+        class="font-weight-bold text-info"></span></a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -52,69 +53,31 @@
 
 
 
-<!-- <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">Admin Panel</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
 
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="/admin">Home <span class="sr-only">(current)</span></a>
-      </li>
-
-
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-          aria-haspopup="true" aria-expanded="false">
-          Category
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="/admin/customer">Customer</a>
-          <a class="dropdown-item" href="/admin/customer-style">Customer Style</a>
-
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="/admin/staff">Staff</a>
-        </div>
-      </li>
-
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-          aria-haspopup="true" aria-expanded="false">
-          Setting
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="/admin/setting/bank">Bank list</a>
-          <a class="dropdown-item" href="/admin/setting/color-mode">Color mode</a>
-          <a class="dropdown-item" href="/admin/setting/style">Style</a>
-          <a class="dropdown-item" href="/admin/setting/job-level">Job level</a>
-          <a class="dropdown-item" href="/admin/setting/national-style">National style</a> -->
-<!-- <a class="dropdown-item" href="/admin/setting/skill">Skill</a> -->
-<!-- <a class="dropdown-item" href="/admin/setting/status">Status</a> -->
-<!-- <a class="dropdown-item" href="/admin/setting/file-format">File format</a> -->
-<!-- <a class="dropdown-item" href="/admin/setting/level">Level</a> -->
-<!-- <a class="dropdown-item" href="/admin/setting/staff-level">Staff level</a> -->
-<!-- <a class="dropdown-item" href="/admin/setting/cloud">Cloud</a> -->
-<!-- <a class="dropdown-item" href="/admin/setting/size">Size</a> -->
-<!-- <a class="dropdown-item" href="/admin/setting/user-type">User Group</a> -->
-<!-- <a class="dropdown-item" href="/admin/setting/module">Module</a> -->
-
-<!-- </div> -->
-<!-- </li> -->
-
-
-<!-- </ul>
-    <form class="form-inline my-2 my-lg-0">
-      <button class="btn btn-sm btn-danger" id="btnLogout">
-        <i class="fa fa-sign-out" aria-hidden="true"></i>
-      </button>
-    </form>
-  </div> -->
-<!-- </nav> -->
 
 <script>
+  $(document).ready(function () {
+    getProfile();
+  });
+
+  function getProfile() {
+    $.ajax({
+      url: '/admin/user/profile',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      success: function (data) {
+        $('#spUser').text(data.fullname)
+      },
+      error: function (err) {
+        window.location.href = '/admin/login';
+      }
+
+    })
+  }
+
+
   $('#btnLogout').on('click', function (e) {
     e.preventDefault();
     localStorage.removeItem('accessToken');
