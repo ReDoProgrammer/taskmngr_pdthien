@@ -28,6 +28,10 @@ app.use(bodyParser.json());
 app.use(layout); //set layout
 
 //Q.A CONTROLLERS
+
+const qaAuthController = require('./BE/API/qa/authenticate');
+app.use('/qa/auth',qaAuthController);
+
 const qaHomeController = require('./BE/controllers/qa/home-controller');
 app.use('/qa',qaHomeController);
 
