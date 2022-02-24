@@ -39,8 +39,8 @@ app.use("/editor", editorHomeController);
 
 
 
-const staffTaskAPI = require('./BE/API/editor/api-task');
-app.use('/task',staffTaskAPI);
+const editorTaskAPI = require('./BE/API/editor/api-task');
+app.use('/editor/task',editorTaskAPI);
 
 //ADMIN CONTROLLERS
 const adminAccountController = require("./BE/controllers/Admin/account-controller");

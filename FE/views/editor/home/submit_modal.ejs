@@ -48,7 +48,7 @@
             $('#lblError').show().delay(5000).fadeOut();
         }
         $.ajax({
-            url: '/task/submit',
+            url: '/editor/task/submit',
             type: 'put',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
