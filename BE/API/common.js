@@ -1,5 +1,7 @@
 const Module = require('../models/module-model');
 const UserModule = require('../models/user-module-model');
+const Wage = require('../models/wage-model');
+const User = require('../models/user-model');
 const jwt = require("jsonwebtoken");
 
 function generateAccessToken(user) {
@@ -56,8 +58,79 @@ const getModule = (_module)=>{
 }
 
 
+
+const getWage = (staffId, job_lv, moduleId) => {
+    return new Promise((resolve, reject) => {
+        getUser(staffId)
+        .then(result=>{
+            Wage
+            .findOne({
+                module:moduleId,
+                job_lv,
+                staff_lv:result.u.user_level,
+                user_group:result.u.user_group
+            })
+            .exec()
+            .then(w=>{
+               if(!w){
+                   return reject({
+                       code:404,
+                       msg:`Can not get wage with this job level and this user group. Please set this wage in user group module first!`
+                   })
+               }
+               return resolve({
+                   code:200,
+                   msg:`Get wage successfully!`,
+                   w
+               })
+            })
+            .catch(err=>{
+                console.log(`Can not get wage with error: ${new Error(err.message)}`);
+                return reject({
+                    code:500,
+                    msg:`Can not get wage with error: ${new Error(err.message)}`
+                })
+            })
+        })
+        .catch(err=>{
+            return reject(err)
+        })
+    })
+}
+
+const getUser = (staffId)=>{
+    return new Promise((resolve,reject)=>{
+        User
+        .findById(staffId)
+        .exec()
+        .then(u=>{
+            if(!u){
+                return reject({
+                    code:404,
+                    msg:`Staff not found`
+                })
+            }
+            return resolve({
+                code:200,
+                msg:`Staff found`,
+                u
+            })
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not get staff info with error: ${new Error(err.message)}`
+            })
+        })
+    })
+}
+
+
+
 module.exports = {
     generateAccessToken,
     getRole,
-    getModule
+    getModule,
+    getUser,
+    getWage
 }
