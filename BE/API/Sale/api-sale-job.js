@@ -65,6 +65,47 @@ router.get("/list", authenticateSaleToken, (req, res) => {
     });
 });
 
+router.put("/", authenticateSaleToken, (req, res) => {
+  let {
+    jobId,   
+    name,
+    input_link,
+    received_date,
+    delivery_date,
+    intruction
+  } = req.body;
+
+  Job
+  .findByIdAndUpdate(jobId,
+    {
+      name,
+      input_link,
+      received_date,
+      delivery_date,
+      intruction
+    },{new:true},(err,job)=>{
+      if(err){
+        return res.status(500).json({
+          msg:`Can not update job by id with error: ${new Error(err.message)}`
+        })
+      }
+
+      if(!job){
+        return res.status(404).json({
+          msg:`Job not found!!`
+        })
+      }
+
+      return res.status(200).json({
+        msg:`Update job successfully!`,
+        job
+      })
+    })
+ 
+  
+});
+
+
 router.post("/", authenticateSaleToken, (req, res) => {
   let {
     customer,

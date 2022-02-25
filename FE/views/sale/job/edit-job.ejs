@@ -66,7 +66,7 @@
 
 
             <div class="form-group text-right">
-              <button type="button" class="btn btn-sm btn-primary" id="btnSubmitJob">Submit changes</button>
+              <button type="button" class="btn btn-sm btn-primary" id="btnUpdateJob">Submit changes</button>
               <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
             </div>
           </div>
@@ -91,15 +91,23 @@
           jobId
       },
       success:function(data){
-          console.log(data);
+        console.log(data);
+          $('#lblCustomerFullname').text(data.job.customer.firstname+' '+data.job.customer.lastname);
+          $('#lblCustomerPhone').text(data.job.customer.phone);
+          $('#lblCustomerEmail').text(data.job.customer.email);
+          $('#txtName').val(data.job.name);
+          $('#txtLinkSource').val(data.job.input_link);
+          $('#txtReceivedDate').val(convertISODateToTimeFormat(data.job.received_date));
+          $('#txtDeliveryDate').val(convertISODateToTimeFormat(data.job.delivery_date));
+          $('#txaIntruction').val(data.job.intruction);
+
       },
       error: function (jqXHR, textStatus, errorThrown) {
         alert(jqXHR.responseJSON.msg);
       },
     })
 })
-  $('#btnSubmitJob').click(function () {
-    let customer = customerId;
+  $('#btnUpdateJob').click(function () { 
     let name = $('#txtName').val();
     let input_link = $('#txtLinkSource').val();
     let received_date = strToDate($('#txtReceivedDate').val());
@@ -137,15 +145,14 @@
 
     $.ajax({
       url: '/sale/job',
-      type: 'post',
+      type: 'put',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { customer, name, input_link, received_date, delivery_date, intruction },
+      data: { jobId, name, input_link, received_date, delivery_date, intruction },
       success: function (data) {
         alert(data.msg);
-        $('#addJobModal').modal('hide');
-        customerId = "";
+        $('#updateJobModal').modal('hide');
       },
       error: function (jqXHR, textStatus, errorThrown) {
         alert(jqXHR.responseJSON.msg);
