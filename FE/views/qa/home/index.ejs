@@ -42,6 +42,8 @@
   </table>
 </div>
 
+<%-include('task_detail')%>
+
 <script src="/js/common.js"></script>
 
 <script>
@@ -51,6 +53,15 @@
   $(document).ready(function () {
     LoadTask();
   })
+
+  
+  
+  $(document).on("click", "button[name='btnTaskInfo']", function () {
+        taskId = $(this).closest("tr").attr("id");
+        $('#modalTaskDetail').modal();
+  })
+
+
 
   function LoadTask() {
     $.ajax({
