@@ -1,36 +1,109 @@
 <div class="row">
-    <div class="col-md-1 col-sm-2 col-xs-3 mt-2 text-right">
-      <button class="btn btn-success" id="btnGetTask">
-        <i class="fa fa-plus"></i> Get job
-      </button>
-    </div>
-    <div class="col-md-offset-6 col-md-5 col-sm-offset-4 col-sm-6 col-xs-9 mt-2">
-      <!-- Another variation with a button -->
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="Seach your job..." id="txtSearch" />
-        <div class="input-group-btn">
-          <button class="btn btn-info" type="submit" id="btnSearch">
-            <i class="fa fa-search" aria-hidden="true"></i>
-          </button>
-        </div>
+  <div class="col-md-2 col-sm-2 col-xs-4 mt-2">
+    <label for="">Status:</label>
+  </div>
+  <div class="col-md-4 col-sm-4 col-xs-8 mt-2">
+    <select name="" id="slStatus" class="form-control">
+      <option value="">Initial</option>
+      <option value="">Processing</option>
+      <option value="">Editor done</option>
+    </select>
+  </div>
+  <div class="col-md-6 col-sm-6 col-xs-12 mt-2">
+    <!-- Another variation with a button -->
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="Seach your job..." id="txtSearch" />
+      <div class="input-group-btn">
+        <button class="btn btn-info" type="submit" id="btnSearch">
+          <i class="fa fa-search" aria-hidden="true"></i>
+        </button>
       </div>
     </div>
   </div>
-  
-  
-  <div class="table-responsive mt-2">
-    <table class="table table-striped">
-      <thead class="thead-dark">
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Level</th>
-          <th scope="col">Deadline</th>
-          <th scope="col">Remark</th>
-          <th scope="col">Status</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody id="tbdTasks">
-      </tbody>
-    </table>
-  </div>
+</div>
+
+
+<div class="table-responsive mt-2">
+  <table class="table table-striped">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Job</th>
+        <th scope="col">Level</th>
+        <th scope="col">Deadline</th>
+        <th scope="col">Remark</th>
+        <th scope="col">Status</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody id="tbdTasks">
+    </tbody>
+  </table>
+</div>
+
+<script src="/js/common.js"></script>
+
+<script>
+  var page = 1;
+  var search = '';
+  var status = -1;
+  $(document).ready(function () {
+    LoadTask();
+  })
+
+  function LoadTask() {
+    $.ajax({
+      url: '/qa/task/list',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        search,
+        page,
+        status
+      },
+      success: function (data) {
+        console.log(data);
+        $('#tbdTasks').empty();
+        let idx = 1;
+        data.tasks.forEach(t => {
+          let tr = '<tr id="' + t._id + '">';
+          tr += '<td>' + (idx++) + '</td>';
+          tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
+          tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
+          tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>'
+          tr += '<td>' + t.remark + '</td>';
+          tr += '<td class="font-italic text-success">';
+          switch (t.status) {
+
+            case 0: tr += 'Processing'; break;
+            case 1: tr += 'Editor done'; break;
+            case 2: tr += 'Q.A ok'; break;
+            case 3: tr += 'DC ok'; break;
+            case -1: tr += 'Initial'; break;
+            case -2: tr += 'Q.A reject'; break;
+            case -3: tr += 'DC reject'; break;
+
+          }
+          tr += '</td>';
+
+          tr += '<td class="text-right">';
+          tr += '<button class="btn btn-xs btn-info" name="btnTaskInfo">';
+          tr += '<i class="fa fa-info"></i> Detail';
+          tr += '</button>';
+          if (t.status == 0 || t.status == -1 || t.status == -2 || t.status == -3) {
+            tr += '<button class="btn btn-xs btn-primary ml-2" name="btnSubmitTask">';
+            tr += '<i class="fa fa-send-o"></i> Q.A';
+            tr += '</button>';
+          }
+
+
+          tr += '</tr>';
+          $('#tbdTasks').append(tr);
+        })
+      }
+
+    })
+  }
+</script>

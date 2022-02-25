@@ -32,6 +32,9 @@ app.use(layout); //set layout
 const qaAuthController = require('./BE/API/qa/authenticate');
 app.use('/qa/auth',qaAuthController);
 
+const qaTaskApi = require('./BE/API/qa/api-task');
+app.use('/qa/task',qaTaskApi);
+
 const qaHomeController = require('./BE/controllers/qa/home-controller');
 app.use('/qa',qaHomeController);
 
