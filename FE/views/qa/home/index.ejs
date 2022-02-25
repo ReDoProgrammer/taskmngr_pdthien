@@ -32,6 +32,7 @@
         <th scope="col">Level</th>
         <th scope="col">Deadline</th>
         <th scope="col">Remark</th>
+        <th scope="col" class="text-right">Amount</th>
         <th scope="col">Status</th>
         <th scope="col"></th>
       </tr>
@@ -74,6 +75,7 @@
           tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
           tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>'
           tr += '<td>' + t.remark + '</td>';
+          tr += '<td class="text-right">' + t.amount + '</td>';
           tr += '<td class="font-italic text-success">';
           switch (t.status) {
 
@@ -92,9 +94,12 @@
           tr += '<button class="btn btn-xs btn-info" name="btnTaskInfo">';
           tr += '<i class="fa fa-info"></i> Detail';
           tr += '</button>';
-          if (t.status == 0 || t.status == -1 || t.status == -2 || t.status == -3) {
+          if (t.status == 1) {
             tr += '<button class="btn btn-xs btn-primary ml-2" name="btnSubmitTask">';
-            tr += '<i class="fa fa-send-o"></i> Q.A';
+            tr += '<i class="fa fa-send-o"></i> Submit';
+            tr += '</button>';
+            tr += '<button class="btn btn-xs btn-warning ml-2" name="btnReject">';
+            tr += '<i class="fa fa-close text-danger"></i> Reject';
             tr += '</button>';
           }
 

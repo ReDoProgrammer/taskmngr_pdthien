@@ -5,7 +5,9 @@ const { authenticateQAToken } = require("../../../middlewares/qa-middleware");
 router.get('/list',authenticateQAToken,(req,res)=>{
     let {page,search,status} = req.query;
     Task
-    .find({})
+    .find({
+        status:1
+    })
     .populate('job')
     .populate('level')
     .exec()
