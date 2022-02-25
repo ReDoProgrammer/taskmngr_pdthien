@@ -23,6 +23,7 @@
     <thead class="thead-dark">
       <tr>
         <th scope="col">#</th>
+        <th scope="col">Job</th>
         <th scope="col">Level</th>
         <th scope="col">Deadline</th>
         <th scope="col">Remark</th>
@@ -94,13 +95,14 @@
             page,
             search
           },
-          success: function (data) {
+          success: function (data) {           
             $('#tbdTasks').empty();
             let idx = 1;
             data.tasks.forEach(t => {
               let tr = '<tr id="' + t._id + '">';
 
               tr += '<td>' + (idx++) + '</td>';
+              tr += '<td class="font-weight-bold">' + t.job.name + '</td>';
               tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
               tr += '<td class="text-danger">' + convertISODateToTimeFormat(t.deadline) + '</td>';
               tr += '<td>' + t.remark + '</td>';
