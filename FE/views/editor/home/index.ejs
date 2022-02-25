@@ -27,6 +27,7 @@
         <th scope="col">Level</th>
         <th scope="col">Deadline</th>
         <th scope="col">Remark</th>
+        <th scope="col" class="text-right">Amount</th>
         <th scope="col">Status</th>
         <th scope="col"></th>
       </tr>
@@ -107,6 +108,8 @@
               tr += '<td class="text-danger">' + convertISODateToTimeFormat(t.deadline) + '</td>';
               tr += '<td>' + t.remark + '</td>';
 
+              tr+= '<td class="text-right">'+t.amount+'</td>'; 
+              
 
               /*
               
