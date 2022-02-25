@@ -8,11 +8,14 @@
                     <div class="panel-body">
 
                         <div class="form-row">
-                            <div class="form-group col-md-10 col-sm-9 col-xs-8">
+                            <div class="form-group col-md-8 col-sm-7 col-xs-6">
                                 <label for="">Task output link <span class="text-danger">(!)</span>:</label>
                                 <input type="text" name="" id="txtLink" class="form-control">
                             </div>
-                            
+                            <div class="col-md-2 col-sm-2 col-xs-2 form-group">
+                                <label for="">Amount:</label>
+                                <input type="number" name="Amount" id="txtAmount" class="form-control text-right" value="1" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')">
+                            </div>
                             <div class="form-group col-md-2 col-sm-3 col-xs-4">                               
                                 <button class="btn btn-success" id="btnSubmitTaskDone" style="margin-top: 25px;">
                                     Submit done
@@ -43,9 +46,19 @@
 <script>
     $('#btnSubmitTaskDone').click(function () {
         let output_link = $('#txtLink').val();
+        let amount = $('#txtAmount').val();
+
+        if(amount.length == 0){
+            $('#lblError').text('(!) Please enter amount to continue');
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+        }
+       
+
         if(output_link.trim().length == 0){
             $('#lblError').text('(!) Please enter output link');
             $('#lblError').show().delay(5000).fadeOut();
+            return;
         }
         $.ajax({
             url: '/editor/task/submit',
@@ -56,7 +69,8 @@
             data: {
                 taskId,
                 output_link,
-                editor_done:  strToDate(getCurrentTime())
+                editor_done:  strToDate(getCurrentTime()),
+                amount
             },
             success: function(data){
                 alert(data.msg);
@@ -68,4 +82,20 @@
             }
         })
     })
+
+    //ràng buộc nhập dữ liệu, chỉ cho nhập kiểu số thực
+  $("#txtAmount").on("keypress keyup blur", function (event) {
+    //this.value = this.value.replace(/[^0-9\.]/g,'');
+    $(this).val(
+      $(this)
+        .val()
+        .replace(/[^0-9]/g, "")
+    );
+    if (
+      (event.which != 46 || $(this).val().indexOf(".") != -1) &&
+      (event.which < 48 || event.which > 57)
+    ) {
+      event.preventDefault();
+    }
+  });
 </script>

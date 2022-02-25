@@ -103,6 +103,11 @@ const taskSchema = new Schema({
         //link thành phẩm sau khi editor đã hoàn thành task của mình và submit done
         type:String,
         require:true
+    },
+    amount:{
+        //số lượng file xuất ra của editor
+        type: Number,
+        default:0
     }
 
 

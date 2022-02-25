@@ -39,6 +39,7 @@ const jobSchema = new Schema({
 
             -1: initial
             -2:'Rejected
+            
             - 3: Canceled           
         */
         type: Number,
