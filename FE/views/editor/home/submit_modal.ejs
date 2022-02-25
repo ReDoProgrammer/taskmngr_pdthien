@@ -55,11 +55,11 @@
         }
        
 
-        if(output_link.trim().length == 0){
-            $('#lblError').text('(!) Please enter output link');
-            $('#lblError').show().delay(5000).fadeOut();
-            return;
-        }
+        // if(output_link.trim().length == 0){
+        //     $('#lblError').text('(!) Please enter output link');
+        //     $('#lblError').show().delay(5000).fadeOut();
+        //     return;
+        // }
         $.ajax({
             url: '/editor/task/submit',
             type: 'put',
