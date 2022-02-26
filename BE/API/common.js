@@ -3,6 +3,8 @@ const UserModule = require('../models/user-module-model');
 const Wage = require('../models/wage-model');
 const User = require('../models/user-model');
 const jwt = require("jsonwebtoken");
+const Task = require('../models/task-model');
+const StaffJobLevel = require('../models/staff-job-level-model');
 
 function generateAccessToken(user) {
     return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "72h" });
@@ -10,17 +12,56 @@ function generateAccessToken(user) {
 
 
 
-const assignOrTakeTask = (moduleName,jobLevelId,staffId,is_assigned)=>{
+
+
+//hàm dùng để gán hoặc nhận task
+const assignOrTakeTask = (moduleName,taskId,jobLevelId,staffId,is_assigned)=>{
     return new Promise((resolve,reject)=>{
         getModule(moduleName)
-        .then(result=>{
-            console.log(result);
+        .then(result=>{          
+            getWage(staffId,jobLevelId,result.mod._id)
+            .then(rs=>{
+                console.log(rs);
+                Task
+                .findByIdAndUpdate(taskId,{
+                    editor:staffId,
+                    editor_wage: rs.w.wage,
+                    editor_assigned:is_assigned,
+                    status:0,
+
+                },
+                {new:true},(err,task)=>{
+                    if(err){
+                        return reject({
+                            code:500,
+                            msg:`Can not assign or take task with error: ${new Error(err.message)}`
+                        })
+                    }
+
+                    if(!task){
+                        return reject({
+                            code:404,
+                            msg:`Task not found so can not assign or take task!`
+                        })
+                    }
+                    return resolve(task);
+                })
+
+            })
+            .catch(err=>{
+                console.log(err);
+                return reject(err);
+            })
         })
         .catch(err=>{
             return reject(err)
         })
     })
 }
+
+
+
+//hàm lấy quyền truy cập module
 
 const getRole = (moduleId, userId) => {
     return new Promise((resolve, reject) => {
@@ -45,6 +86,8 @@ const getRole = (moduleId, userId) => {
     })
 }
 
+
+//hàm trả về module từ tên module
 const getModule = (_module)=>{
    return new Promise((resolve, reject) => {
         Module.findOne({ name: _module })
@@ -72,6 +115,7 @@ const getModule = (_module)=>{
 }
 
 
+//hàm lấy tiền công của nhân viên
 
 const getWage = (staffId, job_lv, moduleId) => {
     return new Promise((resolve, reject) => {
@@ -112,6 +156,7 @@ const getWage = (staffId, job_lv, moduleId) => {
     })
 }
 
+//hàm trả về nhân viên từ mã nhân viên
 const getUser = (staffId)=>{
     return new Promise((resolve,reject)=>{
         User
@@ -142,10 +187,6 @@ const getUser = (staffId)=>{
 
 
 module.exports = {
-    generateAccessToken,
-    getRole,
-    getModule,
-    getUser,
-    getWage,
-    assignOrTakeTask
+    generateAccessToken,  
+    assignOrTakeTask    
 }

@@ -39,12 +39,21 @@
           </div>
         </div>
 
+
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-xs-12">
+            <button class="btn btn-success" id="btnAddTask"><i class="fa fa-plus"></i> Add Task</button>
+          </div>
+        </div>
+
+
         <div class="table-responsive  table-responsive-sm table-responsive-xs mt-2">
           <table class="table mt-1 table-striped bg-white text-dark nowrap">
             <thead class="thead-dark">
               <tr>
 
                 <th scope="col">#</th>
+                <th scope="col">Assign</th>
                 <th scope="col">Level</th>
                 <th scope="col">Assign date</th>
                 <th scope="col">Deadline</th>
@@ -56,14 +65,14 @@
             </thead>
             <tbody id="tblTasks"></tbody>
           </table>
-        </div>
+        </div>        
 
 
         <hr />
 
 
         <div class="panel panel-primary" id="divLevel">
-          <div class="panel-heading font-w"> Add job level</div>
+          <div class="panel-heading font-w"> Add task</div>
           <div class="panel-body">
 
             <div class="row">
@@ -180,6 +189,11 @@
   let idx = 1;
   var taskId = '';
   var levelId = '';
+
+
+  $('#btnAddTask').click(function(){
+    $('#divLevel').show(500);
+  })
 
   $('#btnAssignQA').on('click', function () {
 
@@ -310,7 +324,7 @@
   $("#assignJobModal").on('shown.bs.modal', function (e) {
     LoadTasks();
     LoadJobLevels();
-
+    $('#divLevel').hide();
     $('#txtAssignDate').val(getCurrentTime())
   });
 
@@ -493,8 +507,7 @@
       data: {
         jobId
       },
-      success: function (data) {
-        console.log(data);
+      success: function (data) {       
         let idx = 1;
         data.tasks.forEach(t => {
           let tr = '<tr id="' + t._id + '" data-level="' + t.level._id + '" data-editor="';
@@ -504,7 +517,14 @@
           tr += '">';
 
           tr += "<td>" + idx++ + "</td>";
-
+          
+          tr+='<td>';
+            if (!(t.editor_assigned && t.qa_assigned)) {
+            tr += '<button class="btn btn-xs btn-primary" name="btnAssignStaff"><i class="fa fa-plus" aria-hidden="true"></i> Assign staff</button>';
+            tr += '<button class="ml-2 btn btn-xs btn-warning" name="btnAssignStaffAuto"><i class="fa fa-refresh" aria-hidden="true"></i> Assign auto</button>';
+          }
+          tr+= '</td>';
+          
 
           tr += "<td class='font-weight-bold text-info'>" + t.level.name + "</td>";
           tr += "<td>" + convertISODateToTimeFormat(t.assigned_date) + "</td>";
@@ -528,10 +548,7 @@
           else tr += '';
 
 
-          tr += '<td class="text-right">';
-          if (!(t.editor_assigned && t.qa_assigned)) {
-            tr += '<button class="btn btn-xs btn-primary" name="btnAssignStaff"><i class="fa fa-plus" aria-hidden="true"></i> Assign staff</button>';
-          }
+          tr += '<td class="text-right">';         
           tr += '<button class="ml-1 btn btn-xs btn-danger" name="btnDelTask"><i class="fa fa-trash text-white" aria-hidden="true"></i></button>';
           tr += '</td>';
 
