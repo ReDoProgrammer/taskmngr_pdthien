@@ -36,15 +36,17 @@
                 <label id="job_intruction" class="text-warning"></label>
               </div>
             </div>
+
+            <div class="row mt-2">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <button class="btn btn-sm btn-success" id="btnAddTask"><i class="fa fa-plus"></i> Add Task</button>
+              </div>
+            </div>
           </div>
         </div>
 
 
-        <div class="row">
-          <div class="col-md-12 col-sm-12 col-xs-12">
-            <button class="btn btn-success" id="btnAddTask"><i class="fa fa-plus"></i> Add Task</button>
-          </div>
-        </div>
+
 
 
         <div class="table-responsive  table-responsive-sm table-responsive-xs mt-2">
@@ -65,10 +67,7 @@
             </thead>
             <tbody id="tblTasks"></tbody>
           </table>
-        </div>        
-
-
-        <hr />
+        </div>
 
 
         <div class="panel panel-primary" id="divLevel">
@@ -190,8 +189,28 @@
   var taskId = '';
   var levelId = '';
 
+  $(document).on("click", "button[name='btnAssignStaffAuto']", function () {
 
-  $('#btnAddTask').click(function(){
+    console.log($(this).closest("tr").data('level'));
+    $.ajax({
+      url: '/tla/queue',
+      type: 'post',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        levelId: $(this).closest("tr").data('level')
+      },
+      success: function (data) {
+        console.log(data);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $('#msgError').text(jqXHR.responseJSON.msg);
+      }
+    })
+  })
+
+  $('#btnAddTask').click(function () {
     $('#divLevel').show(500);
   })
 
@@ -507,7 +526,7 @@
       data: {
         jobId
       },
-      success: function (data) {       
+      success: function (data) {
         let idx = 1;
         data.tasks.forEach(t => {
           let tr = '<tr id="' + t._id + '" data-level="' + t.level._id + '" data-editor="';
@@ -517,14 +536,14 @@
           tr += '">';
 
           tr += "<td>" + idx++ + "</td>";
-          
-          tr+='<td>';
-            if (!(t.editor_assigned && t.qa_assigned)) {
-            tr += '<button class="btn btn-xs btn-primary" name="btnAssignStaff"><i class="fa fa-plus" aria-hidden="true"></i> Assign staff</button>';
+
+          tr += '<td>';
+          if (!(t.editor_assigned && t.qa_assigned)) {
+            tr += '<button class="btn btn-xs btn-primary" name="btnAssignStaff"><i class="fa fa-cog" aria-hidden="true"></i> Assign staff</button>';
             tr += '<button class="ml-2 btn btn-xs btn-warning" name="btnAssignStaffAuto"><i class="fa fa-refresh" aria-hidden="true"></i> Assign auto</button>';
           }
-          tr+= '</td>';
-          
+          tr += '</td>';
+
 
           tr += "<td class='font-weight-bold text-info'>" + t.level.name + "</td>";
           tr += "<td>" + convertISODateToTimeFormat(t.assigned_date) + "</td>";
@@ -548,8 +567,9 @@
           else tr += '';
 
 
-          tr += '<td class="text-right">';         
+          tr += '<td class="text-right">';
           tr += '<button class="ml-1 btn btn-xs btn-danger" name="btnDelTask"><i class="fa fa-trash text-white" aria-hidden="true"></i></button>';
+          tr += '<button class="ml-1 btn btn-xs btn-warning" name="btnEditTask"><i class="fa fa-edit"></i></button>';
           tr += '</td>';
 
           tr += "</tr>";

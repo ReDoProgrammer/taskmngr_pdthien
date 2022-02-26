@@ -6,11 +6,57 @@ const jwt = require("jsonwebtoken");
 const Task = require('../models/task-model');
 const StaffJobLevel = require('../models/staff-job-level-model');
 
+
 function generateAccessToken(user) {
     return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "72h" });
 }
 
 
+//hàm trả về danh sách staff level id
+const getStaffsFromJobLevel = (jobLevelId)=>{
+    return new Promise((resolve,reject)=>{
+        StaffJobLevel
+        .find({job_lv:jobLevelId})
+        .exec()
+        .then(sjl=>{
+            let staff_levels = sjl.map(x=>{
+                return x.staff_lv;
+            })
+            if(staff_levels.length == 0){
+                return reject({
+                    code:404,
+                    msg:`Can not get staff levels from joblevel id`
+                })
+            }
+
+            User
+            .find({user_level:{$in:staff_levels}})
+            .exec()
+            .then(users=>{
+                if(users.length == 0){
+                    return reject({
+                        code:401,
+                        msg:`Can not find any user from staff levels list`
+                    })
+                }
+
+                return resolve(users);
+            })
+            .catch(err=>{
+                return reject({
+                    code:500,
+                    msg:`Can not get users list from staff levels id array with error: ${new Error(err.message)}`
+                })
+            })
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not get staff job level from joblevel id with error: ${new Error(err.message)}`
+            })
+        })
+    })
+}
 
 
 
@@ -188,5 +234,6 @@ const getUser = (staffId)=>{
 
 module.exports = {
     generateAccessToken,  
-    assignOrTakeTask    
+    assignOrTakeTask,
+    getStaffsFromJobLevel    
 }
