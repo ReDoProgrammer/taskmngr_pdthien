@@ -1,9 +1,11 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
 const Customer = require('../../models/customer-model');
-const Job = require('../../models/job-model');
+const {assignOrTakeTask} = require('../common');
 
 const { authenticateEditorToken } = require("../../../middlewares/editor-middleware");
+
+const _MODULE = 'EDITOR';
 
 
 router.get('/', authenticateEditorToken, (req, res) => {
@@ -97,6 +99,11 @@ router.put('/submit', authenticateEditorToken, (req, res) => {
             })
         })
 })
+
+
+
+
+
 
 router.put('/get-more', authenticateEditorToken, (req, res) => {
     //----------TÁC VỤ NHẬN task MỚI ---------------//

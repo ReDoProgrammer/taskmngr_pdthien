@@ -8,6 +8,20 @@ function generateAccessToken(user) {
     return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "72h" });
 }
 
+
+
+const assignOrTakeTask = (moduleName,jobLevelId,staffId,is_assigned)=>{
+    return new Promise((resolve,reject)=>{
+        getModule(moduleName)
+        .then(result=>{
+            console.log(result);
+        })
+        .catch(err=>{
+            return reject(err)
+        })
+    })
+}
+
 const getRole = (moduleId, userId) => {
     return new Promise((resolve, reject) => {
         UserModule.countDocuments({ user: userId, module: moduleId }, (err, count) => {
@@ -132,5 +146,6 @@ module.exports = {
     getRole,
     getModule,
     getUser,
-    getWage
+    getWage,
+    assignOrTakeTask
 }
