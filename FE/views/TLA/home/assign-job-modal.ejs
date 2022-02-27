@@ -69,108 +69,17 @@
           </table>
         </div>
 
+        <%-include('child/assign-task')%>
+          <%-include('child/assign-staff')%>
+          <%-include('child/edit-task')%>
 
-        <div class="panel panel-primary" id="divLevel">
-          <div class="panel-heading font-w"> Add task</div>
-          <div class="panel-body">
 
-            <div class="row">
-              <div class="col-md-6 col-sm-12 col-xs-12">
-                <div class="form-group">
-                  <label for="">Job level</label>
-                  <select name="" id="slJobLevels" class="form-control"></select>
-                </div>
 
-              </div>
-              <div class="col-md-3 col-sm-6 col-xs-6">
-                <div class="form-group">
-                  <label for="">Assign Date<span class="text-danger font-weight-bold">(*)</span>: </label>
-                  <input type="text" class="inputDate form-control" id="txtAssignDate">
-                </div>
-              </div>
-
-              <div class="col-md-3 col-sm-6 col-xs-6">
-                <div class=" form-group">
-                  <label for="">Deadline<span class="text-danger font-weight-bold">(*)</span>:</label>
-                  <input type="text" class="inputDate form-control" id="txtDeadline">
-                </div>
+            <div class="form-row">
+              <div class="col-sm-12">
+                <label class="font-weight-bold text-danger mt-3" id="msgError"></label>
               </div>
             </div>
-
-            <div class="row mt-2">
-              <div class="form-group col-md-12 col-sm-12 col-xs-12">
-                <label for="">Images Link:</label>
-                <input type="text" class="form-control" id="txtInputLink">
-              </div>
-            </div>
-
-            <div class="row mt-2">
-              <div class="col-md-10 col-sm-8 col-xs-7">
-                <input type="text" name="txtRemark" id="txtRemark" class="form-control" placeholder="Level remark">
-              </div>
-              <div class="col-md-2 col-sm-4 col-xs-5 text-center">
-                <button class="btn btn-info" id="btnAddLevel">
-                  <i class="fa fa-plus" aria-hidden="true"></i>Add job level
-                </button>
-              </div>
-            </div>
-
-
-          </div>
-
-        </div>
-        <div id="divAssign" class="panel panel-primary">
-          <div class="panel-heading font-w">Assign Editor & Q.A</div>
-          <div class="panel-body">
-
-            <div class="row mt-3" id="divEditor">
-              <div class="col-md-6 col-sm-6 col-xs-12 mt-2">
-                <select class="form-control selectpicker" id="slEditor" data-live-search="true"></select>
-              </div>
-              <div class="col-md-4 col-sm-3 col-xs-6 mt-2">
-                <button class="btn btn-sm btn-success" id="btnAssignEditor">
-                  <i class="fa fa-plus"></i> Assign Editor
-                </button>
-              </div>
-              <div class="col-md-2 col-sm-3 col-xs-6 mt-2">
-                <button class="btnCancelAssign btn btn-xs">
-                  <i class="fa fa-close text-danger"></i>
-                </button>
-              </div>
-              <hr />
-            </div>
-
-
-
-            <div class="row" id="divQA">
-              <div class="col-md-6 col-sm-6 col-xs-12 mt-2">
-                <select class="form-control selectpicker" id="slQA" data-live-search="true"></select>
-              </div>
-              <div class="col-md-4 col-sm-3 col-xs-6 mt-2">
-                <button class="btn btn-sm btn-success" id="btnAssignQA">
-                  <i class="fa fa-plus"></i> Assign Q.A
-                </button>
-              </div>
-              <div class="col-md-2 col-sm-3 col-xs-6 mt-2">
-                <button class="btnCancelAssign btn btn-xs">
-                  <i class="fa fa-close text-danger"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-
-
-
-        </div>
-
-
-
-
-        <div class="form-row">
-          <div class="col-sm-12">
-            <label class="font-weight-bold text-danger mt-3" id="msgError"></label>
-          </div>
-        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -189,9 +98,17 @@
   var taskId = '';
   var levelId = '';
 
+  //sự kiện click button sửa task trên table
+
+  $(document).on("click", "button[name='btnEditTask']", function () {
+    taskId = $(this).closest("tr").attr("id");
+    levelId = $(this).closest("tr").data('level');
+    LoadEditor();
+    LoadQA();
+  })
+
   $(document).on("click", "button[name='btnAssignStaffAuto']", function () {
 
-    console.log($(this).closest("tr").data('level'));
     $.ajax({
       url: '/tla/queue',
       type: 'post',
@@ -206,136 +123,34 @@
       },
       error: function (jqXHR, textStatus, errorThrown) {
         $('#msgError').text(jqXHR.responseJSON.msg);
+        $('#msgError').show().delay(5000).fadeOut();
       }
     })
   })
 
   $('#btnAddTask').click(function () {
-    $('#divLevel').show(500);
+    $('#divLevel').slideDown(1000);
+    $('#divAssign').slideUp(200);
+    $('#divEditTask').slideUp(200);
+    $("button[name='btnAssignStaff']").show(100);
+    $("button[name='btnDelTask']").show(100);
   })
 
-  $('#btnAssignQA').on('click', function () {
-
-    $.ajax({
-      url: '/tla/task/assign-qa',
-      type: 'put',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        taskId,
-        levelId,
-        staff: $('#slQA option:selected').val()
-      },
-      success: function (data) {
-        $('#msgError').text(data.msg);
-        $('#msgError').show().delay(3000).fadeOut();
-        $(".btnCancelAssign").click();
-        LoadTasks();
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $('#msgError').text(jqXHR.responseJSON.msg);
-        $('#msgError').show().delay(3000).fadeOut();
-      },
-    })
-  })
-
-
-
-  $('#btnAssignEditor').on('click', function () {
-
-    $.ajax({
-      url: '/tla/task/assign-editor',
-      type: 'put',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        taskId,
-        levelId,
-        staff: $('#slEditor option:selected').val()
-      },
-      success: function (data) {
-        $('#msgError').text(data.msg);
-        $('#msgError').show().delay(3000).fadeOut();
-        $(".btnCancelAssign").click();
-        LoadTasks();
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $('#msgError').text(jqXHR.responseJSON.msg);
-        $('#msgError').show().delay(3000).fadeOut();
-      },
-    })
-  })
-
-  $("#btnAddLevel").click(function () {
-    let level = $("#slJobLevels option:selected").val();
-    let name = $("#slJobLevels option:selected").text();
-
-    let assigned_date = strToDate($('#txtAssignDate').val());
-    let deadline = strToDate($('#txtDeadline').val());
-    let input_link = $('#txtInputLink').val();
-    let remark = $('#txtRemark').val();
-
-    // validateion component inputs
-
-    if (isNaN(assigned_date) || assigned_date === null || isNaN(deadline) || deadline == null) {
-      $('#msgError').text('(*) Assign date or deadline is invalid!');
-      $('#msgError').show().delay(3000).fadeOut();
-      return;
-    }
-
-
-    if (deadline < new Date($.now())) {
-      $('#msgError').text('(*) deadline must be later than current time!');
-      $('#msgError').show().delay(3000).fadeOut();
-      return;
-    }
-
-    if (deadline <= assigned_date) {
-      $('#msgError').text('(*) deadline must be greater than assign date!');
-      $('#msgError').show().delay(3000).fadeOut();
-      return;
-    }
-
-
-
-    $.ajax({
-      url: '/tla/task',
-      type: 'post',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        job: jobId,
-        level,
-        assigned_date,
-        deadline,
-        input_link,
-        remark
-      },
-      success: function (data) {
-        $('#msgError').text(data.msg);
-        $('#msgError').show();
-        $('#msgError').hide(2000);
-        LoadTasks();
-        ChangeJobStatus(jobId, 0);
-        LoadJob();
-        $('#txtInputLink').val('');
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
-        $('#msgError').show().delay(3000).fadeOut();
-      },
+  $('.btnCancel').on('click', function () {
+        $('#divAssign').slideUp(500);    
+        $('#divLevel').slideUp(500);    
+        $('#divEditTask').slideUp(500);
+        $("button[name='btnAssignStaff']").show(100);
+        $("button[name='btnDelTask']").show(100);
+        taskId = '';
     })
 
 
 
-    //reset components value
-    $('#msgError').text('');
-    $('#txtRemark').val('');
 
-  });
+
+
+
 
 
 
@@ -350,7 +165,7 @@
 
   $(document).ready(function () {
     $('#divAssign').hide();
-
+    $('#divEditTask').hide();
   })
 
   function ChangeJobStatus(jobId, status) {
@@ -374,13 +189,11 @@
   }
 
 
-
-  $('.btnCancelAssign').on('click', function () {
+  $(document).on("click", "button[name='btnEditTask']", function () {
     $('#divAssign').hide(100);
-    $('#divLevel').show(500);
-    $("button[name='btnAssignStaff']").show(100);
-    $("button[name='btnDelTask']").show(100);
-    taskId = '';
+    $('#divLevel').hide(100);
+    $('#divEditTask').slideDown(1000);
+
   })
 
   $(document).on("click", "button[name='btnAssignStaff']", function () {
@@ -403,10 +216,11 @@
     LoadEditor();
     LoadQA();
 
-    $('#divAssign').show(500);
-    $('#divLevel').hide(100);
-    $("button[name='btnAssignStaff']").hide(100);
-    $("button[name='btnDelTask']").hide(100);
+    $('#divAssign').slideDown(1000);
+    $('#divLevel').slideUp(500);
+    $('#divEditTask').slideUp(500);
+    $("button[name='btnAssignStaff']").fadeOut(100);
+    $("button[name='btnDelTask']").fadeOut(100);
   })
 
   $(document).on("click", "button[name='btnDelTask']", function () {
@@ -439,81 +253,7 @@
 
 
 
-  function LoadEditor() {
-    $.ajax({
-      url: '/tla/user/list-editor',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        levelId
-      },
-      success: function (data) {
-        $('#slEditor').empty();
-        data.editors.forEach(e => {
-          let opt = '<option value="' + e._id + '">' + e.fullname + '</option>';
-          $('#slEditor').append(opt);
-        })
-        $('#slEditor').selectpicker();
-        $('#slEditor').selectpicker('refresh');
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $('#msgError').text(jqXHR.responseJSON.msg);
-      },
-    })
-  }
-
-  function LoadQA() {
-    $.ajax({
-      url: '/tla/user/list-qa',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        levelId
-      },
-      success: function (data) {
-        $('#slQA').empty();
-        data.qas.forEach(q => {
-          let opt = '<option value="' + q._id + '">' + q.fullname + '</option>';
-          $('#slQA').append(opt);
-        })
-        $('#slQA').selectpicker();
-        $('#slQA').selectpicker('refresh');
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $('#msgError').text(jqXHR.responseJSON.msg);
-      },
-    })
-  }
-
-  function LoadJobLevels() {
-
-    $.ajax({
-      url: '/tla/job-level',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        customerId
-      },
-
-      success: function (data) {
-        $('#slJobLevels').empty();
-        data.jl.forEach(j => {
-          let opt = '<option value="' + j._id + '" class="font-weight-bold text-danger">' + j.name + '</option>';
-          $('#slJobLevels').append(opt);
-        })
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $('#msgError').text(jqXHR.responseJSON.msg);
-      },
-    })
-  }
-
+ 
 
   function LoadTasks() {
     $("#tblTasks").empty();

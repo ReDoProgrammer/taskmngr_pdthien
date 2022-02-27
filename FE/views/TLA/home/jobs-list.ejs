@@ -58,8 +58,7 @@
 
 
         $(document).ready(function () {
-            LoadJob();
-            LoadLevels();
+            LoadJob();            
         })
 
 
@@ -82,7 +81,7 @@
                     data.jobs.forEach(job => {                   
                         let tr = '<tr id = "' + job._id + '" data-customer="' + job.customer._id + '"  >';
                         if (job.status == -1 || job.status == 0) {
-                            tr += '<td class="font-weight-bold text-right"><button class="btn btn-xs btn-primary" name="assign-job"><i class="fa fa-tasks" aria-hidden="true"></i> Assign task</button></td>'
+                            tr += '<td class="font-weight-bold text-right"><button class="btn btn-xs btn-primary" name="process-job"><i class="fa fa-cog" aria-hidden="true"></i> Process job</button></td>'
                         } else {
                             tr += '<td></td>';
                         }
@@ -130,7 +129,7 @@
         }
 
 
-        $(document).on("click", "button[name='assign-job']", function () {
+        $(document).on("click", "button[name='process-job']", function () {
             jobId = $(this).closest('tr').attr('id');
             customerId = $(this).closest('tr').data('customer');
             $.ajax({
@@ -215,23 +214,6 @@
 
 
 
-        function LoadLevels() {
-            $.ajax({
-                url: '/tla/level',
-                type: 'get',
-                headers: {
-                    authorization: "Bearer " + localStorage.getItem("accessToken"),
-                },
-                success: function (data) {
-                    console.log(data);
-                    data.levels.forEach(l => {
-
-                    })
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
-                }
-            })
-        }
+        
 
     </script>

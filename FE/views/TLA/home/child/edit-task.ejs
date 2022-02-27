@@ -1,0 +1,147 @@
+<div class="panel panel-primary" id="divEditTask">
+    <div class="panel-heading font-w">
+        <div class="row">
+            <div class="col-md-11 col-sm-11 col-xs-11">
+                Edit task
+            </div>
+            <div class="col-md-1 col-sm-1 col-xs-1 text-right">
+                <button class="btn btn-xs btn-danger btnCancel">
+                    <i class="fa fa-close"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="panel-body">
+
+        <div class="row">
+            <div class="col-md-6 col-sm-12 col-xs-12">
+                <div class="form-group">
+                    <label for="">Job level</label>
+                    <select name="" id="slJobLevelsInEditDiv" class="form-control"></select>
+                </div>
+
+            </div>
+            <div class="col-md-3 col-sm-6 col-xs-6">
+                <div class="form-group">
+                    <label for="">Assign Date<span class="text-danger font-weight-bold">(*)</span>: </label>
+                    <input type="text" class="inputDate form-control" id="txtAssignDateInEditDiv">
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6 col-xs-6">
+                <div class=" form-group">
+                    <label for="">Deadline<span class="text-danger font-weight-bold">(*)</span>:</label>
+                    <input type="text" class="inputDate form-control" id="txtDeadlineInEditDiv">
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                <label for="">Images Link:</label>
+                <input type="text" class="form-control" id="txtInputLinkInEditDiv">
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <input type="text" name="txtRemark" id="txtRemarkInEditDiv" class="form-control" placeholder="Task remark">
+            </div>            
+        </div>
+
+        <hr/>
+        <div class="row mt-2">
+            <div class="form-group mt-2 col-md-6 col-sm-6 col-xs-12">
+                <label for="">Editor:</label>
+                <select name="" id="slEditorInEditDiv" class="form-control"></select>
+            </div>
+            <div class="form-group mt-2 col-md-6 col-sm-6 col-xs-12">
+                <label for="">Q.A:</label>
+                <select name="" id="slQAInEditDiv" class="form-control"></select>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                <button class="btn btn-success" id="btnSubmitUpdate">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i> Submit changes
+                </button>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+
+<script>
+
+    $("#btnAddLevel").click(function () {
+        let level = $("#slJobLevels option:selected").val();
+        let name = $("#slJobLevels option:selected").text();
+
+        let assigned_date = strToDate($('#txtAssignDate').val());
+        let deadline = strToDate($('#txtDeadline').val());
+        let input_link = $('#txtInputLink').val();
+        let remark = $('#txtRemark').val();
+
+        // validateion component inputs
+
+        if (isNaN(assigned_date) || assigned_date === null || isNaN(deadline) || deadline == null) {
+            $('#msgError').text('(*) Assign date or deadline is invalid!');
+            $('#msgError').show().delay(3000).fadeOut();
+            return;
+        }
+
+
+        if (deadline < new Date($.now())) {
+            $('#msgError').text('(*) deadline must be later than current time!');
+            $('#msgError').show().delay(3000).fadeOut();
+            return;
+        }
+
+        if (deadline <= assigned_date) {
+            $('#msgError').text('(*) deadline must be greater than assign date!');
+            $('#msgError').show().delay(3000).fadeOut();
+            return;
+        }
+
+
+
+        $.ajax({
+            url: '/tla/task',
+            type: 'post',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                job: jobId,
+                level,
+                assigned_date,
+                deadline,
+                input_link,
+                remark
+            },
+            success: function (data) {
+                $('#msgError').text(data.msg);
+                $('#msgError').show();
+                $('#msgError').hide(2000);
+                LoadTasks();
+                ChangeJobStatus(jobId, 0);
+                LoadJob();
+                $('#txtInputLink').val('');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
+                $('#msgError').show().delay(3000).fadeOut();
+            },
+        })
+
+
+
+        //reset components value
+        $('#msgError').text('');
+        $('#txtRemark').val('');
+
+    });
+</script>

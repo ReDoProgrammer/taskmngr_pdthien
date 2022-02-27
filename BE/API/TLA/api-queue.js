@@ -6,12 +6,10 @@ const { getStaffsFromJobLevel } = require('../common');
 
 router.post('/', authenticateTLAToken, (req, res) => {
 
-    let { levelId } = req.body;
-    console.log(levelId);
+    let { levelId } = req.body;   
 
     getStaffsFromJobLevel(levelId)
-        .then(users => {
-            console.log(users);
+        .then(users => {           
             let userIds = users.map(x => {
                 return x._id;
             })
