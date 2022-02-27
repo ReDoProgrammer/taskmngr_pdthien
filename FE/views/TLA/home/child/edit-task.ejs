@@ -51,11 +51,11 @@
 
         <hr/>
         <div class="row mt-2">
-            <div class="form-group mt-2 col-md-6 col-sm-6 col-xs-12">
+            <div class="form-group mt-2 col-md-6 col-sm-6 col-xs-12" id="colEditor">
                 <label for="">Editor:</label>
                 <select name="" id="slEditorInEditDiv" class="form-control"></select>
             </div>
-            <div class="form-group mt-2 col-md-6 col-sm-6 col-xs-12">
+            <div class="form-group mt-2 col-md-6 col-sm-6 col-xs-12" id="colQA">
                 <label for="">Q.A:</label>
                 <select name="" id="slQAInEditDiv" class="form-control"></select>
             </div>
@@ -76,14 +76,14 @@
 
 <script>
 
-    $("#btnAddLevel").click(function () {
-        let level = $("#slJobLevels option:selected").val();
-        let name = $("#slJobLevels option:selected").text();
+    $("#btnSubmitUpdate").click(function () {
+        let level = $("#slJobLevelsInEditDiv option:selected").val();
+        let name = $("#slJobLevelsInEditDiv option:selected").text();
 
-        let assigned_date = strToDate($('#txtAssignDate').val());
-        let deadline = strToDate($('#txtDeadline').val());
-        let input_link = $('#txtInputLink').val();
-        let remark = $('#txtRemark').val();
+        let assigned_date = strToDate($('#txtAssignDateInEditDiv').val());
+        let deadline = strToDate($('#txtDeadlineInEditDiv').val());
+        let input_link = $('#txtInputLinkInEditDiv').val();
+        let remark = $('#txtRemarkInEditDiv').val();
 
         // validateion component inputs
 
@@ -107,35 +107,45 @@
         }
 
 
-
-        $.ajax({
-            url: '/tla/task',
-            type: 'post',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-                job: jobId,
+        console.log({
+                jobId,
                 level,
                 assigned_date,
                 deadline,
                 input_link,
                 remark
-            },
-            success: function (data) {
-                $('#msgError').text(data.msg);
-                $('#msgError').show();
-                $('#msgError').hide(2000);
-                LoadTasks();
-                ChangeJobStatus(jobId, 0);
-                LoadJob();
-                $('#txtInputLink').val('');
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
-                $('#msgError').show().delay(3000).fadeOut();
-            },
-        })
+            });
+
+            return;
+
+        // $.ajax({
+        //     url: '/tla/task',
+        //     type: 'post',
+        //     headers: {
+        //         authorization: "Bearer " + localStorage.getItem("accessToken"),
+        //     },
+        //     data: {
+        //         job: jobId,
+        //         level,
+        //         assigned_date,
+        //         deadline,
+        //         input_link,
+        //         remark
+        //     },
+        //     success: function (data) {
+        //         $('#msgError').text(data.msg);
+        //         $('#msgError').show();
+        //         $('#msgError').hide(2000);
+        //         LoadTasks();
+        //         ChangeJobStatus(jobId, 0);
+        //         LoadJob();
+        //         $('#txtInputLink').val('');
+        //     },
+        //     error: function (jqXHR, textStatus, errorThrown) {
+        //         $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
+        //         $('#msgError').show().delay(3000).fadeOut();
+        //     },
+        // })
 
 
 

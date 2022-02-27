@@ -50,7 +50,7 @@
 
 
         <div class="table-responsive  table-responsive-sm table-responsive-xs mt-2">
-          <table class="table mt-1 table-striped bg-white text-dark nowrap">
+          <table class="table mt-1 table-striped bg-white text-dark nowrap text-nowrap">
             <thead class="thead-dark">
               <tr>
 
@@ -62,6 +62,7 @@
                 <th scope="col">Remark</th>
                 <th scope="col">Editor</th>
                 <th scope="col">Q.A</th>
+                <th scope="col">Link</th>
                 <th></th>
               </tr>
             </thead>
@@ -71,15 +72,15 @@
 
         <%-include('child/assign-task')%>
           <%-include('child/assign-staff')%>
-          <%-include('child/edit-task')%>
+            <%-include('child/edit-task')%>
 
 
 
-            <div class="form-row">
-              <div class="col-sm-12">
-                <label class="font-weight-bold text-danger mt-3" id="msgError"></label>
+              <div class="form-row">
+                <div class="col-sm-12">
+                  <label class="font-weight-bold text-danger mt-3" id="msgError"></label>
+                </div>
               </div>
-            </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -105,6 +106,39 @@
     levelId = $(this).closest("tr").data('level');
     LoadEditor();
     LoadQA();
+
+    $.ajax({
+      url: '/tla/task/detail',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        taskId
+      },
+      success: function (data) {
+        console.log(data);
+          $('#slJobLevelsInEditDiv').val(data.task.level);
+          $('#txtAssignDateInEditDiv').val(convertISODateToTimeFormat(data.task.assigned_date));
+          $('#txtDeadlineInEditDiv').val(convertISODateToTimeFormat(data.task.deadline));
+          $('#txtInputLinkInEditDiv').val(data.task.input_link);
+          $('#txtRemarkInEditDiv').val(data.task.remark);
+
+          if(data.task.editor_assigned){
+            $('#colEditor').show();
+            $('#slEditorInEditDiv').val(data.task.editor);
+          }else{
+            $('#colEditor').hide();
+          }
+          if(data.task.qa_assigned){
+            $('#colQA').show();
+            $('#slQAInEditDiv').val(data.task.qa);
+          }else{
+            $('#colQA').hide();
+          }
+
+      }
+    })
   })
 
   $(document).on("click", "button[name='btnAssignStaffAuto']", function () {
@@ -137,13 +171,13 @@
   })
 
   $('.btnCancel').on('click', function () {
-        $('#divAssign').slideUp(500);    
-        $('#divLevel').slideUp(500);    
-        $('#divEditTask').slideUp(500);
-        $("button[name='btnAssignStaff']").show(100);
-        $("button[name='btnDelTask']").show(100);
-        taskId = '';
-    })
+    $('#divAssign').slideUp(500);
+    $('#divLevel').slideUp(500);
+    $('#divEditTask').slideUp(500);
+    $("button[name='btnAssignStaff']").show(100);
+    $("button[name='btnDelTask']").show(100);
+    taskId = '';
+  })
 
 
 
@@ -159,6 +193,8 @@
     LoadTasks();
     LoadJobLevels();
     $('#divLevel').hide();
+    $('#divEditTask').hide();
+    $('#divAssign').hide();
     $('#txtAssignDate').val(getCurrentTime())
   });
 
@@ -253,7 +289,7 @@
 
 
 
- 
+
 
   function LoadTasks() {
     $("#tblTasks").empty();
@@ -268,6 +304,7 @@
       },
       success: function (data) {
         let idx = 1;
+        $("#tblTasks").empty();
         data.tasks.forEach(t => {
           let tr = '<tr id="' + t._id + '" data-level="' + t.level._id + '" data-editor="';
           tr += t.editor_assigned ? 1 : 0;
@@ -306,6 +343,14 @@
             tr += t.qa.fullname;
           else tr += '';
 
+          tr+= '<td>';
+          if(isValidHttpUrl(t.input_link)){
+            tr+= '<a href="'+t.input_link+'" target="_blank">Link</a>'
+          }else{
+            tr+= t.input_link
+          }
+
+          tr+= '</td>'
 
           tr += '<td class="text-right">';
           tr += '<button class="ml-1 btn btn-xs btn-danger" name="btnDelTask"><i class="fa fa-trash text-white" aria-hidden="true"></i></button>';
@@ -340,3 +385,4 @@
 
 
 </script>
+

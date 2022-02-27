@@ -64,7 +64,26 @@ router.get('/', authenticateTLAToken, (req, res) => {
 })
 
 router.get('/detail', authenticateTLAToken, (req, res) => {
-
+    let {taskId} = req.query;
+    Task
+    .findById(taskId)
+    .exec()
+    .then(task=>{
+        if(!task){
+            return res.status(404).json({
+                msg:`Task not found!`
+            })
+        }
+        return res.status(200).json({
+            msg:`Task has been already found!`,
+            task
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not get task info by id with error: ${new Error(err.message)}`
+        })
+    })
 })
 
 router.post('/', authenticateTLAToken, (req, res) => {
