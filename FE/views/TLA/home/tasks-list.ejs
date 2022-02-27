@@ -22,6 +22,8 @@
                 <th scope="col">Begin date</th>
                 <th scope="col">Deadline</th>               
                 <th scope="col">Editor</th>
+                <th scope="col" class="text-right">I-N</th>
+                <th scope="col" class="text-right">E-T</th>
                 <th scope="col">Q.A</th>
                 <th scope="col">Remark</th>
                 <th scope="col" class="text-right">Status</th>
@@ -76,10 +78,22 @@
                     tr += '<td>';
                         if(t.editor){
                             tr+= t.editor.fullname
+
                         }else{
                             tr+= '';
                         }
                     tr += '</td>';
+
+                    tr+= '<td class="text-right">';
+                    if(t.editor){
+                        tr+= t.amount
+                    }else{
+                        tr+= '';
+                    }
+
+                    tr+= '<td class="text-right">'+t.edited_time+'</td>';
+
+                    tr+= '</td>';
 
                     tr += '<td>';
                         if(t.qa){
