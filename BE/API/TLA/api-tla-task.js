@@ -161,6 +161,70 @@ router.post('/', authenticateTLAToken, (req, res) => {
 
 })
 
+router.put('/',authenticateTLAToken,(req,res)=>{
+    let {
+        taskId,
+        level,
+        assigned_date,
+        deadline,
+        input_link,
+        remark,
+        editor,
+        qa
+    } = req.body;
+
+    let task = Task.findById(taskId);
+    if(!task){
+        return res.status(404).json({
+            msg:`Task not found!`
+        })
+    }
+
+    
+    Task.findById(taskId)
+    .exec()
+    .then(t=>{
+        if(!t){
+            return res.status(404).json({
+                msg:`Task not found`
+            })
+        }
+        Task
+    .findByIdAndUpdate(taskId,{
+        level,
+        assigned_date,
+        deadline,
+        input_link,
+        remark,
+        editor:(editor)?editor:(t.editor),
+        qa:(qa)?qa:t.qa
+    },{new:true},(err,task)=>{
+        if(err){
+            return res.status(500).json({
+                msg:`Can not update task by id with error: ${new Error(err.message)}`
+            })
+        }
+
+        if(!task){
+            return res.status(404).json({
+                msg:`Task not found!`
+            })
+        }
+        return res.status(200).json({
+            msg:`Update task successfully!`,
+            task
+        })
+    })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not get task by id with error: ${new Error(err.message)}`
+        })
+    })
+
+    
+})
+
 router.put('/assign-editor', authenticateTLAToken, (req, res) => {
 
     let { taskId, levelId, staff } = req.body;
