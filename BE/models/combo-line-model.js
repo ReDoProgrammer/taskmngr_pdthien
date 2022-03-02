@@ -11,7 +11,7 @@ const comboLineSchema = new Schema({
     },
     lv:{
         type:Schema.Types.ObjectId,
-        ref:'level'
+        ref:'job_level'
     },
     qty:{
         type:Number,

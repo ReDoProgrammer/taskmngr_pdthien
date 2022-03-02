@@ -24,7 +24,7 @@
                                 <input type="text" value="0" id="txtQuantity" class="form-control text-right">
                             </div>
                             <div class="col-md-2 col-sm-2 col-xs-12 text-center mt-2">
-                                <button class="btn btn-primary" id="btnAddLine">Add</button>
+                                <button class="btn btn-primary" id="btnSubmitLine">Submit</button>
                             </div>
                         </div>
                         <div class="row mt-2">
@@ -40,8 +40,8 @@
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">Level</th>
-                                        <th scope="col">Quantity</th>
-                                        <th scope="col"></th>
+                                        <th scope="col" class="text-right">Quantity</th>
+                                        <th scope="col" class="text-right"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="tblLines"></tbody>
@@ -55,11 +55,37 @@
 </div>
 
 <script>
+    var lineId = '';
     $(document).ready(function () {
         LoadLevel();
     })
 
-    $('#btnAddLine').click(function () {
+    $(document).on("click", "button[name='edit_line']", function () {
+        lineId = $(this).closest("tr").attr("id");
+
+        $.ajax({
+            url: '/admin/combo-line/detail',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                _id: lineId
+            },
+            success: function (data) {
+                $('#slLevel').val(data.cbl.lv);
+                $('#txtQuantity').val(data.cbl.qty);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $('#lblLineMsg').text(jqXHR.responseJSON.msg);
+                $('#lblLineMsg').show().delay(5000).fadeOut();
+            }
+
+        })
+
+    })
+
+    $('#btnSubmitLine').click(function () {
         let lv = $('#slLevel option:selected').val();
         let qty = parseInt($('#txtQuantity').val());
 
@@ -69,28 +95,58 @@
             return;
         }
 
-        $.ajax({
-            url: '/admin/combo-line',
-            type: 'post',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-                lv,
-                cb: _id,
-                qty
-            },
-            success: function (data) {
-                alert(data.msg);
-                LoadLines();
-            }, error: function (jqXHR, textStatus, errorThrown) {
-                $('#lblLineMsg').text(jqXHR.responseJSON.msg);
-                $('#lblLineMsg').show().delay(5000).fadeOut();
-            }
-        })
+        if (lineId.trim().length == 0) {
+            //trường hợp thêm mới 1 line vào combo
+            $.ajax({
+                url: '/admin/combo-line',
+                type: 'post',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                    lv,
+                    cb: _id,
+                    qty
+                },
+                success: function (data) {
+                    alert(data.msg);
+                    LoadLines();
+                }, error: function (jqXHR, textStatus, errorThrown) {
+                    $('#lblLineMsg').text(jqXHR.responseJSON.msg);
+                    $('#lblLineMsg').show().delay(5000).fadeOut();
+                }
+            })
+        } else {
+            //cập nhật line đã tồn tại 
+            $.ajax({
+                url: '/admin/combo-line',
+                type: 'put',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                    _id: lineId,
+                    cb:_id,
+                    lv, qty
+                }, success: function (data) {
+                    alert(data.msg);
+                    LoadLines();
+                }
+            })
+        }
+
+        //reset lại giá trị cho các input
+        $('#txtQuantity').val('0');
+        lineId = '';
 
 
 
+
+    })
+
+
+    $('#btnClose').click(function () {
+        $('#modalComboLine').modal('hide');
     })
 
     function LoadLines() {
@@ -101,10 +157,23 @@
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
             data: {
-                cb:_id
+                cb: _id
             },
             success: function (data) {
-                console.log(data);
+                $('#tblLines').empty();
+                let idx = 1;
+                data.cbls.forEach(l => {
+                    let tr = '<tr id="' + l._id + '">';
+                    tr += '<td>' + (idx++) + '</td>';
+                    tr += '<td class = "font-weight-bold text-primary">' + l.lv.name + '</td>';
+                    tr += '<td class = "text-right">' + l.qty + '</td>';
+                    tr += '<td class = "text-right">';
+                    tr += '<button class = "btn btn-xs btn-warning" name="edit_line"><i class="fa fa-edit"></i> </button>';
+                    tr += '<button class = "btn btn-xs btn-danger ml-2" name="delete_line"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                    tr += '</td>';
+                    tr += '</tr>';
+                    $('#tblLines').append(tr);
+                })
             }
         })
     }
