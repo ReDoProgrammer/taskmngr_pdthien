@@ -1,0 +1,145 @@
+<div class="modal" tabindex="-1" id="modalCombo">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- <div class="modal-header">
+                <h5 class="modal-title font-weight-bold text-info">Create or update combo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                    class="btn btn-sm btn-danger">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div> -->
+            <div class="modal-body">
+                <div class="panel panel-primary">
+                    <div class="panel-heading font-weight-bold">Create or update combo</div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-10 col-sm-10 col-xs-8 form-group">
+                                <label for="">Name:</label>
+                                <input type="text" placeholder="Combo name" id="txtName" class="form-control">
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-4 form-group">
+                                <label for="">Price:</label>
+                                <input type="text" name="" id="txtPrice" class="form-control text-right" value="0">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xs-12 form-group">
+                                <label for="">Combo description:</label>
+                                <textarea name="" id="txaDescription" rows="3" class="form-control" placeholder="Combo description...."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <label class="text-danger font-weight-bold" id="lblError"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xs-12  text-right">
+                                <button class="btn btn-success" id="btnSubmit">Submit changes</button>
+                                <button class="btn btn-default" id="btnCancel">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    //sự kiện load lại hàm ds level khi modal đc đóng lại
+    $(document).on('hidden.bs.modal', '#modalCombo', function () {
+        $('#txtName').val('');
+        $('#txtPrice').val(0);
+        $('#txaDescription').val('');
+        _id ='';
+        LoadCombo();
+    });
+
+    $('#btnCancel').click(function(){
+        $('#modalCombo').modal('hide');
+    })
+
+    $('#btnSubmit').click(function () {
+        let name = $('#txtName').val();
+        let price = parseFloat($('#txtPrice').val());
+        let description = $('#txaDescription').val();
+        if (name.trim().length == 0) {
+            $('#lblError').text('(!) Combo name can not be blank');
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+        }
+
+        if (price == 0) {
+            $('#lblError').text('(!) Combo price is invalid!');
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+        }
+
+        if (_id.trim().length == 0) {
+            //insert a new combo
+            $.ajax({
+                url: '/admin/combo',
+                type: 'post',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                    name,
+                    price,
+                    description
+                },
+                success: function (data) {
+                    alert(data.msg);
+                    $('#modalCombo').modal('hide');
+                    LoadCombo();
+                }, error: function (jqXHR, textStatus, errorThrown) {
+                    $('#lblError').text(jqXHR.responseJSON.msg);
+                    $('#lblError').show().delay(5000).fadeOut();
+                }
+            })
+        } else {
+            //update an exist combo
+            $.ajax({
+                url: '/admin/combo',
+                type: 'put',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                    _id,
+                    name,
+                    price,
+                    description
+                },
+                success: function (data) {
+                    alert(data.msg);
+                    $('#modalCombo').modal('hide');
+                    LoadCombo();
+                }, error: function (jqXHR, textStatus, errorThrown) {
+                    $('#lblError').text(jqXHR.responseJSON.msg);
+                    $('#lblError').show().delay(5000).fadeOut();
+                }
+            })
+        }
+    })
+
+
+    $("#txtPrice").on("keypress keyup blur", function (event) {
+        //this.value = this.value.replace(/[^0-9\.]/g,'');
+        $(this).val(
+            $(this)
+                .val()
+                .replace(/[^0-9\.]/g, "")
+        );
+        if (
+            (event.which != 46 || $(this).val().indexOf(".") != -1) &&
+            (event.which < 48 || event.which > 57)
+        ) {
+            event.preventDefault();
+        }
+    });
+</script>

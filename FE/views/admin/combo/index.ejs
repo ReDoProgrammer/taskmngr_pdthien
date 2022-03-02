@@ -1,0 +1,122 @@
+<div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <button class="btn btn-primary" id="btnAddNew">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+            Add new
+        </button>
+    </div>
+
+</div>
+<div class="table-responsive mt-2">
+    <table class="table table-striped mt-1">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col" class="text-right">Price <span class="text-warning font-weight-bold">($)</span></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="tblData"></tbody>
+    </table>
+</div>
+
+<%-include('modal')%>
+<%-include('modal_line')%>
+
+
+    <script>
+        var _id = '';
+        $(document).ready(function () {
+            LoadCombo();
+        })
+        $(document).on("click", "button[name='lines']", function () {
+            _id = $(this).closest("tr").attr("id");
+            $('#modalComboLine').modal();
+        })
+
+
+        $(document).on("click", "button[name='delete']", function () {
+            _id = $(this).closest("tr").attr("id");
+            var r = confirm("Are you sure want to delete this combo?");
+            if (r) {
+                $.ajax({
+                    url: '/admin/combo',
+                    type: 'delete',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                    data: {
+                        _id
+                    },
+                    success: function (data) {
+                        alert(data.msg);
+                        _id = '';
+                        LoadCombo();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert(jqXHR.responseJSON.msg);
+                    }
+                })
+            }
+
+        })
+        $(document).on("click", "button[name='update']", function () {
+            _id = $(this).closest("tr").attr("id");
+            $('#modalCombo').modal();
+            $.ajax({
+                url: '/admin/combo/detail',
+                type: 'get',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                    _id
+                },
+                success: function (data) {
+                    $('#txtName').val(data.combo.name);
+                    $('#txtPrice').val(data.combo.price);
+                    $('#txaDescription').val(data.combo.description);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseJSON.msg);
+
+                }
+
+            })
+        })
+        $('#btnAddNew').click(function () {
+            $('#modalCombo').modal();
+        })
+
+        function LoadCombo() {
+            $.ajax({
+                url: '/admin/combo/list',
+                type: 'get',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                success: function (data) {
+                    $('#tblData').empty();
+                    let idx = 1;
+                    data.cbs.forEach(c => {
+                        let tr = '<tr id = "' + c._id + '">';
+                        tr += '<td>' + (idx++) + '</td>';
+                        tr += '<td class="font-weight-bold text-info">' + c.name + '</td>';
+                        tr += '<td>' + c.description + '</td>';
+                        tr += '<td class="text-warning text-right">' + c.price + '</td>';
+
+                        tr += '<td class="text-right">';
+
+                        tr += '<button name = "lines" class="btn btn-xs btn-info"><i class="fa fa-bars" aria-hidden="true"></i></button>';
+                        tr += '<button name = "update" class="btn btn-xs btn-warning ml-2"><i class="fa fa-edit"></i></button>';
+                        tr += '<button name = "delete" class="btn btn-xs btn-danger ml-1"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                        tr += '</td>';
+                        tr += '</tr>';
+                        $('#tblData').append(tr);
+                    })
+                }
+            })
+        }
+    </script>

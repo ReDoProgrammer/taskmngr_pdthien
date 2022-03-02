@@ -1,0 +1,158 @@
+<div class="modal" tabindex="-1" id="modalComboLine">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="panel panel-primary">
+                    <div class="panel-heading font-weight-bold">
+                        <div class="row">
+                            <div class="col-md-11 col-sm-11 col-xs-10">
+                                Combo line
+                            </div>
+                            <div class="col-md-1 col-sm-1 col-xs-2 text-right">
+                                <button class="btn btn-xs btn-default" id="btnClose">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-8 col-sm-8 col-xs-12 mt-2">
+                                <select name="" id="slLevel" class="form-control"></select>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-12 mt-2">
+                                <input type="text" value="0" id="txtQuantity" class="form-control text-right">
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-12 text-center mt-2">
+                                <button class="btn btn-primary" id="btnAddLine">Add</button>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <label id="lblLineMsg" class="text-danger font-weight-bold"></label>
+                            </div>
+                        </div>
+
+                        <hr />
+                        <div class="table-responsive mt-2">
+                            <table class="table table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Level</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblLines"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        LoadLevel();
+    })
+
+    $('#btnAddLine').click(function () {
+        let lv = $('#slLevel option:selected').val();
+        let qty = parseInt($('#txtQuantity').val());
+
+        if (qty == 0) {
+            $('#lblLineMsg').text('(!) Quantity is invalid!');
+            $('#lblLineMsg').show().delay(5000).fadeOut();
+            return;
+        }
+
+        $.ajax({
+            url: '/admin/combo-line',
+            type: 'post',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                lv,
+                cb: _id,
+                qty
+            },
+            success: function (data) {
+                alert(data.msg);
+                LoadLines();
+            }, error: function (jqXHR, textStatus, errorThrown) {
+                $('#lblLineMsg').text(jqXHR.responseJSON.msg);
+                $('#lblLineMsg').show().delay(5000).fadeOut();
+            }
+        })
+
+
+
+    })
+
+    function LoadLines() {
+        $.ajax({
+            url: '/admin/combo-line/list',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                cb:_id
+            },
+            success: function (data) {
+                console.log(data);
+            }
+        })
+    }
+
+    $('#modalComboLine').on('shown.bs.modal', function (e) {
+        LoadLines();
+    })
+
+    $(document).on('hidden.bs.modal', '#modalComboLine', function () {
+        $('#txtName').val('');
+        $('#txtPrice').val(0);
+        $('#txaDescription').val('');
+        _id = '';
+        LoadCombo();
+    });
+
+    function LoadLevel() {
+        $.ajax({
+            url: '/admin/job-level',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            success: function (data) {
+                $('#slLevel').empty();
+                data.jl.forEach(l => {
+                    let opt = '<option value="' + l._id + '">' + l.name + '</option>';
+                    $('#slLevel').append(opt);
+                })
+            }, error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+            }
+        })
+    }
+
+    $("#txtQuantity").on("keypress keyup blur", function (event) {
+        //this.value = this.value.replace(/[^0-9\.]/g,'');
+        $(this).val(
+            $(this)
+                .val()
+                .replace(/[^0-9]/g, "")
+        );
+        if (
+            (event.which != 46 || $(this).val().indexOf(".") != -1) &&
+            (event.which < 48 || event.which > 57)
+        ) {
+            event.preventDefault();
+        }
+    });
+
+</script>

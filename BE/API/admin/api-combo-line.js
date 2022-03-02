@@ -7,7 +7,7 @@ const { authenticateAdminToken } = require("../../../middlewares/middleware");
 router.get('/list',authenticateAdminToken,(req,res)=>{
     let {cb} = req.query;
     ComboLine
-    .find({cb})
+    .find({cb:cb})
     .populate('lv')  
     .exec()
     .then(cbls=>{

@@ -57,6 +57,7 @@ const adminAccountController = require("./BE/controllers/Admin/account-controlle
 const adminBankController = require('./BE/controllers/Admin/bank-controller');
 const adminCloudController = require('./BE/controllers/Admin/cloud-controller');
 const adminColorModeController = require('./BE/controllers/Admin/color-mode-controller');
+const adminComboController = require('./BE/controllers/Admin/combo-controller');
 const adminStyleController = require("./BE/controllers/Admin/style-controller");
 const adminCustomerController = require("./BE/controllers/Admin/customer-controller");
 const adminCustomerStyleController = require("./BE/controllers/Admin/customer-style-controller");
@@ -104,6 +105,8 @@ const saleHomeController = require('./BE/controllers/Sale/sale-home-controller')
 const apiAdminBank = require('./BE/API/admin/api-bank');
 const apiAdminCloud = require('./BE/API/admin/api-cloud');
 const apiAdminColorMode = require('./BE/API/admin/api-color-mode');
+const apiCombo = require('./BE/API/admin/api-combo');
+const apiComboLine = require('./BE/API/admin/api-combo-line');
 const apiAdminCustomer = require('./BE/API/admin/api-customer');
 const apiAdminCustomerLevel = require('./BE/API/admin/api-customer-level');
 const apiAdminFileFormat = require('./BE/API/admin/api-file-format');
@@ -202,6 +205,8 @@ app.use('/admin/bank',apiAdminBank);//quản lý thông tin danh sách ngân hà
 app.use('/admin/user',apiAdminUser);//quản lý thông tin nhân viên
 app.use('/admin/cloud',apiAdminCloud);//quản lý thông tin cloud để upload link file của khách
 app.use('/admin/color-mode',apiAdminColorMode);//quảnlý hệ màu của hình ảnh
+app.use('/admin/combo',apiCombo);//quan ly combo
+app.use('/admin/combo-line',apiComboLine);//quan ly comboline
 app.use('/admin/customer',apiAdminCustomer);//quản lý thông tin khách hàng
 app.use('/admin/customer-level',apiAdminCustomerLevel);//quản lý thông tin các level mặt hàng của khách, liên quan tới thông tin hợp đồng của từng khách hàng
 app.use('/admin/file-format',apiAdminFileFormat);//quản lý thông tin định dạng file hình ảnh xuất cho khách
@@ -230,9 +235,11 @@ app.use("/admin", adminAccountController);
 app.use("/admin/customer", adminCustomerController);
 app.use("/admin/customer-style", adminCustomerStyleController);
 
+
 app.use('/admin/setting/bank',adminBankController);
 app.use('/admin/setting/color-mode',adminColorModeController);
 app.use('/admin/setting/cloud',adminCloudController);
+app.use('/admin/setting/combo',adminComboController);
 app.use("/admin/setting/file-format", adminFileFormatController);
 app.use('/admin/setting/job-level',adminJobLevelController);
 app.use("/admin/setting/level", adminLevelController);
