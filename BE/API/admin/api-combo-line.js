@@ -47,6 +47,22 @@ router.get('/detail', authenticateAdminToken, (req, res) => {
         })
 })
 
+router.delete('/delete-many',authenticateAdminToken,(req,res)=>{
+    let {comboId} = req.body;//lấy id của combo
+    console.log(comboId);
+    // ComboLine
+    // .deleteMany({cb:comboId},err=>{
+    //     if(err){
+    //         return res.status(500).json({
+    //             msg:`Can not delete comboline based on combo id with error: ${new Error(err.message)}`
+    //         })
+    //     }
+
+    //     return res.status(200).json({
+    //         msg:`Delete Combo and lines based on it successfully!`
+    //     })
+    // })
+})
 
 router.delete('/', authenticateAdminToken, (req, res) => {
     let { _id } = req.body;

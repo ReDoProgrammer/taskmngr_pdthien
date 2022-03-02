@@ -23,27 +23,51 @@
 </div>
 
 <%-include('modal')%>
-<%-include('modal_line')%>
+    <%-include('modal_line')%>
 
 
-    <script>
-        var _id = '';
-        $(document).ready(function () {
-            LoadCombo();
-        })
-        $(document).on("click", "button[name='lines']", function () {
-            _id = $(this).closest("tr").attr("id");
-            $('#modalComboLine').modal();
-        })
+        <script>
+            var _id = '';
+            $(document).ready(function () {
+                LoadCombo();
+            })
+            $(document).on("click", "button[name='lines']", function () {
+                _id = $(this).closest("tr").attr("id");
+                $('#modalComboLine').modal();
+            })
 
 
-        $(document).on("click", "button[name='delete']", function () {
-            _id = $(this).closest("tr").attr("id");
-            var r = confirm("Are you sure want to delete this combo?");
-            if (r) {
+            $(document).on("click", "button[name='delete']", function () {
+                _id = $(this).closest("tr").attr("id");
+                var r = confirm("Are you sure want to delete this combo?");
+                if (r) {
+                    $.ajax({
+                        url: '/admin/combo',
+                        type: 'delete',
+                        headers: {
+                            authorization: "Bearer " + localStorage.getItem("accessToken"),
+                        },
+                        data: {
+                            _id
+                        },
+                        success: async function (data) {
+                            await DeleteLinesBasedOnCombo(_id);
+                            _id = '';
+                            LoadCombo();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert(jqXHR.responseJSON.msg);
+                        }
+                    })
+                }
+
+            })
+            $(document).on("click", "button[name='update']", function () {
+                _id = $(this).closest("tr").attr("id");
+                $('#modalCombo').modal();
                 $.ajax({
-                    url: '/admin/combo',
-                    type: 'delete',
+                    url: '/admin/combo/detail',
+                    type: 'get',
                     headers: {
                         authorization: "Bearer " + localStorage.getItem("accessToken"),
                     },
@@ -51,9 +75,64 @@
                         _id
                     },
                     success: function (data) {
+                        $('#txtName').val(data.combo.name);
+                        $('#txtPrice').val(data.combo.price);
+                        $('#txaDescription').val(data.combo.description);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert(jqXHR.responseJSON.msg);
+
+                    }
+
+                })
+            })
+            $('#btnAddNew').click(function () {
+                $('#modalCombo').modal();
+            })
+
+            function LoadCombo() {
+                $.ajax({
+                    url: '/admin/combo/list',
+                    type: 'get',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                    success: function (data) {
+                        $('#tblData').empty();
+                        let idx = 1;
+                        data.cbs.forEach(c => {
+                            let tr = '<tr id = "' + c._id + '">';
+                            tr += '<td>' + (idx++) + '</td>';
+                            tr += '<td class="font-weight-bold text-info">' + c.name + '</td>';
+                            tr += '<td>' + c.description + '</td>';
+                            tr += '<td class="text-warning text-right">' + c.price + '</td>';
+
+                            tr += '<td class="text-right">';
+
+                            tr += '<button name = "lines" class="btn btn-xs btn-info"><i class="fa fa-bars" aria-hidden="true"></i></button>';
+                            tr += '<button name = "update" class="btn btn-xs btn-warning ml-2"><i class="fa fa-edit"></i></button>';
+                            tr += '<button name = "delete" class="btn btn-xs btn-danger ml-1"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                            tr += '</td>';
+                            tr += '</tr>';
+                            $('#tblData').append(tr);
+                        })
+                    }
+                })
+            }
+
+            function DeleteLinesBasedOnCombo(comboId) {
+                
+                $.ajax({
+                    url: '/admin/combo-line/delete-many',
+                    type: 'delete',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                    data: {
+                        comboId
+                    },
+                    success: function (data) {
                         alert(data.msg);
-                        _id = '';
-                        LoadCombo();
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
                         alert(jqXHR.responseJSON.msg);
@@ -61,62 +140,4 @@
                 })
             }
 
-        })
-        $(document).on("click", "button[name='update']", function () {
-            _id = $(this).closest("tr").attr("id");
-            $('#modalCombo').modal();
-            $.ajax({
-                url: '/admin/combo/detail',
-                type: 'get',
-                headers: {
-                    authorization: "Bearer " + localStorage.getItem("accessToken"),
-                },
-                data: {
-                    _id
-                },
-                success: function (data) {
-                    $('#txtName').val(data.combo.name);
-                    $('#txtPrice').val(data.combo.price);
-                    $('#txaDescription').val(data.combo.description);
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.responseJSON.msg);
-
-                }
-
-            })
-        })
-        $('#btnAddNew').click(function () {
-            $('#modalCombo').modal();
-        })
-
-        function LoadCombo() {
-            $.ajax({
-                url: '/admin/combo/list',
-                type: 'get',
-                headers: {
-                    authorization: "Bearer " + localStorage.getItem("accessToken"),
-                },
-                success: function (data) {
-                    $('#tblData').empty();
-                    let idx = 1;
-                    data.cbs.forEach(c => {
-                        let tr = '<tr id = "' + c._id + '">';
-                        tr += '<td>' + (idx++) + '</td>';
-                        tr += '<td class="font-weight-bold text-info">' + c.name + '</td>';
-                        tr += '<td>' + c.description + '</td>';
-                        tr += '<td class="text-warning text-right">' + c.price + '</td>';
-
-                        tr += '<td class="text-right">';
-
-                        tr += '<button name = "lines" class="btn btn-xs btn-info"><i class="fa fa-bars" aria-hidden="true"></i></button>';
-                        tr += '<button name = "update" class="btn btn-xs btn-warning ml-2"><i class="fa fa-edit"></i></button>';
-                        tr += '<button name = "delete" class="btn btn-xs btn-danger ml-1"><i class="fa fa-trash" aria-hidden="true"></i></button>';
-                        tr += '</td>';
-                        tr += '</tr>';
-                        $('#tblData').append(tr);
-                    })
-                }
-            })
-        }
-    </script>
+        </script>
