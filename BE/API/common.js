@@ -235,5 +235,7 @@ const getUser = (staffId)=>{
 module.exports = {
     generateAccessToken,  
     assignOrTakeTask,
-    getStaffsFromJobLevel    
+    getStaffsFromJobLevel,
+    getRole,
+    getModule    
 }

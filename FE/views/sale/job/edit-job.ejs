@@ -52,6 +52,22 @@
 
             <div class="row">
               <div class="col-sm-12 form-group">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="ckbChooseCombo">
+                  <label class="form-check-label" for="ckbChooseCombo">
+                    Choose Combo
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="row" id="divCombo">
+              <div class="col-sm-12">
+                <select name="" id="slCombo" class="form-control"></select>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-12 form-group">
                 <label for="">Intruction:</label>
                 <textarea name="" id="txaIntruction" rows="2" class="form-control"></textarea>
               </div>
@@ -79,69 +95,98 @@
 
 
 <script>
- 
- $("#updateJobModal").on('shown.bs.modal', function (e) {
+  $(document).ready(function () {
+    LoadCombo()
+  })
+  function LoadCombo() {
     $.ajax({
-        url:'/sale/job/detail',
-        type:'get',
-        headers: {
+      url: '/sale/combo',
+      type: 'get',
+      headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data:{
-          jobId
+      success: function (data) {
+        data.cbs.forEach(c => {
+          let opt = '<option value="' + c._id + '">' + c.name + '</option>';
+          $('#slCombo').append(opt);
+        })
+      }
+    })
+  }
+
+
+  $("#ckbChooseCombo").change(function () {
+    if (this.checked) {
+      $('#divCombo').slideDown(600);
+    } else {
+      $('#divCombo').slideUp(600);
+    }
+  });
+
+  $("#updateJobModal").on('shown.bs.modal', function (e) {
+    $.ajax({
+      url: '/sale/job/detail',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      success:function(data){
-        console.log(data);
-          $('#lblCustomerFullname').text(data.job.customer.firstname+' '+data.job.customer.lastname);
-          $('#lblCustomerPhone').text(data.job.customer.phone);
-          $('#lblCustomerEmail').text(data.job.customer.email);
-          $('#txtName').val(data.job.name);
-          $('#txtLinkSource').val(data.job.input_link);
-          $('#txtReceivedDate').val(convertISODateToTimeFormat(data.job.received_date));
-          $('#txtDeliveryDate').val(convertISODateToTimeFormat(data.job.delivery_date));
-          $('#txaIntruction').val(data.job.intruction);
+      data: {
+        jobId
+      },
+      success: function (data) {
+        $('#lblCustomerFullname').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
+        $('#lblCustomerPhone').text(data.job.customer.phone);
+        $('#lblCustomerEmail').text(data.job.customer.email);
+        $('#txtName').val(data.job.name);
+        $('#txtLinkSource').val(data.job.input_link);
+        $('#txtReceivedDate').val(convertISODateToTimeFormat(data.job.received_date));
+        $('#txtDeliveryDate').val(convertISODateToTimeFormat(data.job.delivery_date));
+        $('#txaIntruction').val(data.job.intruction);
+        $('#ckbChooseCombo').prop('checked', data.job.cb_ticked);
+        if ($('#ckbChooseCombo').is(':checked')) {
+          $('#divCombo').show();
+          $('#slCombo').val(data.job.cb)
+        } else {
+          $('#divCombo').hide();
+        }
+
 
       },
       error: function (jqXHR, textStatus, errorThrown) {
         alert(jqXHR.responseJSON.msg);
       },
     })
-})
-  $('#btnUpdateJob').click(function () { 
+  })
+  $('#btnUpdateJob').click(function () {
     let name = $('#txtName').val();
     let input_link = $('#txtLinkSource').val();
     let received_date = strToDate($('#txtReceivedDate').val());
     let delivery_date = strToDate($('#txtDeliveryDate').val());
     let intruction = $('#txaIntruction').val();
+    let cb_ticked = $("#ckbChooseCombo").is(':checked');
+    let cb = $('#slCombo option:selected').val();
 
 
-    // if(!isValidHttpUrl(input_link)){
-    //   $('#lblError').text('(*) Invalid image link source. Please insert source link to be continue!');
-    //   $('#lblError').show().delay(3000).fadeOut();
-    //   return;
-    // }  
-
-  
-    if(isNaN(delivery_date) || delivery_date === null  || isNaN(received_date) || received_date == null){
+    if (isNaN(delivery_date) || delivery_date === null || isNaN(received_date) || received_date == null) {
       $('#lblError').text('(*) Received date or delivery date is  invalid!');
       $('#lblError').show().delay(3000).fadeOut();
       return;
     }
-    
 
-    if(delivery_date< new Date($.now())){
+
+    if (delivery_date < new Date($.now())) {
       $('#lblError').text('(*) delivery date can not smaller than current time!');
       $('#lblError').show().delay(3000).fadeOut();
       return;
     }
 
-    if(delivery_date <= received_date){
+    if (delivery_date <= received_date) {
       $('#lblError').text('(*) delivery date must be greater than received date!');
       $('#lblError').show().delay(3000).fadeOut();
       return;
     }
 
-   
+
 
     $.ajax({
       url: '/sale/job',
@@ -149,7 +194,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { jobId, name, input_link, received_date, delivery_date, intruction },
+      data: { jobId, name, input_link, received_date, delivery_date, intruction, cb_ticked, cb },
       success: function (data) {
         alert(data.msg);
         $('#updateJobModal').modal('hide');

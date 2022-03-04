@@ -46,7 +46,7 @@ router.get("/list", authenticateSaleToken, (req, res) => {
       // }
 
     })
-
+    .populate('cb')
     .exec()
     .then((jobs) => {
       let result = jobs.slice(process.env.PAGE_SIZE * (page - 1), process.env.PAGE_SIZE);
@@ -72,7 +72,9 @@ router.put("/", authenticateSaleToken, (req, res) => {
     input_link,
     received_date,
     delivery_date,
-    intruction
+    intruction,
+    cb_ticked,
+    cb
   } = req.body;
 
   Job
@@ -82,7 +84,9 @@ router.put("/", authenticateSaleToken, (req, res) => {
       input_link,
       received_date,
       delivery_date,
-      intruction
+      intruction,
+      cb_ticked,
+      cb
     },{new:true},(err,job)=>{
       if(err){
         return res.status(500).json({
@@ -114,8 +118,9 @@ router.post("/", authenticateSaleToken, (req, res) => {
     received_date,
     delivery_date,
     intruction,
+    cb_ticked,
+    cb
   } = req.body;
-
 
 
   let job = new Job({
@@ -125,6 +130,8 @@ router.post("/", authenticateSaleToken, (req, res) => {
     received_date,
     delivery_date,
     intruction,
+    cb_ticked,
+    cb
   });
   job
     .save()

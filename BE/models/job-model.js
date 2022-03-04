@@ -54,6 +54,16 @@ const jobSchema = new Schema({
         //link này chứa hình ảnh output khi eidtor,qa,dc submit done TLA sẽ tổng hợp lại để post lên cho sale giao cho khách
         type:String,
         default:''
+    },
+    cb_ticked:{
+        //đánh dấu có lựa chọn combo hay không
+        type:Boolean,
+        default:false
+    },
+    cb:{
+        //lưu mã combo được chọn
+        type:Schema.Types.ObjectId,
+        ref:'combo'
     }
 });
 

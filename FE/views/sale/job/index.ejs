@@ -18,6 +18,7 @@
         <th scope="col">#</th>
         <th scope="col">Customer</th>
         <th scope="col">Job name</th>
+        <th scope="col">Combo</th>
         <th scope="col">Receive date</th>
         <th scope="col">Delivery date</th>
         <th scope="col">Intruction</th>
@@ -104,6 +105,14 @@
             tr +=
               " <td class='font-weight-bold'>" + job.customer.firstname + " " + job.customer.lastname + "</td>";
             tr += "<td class='text-info font-weight-bold'>" + job.name + "</td>";
+
+            tr+= '<td>';
+            if(job.cb_ticked){
+              tr+= job.cb.name
+            }else{
+              tr+= '';
+            }
+            tr+= '</td>';
             tr += "<td>" + new Date(job.received_date).toLocaleString() + "</td>";
             tr += "<td>" + new Date(job.delivery_date).toLocaleString() + "</td>";
             tr += "<td class='text-warning'>" + job.intruction + "</td>";

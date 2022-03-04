@@ -144,6 +144,8 @@ app.use('/sale/job',saleJobController);
 const apiSaleAuth = require('./BE/API/Sale/api-auth');
 app.use('/sale/auth',apiSaleAuth);
 
+const apiSaleCombo = require('./BE/API/Sale/api-sale-combo');
+app.use('/sale/combo',apiSaleCombo);
 
 const apiSaleCustomer = require('./BE/API/Sale/api-sale-customer');
 app.use('/sale/customer',apiSaleCustomer);
@@ -172,6 +174,7 @@ app.use('/tla/customer',TLACustomerController);
 
 const apiTLAAuth = require('./BE/API/TLA/api-auth');
 app.use('/tla/auth',apiTLAAuth);
+
 
 
 const apiTLACustomer = require('./BE/API/TLA/api-tla-customer');

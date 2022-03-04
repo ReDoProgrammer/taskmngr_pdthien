@@ -53,6 +53,21 @@
 
             <div class="row">
               <div class="col-sm-12 form-group">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="ckbChooseCombo">
+                  <label class="form-check-label" for="ckbChooseCombo">
+                    Choose Combo
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="row" id="divCombo">
+             <div class="col-sm-12">
+              <select name="" id="slCombo" class="form-control"></select>
+             </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 form-group">
                 <label for="">Intruction:</label>
                 <textarea name="" id="txaIntruction" rows="2" class="form-control"></textarea>
               </div>
@@ -80,11 +95,44 @@
 
 
 <script>
- 
- $("#addJobModal").on('shown.bs.modal', function (e) {
-  $('#txtReceivedDate').val(getCurrentTime())
-  $('#lblError').hide();
-})
+
+  $(document).ready(function(){
+    LoadCombo();
+  })
+
+  function LoadCombo(){
+    $.ajax({
+      url:'/sale/combo',
+      type:'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      success:function(data){
+        data.cbs.forEach(c=>{
+          let opt = '<option value="'+c._id+'">'+c.name+'</option>';
+          $('#slCombo').append(opt);
+        })
+      }
+    })
+  }
+
+  $("#addJobModal").on('shown.bs.modal', function (e) {
+    $('#txtReceivedDate').val(getCurrentTime())
+    $('#lblError').hide();
+    $('#ckbChooseCombo').prop('checked', false);
+    $('#divCombo').hide();
+
+  })
+
+  $("#ckbChooseCombo").change(function() {
+    if(this.checked) {
+     $('#divCombo').slideDown(600);
+   }else{
+    $('#divCombo').slideUp(600);
+   }
+});
+
+
   $('#btnSubmitJob').click(function () {
     let customer = customerId;
     let name = $('#txtName').val();
@@ -92,28 +140,30 @@
     let received_date = strToDate($('#txtReceivedDate').val());
     let delivery_date = strToDate($('#txtDeliveryDate').val());
     let intruction = $('#txaIntruction').val();
+    let cb_ticked =  $("#ckbChooseCombo").is(':checked');
+    let cb  = $('#slCombo option:selected').val();
 
-  
-    if(isNaN(delivery_date) || delivery_date === null  || isNaN(received_date) || received_date == null){
+
+    if (isNaN(delivery_date) || delivery_date === null || isNaN(received_date) || received_date == null) {
       $('#lblError').text('(*) Received date or delivery date is  invalid!');
       $('#lblError').show().delay(3000).fadeOut();
       return;
     }
-    
 
-    if(delivery_date< new Date($.now())){
+
+    if (delivery_date < new Date($.now())) {
       $('#lblError').text('(*) delivery date can not smaller than current time!');
       $('#lblError').show().delay(3000).fadeOut();
       return;
     }
 
-    if(delivery_date <= received_date){
+    if (delivery_date <= received_date) {
       $('#lblError').text('(*) delivery date must be greater than received date!');
       $('#lblError').show().delay(3000).fadeOut();
       return;
     }
 
-   
+
 
     $.ajax({
       url: '/sale/job',
@@ -121,7 +171,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { customer, name, input_link, received_date, delivery_date, intruction },
+      data: { customer, name, input_link, received_date, delivery_date, intruction,cb_ticked,cb },
       success: function (data) {
         alert(data.msg);
         $('#addJobModal').modal('hide');
