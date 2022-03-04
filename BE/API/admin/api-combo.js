@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const Combo = require('../../models/combo-model');
+const ComboLine = require('../../models/combo-line-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 
@@ -56,9 +57,20 @@ router.delete('/',authenticateAdminToken,(req,res)=>{
                 msg:`Combo not found!`
             })
         }
-        return res.status(200).json({
-            msg:`The combo has been deleted!`
+
+        ComboLine
+        .deleteMany({cb:_id},(err)=>{
+            if(err){
+                return res.status(500).json({
+                    msg:`Can not delete comboline based on combo with error: ${new Error(err.message)}`
+                })
+            }
+            return res.status(200).json({
+                msg:`The combo  and combolines based on it have been deleted!`
+            })
         })
+
+       
     })
     .catch(err=>{
         return res.status(500).json({

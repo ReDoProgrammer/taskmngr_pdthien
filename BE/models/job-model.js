@@ -54,8 +54,7 @@ const jobSchema = new Schema({
         //link này chứa hình ảnh output khi eidtor,qa,dc submit done TLA sẽ tổng hợp lại để post lên cho sale giao cho khách
         type:String,
         default:''
-    },    
-
+    }
 });
 
 

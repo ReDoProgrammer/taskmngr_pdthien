@@ -50,8 +50,8 @@
                         data: {
                             _id
                         },
-                        success: async function (data) {
-                            await DeleteLinesBasedOnCombo(_id);
+                        success: function (data) {
+                            alert(data.msg);
                             _id = '';
                             LoadCombo();
                         },
@@ -119,25 +119,5 @@
                     }
                 })
             }
-
-            function DeleteLinesBasedOnCombo(comboId) {
-                
-                $.ajax({
-                    url: '/admin/combo-line/delete-many',
-                    type: 'delete',
-                    headers: {
-                        authorization: "Bearer " + localStorage.getItem("accessToken"),
-                    },
-                    data: {
-                        comboId
-                    },
-                    success: function (data) {
-                        alert(data.msg);
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        alert(jqXHR.responseJSON.msg);
-                    }
-                })
-            }
-
+          
         </script>
