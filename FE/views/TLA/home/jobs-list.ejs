@@ -30,11 +30,12 @@
                 <th scope="col">#</th>
                 <th scope="col">Customer</th>
                 <th scope="col">Job name</th>
+                <th scope="col">Combo</th>
                 <th scope="col">Intruction</th>
                 <th scope="col">Received date</th>
                 <th scope="col">Delivery date</th>
                 <th scope="col">Status</th>
-                
+
             </tr>
         </thead>
         <tbody id="tblData">
@@ -58,7 +59,7 @@
 
 
         $(document).ready(function () {
-            LoadJob();            
+            LoadJob();
         })
 
 
@@ -78,7 +79,7 @@
                 success: function (data, textStatus, xhr) {
                     let idx = 1;
                     $('#tblData').empty();
-                    data.jobs.forEach(job => {                   
+                    data.jobs.forEach(job => {
                         let tr = '<tr id = "' + job._id + '" data-customer="' + job.customer._id + '"  >';
                         if (job.status == -1 || job.status == 0) {
                             tr += '<td class="font-weight-bold text-right"><button class="btn btn-xs btn-primary" name="process-job"><i class="fa fa-cog" aria-hidden="true"></i> Process job</button></td>'
@@ -89,9 +90,18 @@
                         tr += '<td>' + (idx++) + '</td>'
                         tr += '<td class="text-info font-weight-bold">' + job.customer.firstname + ' ' + job.customer.lastname + '</td>';
                         tr += '<td class="text-warning">' + job.name + '</td>';
+                        tr += '<td class="font-weight-bold text-danger">';
+
+                        if (job.cb_ticked) {
+                            tr += job.cb.name;
+                        } else {
+                            tr += '';
+                        }
+                        tr += '</td>'
+
                         tr += '<td>' + job.intruction + '</td>';
                         tr += "<td>" + convertISODateToTimeFormat(job.received_date) + "</td>";
-                        tr += "<td>" +convertISODateToTimeFormat(job.delivery_date) + "</td>";
+                        tr += "<td>" + convertISODateToTimeFormat(job.delivery_date) + "</td>";
                         tr += '<td class = "font-weight-bold"><i>';
                         switch (job.status) {
                             case -1:
@@ -214,6 +224,6 @@
 
 
 
-        
+
 
     </script>

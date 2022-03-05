@@ -7,6 +7,7 @@ router.get('/list',authenticateTLAToken,(req,res)=>{
     let {page,search} = req.query;
     Job.find({})
     .populate('customer','firstname lastname remark')
+    .populate('cb')
     .exec()
     .then(jobs=>{
         
