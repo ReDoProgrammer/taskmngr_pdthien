@@ -10,6 +10,7 @@ const _EDITOR = 'EDITOR';
 const _QA = 'QA';
 
 
+
 router.get('/list', authenticateTLAToken, (req, res) => {
     let { jobId } = req.query;
     Task
@@ -85,6 +86,9 @@ router.get('/detail', authenticateTLAToken, (req, res) => {
         })
     })
 })
+
+
+
 
 router.post('/', authenticateTLAToken, (req, res) => {
     let { job, level, assigned_date, deadline,input_link, remark } = req.body;
