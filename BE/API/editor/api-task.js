@@ -1,7 +1,8 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
 const Customer = require('../../models/customer-model');
-const { assignOrTakeTask } = require('../common');
+const { assignOrTakeTask,
+    getJobLevelBasedOnConditons } = require('../common');
 
 const { authenticateEditorToken } = require("../../../middlewares/editor-middleware");
 
@@ -10,10 +11,10 @@ const _MODULE = 'EDITOR';
 
 router.get('/', authenticateEditorToken, (req, res) => {
     let { page, search } = req.query;
-    Task
-        .find({
-            editor: req.user._id
-        })
+    getJobLevelBasedOnConditons(req.user._id,_MODULE)
+    .then(levels=>{
+        Task
+        .find({editor: req.user._id})//chỉ load những task đã được TLA gán hoặc editor đã nhận được
         .populate('level', 'name -_id')
         .populate('job') //,'source_link intruction -_id'
         .exec()
@@ -28,6 +29,15 @@ router.get('/', authenticateEditorToken, (req, res) => {
                 msg: `Can not load your tasks list with error: ${new Error(err.message)}`
             })
         })
+    })
+    .catch(err=>{
+       return re.status(err.code).json({
+           msg:err.msg
+       })
+    })
+
+
+   
 
 
 })

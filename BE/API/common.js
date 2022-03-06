@@ -8,6 +8,37 @@ const StaffJobLevel = require('../models/staff-job-level-model');
 const Customer = require('../models/customer-model');
 
 
+
+const getJobLevelBasedOnConditons = (staffId,moduleName)=>{
+    return new Promise((resolve,reject)=>{
+        Promise.all([  getModule(moduleName),getUser(staffId)])      
+        .then(rs=>{
+            Wage
+            .find({
+                module: rs[0]._id,
+                user_group: rs[1].user_group
+            })
+            .exec()
+            .then(ws=>{
+                let levels = ws.map(x=>{
+                    return x.job_lv
+                })
+                return resolve(levels);
+            })
+            .catch(err=>{
+                return reject({
+                    code:500,
+                    msg:`Can not get joblevel based on conditons with error: ${new Error(err.message)}`
+                })
+            })
+        })
+        .catch(err=>{
+            return reject(err);
+        })
+    })
+}
+
+
 function generateAccessToken(user) {
     return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "72h" });
 }
@@ -332,5 +363,6 @@ module.exports = {
     getRole,
     getModule,
     getWage,
-    checkAccount
+    checkAccount,
+    getJobLevelBasedOnConditons
 }
