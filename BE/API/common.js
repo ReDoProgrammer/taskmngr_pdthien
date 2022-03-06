@@ -9,32 +9,32 @@ const Customer = require('../models/customer-model');
 
 
 
-const getJobLevelBasedOnConditons = (staffId,moduleName)=>{
-    return new Promise((resolve,reject)=>{
-        Promise.all([  getModule(moduleName),getUser(staffId)])      
-        .then(rs=>{
-            Wage
-            .find({
-                module: rs[0]._id,
-                user_group: rs[1].user_group
+const getJobLevelBasedOnConditons = (staffId, moduleName) => {
+    return new Promise((resolve, reject) => {
+        Promise.all([getModule(moduleName), getUser(staffId)])
+            .then(rs => {
+                Wage
+                    .find({
+                        module: rs[0]._id,
+                        user_group: rs[1].user_group
+                    })
+                    .exec()
+                    .then(ws => {
+                        let levels = ws.map(x => {
+                            return x.job_lv
+                        })
+                        return resolve(levels);
+                    })
+                    .catch(err => {
+                        return reject({
+                            code: 500,
+                            msg: `Can not get joblevel based on conditons with error: ${new Error(err.message)}`
+                        })
+                    })
             })
-            .exec()
-            .then(ws=>{
-                let levels = ws.map(x=>{
-                    return x.job_lv
-                })
-                return resolve(levels);
+            .catch(err => {
+                return reject(err);
             })
-            .catch(err=>{
-                return reject({
-                    code:500,
-                    msg:`Can not get joblevel based on conditons with error: ${new Error(err.message)}`
-                })
-            })
-        })
-        .catch(err=>{
-            return reject(err);
-        })
     })
 }
 
@@ -45,53 +45,53 @@ function generateAccessToken(user) {
 
 const checkAccount = (username, password) => {
     return new Promise((resolve, reject) => {
-      User
-        .findOne({ username: username })
-        .exec()
-        .then(user => {
-          if (!user) {
-            return reject({
-              code: 404,
-              msg: `Username not found`
+        User
+            .findOne({ username: username })
+            .exec()
+            .then(user => {
+                if (!user) {
+                    return reject({
+                        code: 404,
+                        msg: `Username not found`
+                    })
+                }
+
+                if (!user.is_active) {
+                    return reject({
+                        code: 403,
+                        msg: `Your account is banned!`
+                    })
+                }
+
+                user.ComparePassword(password, function (err, isMatch) {
+                    if (err) {
+                        return reject({
+                            code: 403,
+                            msg: `Can not check password with error: ${new Error(err.message)}`
+                        })
+                    }
+                    if (isMatch) {
+                        return resolve(user);
+                    } else {
+                        return reject({
+                            code: 403,
+                            msg: 'Your password not match!'
+                        })
+                    }
+                });
+
+
+
             })
-          }      
-  
-          if(!user.is_active){
-            return reject({
-              code:403,
-              msg:`Your account is banned!`            
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: new Error(err.message)
+                });
             })
-          }
-  
-          user.ComparePassword(password, function (err, isMatch) {
-            if (err) {
-              return reject({
-                code: 403,
-                msg: `Can not check password with error: ${new Error(err.message)}`
-              })
-            }
-            if (isMatch) {               
-              return resolve(user);
-            } else {
-              return reject({
-                code: 403,
-                msg: 'Your password not match!'
-              })
-            }
-          });
-  
-  
-  
-        })
-        .catch(err => {
-          return reject({
-            code: 500,
-            msg: new Error(err.message)
-          });
-        })
     })
-  }
-  
+}
+
 
 
 //hàm trả về danh sách staff level id
@@ -146,14 +146,13 @@ const getStaffsFromJobLevel = (jobLevelId) => {
 const assignOrTakeTask = (moduleName, taskId, jobLevelId, staffId, is_assigned) => {
     return new Promise((resolve, reject) => {
         getModule(moduleName)
-            .then(result => {
-                getWage(staffId, jobLevelId, result.mod._id)
-                    .then(rs => {
-                        console.log(rs);
+            .then(md => {
+                getWage(staffId, jobLevelId, md._id)
+                    .then(w => {
                         Task
                             .findByIdAndUpdate(taskId, {
                                 editor: staffId,
-                                editor_wage: rs.w.wage,
+                                editor_wage: w.wage,
                                 editor_assigned: is_assigned,
                                 status: 0,
 
@@ -192,8 +191,8 @@ const assignOrTakeTask = (moduleName, taskId, jobLevelId, staffId, is_assigned) 
 //hàm lấy quyền truy cập module
 
 const getRole = (moduleId, userId) => {
-    return new Promise((resolve, reject) => {     
-       
+    return new Promise((resolve, reject) => {
+
         UserModule.countDocuments({ user: userId, module: moduleId }, (err, count) => {
             if (err) {
                 return reject({
@@ -246,49 +245,39 @@ const getModule = (_module) => {
 
 //hàm lấy tiền công của nhân viên
 
-const getWage = (staffId, job_lv, moduleName) => {
+const getWage = (staffId, job_lv, moduleId) => {
     return new Promise((resolve, reject) => {
+        getUser(staffId)
+            .then(u => {             
+                Wage
+                    .findOne({
+                        module: moduleId,
+                        job_lv,
+                        staff_lv: u.user_level,
+                        user_group: u.user_group
+                    })
+                    .exec()
+                    .then(w => {
 
-        getModule(moduleName)
-            .then(md => {               
-                getUser(staffId)
-                    .then(u => {    
-                             console.log(job_lv);
-                        Wage
-                            .findOne({
-                                module: md._id,
-                                job_lv,
-                                staff_lv: u.user_level,
-                                user_group: u.user_group
+                        if (!w) {
+                            return reject({
+                                code: 404,
+                                msg: `Can not get wage with this job level and this user group. Please set this wage in user group module first!`
                             })
-                            .exec()
-                            .then(w => {
-                               
-                                if (!w) {
-                                    return reject({
-                                        code: 404,
-                                        msg: `Can not get wage with this job level and this user group. Please set this wage in user group module first!`
-                                    })
-                                }
-                                return resolve(w);
-                            })
-                            .catch(err => {
-                                console.log(`Can not get wage with error: ${new Error(err.message)}`);
-                                return reject({
-                                    code: 500,
-                                    msg: `Can not get wage with error: ${new Error(err.message)}`
-                                })
-                            })
+                        }
+                        return resolve(w);
                     })
                     .catch(err => {
-                        return reject(err)
+                        console.log(`Can not get wage with error: ${new Error(err.message)}`);
+                        return reject({
+                            code: 500,
+                            msg: `Can not get wage with error: ${new Error(err.message)}`
+                        })
                     })
             })
             .catch(err => {
-                return reject(err);
+                return reject(err)
             })
-
-
     })
 }
 
@@ -364,5 +353,6 @@ module.exports = {
     getModule,
     getWage,
     checkAccount,
-    getJobLevelBasedOnConditons
+    getJobLevelBasedOnConditons,
+    getCustomer
 }

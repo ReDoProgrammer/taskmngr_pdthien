@@ -2,7 +2,8 @@ const router = require("express").Router();
 const Task = require("../../models/task-model");
 const Customer = require('../../models/customer-model');
 const { assignOrTakeTask,
-    getJobLevelBasedOnConditons } = require('../common');
+    getJobLevelBasedOnConditons,
+    getCustomer } = require('../common');
 
 const { authenticateEditorToken } = require("../../../middlewares/editor-middleware");
 
@@ -11,12 +12,12 @@ const _MODULE = 'EDITOR';
 
 router.get('/', authenticateEditorToken, (req, res) => {
     let { page, search } = req.query;
-    getJobLevelBasedOnConditons(req.user._id,_MODULE)
-    .then(levels=>{
-        Task
-        .find({editor: req.user._id})//chỉ load những task đã được TLA gán hoặc editor đã nhận được
+    Task
+        .find({ editor: req.user._id })//chỉ load những task đã được TLA gán hoặc editor đã nhận được
         .populate('level', 'name -_id')
         .populate('job') //,'source_link intruction -_id'
+        .sort({ deadline: -1 })//sắp xếp giảm dần theo deadline
+        .sort({status:1})//sắp xếp tăng dần theo trạng thái của task
         .exec()
         .then(tasks => {
             return res.status(200).json({
@@ -29,17 +30,6 @@ router.get('/', authenticateEditorToken, (req, res) => {
                 msg: `Can not load your tasks list with error: ${new Error(err.message)}`
             })
         })
-    })
-    .catch(err=>{
-       return re.status(err.code).json({
-           msg:err.msg
-       })
-    })
-
-
-   
-
-
 })
 
 
@@ -144,29 +134,57 @@ router.put('/get-more', authenticateEditorToken, (req, res) => {
 
 
     Task
-        .find({ editor: req.user._id })
-        .exec()
-        .then(tasks => {
-            if (tasks.length > 0) {
-                let ids = tasks.map(x => {
-                    return x.job
+        .countDocuments({
+            editor: req.user._id,
+            status: 0//task đang được xử lý 
+        }, (err, count) => {
+            if (err) {
+                return res.status(500).json({
+                    msg: `Can not check tasks have been editing with error: ${new Error(err.message)}`
                 })
-                getJobsByIdsList(ids)
-                    .then(jobs => {
-                        console.log(jobs);
-                    })
-                    .catch(err => {
-                        return res.status(err.code).json({
-                            msg: err.msg
-                        })
-                    })
+            }
+            if (count > 0) {
+                return res.status(403).json({
+                    msg: `You can not get more task till your editing tasks have been submited!`
+                })
             }
 
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not get task by editor with error: ${new Error(err.message)}`
-            })
+            getJobLevelBasedOnConditons(req.user._id, _MODULE)
+                .then(levels => {
+                    Task
+                        .findOne({
+                            level: { $in: levels },
+                            status: -1
+                        })
+                        .sort({ deadline: 1 })
+                        .exec()
+                        .then(t => {
+                            assignOrTakeTask(_MODULE, t._id, t.level, req.user._id, false)
+                                .then(t => {
+                                    return res.status(200).json({
+                                        msg: `You have take task successfully!`,
+                                        t
+                                    })
+                                })
+                                .catch(err => {
+                                    return res.status(err.code).json({
+                                        msg: err.msg
+                                    })
+                                })
+                        })
+                        .catch(err => {
+                            return res.status(500).json({
+                                msg: `Can find initial task with error: ${new Error(err.message)}`
+                            })
+                        })
+                })
+                .catch(err => {
+                    return res.status(err.code).json({
+                        msg: err.msg
+                    })
+                })
+
+
         })
 
 })
@@ -175,58 +193,5 @@ router.put('/get-more', authenticateEditorToken, (req, res) => {
 
 module.exports = router;
 
-const getJobsByIdsList = (ids) => {
-    return new Promise((resolve, reject) => {
-        Jo
-        b
-            .find({ _id: { $in: ids } })
-            .exec()
-            .then(jobs => {
-                return resolve(jobs)
-            })
-            .catch(err => {
-                return reject({
-                    code: 500,
-                    msg: `Can not get jobs list by id array with error: ${new Error(err.message)}`
-                })
-            })
-    })
-}
 
-const getCustomer = (customerId) => {
-    return new Promise((resolve, reject) => {
-        Customer.findById(customerId)
-            .populate({
-                path: 'levels',
-                populate: { path: 'level' }
-            })
-            .populate('output', 'name')
-            .populate('size', 'name')
-            .populate('color', 'name')
-            .populate('cloud', 'name')
-            .populate('nation', 'name')
-            .exec((err, customer) => {
-                if (err) {
-                    return reject({
-                        code: 500,
-                        msg: `Can not get customer by id with error: ${new Error(err.message)}`
-                    });
-                }
-                if (!customer) {
-                    return reject({
-                        code: 404,
-                        msg: `Customer not found!`
-                    });
-                }
-
-                return resolve({
-                    code: 200,
-                    msg: `Get customer by id successfully`,
-                    customer
-                });
-
-            });
-    })
-
-}
 
