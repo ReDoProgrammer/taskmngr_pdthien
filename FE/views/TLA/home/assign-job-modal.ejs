@@ -118,24 +118,24 @@
       },
       success: function (data) {
         console.log(data);
-          $('#slJobLevelsInEditDiv').val(data.task.level);
-          $('#txtAssignDateInEditDiv').val(convertISODateToTimeFormat(data.task.assigned_date));
-          $('#txtDeadlineInEditDiv').val(convertISODateToTimeFormat(data.task.deadline));
-          $('#txtInputLinkInEditDiv').val(data.task.input_link);
-          $('#txtRemarkInEditDiv').val(data.task.remark);
+        $('#slJobLevelsInEditDiv').val(data.task.level);
+        $('#txtAssignDateInEditDiv').val(convertISODateToTimeFormat(data.task.assigned_date));
+        $('#txtDeadlineInEditDiv').val(convertISODateToTimeFormat(data.task.deadline));
+        $('#txtInputLinkInEditDiv').val(data.task.input_link);
+        $('#txtRemarkInEditDiv').val(data.task.remark);
 
-          if(data.task.editor_assigned){
-            $('#colEditor').show();
-            $('#slEditorInEditDiv').val(data.task.editor);
-          }else{
-            $('#colEditor').hide();
-          }
-          if(data.task.qa_assigned){
-            $('#colQA').show();
-            $('#slQAInEditDiv').val(data.task.qa);
-          }else{
-            $('#colQA').hide();
-          }
+        if (data.task.editor_assigned) {
+          $('#colEditor').show();
+          $('#slEditorInEditDiv').val(data.task.editor);
+        } else {
+          $('#colEditor').hide();
+        }
+        if (data.task.qa_assigned) {
+          $('#colQA').show();
+          $('#slQAInEditDiv').val(data.task.qa);
+        } else {
+          $('#colQA').hide();
+        }
 
       }
     })
@@ -143,23 +143,26 @@
 
   $(document).on("click", "button[name='btnAssignStaffAuto']", function () {
 
-    $.ajax({
-      url: '/tla/queue',
-      type: 'post',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        levelId: $(this).closest("tr").data('level')
-      },
-      success: function (data) {
-        console.log(data);
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $('#msgError').text(jqXHR.responseJSON.msg);
-        $('#msgError').show().delay(5000).fadeOut();
-      }
-    })
+    if (confirm('Are you sure want to set editor automatically')) {
+      $.ajax({
+        url: '/tla/queue',
+        type: 'post',
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: {
+          taskId: $(this).closest("tr").attr('id')
+        },
+        success: function (data) {
+          console.log(data);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          $('#msgError').text(jqXHR.responseJSON.msg);
+          $('#msgError').show().delay(5000).fadeOut();
+        }
+      })
+    }
+
   })
 
   $('#btnAddTask').click(function () {
@@ -236,13 +239,13 @@
     taskId = $(this).closest("tr").attr("id");
     levelId = $(this).closest("tr").data('level');
 
-    if ($(this).closest("tr").data('editor') == 0) {
+    if ($(this).closest("tr").data('editor') === 'undefined') {
       $('#divEditor').show();
     } else {
       $('#divEditor').hide();
     }
 
-    if ($(this).closest("tr").data('qa') == 0) {
+    if ($(this).closest("tr").data('qa') === 'undefined') {
       $('#divQA').show();
     } else {
       $('#divQA').hide();
@@ -305,19 +308,23 @@
       success: function (data) {
         let idx = 1;
         $("#tblTasks").empty();
+        console.log(data);
         data.tasks.forEach(t => {
           let tr = '<tr id="' + t._id + '" data-level="' + t.level._id + '" data-editor="';
-          tr += t.editor_assigned ? 1 : 0;
+          tr += t.editor;
           tr += '" data-qa="';
-          tr += t.qa_assigned ? 1 : 0;
+          tr += t.qa;
           tr += '">';
 
           tr += "<td>" + idx++ + "</td>";
 
           tr += '<td>';
-          if (!(t.editor_assigned && t.qa_assigned)) {
+          if ((typeof t.editor === 'undefined' || typeof t.qa === 'undefined')) {
             tr += '<button class="btn btn-xs btn-primary" name="btnAssignStaff"><i class="fa fa-cog" aria-hidden="true"></i> Assign staff</button>';
-            tr += '<button class="ml-2 btn btn-xs btn-warning" name="btnAssignStaffAuto"><i class="fa fa-refresh" aria-hidden="true"></i> Assign auto</button>';
+
+          }
+          if (t.status == -1) {
+            tr += '<button class="ml-2 btn btn-xs btn-warning" name="btnAssignStaffAuto"><i class="fa fa-refresh" aria-hidden="true"></i> ASE</button>';
           }
           tr += '</td>';
 
@@ -333,24 +340,25 @@
 
 
           tr += '<td>';
-          if (t.editor_assigned)
+          if (typeof t.editor !== 'undefined')
             tr += t.editor.fullname;
           else tr += '';
           tr += "</td>";
 
           tr += '<td>';
-          if (t.qa_assigned)
+
+          if (typeof t.qa !== 'undefined')
             tr += t.qa.fullname;
           else tr += '';
 
-          tr+= '<td>';
-          if(isValidHttpUrl(t.input_link)){
-            tr+= '<a href="'+t.input_link+'" target="_blank">Link</a>'
-          }else{
-            tr+= t.input_link
+          tr += '<td>';
+          if (isValidHttpUrl(t.input_link)) {
+            tr += '<a href="' + t.input_link + '" target="_blank">Link</a>'
+          } else {
+            tr += t.input_link
           }
 
-          tr+= '</td>'
+          tr += '</td>'
 
           tr += '<td class="text-right">';
           tr += '<button class="ml-1 btn btn-xs btn-danger" name="btnDelTask"><i class="fa fa-trash text-white" aria-hidden="true"></i></button>';
@@ -385,4 +393,3 @@
 
 
 </script>
-
