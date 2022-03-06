@@ -46,7 +46,8 @@ app.use('/editor/auth',editorAuthController);
 const editorHomeController = require("./BE/controllers/editor/home-controller");
 app.use("/editor", editorHomeController);
 
-
+const editorQueueAPI = require('./BE/API/editor/api-queue');
+app.use('/editor/queue',editorQueueAPI);
 
 
 const editorTaskAPI = require('./BE/API/editor/api-task');

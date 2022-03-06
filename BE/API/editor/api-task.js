@@ -159,6 +159,11 @@ router.put('/get-more', authenticateEditorToken, (req, res) => {
                         .sort({ deadline: 1 })
                         .exec()
                         .then(t => {
+                            if(!t){
+                                return res.status(404).json({
+                                    msg:`No available task to take!`
+                                })
+                            }
                             assignOrTakeTask(_MODULE, t._id, t.level, req.user._id, false)
                                 .then(t => {
                                     return res.status(200).json({
