@@ -56,11 +56,16 @@
 
 
 	<script>
+		$(document).ready(function(){
+			$( "#txtUsername" ).focus();
+		})
 		$('#txtPassword').keyup(function (e) {
 			if (e.keyCode == 13) {
 				$("#btnLogin").click()
 			}
 		});
+
+
 
 	</script>
 
