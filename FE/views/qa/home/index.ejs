@@ -4,9 +4,10 @@
   </div>
   <div class="col-md-4 col-sm-4 col-xs-8 mt-2">
     <select name="" id="slStatus" class="form-control">
-      <option value="">Initial</option>
-      <option value="">Processing</option>
-      <option value="">Editor done</option>
+      <option value="-1">Initial</option>
+      <option value="0">Editing</option>
+      <option value="1">Editor done</option>
+      <option value="2">Submited</option>
     </select>
   </div>
   <div class="col-md-6 col-sm-6 col-xs-12 mt-2">
@@ -55,12 +56,41 @@
         LoadTask();
       })
 
+      $('#slStatus').on('change', function() {
+        status = this.value;
+        LoadTask();
+      })
+
 
 
       $('#modalRejectTask').on('hidden.bs.modal', function () {
         LoadTask();
       })
 
+      
+      $(document).on("click", "button[name='btnSubmitTask']", function () {
+        taskId = $(this).closest("tr").attr("id");
+        job_lv = $(this).closest("tr").data('job');        
+      
+        if(confirm("Are you sure want to submit this task?")){
+          $.ajax({
+          url:'/qa/task/submit',
+          type:'put',
+          headers: {
+            authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+          data:{
+            taskId,
+            job_lv
+          },
+          success:function(data){
+            alert(data.msg);
+            LoadTask();
+          }
+        })
+        }
+        
+      })
 
       $(document).on("click", "button[name='btnTaskInfo']", function () {
         taskId = $(this).closest("tr").attr("id");
@@ -91,8 +121,9 @@
           success: function (data) {
             $('#tbdTasks').empty();
             let idx = 1;
+
             data.tasks.forEach(t => {
-              let tr = '<tr id="' + t._id + '">';
+              let tr = '<tr id="' + t._id + '" data-job="'+t.level._id+'">';
               tr += '<td>' + (idx++) + '</td>';
               tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
               tr += '<td class="font-weight-bold">' + t.level.name + '</td>';

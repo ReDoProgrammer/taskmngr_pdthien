@@ -1,18 +1,20 @@
 const router = require('express').Router();
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 const User = require('../../models/user-model');
-const UserModule = require('../../models/user-module-model');
-const Module = require('../../models/module-model');
 const jwt = require("jsonwebtoken");
 
+const { getModule, getRole, checkAccount } = require('../common');
+
 let refershTokens = [];
+
+const _MODULE = 'ADMIN';
 
 
 
 router.get('/', authenticateAdminToken, (req, res) => {
   let { search, page } = req.query;
   User.find({
-    username:{$ne:'admin'},
+    username: { $ne: 'admin' },
     $or: [
       { fullname: { "$regex": search, "$options": "i" } },
       { email: { "$regex": search, "$options": "i" } },
@@ -40,7 +42,7 @@ router.get('/', authenticateAdminToken, (req, res) => {
 
 router.get('/list', authenticateAdminToken, (req, res) => {
   User
-    .find({username:{$ne:'admin'}})
+    .find({ username: { $ne: 'admin' } })
     .exec()
     .then(users => {
       return res.status(200).json({
@@ -96,7 +98,7 @@ router.post('/', authenticateAdminToken, (req, res) => {
     bank,
     bank_no,
     bank_holder
-  
+
   } = req.body;
 
 
@@ -116,10 +118,10 @@ router.post('/', authenticateAdminToken, (req, res) => {
     bank,
     bank_no,
     bank_holder
-    
+
   });
   u.save()
-    .then(user => {      
+    .then(user => {
       return res.status(201).json({
         msg: 'New user has been created successfully!',
         user: user
@@ -135,10 +137,10 @@ router.post('/', authenticateAdminToken, (req, res) => {
 })
 
 router.put('/', authenticateAdminToken, (req, res) => {
-  let { 
+  let {
     user_group,
     user_level,
-    userId,   
+    userId,
     fullname,
     username,
     password,
@@ -151,13 +153,13 @@ router.put('/', authenticateAdminToken, (req, res) => {
     bank,
     bank_no,
     bank_holder
-    } = req.body;
+  } = req.body;
 
   User.findByIdAndUpdate(userId, {
     user_group,
     user_level,
     fullname,
-    username,    
+    username,
     phone,
     email,
     idNo,
@@ -166,7 +168,7 @@ router.put('/', authenticateAdminToken, (req, res) => {
     is_active,
     bank,
     bank_no,
-    bank_holder   
+    bank_holder
   }, { new: true }, async (err, user) => {
     if (err) {
       return res.status(500).json({
@@ -210,38 +212,38 @@ router.delete('/', authenticateAdminToken, (req, res) => {
 })
 
 
-router.get('/profile',authenticateAdminToken,(req,res)=>{
+router.get('/profile', authenticateAdminToken, (req, res) => {
   User
-  .findById(req.user._id)
-  .exec()
-  .then(user=>{
-    if(!user){
-      return res.status(404).json({
-        msg:`User not found!`
-      })      
-    }
-    return res.status(200).json({
-      msg:`Get user profile successfully!`,
-      fullname: user.fullname
+    .findById(req.user._id)
+    .exec()
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({
+          msg: `User not found!`
+        })
+      }
+      return res.status(200).json({
+        msg: `Get user profile successfully!`,
+        fullname: user.fullname
+      })
     })
-  })
-  .catch(err=>{
-    return res.status(500).json({
-      msg:`Can not get user profile with error: ${new Error(err.message)}`
+    .catch(err => {
+      return res.status(500).json({
+        msg: `Can not get user profile with error: ${new Error(err.message)}`
+      })
     })
-  })
 })
 
 
 router.post("/login", (req, res) => {
   let { username, password } = req.body;
 
-  Promise.all([getModule, checkAccount(username, password)])
-    .then(result => {     
-      
-      checkRole(result[1]._id, result[0]._id)
-        .then(chk => {    
-         
+  Promise.all([getModule(_MODULE), checkAccount(username, password)])
+    .then(result => {
+
+      getRole(result[0]._id, result[1]._id)
+        .then(chk => {
+          console.log(chk);
           if (chk) {
             let user = result[1];
             let u = {
@@ -263,7 +265,8 @@ router.post("/login", (req, res) => {
           }
 
         })
-        .catch(err => {         
+        .catch(err => {
+          console.log(err);
           return res.status(err.code).json({
             msg: err.message
           })
@@ -271,7 +274,7 @@ router.post("/login", (req, res) => {
     })
     .catch(err => {
       return res.status(err.code).json({
-        msg:`${new Error(err.msg)}`
+        msg: `${new Error(err.msg)}`
       })
     })
 
@@ -279,99 +282,15 @@ router.post("/login", (req, res) => {
 });
 
 
-const checkRole = (userId, moduleId) => {
-  return new Promise((resolve, reject) => {
-    UserModule
-      .countDocuments({ module: moduleId, user: userId })
-      .exec()
-      .then(count => {
-        if (count == 0) {
-          return reject({
-            code: 404,
-            msg: `Can not found user module role`
-          })
-        }
-        return resolve(true)
-      })
-      .catch(err => {
-        return reject({
-          code: 500,
-          msg: `Can not check user role with error: ${new Error(err.message)}`
-        })
-      })
-  })
-}
-
-const getModule = new Promise((resolve, reject) =>  {
-  
-    Module
-      .findOne({ name: 'ADMIN' })
-      .exec()
-      .then(module => {      
-        return resolve(module)
-      })
-      .catch(err => {
-        return reject({
-          code: 500,
-          msg: `Can not get admin module with error: ${new Error(err.message)}`
-        });
-      })
-  })
 
 
 
-const checkAccount = (username, password) => {
-  return new Promise((resolve, reject) => {
-    User
-      .findOne({ username: username })
-      .exec()
-      .then(user => {
-        if (!user) {
-          return reject({
-            code: 404,
-            msg: `Username not found`
-          })
-        }
-
-       
-
-        if(!user.is_active){
-          return reject({
-            code:403,
-            msg:`Your account is banned!`            
-          })
-        }
-
-        user.ComparePassword(password, function (err, isMatch) {
-          if (err) {
-            return reject({
-              code: 403,
-              msg: `Can not check password with error: ${new Error(err.message)}`
-            })
-          }
-          if (isMatch) {
-            return resolve(user);
-          } else {
-            return reject({
-              code: 403,
-              msg: 'Admin password not match!'
-            })
-          }
-        });
 
 
 
-      })
-      .catch(err => {
-        return reject({
-          code: 500,
-          msg: new Error(err.message)
-        });
-      })
-  })
-}
+module.exports = router;
+
 
 function generateAccessToken(user) {
   return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "8h" });
 }
-module.exports = router;
