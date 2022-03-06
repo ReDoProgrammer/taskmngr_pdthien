@@ -14,8 +14,13 @@ router.get('/', authenticateEditorToken, (req, res) => {
     let { page, search } = req.query;
     Task
         .find({ editor: req.user._id })//chỉ load những task đã được TLA gán hoặc editor đã nhận được
-        .populate('level', 'name -_id')
-        .populate('job') //,'source_link intruction -_id'
+        .populate('level', 'name -_id')      
+        .populate({
+            path : 'job',
+            populate : {
+              path : 'customer'
+            }
+          })
         .sort({ deadline: -1 })//sắp xếp giảm dần theo deadline
         .sort({status:1})//sắp xếp tăng dần theo trạng thái của task
         .exec()
