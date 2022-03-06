@@ -16,8 +16,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
             msg:`Editor has been set successfully!`
         })
     })
-    .catch(err=>{
-        console.log(err.msg);
+    .catch(err=>{     
         return res.status(err.code).json({
             msg:err.msg
         })
@@ -37,7 +36,7 @@ const setRegistedEditor = (taskId)=>{
         Task//lấy thông tin của task truyền vào
         .findById(taskId)
         .exec()
-        .then(t=>{
+        .then(async t=>{
             if(!t){
                 return reject({
                     code:404,
@@ -46,43 +45,36 @@ const setRegistedEditor = (taskId)=>{
             }
 
             //lấy trình độ của nhân viên phù hợp với yêu cầu về level của task
-            getStaffLevelFromJobLevel(t.level)
-            .then(sls=>{
+            await getStaffLevelFromJobLevel(t.level)
+            .then(async sls=>{
+               
                 //lấy ra 1 phần tử đã đăng ký sớm nhất từ hàng đợi
-                getQueue(sls)
-                .then(q=>{   
-                    console.log('queue: ',q);            
-                    assignOrTakeTask(_MODULE,t._id,t.level,q.staff,true)
-                    .then(async t=>{
-                        console.log('task: ',t);
+                await getQueue(sls)
+                .then(async q=>{    
+                 await  assignOrTakeTask(_MODULE,t._id,t.level,q.staff,true)
+                    .then(async t=>{                      
                         //sau khi gán tự động xong thì phải loại bỏ phần tử hàng chờ đã được lấy ở trên ra khỏi hàng chờ
                         await RemoveStaffFromQueue(q.staff)
                         .then(_=>{
                             return resolve();
                         })
-                        .catch(err=>{
-                            console.log(err);
+                        .catch(err=>{                            
                             return reject(err)
                         })
                     })
-                    .catch(err=>{
+                    .catch(err=>{                       
                         return reject(err);
                     })
                 })
             })
-            .catch(err=>{
-                return res.status(err.code).json({
-                    msg:err.msg
-                })
+            .catch(err=>{              
+               return reject(err)                
             })         
 
         })
         .catch(err=>{
             console.log(`Can not get task by id with error: ${new Error(err.message)}`);
-            return reject({
-                code:500,
-                msg:`Can not get task by id with error: ${new Error(err.message)}`
-            })
+            return reject(err)
         })
     })
 }

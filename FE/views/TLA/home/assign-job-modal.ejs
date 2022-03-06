@@ -158,6 +158,7 @@
           LoadTasks();
         },
         error: function (jqXHR, textStatus, errorThrown) {
+          console.log({jqXHR, textStatus, errorThrown});
           alert(jqXHR.responseJSON.msg);         
         }
       })
