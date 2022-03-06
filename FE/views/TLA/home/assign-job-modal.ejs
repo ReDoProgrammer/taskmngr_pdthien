@@ -154,11 +154,11 @@
           taskId: $(this).closest("tr").attr('id')
         },
         success: function (data) {
-          console.log(data);
+          alert(data.msg);
+          LoadTasks();
         },
         error: function (jqXHR, textStatus, errorThrown) {
-          $('#msgError').text(jqXHR.responseJSON.msg);
-          $('#msgError').show().delay(5000).fadeOut();
+          alert(jqXHR.responseJSON.msg);         
         }
       })
     }
