@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
 const Customer = require('../../models/customer-model');
-const {assignOrTakeTask} = require('../common');
+const { assignOrTakeTask } = require('../common');
 
 const { authenticateEditorToken } = require("../../../middlewares/editor-middleware");
 
@@ -76,28 +76,42 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
 
 
 router.put('/submit', authenticateEditorToken, (req, res) => {
-    let { taskId, output_link,amount } = req.body;
+    let { taskId, output_link, amount } = req.body;
+
     Task
-        .findByIdAndUpdate(taskId, {
-            output_link,
-            status: 1,
-            amount
-        }, { new: true }, (err, task) => {
-            if (err) {
-                return res.status(500).json({
-                    msg: `Can not find and update task by id with error: ${new Error(err.message)}`
-                })
-            }
+        .findById(taskId)
+        .exec()
+        .then(task => {
             if (!task) {
                 return res.status(404).json({
                     msg: `Task not found!`
                 })
             }
 
-            return res.status(200).json({
-                msg: `The task has been submited!`
+            Task
+                .findByIdAndUpdate(taskId, {
+                    output_link,
+                    status: 1,
+                    amount,
+                    edited_time: ++(task.edited_time)
+                }, { new: true }, (err, task) => {
+                    if (err) {
+                        return res.status(500).json({
+                            msg: `Can not find and update task by id with error: ${new Error(err.message)}`
+                        })
+                    }
+
+                    return res.status(200).json({
+                        msg: `The task has been submited!`
+                    })
+                })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not get task by id with error: ${new Error(err.message)}`
             })
         })
+
 })
 
 
