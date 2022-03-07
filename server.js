@@ -36,6 +36,9 @@ app.use('/dc',dcHomeController);
 const dcAuthAPI = require('./BE/API/dc/authenticate');
 app.use('/dc/auth',dcAuthAPI);
 
+const dcTaskAPI = require('./BE/API/dc/api-task');
+app.use('/dc/task',dcTaskAPI);
+
 
 //Q.A CONTROLLERS
 const qaAuthController = require('./BE/API/qa/authenticate');
