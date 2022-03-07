@@ -1,8 +1,8 @@
 <div class="row">
-  <div class="col-md-2 col-sm-2 col-xs-4 mt-2">
-    <label for="">Status:</label>
+  <div class="col-md-6 col-sm-6 col-xs-8 mt-2">
+    <label for=""></label>
   </div>
-  <div class="col-md-4 col-sm-4 col-xs-8 mt-2">
+  <div class="col-md-2 col-sm-2 col-xs-4 mt-2">
     <select name="" id="slStatus" class="form-control">      
       <option value="100">All</option>
       <option value="1">Editor submited</option>
@@ -12,7 +12,7 @@
       <option value="-2">Rejected</option>
     </select>
   </div>
-  <div class="col-md-6 col-sm-6 col-xs-12 mt-2">
+  <div class="col-md-4 col-sm-4 col-xs-12 mt-2">
     <!-- Another variation with a button -->
     <div class="input-group">
       <input type="text" class="form-control" placeholder="Seach your job..." id="txtSearch" />
@@ -134,16 +134,16 @@
               tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>'
               tr += '<td>' + t.remark + '</td>';
               tr += '<td class="text-right">' + t.amount + '</td>';
-              tr += '<td class="font-italic text-success">';
+              tr += '<td class="font-italic font-weight-bold">';
               switch (t.status) {
 
-                case 0: tr += 'Processing'; break;
-                case 1: tr += 'Editor done'; break;
-                case 2: tr += 'Q.A ok'; break;
-                case 3: tr += 'DC ok'; break;
-                case -1: tr += 'Initial'; break;
-                case -2: tr += 'Q.A reject'; break;
-                case -3: tr += 'DC reject'; break;
+                case 0: tr += '<span class="text-info">Processing</span>'; break;
+                case 1: tr += '<span class="text-success">Editor done</span>'; break;
+                case 2: tr += '<span class="text-success">Q.A ok</span>'; break;
+                case 3: tr += '<span class="text-success">DC ok</span>'; break;
+                case -1: tr += '<span class="text-info">Initial</span>'; break;
+                case -2: tr += '<span class="text-danger">Q.A reject</span>'; break;
+                case -3: tr += '<span class="text-danger">DC reject</span>'; break;
 
               }
               tr += '</td>';
