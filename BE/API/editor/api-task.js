@@ -3,7 +3,8 @@ const Task = require("../../models/task-model");
 const Customer = require('../../models/customer-model');
 const { assignOrTakeTask,
     getJobLevelBasedOnConditons,
-    getCustomer } = require('../common');
+    getCustomer,
+    getTaskDetail } = require('../common');
 
 const { authenticateEditorToken } = require("../../../middlewares/editor-middleware");
 
@@ -42,41 +43,27 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
     let { taskId } = req.query;
 
 
-
-
-    Task.findById(taskId)
-        .populate('level', 'name')
-        .populate('job')
-        .exec()
-        .then(task => {
-            if (!task) {
-                return res.status(404).json({
-                    msg: `Task not found!`
-                })
-            }
-
-            getCustomer(task.job.customer)
-                .then(result => {
-                    console.log(result);
-                    return res.status(200).json({
-                        msg: `Load task detail successfully!`,
-                        task,
-                        customer: result.customer
-                    })
-                })
-                .catch(err => {
-                    return res.status(err.code).json({
-                        msg: err.msg
-                    })
-                })
-
-
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not get task info with error: ${new Error(err.message)}`
+    getTaskDetail(taskId)
+    .then(async task=>{
+       await getCustomer(task.job.customer)
+        .then(customer => {           
+            return res.status(200).json({
+                msg: `Load task detail successfully!`,
+                task,
+                customer
             })
         })
+        .catch(err => {
+            return res.status(err.code).json({
+                msg: err.msg
+            })
+        })
+    })
+    .catch(err=>{
+        return res.status(err.code).json({
+            msg: err.msg
+        })
+    })
 })
 
 
