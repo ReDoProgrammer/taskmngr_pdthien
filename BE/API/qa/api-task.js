@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
 const { authenticateQAToken } = require("../../../middlewares/qa-middleware");
-const {getWage } = require('../common');
+const {getWage,getCustomer } = require('../common');
 const _MODULE = 'QA';
 
 router.put('/submit', authenticateQAToken, (req, res) => {
@@ -74,11 +74,15 @@ router.put('/reject', authenticateQAToken, (req, res) => {
 
 router.get('/list', authenticateQAToken, (req, res) => {
     let { page, search, status } = req.query;
-    Task
-        .find({
-            status
-        })
-        .populate('job')
+    if(status == 100){
+        Task
+        .find({})
+        .populate({
+            path : 'job',
+            populate : {
+              path : 'customer'
+            }
+          })
         .populate('level')
         .exec()
         .then(tasks => {
@@ -92,6 +96,33 @@ router.get('/list', authenticateQAToken, (req, res) => {
                 msg: `Can not get tasks list with error: ${new Error(err.message)}`
             })
         })
+    }else{
+        Task
+        .find({
+            status
+        })
+        .populate({
+            path : 'job',
+            populate : {
+              path : 'customer'
+            }
+          })
+        .populate('level')
+
+        .exec()
+        .then(tasks => {
+            return res.status(200).json({
+                msg: `Load tasks list successfully!`,
+                tasks
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not get tasks list with error: ${new Error(err.message)}`
+            })
+        })
+    }
+    
 })
 
 router.get('/detail', authenticateQAToken, (req, res) => {
