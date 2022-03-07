@@ -89,7 +89,7 @@
             if (t.status > 0) {
               if (typeof t.qa !== 'undefined') {// nếu cột qa có giá trị <=> có qa can thiệp
                 if (t.qa_assigned && t.status == 2) {//Q.A được gán bởi TLA và đã được Q.A submit
-                  tr += '<button class="btn btn-xs btn-danger" name="btnRejectTask">';
+                  tr += '<button class="btn btn-xs btn-danger ml-2" name="btnRejectTask">';
                   tr += '<i class="fa fa-stop-circle"></i> Reject';
                   tr += '</button>';
                 } else {
@@ -97,6 +97,13 @@
                   tr += '<i class="fa fa-send-o"></i> Submit';
                   tr += '</button>';
                 }
+              } else {
+                tr += '<button class="btn btn-xs btn-danger ml-2" name="btnRejectTask">';
+                tr += '<i class="fa fa-stop-circle"></i> Reject';
+                tr += '</button>';
+                tr += '<button class="btn btn-xs btn-primary ml-2" name="btnSubmitTask">';
+                  tr += '<i class="fa fa-send-o"></i> Submit';
+                  tr += '</button>';
               }
             } else {
               tr += '';
