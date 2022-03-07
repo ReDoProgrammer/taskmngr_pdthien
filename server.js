@@ -27,8 +27,17 @@ app.use(bodyParser.json());
 
 app.use(layout); //set layout
 
-//Q.A CONTROLLERS
 
+//DC zone
+const dcHomeController = require('./BE/controllers/dc/home-controller');
+app.use('/dc',dcHomeController);
+
+
+const dcAuthAPI = require('./BE/API/dc/authenticate');
+app.use('/dc/auth',dcAuthAPI);
+
+
+//Q.A CONTROLLERS
 const qaAuthController = require('./BE/API/qa/authenticate');
 app.use('/qa/auth',qaAuthController);
 
