@@ -1,42 +1,70 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
 const { authenticateQAToken } = require("../../../middlewares/qa-middleware");
-const {getWage,getCustomer } = require('../common');
+const { getWage,getModule, getCustomer } = require('../common');
 const _MODULE = 'QA';
 
 router.put('/submit', authenticateQAToken, (req, res) => {
     let { taskId, job_lv } = req.body;
 
+    Task.findById(taskId)
+        .exec()
+        .then(t => {
+            if (!t) {
+                return res.status(404).json({
+                    msg: `Task not found!`
+                })
+            }
+            if (!t.qa) {
+                return res.status(403).json({
+                    msg: `This task has been already submited by another Q.A!`
+                })
+            }
+            getModule(_MODULE)
+            .then(m=>{
+                getWage(req.user._id, job_lv, m._id)
+                .then(w => {
+                    Task
+                        .findByIdAndUpdate(taskId, {
+                            qa: req.user._id,
+                            qa_wage: w.wage,
+                            qa_done: new Date(),
+                            status: 2
+                        }, { new: true }, (err, task) => {
+                            if (err) {
+                                return res.status(500).json({
+                                    msg: `Can not find and update task by id with error: ${new Error(err.message)}`
+                                })
+                            }                           
 
-    getWage(req.user._id, job_lv, _MODULE)
-        .then(w => {
-            Task
-                .findByIdAndUpdate(taskId, {
-                    qa: req.user._id,
-                    qa_wage: w.wage,
-                    qa_done: new Date(),
-                    status: 2
-                }, { new: true }, (err, task) => {
-                    if (err) {
-                        return res.status(500).json({
-                            msg: `Can not find and update task by id with error: ${new Error(err.message)}`
+                            return res.status(200).json({
+                                msg: `The task has been submited!`
+                            })
                         })
-                    }
-                    if (!task) {
-                        return res.status(404).json({
-                            msg: `Task not found!`
-                        })
-                    }
 
-                    return res.status(200).json({
-                        msg: `The task has been submited!`
+                })
+                .catch(err => {
+                    return res.status(err.code).json({
+                        msg:err.msg
                     })
                 })
+            })
+            .catch(err=>{
+                return res.status(err.code).json({
+                    msg:err.msg
+                })
+            })
+            
 
         })
         .catch(err => {
-            console.log(err);
+            return res.status(500).json({
+                msg: `Can not get task by id with error: ${new Error(err.message)}`
+            })
         })
+
+
+
 
 
 })
@@ -74,55 +102,55 @@ router.put('/reject', authenticateQAToken, (req, res) => {
 
 router.get('/list', authenticateQAToken, (req, res) => {
     let { page, search, status } = req.query;
-    if(status == 100){
+    if (status == 100) {
         Task
-        .find({})
-        .populate({
-            path : 'job',
-            populate : {
-              path : 'customer'
-            }
-          })
-        .populate('level')
-        .exec()
-        .then(tasks => {
-            return res.status(200).json({
-                msg: `Load tasks list successfully!`,
-                tasks
+            .find({})
+            .populate({
+                path: 'job',
+                populate: {
+                    path: 'customer'
+                }
             })
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not get tasks list with error: ${new Error(err.message)}`
+            .populate('level')
+            .exec()
+            .then(tasks => {
+                return res.status(200).json({
+                    msg: `Load tasks list successfully!`,
+                    tasks
+                })
             })
-        })
-    }else{
+            .catch(err => {
+                return res.status(500).json({
+                    msg: `Can not get tasks list with error: ${new Error(err.message)}`
+                })
+            })
+    } else {
         Task
-        .find({
-            status
-        })
-        .populate({
-            path : 'job',
-            populate : {
-              path : 'customer'
-            }
-          })
-        .populate('level')
+            .find({
+                status
+            })
+            .populate({
+                path: 'job',
+                populate: {
+                    path: 'customer'
+                }
+            })
+            .populate('level')
 
-        .exec()
-        .then(tasks => {
-            return res.status(200).json({
-                msg: `Load tasks list successfully!`,
-                tasks
+            .exec()
+            .then(tasks => {
+                return res.status(200).json({
+                    msg: `Load tasks list successfully!`,
+                    tasks
+                })
             })
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not get tasks list with error: ${new Error(err.message)}`
+            .catch(err => {
+                return res.status(500).json({
+                    msg: `Can not get tasks list with error: ${new Error(err.message)}`
+                })
             })
-        })
     }
-    
+
 })
 
 router.get('/detail', authenticateQAToken, (req, res) => {
