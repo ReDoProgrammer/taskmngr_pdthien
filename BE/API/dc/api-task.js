@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
 const { authenticateDCToken } = require("../../../middlewares/dc-middleware");
-const {getCustomer } = require('../common');
+const {getCustomer,getTaskDetail } = require('../common');
 const _MODULE = 'DC';
 
 router.put('/reject', authenticateDCToken, (req, res) => {
@@ -90,40 +90,28 @@ router.get('/list', authenticateDCToken, (req, res) => {
 
 router.get('/detail', authenticateDCToken, (req, res) => {
     let { taskId } = req.query;
-
-    Task.findById(taskId)
-        .populate('level', 'name')
-        .populate('job')
-        .exec()
-        .then(task => {
-            if (!task) {
-                return res.status(404).json({
-                    msg: `Task not found!`
-                })
-            }
-
-            getCustomer(task.job.customer)
-                .then(result => {
-                    console.log(result);
-                    return res.status(200).json({
-                        msg: `Load task detail successfully!`,
-                        task,
-                        customer: result.customer
-                    })
-                })
-                .catch(err => {
-                    return res.status(err.code).json({
-                        msg: err.msg
-                    })
-                })
-
-
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not get task info with error: ${new Error(err.message)}`
+    getTaskDetail(taskId)
+    .then(async task=>{
+        await getCustomer(task.job.customer)
+        .then(customer=>{
+            return res.status(200).json({
+                msg:`Get task info successfully!`,
+                customer,
+                task
             })
         })
+        .catch(err=>{
+            return res.status(err.code).json({
+                msg:err.msg
+            })
+        })
+    })
+    .catch(err=>{      
+        return res.status(err.code).json({
+            msg:err.msg
+        })
+    })
+   
 })
 
 
