@@ -155,44 +155,53 @@ router.get('/list', authenticateQAToken, (req, res) => {
 
 router.get('/detail', authenticateQAToken, (req, res) => {
     let { taskId } = req.query;
-
-
-
-
-    Task.findById(taskId)
-        .populate('level', 'name')
-        .populate('job')
-        .exec()
-        .then(task => {
-            if (!task) {
-                return res.status(404).json({
-                    msg: `Task not found!`
-                })
-            }
-
-            getCustomer(task.job.customer)
-                .then(result => {
-                    console.log(result);
-                    return res.status(200).json({
-                        msg: `Load task detail successfully!`,
-                        task,
-                        customer: result.customer
-                    })
-                })
-                .catch(err => {
-                    return res.status(err.code).json({
-                        msg: err.msg
-                    })
-                })
-
-
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not get task info with error: ${new Error(err.message)}`
+    getTaskDetail(taskId)
+    .then(async t=>{
+        await getCustomer(t.job.customer)
+        .then(customer=>{
+            return res.status(200).json({
+                msg:`Get task info successfully!`,
+                customer,
+                task:t
             })
         })
+        .catch(err=>{
+            return res.status(err.code).json({
+                msg:err.msg
+            })
+        })
+    })
+    .catch(err=>{
+        return res.status(err.code).json({
+            msg:err.msg
+        })
+    })
 })
+
+const getTaskDetail = (taskId)=>{
+    return new Promise((resolve,reject)=>{
+        Task
+        .findById(taskId)
+        .populate('job')
+        .exec()
+        .then(t=>{
+            if(!t){
+                return reject({
+                    code:404,
+                    msg:`Task not found!`
+                })
+            }
+            return resolve(t);
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not get task detail with error: ${new Error(err.message)}`
+            })
+        })
+
+    })
+}
 
 
 module.exports = router;

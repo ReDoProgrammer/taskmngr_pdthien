@@ -148,7 +148,7 @@
                 taskId
             },
             success: function (data) {
-                console.log(data);
+                console.log(data.customer);
 
                 $('#divNationalStyle').html(data.customer.nation.name)
                 $('#divColor').html(data.customer.color.name)              
@@ -161,7 +161,7 @@
                 $('#lblLevelName').text(data.task.level.name);
                 $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.assigned_date));
                 $('#lblDeadline').text(convertISODateToTimeFormat(data.task.deadline));
-                $('#lblStyleNote').text(data.task.customer.remark);
+                $('#lblStyleNote').text(data.customer.remark);
                 $('#lblIntruction').text(data.task.job.intruction);
                 $('#lblRemark').text(data.task.remark);
 

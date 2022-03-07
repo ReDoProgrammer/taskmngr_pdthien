@@ -288,11 +288,7 @@ const getCustomer = (customerId) => {
                     });
                 }
 
-                return resolve({
-                    code: 200,
-                    msg: `Get customer by id successfully`,
-                    customer
-                });
+                return resolve(customer);
 
             });
     })

@@ -56,18 +56,18 @@
       var search = '';
       var status = 100;
       $(document).ready(function () {
-        LoadTask();
+        LoadTasks();
       })
 
       $('#slStatus').on('change', function() {
         status = this.value;
-        LoadTask();
+        LoadTasks();
       })
 
 
 
       $('#modalRejectTask').on('hidden.bs.modal', function () {
-        LoadTask();
+        LoadTasks();
       })
 
       
@@ -88,7 +88,7 @@
           },
           success:function(data){
             alert(data.msg);
-            LoadTask();
+            LoadTasks();
           }
         })
         }
@@ -109,7 +109,7 @@
 
 
 
-      function LoadTask() {
+      function LoadTasks() {
         $.ajax({
           url: '/qa/task/list',
           type: 'get',
