@@ -1,10 +1,10 @@
 <div class="row">
   <div class="col-md-2 col-sm-2 col-xs-4 mt-2">
-    <select name="" id="slStatus" class="form-control">      
+    <select name="" id="slStatus" class="form-control">
       <option value="100">All</option>
       <option value="1">Editor submited</option>
       <option value="-1">Initial</option>
-      <option value="0">Editing</option>     
+      <option value="0">Editing</option>
       <option value="2">Submited</option>
       <option value="-2">Rejected</option>
     </select>
@@ -23,20 +23,22 @@
 </div>
 <div class="col-md-6 col-dm-6 col-xs-12 mt-2"></div>
 
-<hr/>
+<hr />
 <div class="table-responsive mt-2">
   <table class="table table-striped">
     <thead class="thead-dark">
       <tr>
         <th scope="col">#</th>
+        <th scope="col"></th>
         <th scope="col">Customer</th>
         <th scope="col">Job</th>
         <th scope="col">Level</th>
         <th scope="col">Deadline</th>
+        <th scope="col">Remark</th>
         <th scope="col" class="text-right">E-T</th>
         <th scope="col" class="text-right">I-N</th>
         <th scope="col">Status</th>
-        <th scope="col">Remark</th>
+
         <th scope="col"></th>
       </tr>
     </thead>
@@ -49,79 +51,100 @@
 
 
 
-    <script src="/js/common.js"></script>
-    <script>
-      var page = 1;
-      var search = '';
-      var status = 100;
-      var taskId = '';
+  <script src="/js/common.js"></script>
+  <script>
+    var page = 1;
+    var search = '';
+    var status = 100;
+    var taskId = '';
 
-      $(document).ready(function () {
-        LoadTask();
-      })
-      $(document).on("click", "button[name='btnTaskInfo']", function () {
-        taskId = $(this).closest("tr").attr("id");
-        $('#modalTaskDetail').modal();
-      })
-      function LoadTask() {
-        $.ajax({
-          url: '/dc/task/list',
-          type: 'get',
-          headers: {
-            authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-          data: {
-            search,
-            page,
-            status
-          },
-          success: function (data) {
-            $('#tbdTasks').empty();
-            let idx = 1;
+    $(document).ready(function () {
+      LoadTask();
+    })
+    $(document).on("click", "button[name='btnTaskInfo']", function () {
+      taskId = $(this).closest("tr").attr("id");
+      $('#modalTaskDetail').modal();
+    })
+    function LoadTask() {
+      $.ajax({
+        url: '/dc/task/list',
+        type: 'get',
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: {
+          search,
+          page,
+          status
+        },
+        success: function (data) {
+          $('#tbdTasks').empty();
+          let idx = 1;
 
-            data.tasks.forEach(t => {
-              let tr = '<tr id="' + t._id + '" data-job="'+t.level._id+'">';
-              tr += '<td>' + (idx++) + '</td>';
-              tr += '<td class="font-weight-bold text-primary">' + t.job.customer.firstname+' '+t.job.customer.lastname + '</td>';
-              tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
-              tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
-              tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>'
-              tr += '<td>' + t.remark + '</td>';
-              tr += '<td class="text-right">' + t.amount + '</td>';
-              tr += '<td class="font-italic font-weight-bold">';
-              switch (t.status) {
-
-                case 0: tr += '<span class="text-info">Processing</span>'; break;
-                case 1: tr += '<span class="text-success">Editor done</span>'; break;
-                case 2: tr += '<span class="text-success">Q.A ok</span>'; break;
-                case 3: tr += '<span class="text-success">DC ok</span>'; break;
-                case -1: tr += '<span class="text-info">Initial</span>'; break;
-                case -2: tr += '<span class="text-danger">Q.A reject</span>'; break;
-                case -3: tr += '<span class="text-danger">DC reject</span>'; break;
-
+          data.tasks.forEach(t => {
+            let tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '">';
+            tr += '<td>' + (idx++) + '</td>';
+            console.log(t);
+            tr += '<td>';
+            if (t.status > 0) {
+              if (typeof t.qa !== 'undefined') {// nếu cột qa có giá trị <=> có qa can thiệp
+                if (t.qa_assigned && t.status == 2) {//Q.A được gán bởi TLA và đã được Q.A submit
+                  tr += '<button class="btn btn-xs btn-danger" name="btnRejectTask">';
+                  tr += '<i class="fa fa-stop-circle"></i> Reject';
+                  tr += '</button>';
+                } else {
+                  tr += '<button class="btn btn-xs btn-primary ml-2" name="btnSubmitTask">';
+                  tr += '<i class="fa fa-send-o"></i> Submit';
+                  tr += '</button>';
+                }
               }
-              tr += '</td>';
+            } else {
+              tr += '';
+            }
 
-              tr += '<td class="text-right">';
-              tr += '<button class="btn btn-xs btn-info" name="btnTaskInfo">';
-              tr += '<i class="fa fa-info"></i> Detail';
+
+            tr += '<button class="btn btn-xs btn-info ml-2" name="btnTaskInfo">';
+            tr += '<i class="fa fa-info"></i> Detail';
+            tr += '</button>';
+            tr += '</td>';
+            tr += '<td class="font-weight-bold text-primary">' + t.job.customer.firstname + ' ' + t.job.customer.lastname + '</td>';
+            tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
+            tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
+            tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>'
+            tr += '<td>' + t.remark + '</td>';
+            tr += '<td class="text-right">' + t.edited_time + '</td>';
+            tr += '<td class="text-right">' + t.amount + '</td>';
+
+            tr += '<td class="font-italic font-weight-bold">';
+            switch (t.status) {
+
+              case 0: tr += '<span class="text-info">Processing</span>'; break;
+              case 1: tr += '<span class="text-success">Editor done</span>'; break;
+              case 2: tr += '<span class="text-success">Q.A ok</span>'; break;
+              case 3: tr += '<span class="text-success">DC ok</span>'; break;
+              case -1: tr += '<span class="text-info">Initial</span>'; break;
+              case -2: tr += '<span class="text-danger">Q.A reject</span>'; break;
+              case -3: tr += '<span class="text-danger">DC reject</span>'; break;
+
+            }
+            tr += '</td>';
+
+            tr += '<td class="text-right">';
+            if (t.status == 1) {
+              tr += '<button class="btn btn-xs btn-primary ml-2" name="btnSubmitTask">';
+              tr += '<i class="fa fa-send-o"></i> Submit';
               tr += '</button>';
-              if (t.status == 1) {
-                tr += '<button class="btn btn-xs btn-primary ml-2" name="btnSubmitTask">';
-                tr += '<i class="fa fa-send-o"></i> Submit';
-                tr += '</button>';
-                tr += '<button class="btn btn-xs btn-warning ml-2" name="btnReject">';
-                tr += '<i class="fa fa-close text-danger"></i> Reject';
-                tr += '</button>';
-              }
+
+            }
+            tr += '</td>';
 
 
-              tr += '</tr>';
-              $('#tbdTasks').append(tr);
-            })
-          }
+            tr += '</tr>';
+            $('#tbdTasks').append(tr);
+          })
+        }
 
-        })
-      }
+      })
+    }
 
-    </script>
+  </script>
