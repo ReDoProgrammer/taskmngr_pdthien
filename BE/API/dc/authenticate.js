@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const User = require('../../models/user-model');
 const jwt = require("jsonwebtoken");
-const { authenticateEditorToken } = require("../../../middlewares/editor-middleware");
+const { authenticateDCToken } = require("../../../middlewares/dc-middleware");
 const _MODULE = 'DC';
 const {
   generateAccessToken,
@@ -13,7 +13,7 @@ const {
 
 let refershTokens = [];
 
-router.get('/profile',authenticateEditorToken,(req,res)=>{
+router.get('/profile',authenticateDCToken,(req,res)=>{
   User
   .findById(req.user._id)
   .exec()
@@ -39,7 +39,7 @@ router.get('/profile',authenticateEditorToken,(req,res)=>{
 
 router.post("/login", (req, res) => {
   let { username, password } = req.body;
-  
+  console.log( { username, password });
   Promise.all([getModule(_MODULE), checkAccount(username, password)])
     .then(result => {
       getRole(result[0]._id, result[1]._id)
