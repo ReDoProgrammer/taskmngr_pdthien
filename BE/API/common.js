@@ -295,6 +295,31 @@ const getCustomer = (customerId) => {
 
 }
 
+const getTaskDetail = (taskId)=>{
+    return new Promise((resolve,reject)=>{
+        Task
+        .findById(taskId)
+        .populate('job')
+        .exec()
+        .then(t=>{
+            if(!t){
+                return reject({
+                    code:404,
+                    msg:`Task not found!`
+                })
+            }
+            return resolve(t);
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not get task detail with error: ${new Error(err.message)}`
+            })
+        })
+
+    })
+}
+
 
 
 module.exports = {
@@ -305,5 +330,6 @@ module.exports = {
     getWage,
     checkAccount,
     getJobLevelBasedOnConditons,
-    getCustomer
+    getCustomer,
+    getTaskDetail
 }

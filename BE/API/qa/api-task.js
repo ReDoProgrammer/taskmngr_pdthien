@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
 const { authenticateQAToken } = require("../../../middlewares/qa-middleware");
-const { getWage,getModule, getCustomer } = require('../common');
+const { getWage,getModule, getCustomer,getTaskDetail } = require('../common');
 const _MODULE = 'QA';
 
 router.put('/submit', authenticateQAToken, (req, res) => {
@@ -178,30 +178,6 @@ router.get('/detail', authenticateQAToken, (req, res) => {
     })
 })
 
-const getTaskDetail = (taskId)=>{
-    return new Promise((resolve,reject)=>{
-        Task
-        .findById(taskId)
-        .populate('job')
-        .exec()
-        .then(t=>{
-            if(!t){
-                return reject({
-                    code:404,
-                    msg:`Task not found!`
-                })
-            }
-            return resolve(t);
-        })
-        .catch(err=>{
-            return reject({
-                code:500,
-                msg:`Can not get task detail with error: ${new Error(err.message)}`
-            })
-        })
-
-    })
-}
 
 
 module.exports = router;
