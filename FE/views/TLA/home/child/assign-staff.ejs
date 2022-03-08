@@ -71,8 +71,7 @@
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
             data: {
-                taskId,
-                levelId,
+                taskId,               
                 staff: $('#slQA option:selected').val()
             },
             success: function (data) {

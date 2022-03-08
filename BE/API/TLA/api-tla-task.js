@@ -3,7 +3,11 @@ const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const Task = require('../../models/task-model');
 const CustomerLevel = require('../../models/customer-level-model');
 const Job = require('../../models/job-model');
-const {assignOrTakeTask} = require('../common');
+const {
+    assignOrTakeTask,
+    getModule,
+    getTaskDetail,
+    getWage} = require('../common');
 
 
 const _EDITOR = 'EDITOR';
@@ -249,18 +253,19 @@ router.put('/assign-editor', authenticateTLAToken, (req, res) => {
 
 router.put('/assign-qa', authenticateTLAToken, (req, res) => {
 
-    let { taskId, levelId, staff } = req.body;
+    let { taskId, staff } = req.body;
     getModule(_QA)
-        .then(result => {
-
-            getWage(staff, levelId, result.m._id)
-                .then(result => {                    
+        .then(async m => {     
+            await getTaskDetail(taskId)
+            .then(async t=>{               
+                await getWage(staff, t.level._id, m._id)
+                .then(w => {      
+                              
                     Task.findByIdAndUpdate(taskId,
                         {
                             qa: staff,
                             qa_assigned: true,
-                            qa_wage: result.w.wage,
-                            status:0 //task có trạng thái đang được qa xử lý
+                            qa_wage: w.wage                          
 
                         }, { new: true }, (err, task) => {
                             if (err) {
@@ -268,7 +273,7 @@ router.put('/assign-qa', authenticateTLAToken, (req, res) => {
                                     msg: `Assigned staff failed with error: ${new Error(err.message)}`
                                 })
                             }
-                            if (task == null) {
+                            if (!task) {
                                 return res.status(404).json({
                                     msg: `Task not found`
                                 })
@@ -279,14 +284,19 @@ router.put('/assign-qa', authenticateTLAToken, (req, res) => {
                             })
                         })
                 })
-                .catch(err => {
-                    console.log(err.msg);
+                .catch(err => {                   
                     return res.status(err.code).json({
                         msg: err.msg
                     })
                 })
+            })      
+            .catch(err=>{               
+                return res.status(err.code).json({
+                    msg:err.msg
+                })
+            })           
         })
-        .catch(err => {
+        .catch(err => {          
             return res.status(err.code).json({
                 msg: err.msg
             })
