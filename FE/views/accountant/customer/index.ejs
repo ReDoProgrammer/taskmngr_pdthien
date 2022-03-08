@@ -28,7 +28,7 @@
         <th scope="col">Customer</th>
         <th scope="col">Phone</th>
         <th scope="col">Email</th>
-        <th></th>
+        <th scope="col">Status</th>
         <th></th>
       </tr>
     </thead>
@@ -215,6 +215,14 @@
                 tr += "<td>" + customer.phone + "</td>";
                 tr += "<td>" + customer.email + "</td>";
 
+                tr+= '<td>';
+                  if(customer.status){
+                    tr+= '<span class="text-success"><i class="fa fa-check-square-o" aria-hidden="true"></i> Active</span>';
+                  }else{
+                    tr+= '<span class="text-danger"><i class="fa fa-ban" aria-hidden="true"></i> Unactive</span>';
+                  }
+                  tr+= '</td>';
+
                 tr += "<td class='text-right'>";
                 tr +=
                   '<button class="btn btn-xs btn-info" name="view"><i class="fa fa-eye" aria-hidden="true"></i></button>';
@@ -225,7 +233,7 @@
                 tr += "</td>";
                 $('#tblData').append(tr);
               });
-              console.log(data.pages);
+              
               for (let i = 1; i <= data.pages; i++) {
                 let li = '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>';
                 $('#pagination').append(li);

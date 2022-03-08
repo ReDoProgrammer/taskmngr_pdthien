@@ -94,7 +94,11 @@ const customerSchema = new Schema({
     levels:[{
         type:Schema.Types.ObjectId,
         ref:'customer_level'
-    }]    
+    }],
+    status:{//trạng thái hoạt động của khách hàng
+        type:Boolean,
+        default:true
+    }    
 });
 
 customerSchema.pre("save", function (next) {
