@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <%-include('child/common')%>
+    <title>Accountant Module - BamBoo Photo</title>
+</head>
+
+<body>
+  <%- include('child/accountant/navbar') %>
+    <div class="container-fluid mt-2">
+      <div class="panel panel-primary">
+        <div class="panel-heading font-weight-bold">TLA - <%=title%>
+        </div>
+        <div class="panel-body" style="min-height: 500px !important;">
+          <%-body%>
+        </div>
+        <div class="panel-footer bg-dark" id="footer">
+          <h6>BambooPhoto - Accountant Module</h6>
+        </div>
+      </div>
+
+    </div>
+</body>
+
+</html>
+
+
+

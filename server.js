@@ -27,6 +27,12 @@ app.use(bodyParser.json());
 
 app.use(layout); //set layout
 
+//accountant zone
+const accountantHomeController = require('./BE/controllers/accountant/home-controller');
+app.use('/accountant',accountantHomeController);
+
+const accountantAuthAPI = require('./BE/API/accountant/authenticate');
+app.use('/accountant/auth',accountantAuthAPI);
 
 //DC zone
 const dcHomeController = require('./BE/controllers/dc/home-controller');
