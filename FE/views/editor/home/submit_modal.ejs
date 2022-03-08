@@ -44,6 +44,29 @@
 <script src="/js/common.js"></script>
 
 <script>
+
+$("#modalSubmitTask").on('shown.bs.modal', function (e) {
+        $.ajax({
+            url: '/editor/task/detail',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                taskId
+            },
+            success: function (data) {
+                $('#txtLink').val('');
+                $('#txtAmount').val(data.task.amount);
+               
+            }, error: function (request, status, error) {
+                alert(request.responseJSON.msg)
+                window.location.href = '/editor/default';
+            }
+        })
+    });
+
+
     $('#btnSubmitTaskDone').click(function () {
         let output_link = $('#txtLink').val();
         let amount = $('#txtAmount').val();
@@ -52,14 +75,9 @@
             $('#lblError').text('(!) Please enter amount to continue');
             $('#lblError').show().delay(5000).fadeOut();
             return;
-        }
-       
+        }       
 
-        // if(output_link.trim().length == 0){
-        //     $('#lblError').text('(!) Please enter output link');
-        //     $('#lblError').show().delay(5000).fadeOut();
-        //     return;
-        // }
+       
         $.ajax({
             url: '/editor/task/submit',
             type: 'put',

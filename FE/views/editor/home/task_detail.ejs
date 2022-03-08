@@ -146,8 +146,7 @@
             data: {
                 taskId
             },
-            success: function (data) {
-                console.log(data);
+            success: function (data) {              
 
                 $('#divNationalStyle').html(data.customer.nation.name)
                 $('#divColor').html(data.customer.color.name)              
