@@ -15,15 +15,16 @@ router.get('/', authenticateEditorToken, (req, res) => {
     let { page, search } = req.query;
     Task
         .find({ editor: req.user._id })//chỉ load những task đã được TLA gán hoặc editor đã nhận được
-        .populate('level', 'name -_id')      
+        .populate('level', 'name -_id')
         .populate({
-            path : 'job',
-            populate : {
-              path : 'customer'
+            path: 'job',
+            populate: {
+                path: 'customer'
             }
-          })
+        })
+        .populate('qa')
         .sort({ deadline: -1 })//sắp xếp giảm dần theo deadline
-        .sort({status:1})//sắp xếp tăng dần theo trạng thái của task
+        .sort({ status: 1 })//sắp xếp tăng dần theo trạng thái của task
         .exec()
         .then(tasks => {
             return res.status(200).json({
@@ -44,26 +45,26 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
 
 
     getTaskDetail(taskId)
-    .then(async task=>{
-       await getCustomer(task.job.customer)
-        .then(customer => {           
-            return res.status(200).json({
-                msg: `Load task detail successfully!`,
-                task,
-                customer
-            })
+        .then(async task => {
+            await getCustomer(task.job.customer)
+                .then(customer => {
+                    return res.status(200).json({
+                        msg: `Load task detail successfully!`,
+                        task,
+                        customer
+                    })
+                })
+                .catch(err => {
+                    return res.status(err.code).json({
+                        msg: err.msg
+                    })
+                })
         })
         .catch(err => {
             return res.status(err.code).json({
                 msg: err.msg
             })
         })
-    })
-    .catch(err=>{
-        return res.status(err.code).json({
-            msg: err.msg
-        })
-    })
 })
 
 
@@ -151,9 +152,9 @@ router.put('/get-more', authenticateEditorToken, (req, res) => {
                         .sort({ deadline: 1 })
                         .exec()
                         .then(t => {
-                            if(!t){
+                            if (!t) {
                                 return res.status(404).json({
-                                    msg:`No available task to take!`
+                                    msg: `No available task to take!`
                                 })
                             }
                             assignOrTakeTask(_MODULE, t._id, t.level, req.user._id, false)
