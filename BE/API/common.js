@@ -300,6 +300,7 @@ const getTaskDetail = (taskId)=>{
         Task
         .findById(taskId)
         .populate('job')
+        .populate('level')
         .exec()
         .then(t=>{
             if(!t){
