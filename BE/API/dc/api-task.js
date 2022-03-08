@@ -4,14 +4,53 @@ const { authenticateDCToken } = require("../../../middlewares/dc-middleware");
 const {getCustomer,getTaskDetail } = require('../common');
 const _MODULE = 'DC';
 
+
+router.put('/submit',authenticateDCToken,(req,res)=>{
+    let {taskId} = req.body;
+
+    //validate asif the task has been submited before
+    Task
+    .countDocuments({_id:taskId,status:3},(err,count)=>{
+        if(err){
+            return res.status(500).json({
+                msg:`Can not check task as if that has been submited before with error: ${new Error(err.message)}`
+            })
+        }
+        if(count>0){
+            return res.status(403).json({
+                msg:`The task has been submited before!`
+            })
+        }
+        Task
+        .findByIdAndUpdate(taskId,{
+            status:3
+        },{new:true},(err,task)=>{
+            if(err){
+                return res.status(500).json({
+                    msg:`Can not submit task with error: ${new Error(err.message)}`
+                })
+            }
+            if(!task){
+                return res.status(404).json({
+                    msg:`Task not found so it can not be submited!`
+                })
+            }
+            return res.status(200).json({
+                msg:`The task has been submited!`,
+                task
+            })
+        })
+    })
+
+   
+})
+
 router.put('/reject', authenticateDCToken, (req, res) => {
     let { taskId, remark } = req.body;
 
     Task
-        .findByIdAndUpdate(taskId, {
-            qa_done: new Date(),
-            status: -2,
-            qa: req.user._id,
+        .findByIdAndUpdate(taskId, {           
+            status: -3,          
             remark
         },
             { new: true },
