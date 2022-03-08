@@ -38,8 +38,7 @@
         <th scope="col" class="text-right">E-T</th>
         <th scope="col" class="text-right">I-N</th>
         <th scope="col">Editor</th>
-        <th scope="col">Q.A</th>
-        <th scope="col">Link</th>
+        <th scope="col">Q.A</th>     
         <th scope="col">Status</th>
       </tr>
     </thead>
@@ -137,15 +136,7 @@
             }
             tr += '</td>';
 
-            tr += '<td>';
-            if (isValidHttpUrl(t.output_link)) {
-              tr += ' <a href="' + t.output_link + '" target="_blank" rel="noopener noreferrer">Link</a>'
-            } else {
-              if (typeof t.output_link !== 'undefined') {
-                tr += t.output_link;
-              }
-            }
-            tr += '</td>';
+           
 
             tr += '<td class="font-italic font-weight-bold">';
             switch (t.status) {
