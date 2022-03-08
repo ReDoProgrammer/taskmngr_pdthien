@@ -112,6 +112,7 @@ router.get('/list', authenticateQAToken, (req, res) => {
                 }
             })
             .populate('level')
+            .populate('editor')
             .exec()
             .then(tasks => {
                 return res.status(200).json({
