@@ -138,7 +138,14 @@
               switch (t.status) {
 
                 case 0: tr += '<span class="text-info">Processing</span>'; break;
-                case 1: tr += '<span class="text-success">Editor done</span>'; break;
+                case 1: {
+                  if(t.edited_time>1){
+                    tr += '<span class="text-primary">Fixed</span>'; 
+                  }else{
+                    tr += '<span class="text-primary">Edited</span>'; 
+                  }
+                  break;
+                }
                 case 2: tr += '<span class="text-success">Q.A ok</span>'; break;
                 case 3: tr += '<span class="text-success">DC ok</span>'; break;
                 case -1: tr += '<span class="text-info">Initial</span>'; break;
