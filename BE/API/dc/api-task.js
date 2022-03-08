@@ -47,6 +47,8 @@ router.get('/list', authenticateDCToken, (req, res) => {
             }
           })
         .populate('level')
+        .populate('editor')
+        .populate('qa')
         .exec()
         .then(tasks => {
             return res.status(200).json({
@@ -71,7 +73,8 @@ router.get('/list', authenticateDCToken, (req, res) => {
             }
           })
         .populate('level')
-
+        .populate('editor')
+        .populate('qa')
         .exec()
         .then(tasks => {
             return res.status(200).json({
