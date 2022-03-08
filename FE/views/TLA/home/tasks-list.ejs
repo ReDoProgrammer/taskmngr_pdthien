@@ -18,15 +18,17 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col"></th>
+
                 <th scope="col">Job</th>
+                <th scope="col">Level</th>
                 <th scope="col">Begin date</th>
-                <th scope="col">Deadline</th>               
+                <th scope="col">Deadline</th>
                 <th scope="col">Editor</th>
+                <th scope="col">Q.A</th>
                 <th scope="col" class="text-right">I-N</th>
                 <th scope="col" class="text-right">E-T</th>
-                <th scope="col">Q.A</th>
                 <th scope="col">Remark</th>
-                <th scope="col" class="text-right">Status</th>
+                <th scope="col" >Status</th>
             </tr>
         </thead>
         <tbody id="tblLines">
@@ -68,62 +70,65 @@
                 data.tasks.forEach(t => {
                     let tr = '<tr id="' + t._id + '">';
                     tr += '<td>' + (idx++) + '</td>';
-                    tr += '<td class="font-weight-bold"><button class="btn btn-xs btn-warning" name="assign-job"><i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</button></td>';
-                    tr += '<td class="text-danger font-weight-bold">' + t.job.name + '</td>';
-                    tr += '<td>' + convertISODateToTimeFormat( t.job.received_date) + '</td>';
-                    tr += '<td>' +convertISODateToTimeFormat( t.job.delivery_date)  + '</td>';                  
-                                      
-
-
-                    tr += '<td>';
-                        if(t.editor){
-                            tr+= t.editor.fullname
-
-                        }else{
-                            tr+= '';
-                        }
-                    tr += '</td>';
-
-                    tr+= '<td class="text-right">';
-                    if(t.editor){
-                        tr+= t.amount
-                    }else{
-                        tr+= '';
-                    }
-
-                    tr+= '<td class="text-right">'+t.edited_time+'</td>';
-
+                    tr+= '<td>';
+                    tr += '<button class="btn btn-xs btn-danger" name="assign-job"><i class="fa fa-ban text-danger" aria-hidden="true"></i> Cancel</button>';
                     tr+= '</td>';
 
+                    tr += '<td class="text-primary font-weight-bold">' + t.job.name + '</td>';
+                    tr += '<td class="text-warning font-weight-bold">' + t.level.name + '</td>';
+                    tr += '<td>' + convertISODateToTimeFormat(t.job.received_date) + '</td>';
+                    tr += '<td>' + convertISODateToTimeFormat(t.job.delivery_date) + '</td>';
+
+
+
                     tr += '<td>';
-                        if(t.qa){
-                            tr+= t.qa.fullname
-                        }else{
-                            tr+= '';
-                        }
+                    if (t.editor) {
+                        tr += t.editor.fullname
+                    }
+                    tr += '</td>';
+                    tr += '<td>';
+                    if (t.qa) {
+                        tr += t.qa.fullname
+                    }
                     tr += '</td>';
 
-                    tr+= '<td>'+t.remark+'</td>';
+
+                    tr += '<td class="text-right">';
+                    if (t.editor) {
+                        tr += t.amount
+                    } else {
+                        tr += '';
+                    }
+
+                    tr += '<td class="text-right">' + t.edited_time + '</td>';
+
+                    tr += '</td>';
 
 
-                    tr += '<td class ="font-italic text-info text-right">';
+                    tr += '<td>' + t.remark + '</td>';
+
+
+                    tr += '<td class ="font-italic font-weight-bold">';
 
                     switch (t.status) {
-                        case -1: tr += 'Initial';
+                        case -1: tr += '<span class="text-info">Initial</span>';
                             break;
-                        case 0: tr += 'Editing';
+                        case 0: tr += '<span class="text-info">Processing</span>';
                             break;
                         case 1:
-                            tr += 'Edited';
+                            tr += '<span class="text-primary">Edited</span>';
                             break;
                         case 2:
-                            tr += 'Q.A ok!';
+                            tr += '<span class="text-success">Q.A ok!</span>';
                             break;
                         case 3:
-                            tr += 'DC ok!'
+                            tr += '<span class="text-success">DC ok!</span>'
+                            break;
+                        case -2:
+                            tr += '<span class="text-danger">Q.A rejected</span>';
                             break;
                         case -3:
-                            tr += 'DC rejected';
+                            tr += '<span class="text-danger">DC rejected</span>';
                             break;
 
                     }

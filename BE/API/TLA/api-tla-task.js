@@ -7,7 +7,7 @@ const {
     assignOrTakeTask,
     getModule,
     getTaskDetail,
-    getWage} = require('../common');
+    getWage } = require('../common');
 
 
 const _EDITOR = 'EDITOR';
@@ -20,9 +20,8 @@ router.get('/list', authenticateTLAToken, (req, res) => {
     Task
         .find({ job: jobId })
         .populate('level', 'name')
-        // .populate('job')
         .populate('qa', 'fullname -_id')
-        .populate('editor', 'fullname -_id')
+        .populate('editor', 'fullname -_id')      
         .exec()
         .then(tasks => {
             return res.status(200).json({
@@ -69,33 +68,33 @@ router.get('/', authenticateTLAToken, (req, res) => {
 })
 
 router.get('/detail', authenticateTLAToken, (req, res) => {
-    let {taskId} = req.query;
+    let { taskId } = req.query;
     Task
-    .findById(taskId)
-    .exec()
-    .then(task=>{
-        if(!task){
-            return res.status(404).json({
-                msg:`Task not found!`
+        .findById(taskId)
+        .exec()
+        .then(task => {
+            if (!task) {
+                return res.status(404).json({
+                    msg: `Task not found!`
+                })
+            }
+            return res.status(200).json({
+                msg: `Task has been already found!`,
+                task
             })
-        }
-        return res.status(200).json({
-            msg:`Task has been already found!`,
-            task
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not get task info by id with error: ${new Error(err.message)}`
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not get task info by id with error: ${new Error(err.message)}`
+            })
         })
-    })
 })
 
 
 
 
 router.post('/', authenticateTLAToken, (req, res) => {
-    let { job, level, assigned_date, deadline,input_link, remark } = req.body;
+    let { job, level, assigned_date, deadline, input_link, remark } = req.body;
 
     Job
         .findById(job)
@@ -169,7 +168,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
 
 })
 
-router.put('/',authenticateTLAToken,(req,res)=>{
+router.put('/', authenticateTLAToken, (req, res) => {
     let {
         taskId,
         level,
@@ -182,72 +181,72 @@ router.put('/',authenticateTLAToken,(req,res)=>{
     } = req.body;
 
     let task = Task.findById(taskId);
-    if(!task){
+    if (!task) {
         return res.status(404).json({
-            msg:`Task not found!`
+            msg: `Task not found!`
         })
     }
 
-    
+
     Task.findById(taskId)
-    .exec()
-    .then(t=>{
-        if(!t){
-            return res.status(404).json({
-                msg:`Task not found`
-            })
-        }
-        Task
-    .findByIdAndUpdate(taskId,{
-        level,
-        assigned_date,
-        deadline,
-        input_link,
-        remark,
-        editor:(editor)?editor:(t.editor),
-        qa:(qa)?qa:t.qa
-    },{new:true},(err,task)=>{
-        if(err){
+        .exec()
+        .then(t => {
+            if (!t) {
+                return res.status(404).json({
+                    msg: `Task not found`
+                })
+            }
+            Task
+                .findByIdAndUpdate(taskId, {
+                    level,
+                    assigned_date,
+                    deadline,
+                    input_link,
+                    remark,
+                    editor: (editor) ? editor : (t.editor),
+                    qa: (qa) ? qa : t.qa
+                }, { new: true }, (err, task) => {
+                    if (err) {
+                        return res.status(500).json({
+                            msg: `Can not update task by id with error: ${new Error(err.message)}`
+                        })
+                    }
+
+                    if (!task) {
+                        return res.status(404).json({
+                            msg: `Task not found!`
+                        })
+                    }
+                    return res.status(200).json({
+                        msg: `Update task successfully!`,
+                        task
+                    })
+                })
+        })
+        .catch(err => {
             return res.status(500).json({
-                msg:`Can not update task by id with error: ${new Error(err.message)}`
+                msg: `Can not get task by id with error: ${new Error(err.message)}`
             })
-        }
-
-        if(!task){
-            return res.status(404).json({
-                msg:`Task not found!`
-            })
-        }
-        return res.status(200).json({
-            msg:`Update task successfully!`,
-            task
         })
-    })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not get task by id with error: ${new Error(err.message)}`
-        })
-    })
 
-    
+
 })
 
 router.put('/assign-editor', authenticateTLAToken, (req, res) => {
 
     let { taskId, levelId, staff } = req.body;
-    assignOrTakeTask(_EDITOR,taskId,levelId,staff,true)
-    .then(task=>{
-        return res.status(200).json({
-            msg:`Assign task into editor successfully!`,
-            task
-        }) 
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not assign task into editor with error: ${new Error(err.message)}`
+    assignOrTakeTask(_EDITOR, taskId, levelId, staff, true)
+        .then(task => {
+            return res.status(200).json({
+                msg: `Assign task into editor successfully!`,
+                task
+            })
         })
-    })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not assign task into editor with error: ${new Error(err.message)}`
+            })
+        })
 
 })
 
@@ -255,48 +254,48 @@ router.put('/assign-qa', authenticateTLAToken, (req, res) => {
 
     let { taskId, staff } = req.body;
     getModule(_QA)
-        .then(async m => {     
+        .then(async m => {
             await getTaskDetail(taskId)
-            .then(async t=>{               
-                await getWage(staff, t.level._id, m._id)
-                .then(w => {      
-                              
-                    Task.findByIdAndUpdate(taskId,
-                        {
-                            qa: staff,
-                            qa_assigned: true,
-                            qa_wage: w.wage                          
+                .then(async t => {
+                    await getWage(staff, t.level._id, m._id)
+                        .then(w => {
 
-                        }, { new: true }, (err, task) => {
-                            if (err) {
-                                return res.status(500).json({
-                                    msg: `Assigned staff failed with error: ${new Error(err.message)}`
-                                })
-                            }
-                            if (!task) {
-                                return res.status(404).json({
-                                    msg: `Task not found`
-                                })
-                            }
+                            Task.findByIdAndUpdate(taskId,
+                                {
+                                    qa: staff,
+                                    qa_assigned: true,
+                                    qa_wage: w.wage
 
-                            return res.status(200).json({
-                                msg: `Staff has been assigned successfully!`
+                                }, { new: true }, (err, task) => {
+                                    if (err) {
+                                        return res.status(500).json({
+                                            msg: `Assigned staff failed with error: ${new Error(err.message)}`
+                                        })
+                                    }
+                                    if (!task) {
+                                        return res.status(404).json({
+                                            msg: `Task not found`
+                                        })
+                                    }
+
+                                    return res.status(200).json({
+                                        msg: `Staff has been assigned successfully!`
+                                    })
+                                })
+                        })
+                        .catch(err => {
+                            return res.status(err.code).json({
+                                msg: err.msg
                             })
                         })
                 })
-                .catch(err => {                   
+                .catch(err => {
                     return res.status(err.code).json({
                         msg: err.msg
                     })
                 })
-            })      
-            .catch(err=>{               
-                return res.status(err.code).json({
-                    msg:err.msg
-                })
-            })           
         })
-        .catch(err => {          
+        .catch(err => {
             return res.status(err.code).json({
                 msg: err.msg
             })
