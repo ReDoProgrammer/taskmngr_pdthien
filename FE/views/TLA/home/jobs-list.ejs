@@ -166,8 +166,7 @@
                     $('#assignJobModal').modal();                    
 
                     $('#customer_fullname').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
-                    $('#name_case').text(data.job.name);
-                    $('#customer_remark').text(data.job.customer.remark);
+                    $('#name_case').text(data.job.name);                 
                     $('#job_intruction').text(data.job.intruction);
                     $('#txtDeadline').val(convertISODateToTimeFormat(data.job.delivery_date));
                     $('#style_note').text(data.job.customer.remark);
