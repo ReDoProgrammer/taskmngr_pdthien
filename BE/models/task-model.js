@@ -109,6 +109,16 @@ const taskSchema = new Schema({
         //số lượng file xuất ra của editor
         type: Number,
         default:0
+    },
+    canceled_reason:{
+        /*
+            field này dùng để đánh dấu nguyên nhân task bị cancel
+            -1: TLA gán sai
+            -2: Sale thiết lập sai
+            -3: Khách hàng hủy
+
+        */
+        type:Number
     }
 
 
