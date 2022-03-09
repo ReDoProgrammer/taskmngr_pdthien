@@ -35,6 +35,7 @@
                 <th scope="col">Received date</th>
                 <th scope="col">Delivery date</th>
                 <th scope="col">Status</th>
+                <th scope="col"></th>
 
             </tr>
         </thead>
@@ -49,7 +50,7 @@
     src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
 
 
-<%-include('assign-job-modal')%>
+<%-include('manage-job-modal')%>
 
     <script>
         var search = '';
@@ -81,11 +82,13 @@
                     $('#tblData').empty();
                     data.jobs.forEach(job => {
                         let tr = '<tr id = "' + job._id + '" data-customer="' + job.customer._id + '"  >';
+                        
+                        tr+= '<td>';
                         if (job.status == -1 || job.status == 0) {
-                            tr += '<td class="font-weight-bold text-right"><button class="btn btn-xs btn-primary" name="process-job"><i class="fa fa-cog" aria-hidden="true"></i> Process job</button></td>'
-                        } else {
-                            tr += '<td></td>';
-                        }
+                            tr += '<button class="btn btn-xs btn-primary" name="process-job"><i class="fa fa-cog" aria-hidden="true"></i> Manage job</button>'
+                        } 
+                        tr += '<button class="btn btn-xs btn-success ml-2" name="submit-job"><i class="fa fa-paper-plane" aria-hidden="true"></i> Submit</button>'
+                        tr+= '</td>';
 
                         tr += '<td>' + (idx++) + '</td>'
                         tr += '<td class="text-info font-weight-bold">' + job.customer.firstname + ' ' + job.customer.lastname + '</td>';
@@ -126,6 +129,12 @@
                         tr += '</i></td>';
 
 
+                        tr+= '<td class="text-right">';
+                            tr += '<button class=" btn btn-xs btn-warning" name="btnEditTask"><i class="fa fa-edit"></i></button>';
+                            tr += '<button class="ml-2 btn btn-xs btn-danger" name="btnDelTask"><i class="fa fa-trash text-white" aria-hidden="true"></i></button>';
+                        tr+= '</td>';
+
+
 
                         tr += '</tr>';
                         $('#tblData').append(tr);
@@ -153,12 +162,15 @@
                 },
                 success: function (data, textStatus, xhr) {
 
+                   
                     $('#assignJobModal').modal();
 
                     $('#customer_fullname').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
                     $('#name_case').text(data.job.name);
                     $('#customer_remark').text(data.job.customer.remark);
                     $('#job_intruction').text(data.job.intruction);
+                    $('#txtDeadline').val(convertISODateToTimeFormat(data.job.delivery_date));
+
                     if (data.job.customer.has_fire) {
                         if (data.job.customer.fire_note.trim().length > 0) {
                             $('#customer_fire').html(data.job.customer.fire_note);
