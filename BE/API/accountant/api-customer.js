@@ -28,7 +28,7 @@ router.delete("/", authenticateAccountantToken, (req, res) => {
 router.get("/list", authenticateAccountantToken, (req, res) => {
   let { search, page, status } = req.query;
   Customer.find({
-    // status,
+    status,
     $or: [
       { firstname: { "$regex": search, "$options": "i" } },
       { lastname: { "$regex": search, "$options": "i" } },
