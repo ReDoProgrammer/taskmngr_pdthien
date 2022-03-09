@@ -180,8 +180,11 @@
 
   function LoadOutput() {
     $.ajax({
-      url: "/admin/file-format/type",
+      url: "/accountant/file-format/type",
       type: "get",
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
       data: {
         is_input: false,
       },
@@ -200,8 +203,11 @@
 
   function LoadSize() {
     $.ajax({
-      url: "/admin/size",
+      url: "/accountant/size",
       type: "get",
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
       success: function (data, textStatus, xhr) {
         $("#slSize").empty();
         data.sizes.forEach((size) => {
@@ -218,8 +224,11 @@
 
   function LoadColorMode() {
     $.ajax({
-      url: "/admin/color-mode",
+      url: "/accountant/color-mode",
       type: "get",
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
       success: function (data, textStatus, xhr) {
         $("#slColorMode").empty();
         data.cms.forEach((cm) => {
@@ -235,7 +244,7 @@
 
   function LoadCloud() {
     $.ajax({
-      url: "/admin/cloud",
+      url: "/accountant/cloud",
       type: "get",
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -256,7 +265,7 @@
 
   function LoadNationalStyle() {
     $.ajax({
-      url: "/admin/national-style",
+      url: "/accountant/national-style",
       type: "get",
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),

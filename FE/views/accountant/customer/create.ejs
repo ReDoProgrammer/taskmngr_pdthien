@@ -20,7 +20,7 @@
 
       <script>
         $('#btnCancel').click(function () {
-          $(location).attr("href", '/admin/customer');
+          $(location).attr("href", '/accountant/customer');
         })
 
         $("#btnSubmit").click(function () {
@@ -142,7 +142,7 @@
           }
 
           $.ajax({
-            url: "/admin/customer",
+            url: "/accountant/customer",
             type: "post",
             headers: {
               authorization: "Bearer " + localStorage.getItem("accessToken"),

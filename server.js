@@ -34,6 +34,12 @@ app.use('/accountant',accountantHomeController);
 const accountantAuthAPI = require('./BE/API/accountant/authenticate');
 app.use('/accountant/auth',accountantAuthAPI);
 
+const accountantCloudAPI = require('./BE/API/accountant/api-cloud');
+app.use('/accountant/cloud',accountantCloudAPI);
+
+const accountantColorAPI = require('./BE/API/accountant/api-color-mode');
+app.use('/accountant/color-mode',accountantColorAPI);
+
 const accountantCustomerController = require('./BE/controllers/accountant/customer-controller');
 app.use('/accountant/customer',accountantCustomerController);
 
@@ -42,6 +48,20 @@ app.use('/accountant/customer',accountantCustomerAPI);
 
 const accountantCustomerLevelAPI = require('./BE/API/accountant/api-customer-level');
 app.use('/accountant/customer-level',accountantCustomerLevelAPI);
+
+const accountantFFAPI = require('./BE/API/accountant/api-file-format');
+app.use('/accountant/file-format',accountantFFAPI);
+
+const accountantJobLevelAPI = require('./BE/API/accountant/api-job-level');
+app.use('/accountant/job-level',accountantJobLevelAPI);
+
+const accountantNationalStyleAPI = require('./BE/API/accountant/api-national-style');
+app.use('/accountant/national-style',accountantNationalStyleAPI);
+
+const accountantSizeAPI = require('./BE/API/accountant/api-size');
+app.use('/accountant/size',accountantSizeAPI);
+
+
 
 //DC zone
 const dcHomeController = require('./BE/controllers/dc/home-controller');

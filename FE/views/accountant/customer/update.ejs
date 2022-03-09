@@ -26,7 +26,7 @@
                 })
 
                 $('#btnCancel').click(function(){                   
-                    $(location).attr("href", '/admin/customer');
+                    $(location).attr("href", '/accountant/customer');
                 })
 
                 $("#btnSubmit").click(function () {
@@ -148,7 +148,7 @@
                 
 
                     $.ajax({
-                        url: "/admin/customer",
+                        url: "/accountant/customer",
                         type: "put",
                         headers: {
                             authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -194,7 +194,7 @@
                     id = $(this).closest("tr").attr("id");
                     if (confirm("Are you sure want to delete this customer level?")) {
                         $.ajax({
-                            url: '/admin/customer-level',
+                            url: '/accountant/customer-level',
                             type: 'delete',
                             headers: {
                                 authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -224,7 +224,7 @@
                     }
 
                     $.ajax({
-                        url: '/admin/customer-level',
+                        url: '/accountant/customer-level',
                         type: 'post',
                         headers: {
                             authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -247,7 +247,7 @@
 
                 function LoadCustomer(customerId) {
                     $.ajax({
-                        url: "/admin/customer/detail",
+                        url: "/accountant/customer/detail",
                         type: "get",
                         headers: {
                             authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -339,7 +339,7 @@
 
                 function LoadCustomerLevels(customerId) {
                     $.ajax({
-                        url: "/admin/customer-level",
+                        url: "/accountant/customer-level",
                         type: "get",
                         headers: {
                             authorization: "Bearer " + localStorage.getItem("accessToken"),
