@@ -171,6 +171,7 @@
                     $('#job_intruction').text(data.job.intruction);
                     $('#txtDeadline').val(convertISODateToTimeFormat(data.job.delivery_date));
                     $('#style_note').text(data.job.customer.remark);
+                    $('#customer').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
 
                     if (data.job.customer.has_fire) {
                         if (data.job.customer.fire_note.trim().length > 0) {
