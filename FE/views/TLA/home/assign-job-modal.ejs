@@ -63,6 +63,7 @@
                 <th scope="col">Editor</th>
                 <th scope="col">Q.A</th>
                 <th scope="col">Link</th>
+                <th scope="col">Status</th>
                 <th></th>
               </tr>
             </thead>
@@ -158,8 +159,8 @@
           LoadTasks();
         },
         error: function (jqXHR, textStatus, errorThrown) {
-          console.log({jqXHR, textStatus, errorThrown});
-          alert(jqXHR.responseJSON.msg);         
+          console.log({ jqXHR, textStatus, errorThrown });
+          alert(jqXHR.responseJSON.msg);
         }
       })
     }
@@ -320,13 +321,16 @@
           tr += "<td>" + idx++ + "</td>";
 
           tr += '<td>';
-          if ((typeof t.editor === 'undefined' || typeof t.qa === 'undefined')) {
-            tr += '<button class="btn btn-xs btn-primary" name="btnAssignStaff"><i class="fa fa-cog" aria-hidden="true"></i> Assign staff</button>';
+          if (t.status == -1 || t.status == 0) {
+            if ((typeof t.editor === 'undefined' || typeof t.qa === 'undefined')) {
+              tr += '<button class="btn btn-xs btn-primary" name="btnAssignStaff"><i class="fa fa-cog" aria-hidden="true"></i> Assign staff</button>';
 
+            }
+            if (t.status == -1) {
+              tr += '<button class="ml-2 btn btn-xs btn-warning" name="btnAssignStaffAuto"><i class="fa fa-refresh" aria-hidden="true"></i> ASE</button>';
+            }
           }
-          if (t.status == -1) {
-            tr += '<button class="ml-2 btn btn-xs btn-warning" name="btnAssignStaffAuto"><i class="fa fa-refresh" aria-hidden="true"></i> ASE</button>';
-          }
+
           tr += '</td>';
 
 
@@ -359,10 +363,37 @@
             tr += t.input_link
           }
 
-          tr += '</td>'
+          tr += '</td>';
+
+
+          tr += '<td class="font-italic">';
+          switch (t.status) {
+
+            case 0: tr += '<span class="text-info">Processing</span>'; break;
+            case 1: {
+              if (t.edited_time > 1) {
+                tr += '<span class="text-primary">Fixed</span>';
+              } else {
+                tr += '<span class="text-primary">Edited</span>';
+              }
+              break;
+            }
+            case 2: tr += '<span class="text-success">Q.A ok</span>'; break;
+            case 3: tr += '<span class="text-success">DC ok</span>'; break;
+            case -1: tr += '<span class="text-info">Initial</span>'; break;
+            case -2: tr += '<span class="text-danger">Q.A reject</span>'; break;
+            case -3: tr += '<span class="text-danger">DC reject</span>'; break;
+
+          }
+          tr += '</td>';
+
+
 
           tr += '<td class="text-right">';
-          tr += '<button class="ml-1 btn btn-xs btn-danger" name="btnDelTask"><i class="fa fa-trash text-white" aria-hidden="true"></i></button>';
+          if (t.status < 1) {
+            tr += '<button class="ml-1 btn btn-xs btn-danger" name="btnDelTask"><i class="fa fa-trash text-white" aria-hidden="true"></i></button>';
+          }
+
           tr += '<button class="ml-1 btn btn-xs btn-warning" name="btnEditTask"><i class="fa fa-edit"></i></button>';
           tr += '</td>';
 
