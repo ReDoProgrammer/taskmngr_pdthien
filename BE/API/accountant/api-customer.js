@@ -22,7 +22,7 @@ router.delete("/", authenticateAccountantToken, (req, res) => {
         })
       }
 
-      Customer.findOneAndDelete({ _id: customerId }, (err, customer) => {
+      Customer.findOneAndDelete({ _id: customerId },async (err, customer) => {
         if (err) {
           return res.status(500).json({
             msg: "Delete customer failed!",
@@ -34,10 +34,18 @@ router.delete("/", authenticateAccountantToken, (req, res) => {
             msg: "Customer not found!",
           });
         }
-
-        return res.status(200).json({
-          msg: "Customer has been deleted!",
-        });
+        deleteJobsBasedOnCustomer(customerId)
+        .then(_=>{
+          return res.status(200).json({
+            msg: "Customer and jobs based on it have been deleted!",
+          });
+        })
+        .catch(err=>{
+          return res.status(err.code).json({
+            msg:err.msg
+          })
+        })
+      
 
       });
     })
@@ -327,6 +335,23 @@ router.put("/", authenticateAccountantToken, (req, res) => {
 
 module.exports = router;
 
+
+const deleteJobsBasedOnCustomer = (customerId)=>{
+  return new Promise((resolve,reject)=>{
+    Job
+    .deleteMany({
+      customer:customerId
+    },err=>{
+      if(err){
+        return reject({
+          code:500,
+          msg:`Can not delete jobs based on this customer`
+        })
+      }
+      return resolve()
+    })
+  })
+}
 
 
 var insert_levels = (levels, customerId) => {
