@@ -21,7 +21,7 @@ router.get('/list', authenticateTLAToken, (req, res) => {
         .find({ job: jobId })
         .populate('level', 'name')
         .populate('qa', 'fullname -_id')
-        .populate('editor', 'fullname -_id')      
+        .populate('editor', 'fullname -_id')
         .exec()
         .then(tasks => {
             return res.status(200).json({
@@ -94,8 +94,19 @@ router.get('/detail', authenticateTLAToken, (req, res) => {
 
 
 router.post('/', authenticateTLAToken, (req, res) => {
-    let { job, level, assigned_date, deadline, input_link, remark } = req.body;
-
+    let {
+        job,
+        level,
+        assigned_date,
+        deadline,
+        input_link,
+        remark,
+        qa_assigned,
+        qa,
+        editor_assigned,
+        editor
+    } = req.body;
+   
     Job
         .findById(job)
         .exec()
@@ -119,15 +130,27 @@ router.post('/', authenticateTLAToken, (req, res) => {
                                 })
                             }
 
-                            let task = new Task({
-                                job,
-                                level,
-                                remark,
-                                level_price: result.cl.price,
-                                assigned_date,
-                                deadline,
-                                input_link
-                            });
+                            let task = new Task();
+                            task.job = job;
+                            task.level = level;
+                            task.remark = remark;
+                            task.level_price = result.cl.price;
+                            task.assigned_date = assigned_date;
+                            task.deadline = deadline;
+                            task.input_link = input_link;
+                            
+                            if (editor_assigned =='true') {
+                                task.editor_assigned = true;
+                                task.editor = editor;
+                                task.status = 0;
+                            }
+                            if (qa_assigned =='true') {
+                                task.qa_assigned = true;
+                                task.qa = qa;
+                            }
+
+
+
 
                             task.save()
                                 .then(_ => {
@@ -160,12 +183,6 @@ router.post('/', authenticateTLAToken, (req, res) => {
                 msg: `Can not get job by id with error: ${new Error(err.message)}`
             })
         })
-
-
-
-
-
-
 })
 
 router.put('/', authenticateTLAToken, (req, res) => {

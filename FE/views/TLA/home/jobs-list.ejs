@@ -163,13 +163,14 @@
                 success: function (data, textStatus, xhr) {
 
                    
-                    $('#assignJobModal').modal();
+                    $('#assignJobModal').modal();                    
 
                     $('#customer_fullname').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
                     $('#name_case').text(data.job.name);
                     $('#customer_remark').text(data.job.customer.remark);
                     $('#job_intruction').text(data.job.intruction);
                     $('#txtDeadline').val(convertISODateToTimeFormat(data.job.delivery_date));
+                    $('#style_note').text(data.job.customer.remark);
 
                     if (data.job.customer.has_fire) {
                         if (data.job.customer.fire_note.trim().length > 0) {

@@ -90,7 +90,7 @@
 
         <div class="row mt-2">
             <div class="col-md-12 col-sm-12 col-xs-12 text-center">
-                <button class="btn btn-success" id="btnSubmitUpdate">
+                <button class="btn btn-success" id="btnSubmit">
                     <i class="fa fa-floppy-o" aria-hidden="true"></i> Submit changes
                 </button>
             </div>
@@ -116,6 +116,97 @@
             $('#colQA').slideUp(500);
         }
     });
+
+    $("#btnSubmit").click(function () {
+        let level = $("#slJobLevels option:selected").val();
+        let name = $("#slJobLevels option:selected").text();
+
+        let assigned_date = strToDate($('#txtAssignDate').val());
+        let deadline = strToDate($('#txtDeadline').val());
+        let input_link = $('#txtInputLink').val();
+        let remark = $('#txtRemark').val();
+
+        let editor_assigned = $("#ckbAssignEditor").is(':checked');
+        let qa_assigned = $("#ckbAssignQA").is(':checked');
+        let editor = $('#slEditor option:selected').val();
+        let qa = $('#slQA option:selected').val();
+
+        if(editor_assigned && typeof editor === 'undefined'){
+            $('#msgError').text('(*) No editor is assigned!');
+            $('#msgError').show().delay(3000).fadeOut();
+            return;
+        }
+
+        if(qa_assigned && typeof qa === 'undefined'){
+            $('#msgError').text('(*) No Q.A is assigned!');
+            $('#msgError').show().delay(3000).fadeOut();
+            return;
+        }
+
+        // validateion component inputs
+
+        if (isNaN(assigned_date) || assigned_date === null || isNaN(deadline) || deadline == null) {
+            $('#msgError').text('(*) Assign date or deadline is invalid!');
+            $('#msgError').show().delay(3000).fadeOut();
+            return;
+        }
+
+
+        if (deadline < new Date($.now())) {
+            $('#msgError').text('(*) deadline must be later than current time!');
+            $('#msgError').show().delay(3000).fadeOut();
+            return;
+        }
+
+        if (deadline <= assigned_date) {
+            $('#msgError').text('(*) deadline must be greater than assign date!');
+            $('#msgError').show().delay(3000).fadeOut();
+            return;
+        }
+
+
+        $.ajax({
+            url: '/tla/task',
+            type: 'post',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                job: jobId,
+                level,
+                assigned_date,
+                deadline,
+                input_link,
+                remark,
+                qa_assigned,
+                editor_assigned,
+                qa,
+                editor
+            },
+            success: function (data) {
+                $('#msgError').text(data.msg);
+                $('#msgError').show();
+                $('#msgError').hide(2000);
+                LoadTasks();
+                ChangeJobStatus(jobId, 0);
+                LoadJob();
+                $('#txtInputLink').val('');
+                $('#divAddOrUpdateTask').slideUp(500);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
+                $('#msgError').show().delay(3000).fadeOut();
+            },
+        })
+
+
+
+        //reset components value
+        $('#msgError').text('');
+        $('#txtRemark').val('');
+
+    });
+
 
     $("#btnSubmitUpdate").click(function () {
         let level = $("#slJobLevels option:selected").val();
