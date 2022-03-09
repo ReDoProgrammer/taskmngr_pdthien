@@ -329,8 +329,7 @@
       data: {
         jobId
       },
-      success: function (data) {
-        console.log(data);
+      success: function (data) {       
         let idx = 1;
         $("#tblTasks").empty();       
         data.tasks.forEach(t => {
