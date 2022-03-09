@@ -2,27 +2,47 @@ const router = require('express').Router();
 const { authenticateAccountantToken } = require("../../../middlewares/accountant-middleware");
 const Customer = require("../../models/customer-model");
 const CustomerLevel = require('../../models/customer-level-model');
+const Job = require('../../models/job-model');
 
 router.delete("/", authenticateAccountantToken, (req, res) => {
-  let id = req.body.id;
-  Customer.findOneAndDelete({ _id: id }, (err, customer) => {
-    if (err) {
-      return res.status(500).json({
-        msg: "Delete customer failed!",
-        error: new Error(err.message),
-      });
-    }
+  let { customerId } = req.body;
 
-    if (customer) {
-      return res.status(200).json({
-        msg: "Customer has been deleted!",
+  //validate jobs based on customer
+  Job
+    .countDocuments({ status: { $gt: 1 } }, (err, count) => {
+      if (err) {
+        return res.status(500).json({
+          msg: `Can not check jobs based on this customer`
+        })
+      }
+
+      if (count > 0) {
+        return res.status(403).json({
+          msg: `Can not delete this customer becasuse there are jobs based on it!`
+        })
+      }
+
+      Customer.findOneAndDelete({ _id: customerId }, (err, customer) => {
+        if (err) {
+          return res.status(500).json({
+            msg: "Delete customer failed!",
+            error: new Error(err.message),
+          });
+        }
+        if (!customer) {
+          return res.status(404).json({
+            msg: "Customer not found!",
+          });
+        }
+
+        return res.status(200).json({
+          msg: "Customer has been deleted!",
+        });
+
       });
-    } else {
-      return res.status(404).json({
-        msg: "Customer not found!",
-      });
-    }
-  });
+    })
+
+
 });
 
 router.get("/list", authenticateAccountantToken, (req, res) => {

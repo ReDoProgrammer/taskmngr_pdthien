@@ -68,7 +68,7 @@
           LoadCustomers();
         });
 
-        $('#btnSearch').click(function(){
+        $('#btnSearch').click(function () {
           search = $('#txtSearch').val();
           LoadCustomers();
         })
@@ -81,6 +81,28 @@
         });
 
 
+        $(document).on("click", "button[name='delete']", function () {
+          customerId = $(this).closest("tr").attr("id");
+          if (confirm("Are you sure want to delete this customer?")) {
+            $.ajax({
+              url: '/accountant/customer',
+              type: 'delete',
+              headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+              },
+              data: {
+                customerId
+              },
+              success: function (data) {
+                alert(data.msg);
+                LoadCustomers();
+              }, error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
+              },
+            })
+          }
+        })
+
         $(document).on("click", "button[name='view']", function () {
           customerId = $(this).closest("tr").attr("id");
           LoadCustomer(customerId);
@@ -89,7 +111,7 @@
 
         $(document).on("click", "button[name='update']", function () {
           customerId = $(this).closest("tr").attr("id");
-          window.location.href = "/accountant/customer/update?id="+customerId;
+          window.location.href = "/accountant/customer/update?id=" + customerId;
         });
 
 
@@ -106,14 +128,14 @@
               customerId
             },
             success: function (data, textStatus, xhr) {
-            
+
               $('#modalCustomerDetail').modal();
               $('#fullname').text(data.customer.firstname + ' ' + data.customer.lastname);
               $('#phone').text(data.customer.phone);
               $('#email').text(data.customer.email);
-              $('#address').text(data.customer.address);   
-              
-              
+              $('#address').text(data.customer.address);
+
+
 
 
               $('#output').text(data.customer.output.name);
@@ -141,27 +163,27 @@
 
 
               //special requests
-              if (data.customer.has_TV) {               
-                  $('#tv').html('<i class="fa fa-check-square-o"></i>  '+data.customer.TV_note);                
+              if (data.customer.has_TV) {
+                $('#tv').html('<i class="fa fa-check-square-o"></i>  ' + data.customer.TV_note);
               } else {
                 $('#tv').html('<i class="fa fa-square-o text-warning" aria-hidden="true"></i>');
               }
 
-              if (data.customer.has_grass) {               
-                  $('#grass').html('<i class="fa fa-check-square-o"></i> '+data.customer.grass_note);                
+              if (data.customer.has_grass) {
+                $('#grass').html('<i class="fa fa-check-square-o"></i> ' + data.customer.grass_note);
               } else {
                 $('#grass').html('<i class="fa fa-square-o text-warning" aria-hidden="true"></i>');
               }
 
-              if (data.customer.has_sky) {               
-                  $('#sky').html('<i class="fa fa-check-square-o"></i> '+data.customer.sky_note);               
+              if (data.customer.has_sky) {
+                $('#sky').html('<i class="fa fa-check-square-o"></i> ' + data.customer.sky_note);
               } else {
                 $('#sky').html('<i class="fa fa-square-o text-warning" aria-hidden="true"></i>');
               }
 
 
-              if (data.customer.has_fire) {               
-                  $('#fire').html('<i class="fa fa-check-square-o"></i> '+data.customer.fire_note);               
+              if (data.customer.has_fire) {
+                $('#fire').html('<i class="fa fa-check-square-o"></i> ' + data.customer.fire_note);
               } else {
                 $('#fire').html('<i class="fa fa-square-o text-warning" aria-hidden="true"></i>');
               }
@@ -219,7 +241,7 @@
             data: {
               search,
               page,
-              status:  $("#ckbStatus").is(":checked")
+              status: $("#ckbStatus").is(":checked")
             },
             success: function (data, textStatus, xhr) {
               $('#tblData').empty();
@@ -233,13 +255,13 @@
                 tr += "<td>" + customer.phone + "</td>";
                 tr += "<td>" + customer.email + "</td>";
 
-                tr+= '<td>';
-                  if(customer.status){
-                    tr+= '<span class="text-success"><i class="fa fa-check-square-o" aria-hidden="true"></i> Active</span>';
-                  }else{
-                    tr+= '<span class="text-danger"><i class="fa fa-ban" aria-hidden="true"></i> Unactive</span>';
-                  }
-                  tr+= '</td>';
+                tr += '<td>';
+                if (customer.status) {
+                  tr += '<span class="text-success"><i class="fa fa-check-square-o" aria-hidden="true"></i> Active</span>';
+                } else {
+                  tr += '<span class="text-danger"><i class="fa fa-ban" aria-hidden="true"></i> Unactive</span>';
+                }
+                tr += '</td>';
 
                 tr += "<td class='text-right'>";
                 tr +=
@@ -251,7 +273,7 @@
                 tr += "</td>";
                 $('#tblData').append(tr);
               });
-              
+
               for (let i = 1; i <= data.pages; i++) {
                 let li = '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>';
                 $('#pagination').append(li);
