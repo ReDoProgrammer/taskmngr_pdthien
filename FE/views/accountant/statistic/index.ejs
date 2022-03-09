@@ -1,0 +1,53 @@
+<div class="row">
+  <div class="col-md-6 col-sm-6 col-xs-8 mt-2">
+    <label for=""></label>
+  </div>
+  <div class="col-md-2 col-sm-2 col-xs-4 mt-2">
+    <select name="" id="slStatus" class="form-control">
+      <option value="100">All</option>
+      <option value="1">Editor submited</option>
+      <option value="-1">Initial</option>
+      <option value="0">Editing</option>
+      <option value="2">Submited</option>
+      <option value="-2">Rejected</option>
+    </select>
+  </div>
+  <div class="col-md-4 col-sm-4 col-xs-12 mt-2">
+    <!-- Another variation with a button -->
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="Seach your job..." id="txtSearch" />
+      <div class="input-group-btn">
+        <button class="btn btn-info" type="submit" id="btnSearch">
+          <i class="fa fa-search" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="table-responsive mt-2">
+  <table class="table table-striped text-nowrap">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Customer</th>
+        <th scope="col">Job</th>
+        <th scope="col">Level</th>
+        <th scope="col">Deadline</th>
+        <th scope="col">Remark</th>
+        <th scope="col" class="text-right">Amount</th>
+        <th scope="col">Editor</th>
+        <th scope="col">Status</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody id="tbdTasks">
+    </tbody>
+  </table>
+</div>
+
+
+<script src="/js/common.js"></script>
+
+    

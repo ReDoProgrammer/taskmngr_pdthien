@@ -61,6 +61,11 @@ app.use('/accountant/national-style',accountantNationalStyleAPI);
 const accountantSizeAPI = require('./BE/API/accountant/api-size');
 app.use('/accountant/size',accountantSizeAPI);
 
+const accountantStatisticController = require('./BE/controllers/accountant/statistic-controller');
+app.use('/accountant/statistic',accountantStatisticController);
+const accountantStatisticAPI = require('./BE/API/accountant/api-statistic');
+app.use('/accountant/statistic',accountantStatisticAPI);
+
 
 
 //DC zone
