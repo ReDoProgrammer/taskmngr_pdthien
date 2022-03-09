@@ -8,7 +8,15 @@
     </a>
   </div>
 
-  <div class="col-md-offset-7 col-md-3 text-right col-sm-offset-2 col-sm-6 col-xs-6">
+  <div class="col-md-offset-4 col-sm-2 text-right">
+    <div class="form-check mt-1">
+      <input class="form-check-input" type="checkbox" checked id="ckbStatus" />
+      <label class="form-check-label" for="defaultCheck1">
+        Active
+      </label>
+    </div>
+  </div>
+  <div class=" col-md-4 text-right col-sm-6 col-xs-6">
     <!-- Another variation with a button -->
     <div class="input-group">
       <input type="text" class="form-control" placeholder="Seach customer" id="txtSearch" />
@@ -59,6 +67,12 @@
           $("#direction").val("Quản lý khách hàng");
           LoadCustomers();
         });
+
+        $('#btnSearch').click(function(){
+          search = $('#txtSearch').val();
+          LoadCustomers();
+        })
+
         $("#btnAddNew").click(function () {
           $("#modalCustomer").modal();
         });
@@ -97,7 +111,9 @@
               $('#fullname').text(data.customer.firstname + ' ' + data.customer.lastname);
               $('#phone').text(data.customer.phone);
               $('#email').text(data.customer.email);
-              $('#address').text(data.customer.address);            
+              $('#address').text(data.customer.address);   
+              
+              
 
 
               $('#output').text(data.customer.output.name);
@@ -203,12 +219,14 @@
             data: {
               search,
               page,
+              status:  $("#ckbStatus").is(":checked")
             },
             success: function (data, textStatus, xhr) {
               $('#tblData').empty();
               $('#pagination').empty();
               let idx = 1;
               data.result.forEach((customer) => {
+                console.log(customer);
                 let tr = "  <tr id='" + customer._id + "'>";
                 tr += '<th scope="row">' + (idx++) + '</th>';
                 tr += " <td class='font-weight-bold text-info'>" + customer.firstname + " " + customer.lastname + "</td>";

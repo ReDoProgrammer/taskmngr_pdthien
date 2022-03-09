@@ -25,7 +25,7 @@
                     $('#txtEmail').prop('readonly', true);
                 })
 
-                $('#btnCancel').click(function(){                   
+                $('#btnCancel').click(function () {
                     $(location).attr("href", '/accountant/customer');
                 })
 
@@ -74,6 +74,9 @@
                     let phone = $("#txtPhone").val().trim();
 
                     let address = $("#txtAddress").val().trim();
+
+                    let status = $("#ckbStatus").is(":checked") ? true : false;
+
 
                     let output = $("#slOutput option:selected").val();
                     let size = $("#slSize option:selected").val();
@@ -145,7 +148,7 @@
 
 
 
-                
+
 
                     $.ajax({
                         url: "/accountant/customer",
@@ -156,10 +159,11 @@
                         data: {
                             customerId,
                             firstname,
-                            lastname,                          
+                            lastname,
                             password,
                             phone,
                             address,
+                            status,
                             output,
                             size,
                             color,
@@ -256,7 +260,7 @@
                             customerId
                         },
                         success: function (data, textStatus, xhr) {
-                            console.log(data);
+
 
                             $('#txtFirstname').val(data.customer.firstname);
                             $('#txtLastname').val(data.customer.lastname);
@@ -264,6 +268,12 @@
                             $('#txtPhone').val(data.customer.phone);
                             $('#txtEmail').val(data.customer.email);
                             $('#txtAddress').val(data.customer.address);
+
+                            if (data.customer.status == true) {
+                                $('#ckbStatus').prop('checked', true);
+                            }else{
+                                $('#ckbStatus').prop('checked', false);
+                            }
 
 
                             $('#slOutput').val(data.customer.output._id);

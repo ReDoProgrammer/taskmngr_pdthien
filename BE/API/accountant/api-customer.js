@@ -26,9 +26,10 @@ router.delete("/", authenticateAccountantToken, (req, res) => {
   });
   
   router.get("/list", authenticateAccountantToken, (req, res) => {
-    let { search, page } = req.query;
+    let { search, page,status } = req.query;
   
     Customer.find({
+      // status,
       $or: [
         { firstname: { "$regex": search, "$options": "i" } },
         { lastname: { "$regex": search, "$options": "i" } },
@@ -36,7 +37,7 @@ router.delete("/", authenticateAccountantToken, (req, res) => {
         { email: { "$regex": search, "$options": "i" } },
       ]
     })
-      .select('firstname lastname phone email address')
+      .select('firstname lastname phone email address status')
       .exec((err, customers) => {
         if (err) {
           return res.status(500).json({
@@ -196,7 +197,7 @@ router.delete("/", authenticateAccountantToken, (req, res) => {
                 return res.status(201).json({
                   msg: 'Insert customer succesfully!',
                   customer,
-                  url: '/admin/customer'
+                  url: '/accountant/customer'
                 })
               })
               .catch(err => {
@@ -225,6 +226,7 @@ router.delete("/", authenticateAccountantToken, (req, res) => {
       password,
       phone,
       address,
+      status,
       output,
       size,
       color,
@@ -243,6 +245,9 @@ router.delete("/", authenticateAccountantToken, (req, res) => {
       fire_note
     } = req.body;
   
+
+    
+
   
     Customer
     .findById(customerId)
@@ -259,6 +264,7 @@ router.delete("/", authenticateAccountantToken, (req, res) => {
      customer.password = password
      customer.phone = phone;
      customer.address = address;
+     customer.status =  status;
      customer.output = output;
      customer.size = size;
      customer.color = color;
@@ -280,7 +286,7 @@ router.delete("/", authenticateAccountantToken, (req, res) => {
      .then(_=>{
        return res.status(200).json({
          msg:`Update customer successfully!`,
-         url:'/admin/customer'
+         url:'/accountant/customer'
        })
      })
      .catch(err=>{
