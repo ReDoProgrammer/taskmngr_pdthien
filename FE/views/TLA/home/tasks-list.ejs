@@ -16,9 +16,9 @@
     <table class="table mt-1 table-striped bg-white text-nowrap">
         <thead class="thead-dark">
             <tr>
-                <th scope="col">#</th>
+              
                 <th scope="col"></th>
-
+                <th scope="col">#</th>
                 <th scope="col">Job</th>
                 <th scope="col">Level</th>
                 <th scope="col">Begin date</th>
@@ -35,6 +35,7 @@
         <tbody id="tblLines">
         </tbody>
     </table>
+
 </div>
 <nav aria-label="...">
     <ul class="pagination pagination-sm">
@@ -45,6 +46,46 @@
         <li class="page-item"><a class="page-link" href="#">3</a></li>
     </ul>
 </nav>
+<div id="contextMenu" class="dropdown clearfix">
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu"
+        style="display:block;position:static;margin-bottom:5px;">
+        
+        <li><a tabindex="-1" href="#">
+                <i class="fa fa-user text-primary" aria-hidden="true"></i> Assign Editor
+            </a>
+        </li>
+        <li><a tabindex="-1" href="#">
+                <i class="fa fa-user text-primary" aria-hidden="true"></i> Assign Q.A
+            </a>
+        </li>
+        <li><a tabindex="-1" href="#">
+                <i class="fa fa-user text-primary" aria-hidden="true"></i> Auto assign Editor
+            </a>
+        </li>
+        <li><a tabindex="-1" href="#">
+                <i class="fa fa-ban text-danger" aria-hidden="true"></i> Cancel
+            </a>
+        </li>
+
+        <li></li>
+        <li><a tabindex="-1" href="#">
+                <i class="fa fa-trash text-danger" aria-hidden="true"></i>
+                Delete
+            </a>
+        </li>
+    </ul>
+</div>
+<style>
+    #contextMenu {
+        position: absolute;
+        display: none;
+    }
+
+    tr:hover {
+        background: #c9e8f7;
+        position: relative;
+    }
+</style>
 
 <%-include('task_detail')%>
 
@@ -54,6 +95,31 @@
         $(document).ready(function () {
             LoadTasksList();
         })
+
+        $(function () {
+
+            var $contextMenu = $("#contextMenu");
+
+            $(document).on("click", "button[name='functions']", function (e) {
+                $contextMenu.css({
+                    display: "block",
+                    left: e.pageX,
+                    top: e.pageY
+                });
+                debugger;
+                return false;
+            });
+
+            $('html').click(function () {
+                $contextMenu.hide();
+            });
+
+            $("#contextMenu li a").click(function (e) {
+                var f = $(this);
+                debugger;
+            });
+
+        });
 
         $(document).on("click", "button[name='task-info']", function () {
             taskId = $(this).closest('tr').attr('id');
@@ -76,22 +142,13 @@
                     let idx = 1;
                     data.tasks.forEach(t => {
                         let tr = '<tr id="' + t._id + '">';
-                        tr += '<td>' + (idx++) + '</td>';
+                       
 
-                        tr += '<td>';
-                        tr += '<button class="btn btn-xs btn-danger" name="assign-job"><i class="fa fa-ban text-danger" aria-hidden="true"></i> Cancel</button>';
-                        if (t.status == -1) {
-                            tr += '<button class="btn btn-xs btn-info ml-2" name="assign-editor"><i class="fa fa-user" aria-hidden="true"></i> Editor</button>';
-                            tr += '<button class="ml-2 btn btn-xs btn-primary" name="btnAssignStaffAuto"><i class="fa fa-refresh" aria-hidden="true"></i> ASE</button>';
-
-                        }
-                        if ((typeof t.qa === 'undefined' || t.qa === null) && t.status < 2) {
-                            tr += '<button class="btn btn-xs btn-warning ml-2" name="assign-qa"><i class="fa fa-user" aria-hidden="true"></i> Q.A</button>';
-                        }
-                        tr += '<button class="btn btn-xs btn-danger ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
+                        tr += '<td>';                        
+                        tr += '<button class="btn btn-xs btn-default ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
                         tr += '</td>';
 
-
+                        tr += '<td>' + (idx++) + '</td>';
                         tr += '<td class="text-primary font-weight-bold">' + t.job.name + '</td>';
                         tr += '<td class="text-warning font-weight-bold">' + t.level.name + '</td>';
                         tr += '<td>' + convertISODateToTimeFormat(t.job.received_date) + '</td>';
@@ -157,10 +214,9 @@
 
                         }
                         tr += '</i></td>';
-
-                        tr += '<td class="text-right">';
-                        tr += '<button class="btn btn-xs btn-info ml-2" name="task-info"><i class="fa fa-info-circle" aria-hidden="true"></i></button>';
-                        tr += '</td>';
+                        tr+= '<td class="text-right">';
+                            tr+= '<button class="btn btn-xs btn-info" name="task-info"><i class="fa fa-info-circle" aria-hidden="true"></i></button>';
+                            tr+= '</td>';
 
                         tr += '</tr>';
                         $('#tblLines').append(tr);
