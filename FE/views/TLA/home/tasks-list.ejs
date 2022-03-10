@@ -83,7 +83,7 @@
                         if (t.status == -1) {
                             tr += '<button class="btn btn-xs btn-info ml-2" name="assign-editor"><i class="fa fa-user" aria-hidden="true"></i> Editor</button>';
                         }
-                        if (typeof t.qa === 'undefined' || t.qa === null) {
+                        if ((typeof t.qa === 'undefined' || t.qa === null)&& t.status <2) {
                             tr += '<button class="btn btn-xs btn-warning ml-2" name="assign-qa"><i class="fa fa-user" aria-hidden="true"></i> Q.A</button>';
                         }
                         tr += '</td>';
