@@ -114,29 +114,48 @@
       data: {
         taskId
       },
-      success: function (data) {
-        console.log(data);
-        $('#slJobLevelsInEditDiv').val(data.task.level);
-        $('#slJobLevelsInEditDiv').attr("disabled", true); 
-        $('#txtAssignDateInEditDiv').val(convertISODateToTimeFormat(data.task.assigned_date));
-        $('#txtDeadlineInEditDiv').val(convertISODateToTimeFormat(data.task.deadline));
-        $('#txtInputLinkInEditDiv').val(data.task.input_link);
-        $('#txtRemarkInEditDiv').val(data.task.remark);
+      success: function (data) {       
+        $('#divAddOrUpdateTask').slideUp(200);
+        $('#divAddOrUpdateTask').slideDown(1000);
+        $('#slJobLevels').val(data.task.level);
+        $('#slJobLevels').attr("disabled", true); 
+        $('#txtAssignDate').val(convertISODateToTimeFormat(data.task.assigned_date));
+        $('#txtDeadline').val(convertISODateToTimeFormat(data.task.deadline));
+        $('#txtInputLink').val(data.task.input_link);
 
 
-        if (data.task.status <= 0) {
-          if (data.task.editor_assigned) {
-            $('#colEditor').show();
-            $('#slEditorInEditDiv').val(data.task.editor);
-          } 
-          if (data.task.qa_assigned) {
-            $('#colQA').show();
-            $('#slQAInEditDiv').val(data.task.qa);
-          } 
+
+        //xu ly checkbox va dropdown lien quan toi editor va qa
+        $('#ckbAssignEditor').prop('checked',data.task.editor_assigned);
+        $('#ckbAssignQA').prop('checked',data.task.qa_assigned);
+
+        if(data.task.editor_assigned){
+          $('#colEditor').show();
+          $('#slEditor').val(data.task.editor);
+          if(data.task.status >0){
+            $('#ckbAssignEditor').attr("disabled", true); 
+            $('#slEditor').attr("disabled", true); 
+          }else{
+            $('#ckbAssignEditor').attr("disabled", false); 
+            $('#slEditor').attr("disabled", false); 
+          }
         }else{
-          $('#colQA').hide();
           $('#colEditor').hide();
         }
+
+        if(data.task.qa_assigned){
+          $('#colQA').show();
+          $('#slQA').val(data.task.qa);
+          if(data.task.status >1){
+            $('#ckbAssignQA').attr("disabled", true); 
+            $('#slQA').attr("disabled", true); 
+          }else{
+            $('#ckbAssignQA').attr("disabled", false); 
+            $('#slQA').attr("disabled", false); 
+          }
+        }else{
+          $('#colQA').hide();
+        }        
       }
     })
   })
