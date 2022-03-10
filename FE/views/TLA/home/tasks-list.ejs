@@ -72,7 +72,7 @@
                     search,
                     page
                 },
-                success: function (data) {                   
+                success: function (data) {
                     let idx = 1;
                     data.tasks.forEach(t => {
                         let tr = '<tr id="' + t._id + '">';
@@ -83,7 +83,7 @@
                         if (t.status == -1) {
                             tr += '<button class="btn btn-xs btn-info ml-2" name="assign-editor"><i class="fa fa-user" aria-hidden="true"></i> Editor</button>';
                         }
-                        if ((typeof t.qa === 'undefined' || t.qa === null)&& t.status <2) {
+                        if ((typeof t.qa === 'undefined' || t.qa === null) && t.status < 2) {
                             tr += '<button class="btn btn-xs btn-warning ml-2" name="assign-qa"><i class="fa fa-user" aria-hidden="true"></i> Q.A</button>';
                         }
                         tr += '</td>';
@@ -123,7 +123,7 @@
                         tr += '<td>' + t.remark + '</td>';
 
 
-                        tr += '<td class ="font-italic font-weight-bold">';
+                        tr += '<td><i>';
 
                         switch (t.status) {
                             case -1: tr += '<span class="text-info">Initial</span>';
@@ -131,8 +131,14 @@
                             case 0: tr += '<span class="text-info">Processing</span>';
                                 break;
                             case 1:
-                                tr += '<span class="text-primary">Edited</span>';
-                                break;
+                                {
+                                    if (t.edited_time > 1) {
+                                        tr += '<span class="text-primary">Fixed</span>';
+                                    } else {
+                                        tr += '<span class="text-primary">Edited</span>';
+                                    }
+                                    break;
+                                }
                             case 2:
                                 tr += '<span class="text-success">Q.A ok!</span>';
                                 break;
@@ -147,7 +153,7 @@
                                 break;
 
                         }
-                        tr += '</td>';
+                        tr += '</i></td>';
 
                         tr += '<td class="text-right">';
                         tr += '<button class="btn btn-xs btn-info ml-2" name="task-info"><i class="fa fa-info-circle" aria-hidden="true"></i></button>';
