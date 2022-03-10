@@ -69,17 +69,10 @@
                 </div>
             </div>
         </div>
-        <div class="row mt-2">
-            <div class="form-group mt-2 col-md-6 col-sm-6 col-xs-12">
-                <div id="colEditor">
-                    <select name="" id="slEditor" class="form-control"></select>
-                </div>
-            </div>
-            <div class="form-group mt-2 col-md-6 col-sm-6 col-xs-12">
-                <div id="colQA">
-                    <select name="" id="slQA" class="form-control"></select>
-                </div>
-            </div>
+        
+        <div class="row mt-2">    
+            <%-include('child/editor')%>
+            <%-include('child/qa')%>
         </div>
 
         <div class="row mt-2">
@@ -232,8 +225,9 @@
 
 
     $("#slJobLevels").change(function () {
-        LoadEditor();
-        LoadQA();
+        let levelId =  $("#slJobLevels option:selected").val();
+        LoadEditor(levelId);
+        LoadQA(levelId);
     });
 
     function LoadJobLevels() {
@@ -249,6 +243,7 @@
             },
 
             success: function (data) {
+                console.log(data);
                 $('#slJobLevels').empty();
                 data.jl.forEach(j => {
                     let opt = '<option value="' + j._id + '" class="font-weight-bold text-danger">' + j.name + '</option>';
@@ -262,62 +257,5 @@
     }
 
 
-    function LoadEditor() {
-        $.ajax({
-            url: '/tla/user/list-editor',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-                levelId: $('#slJobLevels option:selected').val()
-            },
-            success: function (data) {
-                $('#slEditor').empty();
-                $('#slEditorInEditDiv').empty();
-                data.editors.forEach(e => {
-                    let opt = '<option value="' + e._id + '">' + e.fullname + '</option>';
-                    $('#slEditor').append(opt);
-                    $('#slEditorInEditDiv').append(opt);
-                })
-                $('#slEditor').selectpicker();
-                $('#slEditorInEditDiv').selectpicker();
-                $('#slEditor').selectpicker('refresh');
-                $('#slEditorInEditDiv').selectpicker('refresh');
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                $('#msgError').text(jqXHR.responseJSON.msg);
-            },
-        })
-    }
-
-    function LoadQA() {
-        $.ajax({
-            url: '/tla/user/list-qa',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-                levelId: $('#slJobLevels option:selected').val()
-            },
-            success: function (data) {
-                $('#slQA').empty();
-                $('#slQAInEditDiv').empty();
-                data.qas.forEach(q => {
-                    let opt = '<option value="' + q._id + '">' + q.fullname + '</option>';
-                    $('#slQA').append(opt);
-                    $('#slQAInEditDiv').append(opt);
-                })
-                $('#slQA').selectpicker();
-                $('#slQAInEditDiv').selectpicker();
-                $('#slQA').selectpicker('refresh');
-                $('#slQAInEditDiv').selectpicker('refresh');
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                $('#msgError').text(jqXHR.responseJSON.msg);
-            },
-        })
-    }
-
+   
 </script>

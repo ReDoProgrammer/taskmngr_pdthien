@@ -1,0 +1,36 @@
+<div class="form-group mt-2 col-md-6 col-sm-6 col-xs-12">
+    <div id="colQA">
+        <select name="" id="slQA" class="form-control"></select>
+    </div>
+</div>
+
+<script>
+      function LoadQA(levelId) {
+        $.ajax({
+            url: '/tla/user/list-qa',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                levelId
+            },
+            success: function (data) {
+                $('#slQA').empty();
+                $('#slQAInEditDiv').empty();
+                data.qas.forEach(q => {
+                    let opt = '<option value="' + q._id + '">' + q.fullname + '</option>';
+                    $('#slQA').append(opt);
+                    $('#slQAInEditDiv').append(opt);
+                })
+                $('#slQA').selectpicker();
+                $('#slQAInEditDiv').selectpicker();
+                $('#slQA').selectpicker('refresh');
+                $('#slQAInEditDiv').selectpicker('refresh');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $('#msgError').text(jqXHR.responseJSON.msg);
+            },
+        })
+    }
+</script>

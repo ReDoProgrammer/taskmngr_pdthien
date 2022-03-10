@@ -53,7 +53,13 @@
 
     </ul>
 </div>
+
+<%-include('edit-task-modal')%>
+
 <style>
+    #divAddOrUpdateTask{
+        z-index: -1000;
+    }
     #contextMenu {
         position: absolute;
         display: none;
@@ -70,13 +76,14 @@
     <script>
         var page = 1;
         var search = '';
+      
         $(document).ready(function () {
             LoadTasksList();
         })
 
         $(document).on('click', '#funcMenu  li', function () {
-           let fnc = $(this).attr('id');
-            console.log(fnc);
+            let fnc = $(this).attr('id');
+            
             switch (fnc) {
                 case 'assign-editor':
 
@@ -89,13 +96,15 @@
                     break;
                 case 'delete-task':
                     break;
+                case 'edit-task':
+                    LoadEditor();
+                    LoadQA();
+                    $('#editTaskModal').modal();
+                   
+                    break;
             }
         });
-        $("#funcMenu li").click(function (e) {
-            e.preventDefault();
-            console.log(111111111111111);
-            
-        });
+
 
         $(document).on("click", "button[name='functions']", function (e) {
             var $contextMenu = $("#contextMenu");
@@ -116,7 +125,7 @@
                     taskId
                 },
                 success: function (data) {
-
+                    customerId = data.customer._id;
                     $('#funcMenu').empty();
                     let mn = '';
                     switch (data.task.status) {
@@ -127,6 +136,7 @@
                             if (typeof data.task.qa === 'undefined' || data.task.qa === null) {
                                 mn += '<li id="assign-qa"><a tabindex="-1" href="#"><i class="fa fa-user text-primary" aria-hidden="true"></i> Assign Q.A</a></li>';
                             }
+                            mn += '<li id="edit-task"><a tabindex="-1" href="#"> <i class="fa fa-edit text-warning"></i> Edit</a></li>';
                             mn += '<li id="delete-task"><a tabindex="-1" href="#"> <i class="fa fa-trash text-danger" aria-hidden="true"></i> Delete</a></li>';
                             $('#funcMenu').append(mn);
                             break;

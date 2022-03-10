@@ -199,8 +199,8 @@
     $('#ckbAssignEditor').prop('checked', false);
     $('#ckbAssignQA').prop('checked', false);
     $('#txtInputLink').val('');
-    LoadEditor();
-    LoadQA();
+    LoadEditor($('#slJobLevels option:selected').val());
+    LoadQA($('#slJobLevels option:selected').val());
   })
 
   $('.btnCancel').on('click', function () {
