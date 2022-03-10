@@ -156,13 +156,13 @@
               tr += '<td class="text-right">' + t.amount + '</td>';
 
               tr += '<td>';
-              if (typeof t.editor !== 'undefined') {
+              if (typeof t.editor !== 'undefined' && t.editor !== null) {
                 tr += t.editor.fullname
               }
               tr += '</td>';
 
               tr += '<td>';
-              if (typeof t.qa !== 'undefined') {
+              if (typeof t.qa !== 'undefined' && t.qa !==null) {
                 tr += t.qa.fullname
               }
               tr += '</td>';
