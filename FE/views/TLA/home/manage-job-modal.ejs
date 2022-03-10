@@ -11,9 +11,9 @@
         <div class="panel panel-info mb-3">
           <div class="panel-heading font-weight-bold">
             <i class="fa fa-tasks" aria-hidden="true"></i>
-            <label  id="name_case" class="text-uppercase"></label> - <label  id="customer" class="text-danger"></label>
+            <label id="name_case" class="text-uppercase"></label> - <label id="customer" class="text-danger"></label>
           </div>
-          <div class="panel-body">            
+          <div class="panel-body">
 
             <div class="row">
               <div class="col-md-2 col-sm-3 col-xs-4">
@@ -23,7 +23,7 @@
                 <label id="style_note" class="text-danger"></label>
               </div>
             </div>
-           
+
 
             <div class="row">
               <div class="col-md-2 col-sm-3 col-xs-4">
@@ -51,7 +51,7 @@
             <thead class="thead-dark">
               <tr>
 
-                <th scope="col">#</th>               
+                <th scope="col">#</th>
                 <th scope="col">Level</th>
                 <th scope="col">Assign date</th>
                 <th scope="col">Deadline</th>
@@ -67,18 +67,18 @@
           </table>
         </div>
 
-        <hr/>
-     
-            
-            <%-include('child/add-or-update-task')%>
+        <hr />
+
+
+        <%-include('add-or-update-task')%>
 
 
 
-              <div class="form-row">
-                <div class="col-sm-12">
-                  <label class="font-weight-bold text-danger mt-3" id="msgError"></label>
-                </div>
-              </div>
+          <div class="form-row">
+            <div class="col-sm-12">
+              <label class="font-weight-bold text-danger mt-3" id="msgError"></label>
+            </div>
+          </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -114,11 +114,11 @@
       data: {
         taskId
       },
-      success: function (data) {       
+      success: function (data) {
         $('#divAddOrUpdateTask').slideUp(200);
         $('#divAddOrUpdateTask').slideDown(1000);
         $('#slJobLevels').val(data.task.level);
-        $('#slJobLevels').attr("disabled", true); 
+        $('#slJobLevels').attr("disabled", true);
         $('#txtAssignDate').val(convertISODateToTimeFormat(data.task.assigned_date));
         $('#txtDeadline').val(convertISODateToTimeFormat(data.task.deadline));
         $('#txtInputLink').val(data.task.input_link);
@@ -126,36 +126,36 @@
 
 
         //xu ly checkbox va dropdown lien quan toi editor va qa
-        $('#ckbAssignEditor').prop('checked',data.task.editor_assigned);
-        $('#ckbAssignQA').prop('checked',data.task.qa_assigned);
+        $('#ckbAssignEditor').prop('checked', data.task.editor_assigned);
+        $('#ckbAssignQA').prop('checked', data.task.qa_assigned);
 
-        if(data.task.editor_assigned){
+        if (data.task.editor_assigned) {
           $('#colEditor').show();
           $('#slEditor').val(data.task.editor);
-          if(data.task.status >0){
-            $('#ckbAssignEditor').attr("disabled", true); 
-            $('#slEditor').attr("disabled", true); 
-          }else{
-            $('#ckbAssignEditor').attr("disabled", false); 
-            $('#slEditor').attr("disabled", false); 
+          if (data.task.status > 0) {
+            $('#ckbAssignEditor').attr("disabled", true);
+            $('#slEditor').attr("disabled", true);
+          } else {
+            $('#ckbAssignEditor').attr("disabled", false);
+            $('#slEditor').attr("disabled", false);
           }
-        }else{
+        } else {
           $('#colEditor').hide();
         }
 
-        if(data.task.qa_assigned){
+        if (data.task.qa_assigned) {
           $('#colQA').show();
           $('#slQA').val(data.task.qa);
-          if(data.task.status >1){
-            $('#ckbAssignQA').attr("disabled", true); 
-            $('#slQA').attr("disabled", true); 
-          }else{
-            $('#ckbAssignQA').attr("disabled", false); 
-            $('#slQA').attr("disabled", false); 
+          if (data.task.status > 1) {
+            $('#ckbAssignQA').attr("disabled", true);
+            $('#slQA').attr("disabled", true);
+          } else {
+            $('#ckbAssignQA').attr("disabled", false);
+            $('#slQA').attr("disabled", false);
           }
-        }else{
+        } else {
           $('#colQA').hide();
-        }        
+        }
       }
     })
   })
@@ -204,7 +204,7 @@
   })
 
   $('.btnCancel').on('click', function () {
-    $('#divAddOrUpdateTask').slideUp(500);    
+    $('#divAddOrUpdateTask').slideUp(500);
     $("button[name='btnAssignStaff']").show(100);
     $("button[name='btnDelTask']").show(100);
     taskId = '';
@@ -334,9 +334,9 @@
       data: {
         jobId
       },
-      success: function (data) {       
+      success: function (data) {
         let idx = 1;
-        $("#tblTasks").empty();       
+        $("#tblTasks").empty();
         data.tasks.forEach(t => {
           let tr = '<tr id="' + t._id + '" data-level="' + t.level._id + '" data-editor="';
           tr += t.editor;
@@ -344,7 +344,7 @@
           tr += t.qa;
           tr += '">';
 
-          tr += "<td>" + idx++ + "</td>";         
+          tr += "<td>" + idx++ + "</td>";
 
 
           tr += "<td class='font-weight-bold text-info'>" + t.level.name + "</td>";
@@ -358,16 +358,15 @@
 
 
           tr += '<td>';
-          if (typeof t.editor !== 'undefined')
+          if (typeof t.editor !== 'undefined' && t.editor !== null)
             tr += t.editor.fullname;
-          else tr += '';
           tr += "</td>";
 
           tr += '<td>';
+            if (typeof t.qa !== 'undefined' && t.qa !== null)
+              tr += t.qa.fullname;
+          tr+= '</td>'
 
-          if (typeof t.qa !== 'undefined')
-            tr += t.qa.fullname;
-          else tr += '';
 
           tr += '<td>';
           if (isValidHttpUrl(t.input_link)) {
@@ -403,11 +402,11 @@
 
 
           tr += '<td class="text-right">';
-                   
+
           if (t.status == -1) {
             tr += '<button class="ml-2 btn btn-xs btn-primary" name="btnAssignStaffAuto"><i class="fa fa-refresh" aria-hidden="true"></i> ASE</button>';
           }
-         
+
           if (t.status < 1) {
             tr += '<button class="ml-1 btn btn-xs btn-danger" name="btnDelTask"><i class="fa fa-trash text-white" aria-hidden="true"></i></button>';
           }

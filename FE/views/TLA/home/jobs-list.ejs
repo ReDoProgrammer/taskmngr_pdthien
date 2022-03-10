@@ -34,9 +34,7 @@
                 <th scope="col">Intruction</th>
                 <th scope="col">Received date</th>
                 <th scope="col">Delivery date</th>
-                <th scope="col">Status</th>
-                <th scope="col"></th>
-
+                <th scope="col">Status</th>    
             </tr>
         </thead>
         <tbody id="tblData">
@@ -51,6 +49,7 @@
 
 
 <%-include('manage-job-modal')%>
+<%-include('submit-job-modal')%>
 
     <script>
         var search = '';
@@ -126,17 +125,7 @@
                                 tr += '<span class = "text-muted">Canceled</span>';
                                 break;
                         }
-                        tr += '</i></td>';
-
-
-                        tr+= '<td class="text-right">';
-                            tr += '<button class=" btn btn-xs btn-info" name="btnEditTask"><i class="fa fa-edit"></i></button>';
-                            tr += '<button class=" btn btn-xs btn-warning ml-2" name="btnCancelJob"><i class="fa fa-times" aria-hidden="true"></i>Cancel</button>';
-                            tr += '<button class="ml-2 btn btn-xs btn-danger" name="btnDelTask"><i class="fa fa-trash text-white" aria-hidden="true"></i></button>';
-                        tr+= '</td>';
-
-
-
+                        tr += '</i></td>';    
                         tr += '</tr>';
                         $('#tblData').append(tr);
                     })
