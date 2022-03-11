@@ -67,21 +67,47 @@
 </div>
 
 <%-include('edit-task-modal')%>
+<%-include('assign-editor-modal')%>
+<%-include('task_detail')%>
 
-
-
-    <%-include('task_detail')%>
+<script src="/js/bootstrap-select.min.js"></script>
+<script src="/js/common.js"></script>
+<link href="/css/bootstrap-select.min.css" rel="stylesheet" />
 
         <script>
             var page = 1;
             var search = '';
             var customerId = '';
-
             var status = 100;
+            var levelId = '';
 
             $(document).ready(function () {
                 LoadTasksList();
             })
+
+            function AutoAssignEditor() {
+                if (confirm('Are you sure want to set editor automatically')) {
+                    $.ajax({
+                        url: '/tla/queue',
+                        type: 'post',
+                        headers: {
+                            authorization: "Bearer " + localStorage.getItem("accessToken"),
+                        },
+                        data: {
+                            taskId
+                        },
+                        success: function (data) {
+                            alert(data.msg);
+                            LoadTasksList();
+                            taskId = '';
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.log({ jqXHR, textStatus, errorThrown });
+                            alert(jqXHR.responseJSON.msg);
+                        }
+                    })
+                }
+            }
 
             function DeleteTask() {
 
@@ -94,7 +120,7 @@
                             authorization: "Bearer " + localStorage.getItem("accessToken"),
                         },
                         data: {
-                            _id:taskId
+                            _id: taskId
                         },
                         success: function (data) {
                             alert(data.msg);
@@ -120,18 +146,19 @@
 
                 switch (fnc) {
                     case 'assign-editor':
-
+                        $('#assignEditorModal').modal();
                         break;
                     case 'assign-qa':
                         break;
                     case 'auto-assign-editor':
+                        AutoAssignEditor();
                         break;
                     case 'cancel-task':
                         break;
                     case 'delete-task':
                         DeleteTask();
                         break;
-                    case 'edit-task':                       
+                    case 'edit-task':
                         $('#editTaskModal').modal();
 
                         break;
@@ -149,6 +176,7 @@
 
                 taskId = $(this).closest('tr').attr('id');
                 customerId = $(this).closest('tr').data('customer');
+                levelId = $(this).closest('tr').data('level');
 
                 $.ajax({
                     url: '/tla/task/detail',
@@ -256,8 +284,9 @@
                     },
                     success: function (data) {
                         let idx = 1;
+                        
                         data.tasks.forEach(t => {
-                            let tr = '<tr id="' + t._id + '" data-customer = "' + t.job.customer + '">';
+                            let tr = '<tr id="' + t._id + '" data-customer = "' + t.job.customer + '" data-level="'+t.level._id+'">';
 
 
                             tr += '<td>';
