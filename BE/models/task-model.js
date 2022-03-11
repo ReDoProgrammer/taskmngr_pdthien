@@ -116,12 +116,27 @@ const taskSchema = new Schema({
             -1: TLA gán sai
             -2: Sale thiết lập sai
             -3: Khách hàng hủy
+            -4: Lý do khác
 
         */
         type:Number
+    },
+    created_by:{
+        type: Schema.Types.ObjectId,
+        ref:'user'
+    },
+    created_at:{
+        type: Date,
+        default: new Date()
+    },
+    updated_by:{
+        type: Schema.Types.ObjectId,
+        ref:'user'
+    },
+    updated_at:{
+        type: Date,
+        default: new Date()
     }
-
-
 
 });
 

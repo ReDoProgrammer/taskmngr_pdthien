@@ -215,6 +215,35 @@ router.post('/', authenticateTLAToken, (req, res) => {
 })
 
 
+router.put('/cancel',authenticateTLAToken,(req,res)=>{
+    let {taskId,canceled_reason,remark} = req.body;
+    Task
+    .findByIdAndUpdate(taskId,{
+        status:-4,
+        canceled_reason,
+        remark,
+        updated_by: req.user._id
+    },{new:true},(err,task)=>{
+        if(err){
+            console.log(err);
+            return res.status(500).json({
+                msg:`Can not cancel task with error: ${new Error(err.message)}`
+            })
+        }
+
+        if(!task){
+            return res.status(404).json({
+                msg:`Can not cancel task because it not found!`
+            })
+        }
+
+        return res.status(200).json({
+            msg:`The task has been canceled!`,
+            task
+        })
+    })
+})
+
 router.put('/assign-editor',authenticateTLAToken,(req,res)=>{
     let {editor,taskId} = req.body;
     Task
