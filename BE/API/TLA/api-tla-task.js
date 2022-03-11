@@ -214,6 +214,62 @@ router.post('/', authenticateTLAToken, (req, res) => {
         })
 })
 
+
+router.put('/assign-editor',authenticateTLAToken,(req,res)=>{
+    let {editor,taskId} = req.body;
+    Task
+    .findByIdAndUpdate(taskId,{
+        status:0,
+        editor_assigned:true,
+        editor
+    },{new:true},(err,task)=>{
+        if(err=>{
+            return res.status(500).json({
+                msg:`Can not assign editor into task with error: ${new Error(err.message)}`
+            })
+        })
+
+        if(!task){
+            return res.status(404).json({
+                msg:`Task not found to assign editor!`
+            })
+        }
+
+        return res.status(200).json({
+            msg:`Assign editor into task successfully!`,
+            task
+        })
+
+    })
+})
+
+router.put('/assign-qa',authenticateTLAToken,(req,res)=>{
+    let {qa,taskId} = req.body;
+    Task
+    .findByIdAndUpdate(taskId,{
+        qa_assigned:true,
+        qa
+    },{new:true},(err,task)=>{
+        if(err=>{
+            return res.status(500).json({
+                msg:`Can not assign qa into task with error: ${new Error(err.message)}`
+            })
+        })
+
+        if(!task){
+            return res.status(404).json({
+                msg:`Task not found to assign qa!`
+            })
+        }
+
+        return res.status(200).json({
+            msg:`Assign qa into task successfully!`,
+            task
+        })
+
+    })
+})
+
 router.put('/', authenticateTLAToken, async (req, res) => {
     let {
         taskId,
