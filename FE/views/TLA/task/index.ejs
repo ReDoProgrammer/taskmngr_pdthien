@@ -148,6 +148,7 @@
                             if (typeof data.task.qa === 'undefined' || data.task.qa === null) {
                                 mn += '<li id="assign-qa"><a tabindex="-1" href="#"><i class="fa fa-user text-primary" aria-hidden="true"></i> Assign Q.A</a></li>';
                             }
+                            mn += '<li id="edit-task"><a tabindex="-1" href="#"> <i class="fa fa-edit text-warning"></i> Edit</a></li>';
                             mn += '<li id="delete-task"><a tabindex="-1" href="#"> <i class="fa fa-trash text-danger" aria-hidden="true"></i> Delete</a></li>';
                             $('#funcMenu').append(mn);
                             break;
@@ -214,8 +215,7 @@
                     page
                 },
                 success: function (data) {
-                    let idx = 1;
-                    console.log(data);
+                    let idx = 1;                   
                     data.tasks.forEach(t => {
                         let tr = '<tr id="' + t._id + '" data-customer = "'+t.job.customer+'">';
 
