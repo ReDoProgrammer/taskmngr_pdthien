@@ -217,8 +217,11 @@ app.use('/tla',TLAAuth);
 const TLAHomeController = require('./BE/controllers/TLA/home-controller');
 app.use('/tla',TLAHomeController);
 
-const TLACustomerController = require('./BE/controllers/TLA/customer-controller');
-app.use('/tla/customer',TLACustomerController);
+const TLAJobController = require('./BE/controllers/TLA/job-controller');
+app.use('/tla/job',TLAJobController);
+
+const TLATaskController = require('./BE/controllers/TLA/task-controller');
+app.use('/tla/task',TLATaskController);
 
 
 // // /*

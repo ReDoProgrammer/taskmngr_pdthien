@@ -36,7 +36,7 @@ router.get('/list', authenticateTLAToken, (req, res) => {
         })
 })
 
-router.get('/', authenticateTLAToken, (req, res) => {
+router.get('/all', authenticateTLAToken, (req, res) => {
     let { page, search } = req.query;
     Task
         .find(
