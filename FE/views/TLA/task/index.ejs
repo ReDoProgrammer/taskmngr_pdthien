@@ -83,7 +83,33 @@
                 LoadTasksList();
             })
 
-            $('#btnSearchTask').click(function(){
+            function DeleteTask() {
+
+                let _id = $(this).closest("tr").attr("id");
+                if (confirm("Are you sure to delete this level?")) {
+                    $.ajax({
+                        url: '/tla/task',
+                        type: 'delete',
+                        headers: {
+                            authorization: "Bearer " + localStorage.getItem("accessToken"),
+                        },
+                        data: {
+                            _id:taskId
+                        },
+                        success: function (data) {
+                            alert(data.msg);
+                            LoadTasksList();
+                            taskId = '';
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            $('#msgError').text(jqXHR.responseJSON.msg);
+                        }
+                    })
+                }
+            }
+
+
+            $('#btnSearchTask').click(function () {
                 search = $('#txtSearchTask').val();
                 status = $('#slStatus option:selected').val();
                 LoadTasksList();
@@ -103,10 +129,9 @@
                     case 'cancel-task':
                         break;
                     case 'delete-task':
+                        DeleteTask();
                         break;
-                    case 'edit-task':
-                        LoadEditor();
-                        LoadQA();
+                    case 'edit-task':                       
                         $('#editTaskModal').modal();
 
                         break;
