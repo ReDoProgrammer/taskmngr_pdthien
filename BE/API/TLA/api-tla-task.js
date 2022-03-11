@@ -160,6 +160,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
                             }
 
                             let task = new Task();
+                            task.created_by = req.user._id;
                             task.job = job;
                             task.level = level;
                             task.remark = remark;
@@ -250,7 +251,8 @@ router.put('/assign-editor',authenticateTLAToken,(req,res)=>{
     .findByIdAndUpdate(taskId,{
         status:0,
         editor_assigned:true,
-        editor
+        editor,
+        updated_by:req.user._id
     },{new:true},(err,task)=>{
         if(err=>{
             return res.status(500).json({
@@ -277,7 +279,8 @@ router.put('/assign-qa',authenticateTLAToken,(req,res)=>{
     Task
     .findByIdAndUpdate(taskId,{
         qa_assigned:true,
-        qa
+        qa,
+        updated_by:req.user._id
     },{new:true},(err,task)=>{
         if(err=>{
             return res.status(500).json({
@@ -323,7 +326,8 @@ router.put('/', authenticateTLAToken, async (req, res) => {
         editor_assigned,
         qa: (qa_assigned == 'true' ? qa : null),
         editor: (editor_assigned == 'true' ? editor : null),
-        status: (editor_assigned == 'true' ? 0 : -1)
+        status: (editor_assigned == 'true' ? 0 : -1),
+        updated_by:req.user._id
     }, { new: true }, (err, task) => {
         if (err) {
             return res.status(500).json({
