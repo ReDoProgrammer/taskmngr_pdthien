@@ -113,6 +113,7 @@ router.get('/list', authenticateQAToken, (req, res) => {
             })
             .populate('level')
             .populate('editor')
+            .populate('qa')
             .exec()
             .then(tasks => {
                 return res.status(200).json({
@@ -177,6 +178,60 @@ router.get('/detail', authenticateQAToken, (req, res) => {
             msg:err.msg
         })
     })
+})
+
+router.get('/personal',authenticateQAToken,(req,res)=>{
+    let { page, search, status } = req.query;
+    if (status == 100) {
+        Task
+            .find({qa:req.user._id})
+            .populate({
+                path: 'job',
+                populate: {
+                    path: 'customer'
+                }
+            })
+            .populate('level')
+            .populate('editor')
+            .populate('qa')
+            .exec()
+            .then(tasks => {
+                return res.status(200).json({
+                    msg: `Load tasks list successfully!`,
+                    tasks
+                })
+            })
+            .catch(err => {
+                return res.status(500).json({
+                    msg: `Can not get tasks list with error: ${new Error(err.message)}`
+                })
+            })
+    } else {
+        Task
+            .find({
+                status
+            })
+            .populate({
+                path: 'job',
+                populate: {
+                    path: 'customer'
+                }
+            })
+            .populate('level')
+
+            .exec()
+            .then(tasks => {
+                return res.status(200).json({
+                    msg: `Load tasks list successfully!`,
+                    tasks
+                })
+            })
+            .catch(err => {
+                return res.status(500).json({
+                    msg: `Can not get tasks list with error: ${new Error(err.message)}`
+                })
+            })
+    }
 })
 
 

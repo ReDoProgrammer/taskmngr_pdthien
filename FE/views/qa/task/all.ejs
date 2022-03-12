@@ -38,6 +38,7 @@
           <th scope="col">Remark</th>
           <th scope="col" class="text-right">Amount</th>
           <th scope="col">Editor</th>
+          <th scope="col">Q.A</th>
           <th scope="col">Status</th>
           <th scope="col"></th>
         </tr>
@@ -144,8 +145,14 @@
                   tr += t.editor.fullname
                 }
                 tr += '</td>';
+
+                tr += '<td>';
+                if (typeof t.qa !== 'undefined' && t.qa !== null) {
+                  tr += t.qa.fullname
+                }
+                tr += '</td>';
   
-                tr += '<td class="font-italic font-weight-bold">';
+                tr += '<td class="font-italic">';
                 switch (t.status) {
   
                   case 0: tr += '<span class="text-info">Processing</span>'; break;
@@ -162,6 +169,7 @@
                   case -1: tr += '<span class="text-info">Initial</span>'; break;
                   case -2: tr += '<span class="text-danger">Q.A reject</span>'; break;
                   case -3: tr += '<span class="text-danger">DC reject</span>'; break;
+                  case -4: tr += '<span class="text-danger">Canceled</span>'; break;
   
                 }
                 tr += '</td>';
