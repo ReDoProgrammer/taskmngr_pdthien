@@ -88,7 +88,7 @@ const taskSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref:'user'
     },
-    assigned_date:{
+    assigned_date:{   
         type: Date,
         default: new Date()
     },
@@ -102,6 +102,12 @@ const taskSchema = new Schema({
         default: new Date()
     },
     qa_assigned_date: {
+         /*
+            Thuộc tính để đánh dấu 3 thao tác:
+            1: thời điểm Q.A được TLA assign
+            2: Thời điểm Q.A nhận task
+            3: Thời điểm Q.A hủy nhận task
+        */
         type: Date,
         default: new Date()
     },
