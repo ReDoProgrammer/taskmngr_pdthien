@@ -224,7 +224,8 @@ router.put('/cancel',authenticateTLAToken,(req,res)=>{
         status:-4,
         canceled_reason,
         remark,
-        canceled_by: req.user._id
+        canceled_by: req.user._id,
+        canceled_at: new Date()
     },{new:true},(err,task)=>{
         if(err){
             console.log(err);
@@ -253,7 +254,8 @@ router.put('/assign-editor',authenticateTLAToken,(req,res)=>{
         status:0,
         editor_assigned:true,
         editor,
-        editor_assigner:req.user._id
+        editor_assigner:req.user._id,
+        editor_assigned_date: new Date()
     },{new:true},(err,task)=>{
         if(err=>{
             return res.status(500).json({
@@ -281,7 +283,8 @@ router.put('/assign-qa',authenticateTLAToken,(req,res)=>{
     .findByIdAndUpdate(taskId,{
         qa_assigned:true,
         qa,
-        qa_assigner:req.user._id
+        qa_assigner:req.user._id,
+        qa_assigned_date: new Date()
     },{new:true},(err,task)=>{
         if(err=>{
             return res.status(500).json({
@@ -328,7 +331,8 @@ router.put('/', authenticateTLAToken, async (req, res) => {
         qa: (qa_assigned == 'true' ? qa : null),
         editor: (editor_assigned == 'true' ? editor : null),
         status: (editor_assigned == 'true' ? 0 : -1),
-        updated_by:req.user._id
+        updated_by:req.user._id,
+        updated_at: new Date()
     }, { new: true }, (err, task) => {
         if (err) {
             return res.status(500).json({
