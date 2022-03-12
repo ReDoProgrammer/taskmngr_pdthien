@@ -41,7 +41,7 @@ router.put('/get-task', authenticateQAToken, (req, res) => {
             */
             qa: req.user._id,
             qa_assigned: false,
-            status: { $lt: 2 }
+            status: { $in: [0,1] }
         }, async (err, count) => {
             if (err) {
                 return res.status(500).json({
