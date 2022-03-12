@@ -72,6 +72,9 @@ app.use('/accountant/statistic',accountantStatisticAPI);
 const dcHomeController = require('./BE/controllers/dc/home-controller');
 app.use('/dc',dcHomeController);
 
+const dcTaskController = require('./BE/controllers/dc/task-controller');
+app.use('/dc/task',dcTaskController);
+
 
 const dcAuthAPI = require('./BE/API/dc/authenticate');
 app.use('/dc/auth',dcAuthAPI);
