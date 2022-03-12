@@ -80,9 +80,21 @@ const taskSchema = new Schema({
         type: String,
         default: ''
     },
-    assigned_date: {
+    editor_assigner:{
+        type: Schema.Types.ObjectId,
+        ref:'user'
+    },
+    qa_assigner:{
+        type: Schema.Types.ObjectId,
+        ref:'user'
+    },
+    editor_assigned_date: {
         type: Date,
-        require: true
+        default: new Date()
+    },
+    qa_assigned_date: {
+        type: Date,
+        default: new Date()
     },
     deadline: {
         type: Date,
@@ -120,6 +132,14 @@ const taskSchema = new Schema({
 
         */
         type:Number
+    },
+    canceled_by:{
+        type: Schema.Types.ObjectId,
+        ref:'user'
+    },
+    canceled_at:{
+        type:Date,
+        default: new Date()
     },
     created_by:{
         type: Schema.Types.ObjectId,
