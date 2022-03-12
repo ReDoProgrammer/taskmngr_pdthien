@@ -90,6 +90,8 @@
             success: function (data) {
               alert(data.msg);
               LoadTasks();
+            }, error: function (request, status, error) {
+              alert(request.responseJSON.msg);
             }
           })
         }
@@ -138,7 +140,7 @@
 
 
               tr += '<td>';
-              if (typeof t.editor !== 'undefined' && t.editor !==null) {
+              if (typeof t.editor !== 'undefined' && t.editor !== null) {
                 tr += t.editor.fullname
               }
               tr += '</td>';
