@@ -84,6 +84,9 @@ app.use('/dc/task',dcTaskAPI);
 const qaAuthController = require('./BE/API/qa/authenticate');
 app.use('/qa/auth',qaAuthController);
 
+const qaTaskController = require('./BE/controllers/qa/task-controller');
+app.use('/qa/task',qaTaskController);
+
 const qaTaskApi = require('./BE/API/qa/api-task');
 app.use('/qa/task',qaTaskApi);
 

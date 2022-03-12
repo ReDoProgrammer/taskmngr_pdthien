@@ -8,13 +8,21 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="/sale">Q.A Module - Hello: <span id="spUser"
+      <a class="navbar-brand" href="/qa">Q.A Module - Hello: <span id="spUser"
           class="font-weight-bold text-info"></span></a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
-      <!-- <ul class="nav navbar-nav">
-        <li class="active"><a href="/sale">Home</a></li>           
-      </ul> -->
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="/qa">Home</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+            aria-expanded="false">Task <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li> <a class="dropdown-item" href="/qa/task/all">All</a></li>
+            <li> <a class="dropdown-item" href="/qa/task/your-tasks">Your tasks</a></li>
+          </ul>
+        </li>
+      </ul>
       <ul class="nav navbar-nav navbar-right">
         <button class="btn btn-sm btn-danger mt-2" id="btnLogout">
           <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
