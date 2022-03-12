@@ -58,13 +58,14 @@ router.get('/detail',authenticateTLAToken,(req,res)=>{
 
 router.put('/submit',authenticateTLAToken,(req,res)=>{
     let {jobId} = req.body;
-    
+    console.log(jobId);
     Task
     .countDocuments({
         job: jobId,
         status:{$in:[3,-4]}
     },async (err,count)=>{
         if(err){
+            console.log(err);
             return res.status(500).json({
                 msg:`Can not check tasks belong to this job with error: ${new Error(err.message)}`
             })
@@ -82,6 +83,7 @@ router.put('/submit',authenticateTLAToken,(req,res)=>{
            })
        })
        .catch(err=>{
+           console.log(err);
            return res.status(err.code).json({
                msg:err.msg
            })

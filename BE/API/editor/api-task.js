@@ -12,7 +12,7 @@ const _MODULE = 'EDITOR';
 
 
 router.get('/', authenticateEditorToken, (req, res) => {
-    let { page, search } = req.query;
+    let { page, search,status } = req.query;
     Task
         .find({ editor: req.user._id })//chỉ load những task đã được TLA gán hoặc editor đã nhận được
         .populate('level', 'name -_id')
