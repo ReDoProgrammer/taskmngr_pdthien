@@ -1,6 +1,9 @@
 const router = require('express').Router();
 const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const Job = require('../../models/job-model');
+const Task = require('../../models/task-model');
+const {setJobStatus} = require('../common');
+
 
 
 router.get('/list',authenticateTLAToken,(req,res)=>{
@@ -53,29 +56,43 @@ router.get('/detail',authenticateTLAToken,(req,res)=>{
     })
 })
 
-router.put('/change-status',authenticateTLAToken,(req,res)=>{
-    let {jobId,status} = req.body;
-    Job.findByIdAndUpdate(jobId,{
-        status
-    },{new:true},(err,job)=>{
+router.put('/submit',authenticateTLAToken,(req,res)=>{
+    let {jobId} = req.body;
+    
+    Task
+    .countDocuments({
+        job: jobId,
+        status:{$in:[3,-4]}
+    },async (err,count)=>{
         if(err){
             return res.status(500).json({
-                msg:`Can not update job status with error: ${new Error(err.message)}`
+                msg:`Can not check tasks belong to this job with error: ${new Error(err.message)}`
             })
         }
-        
-        if(!job){
-            return res.status(404).json({
-                msg:`Job not found to update status`
+        if(count>0){
+            return res.status(403).json({
+                msg:`Can not sumbit this job because having tasks have been not submited done!`
             })
         }
-        return res.status(200).json({
-            msg:`Update job status successfully!`,
-            job
-        })
+       await setJobStatus(jobId,1,req.user._id)
+       .then(job=>{
+           return res.status(200).json({
+               msg:`The job has been submited!`,
+               job
+           })
+       })
+       .catch(err=>{
+           return res.status(err.code).json({
+               msg:err.msg
+           })
+       })
     })
+
+
+   
 })
 
 
 
 module.exports = router;
+

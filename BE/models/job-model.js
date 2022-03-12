@@ -36,6 +36,7 @@ const jobSchema = new Schema({
             0: Processing
             1:Upload   
             2:Done
+            3: finish
 
             -1: initial
             -2:'Rejected
@@ -45,6 +46,7 @@ const jobSchema = new Schema({
         type: Number,
         default: -1
     },
+
     input_link:{
         //link này chứa hình ảnh source khi sale tạo mới job
         type:String,
@@ -64,7 +66,8 @@ const jobSchema = new Schema({
         //lưu mã combo được chọn
         type:Schema.Types.ObjectId,
         ref:'combo'
-    }
+    },
+   
 });
 
 

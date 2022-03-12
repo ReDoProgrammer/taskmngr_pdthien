@@ -321,6 +321,31 @@ const getTaskDetail = (taskId)=>{
     })
 }
 
+const setJobStatus = (jobId,status, staff)=>{
+    return new Promise((resolve,reject)=>{
+        Job
+        .findByIdAndUpdate(jobId,{
+            status
+        },{new:true},(err,job)=>{
+            if(err){
+               return reject({
+                   code:500,
+                   msg:`Can not set job status with erorr: ${new Error(err.message)}`
+               })
+            }
+
+            if(!job){
+                return reject({
+                    code:404,
+                    msg:`Job not found so can not set status!`
+                })
+            }
+
+            return resolve(job);
+        })
+    })
+}
+
 
 
 module.exports = {
@@ -332,5 +357,6 @@ module.exports = {
     checkAccount,
     getJobLevelBasedOnConditons,
     getCustomer,
-    getTaskDetail
+    getTaskDetail,
+    setJobStatus
 }
