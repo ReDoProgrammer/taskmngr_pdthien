@@ -30,13 +30,15 @@
     <table class="table table-striped text-nowrap">
         <thead class="thead-dark">
             <tr>
+                <th scope="col"></th>
                 <th scope="col">#</th>
                 <th scope="col">Customer</th>
                 <th scope="col">Job</th>
                 <th scope="col">Level</th>
                 <th scope="col">Deadline</th>
                 <th scope="col">Remark</th>
-                <th scope="col" class="text-right">Amount</th>
+                <th scope="col" class="text-right">E-N</th>
+                <th scope="col" class="text-right">E-T</th>
                 <th scope="col">Editor</th>
                 <th scope="col">Status</th>
                 <th scope="col"></th>
@@ -47,146 +49,216 @@
     </table>
 </div>
 
+<div id="contextMenu" class="dropdown clearfix">
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu"
+        style="display:block;position:static;margin-bottom:5px;" id="funcMenu">
+    </ul>
+</div>
+
+
 <%-include('task_detail')%>
-<%-include('reject-modal')%>
+    <%-include('reject-modal')%>
 
-<script src="/js/common.js"></script>
+        <script src="/js/common.js"></script>
 
-<script>
-    var page = 1;
-    var search = '';
-    var status = 100;
-    $(document).ready(function () {
-        LoadTasks();
-    })
-
-    $('#slStatus').on('change', function () {
-        status = this.value;
-        LoadTasks();
-    })
-
-
-
-    $('#modalRejectTask').on('hidden.bs.modal', function () {
-        LoadTasks();
-    })
-
-
-    $(document).on("click", "button[name='btnSubmitTask']", function () {
-        taskId = $(this).closest("tr").attr("id");
-        job_lv = $(this).closest("tr").data('job');
-
-        if (confirm("Are you sure want to submit this task?")) {
-            $.ajax({
-                url: '/qa/task/submit',
-                type: 'put',
-                headers: {
-                    authorization: "Bearer " + localStorage.getItem("accessToken"),
-                },
-                data: {
-                    taskId,
-                    job_lv
-                },
-                success: function (data) {
-                    alert(data.msg);
-                    LoadTasks();
-                }, error: function (request, status, error) {
-                    alert(request.responseJSON.msg);
-                }
+        <script>
+            var page = 1;
+            var search = '';
+            var status = 100;
+            var customerId = '';
+            var levelId = '';
+            var taskId = '';
+            $(document).ready(function () {
+                LoadTasks();
             })
-        }
 
-    })
+            $(document).on('click', '#funcMenu  li', function () {
+                let fnc = $(this).attr('id');
 
-    $(document).on("click", "button[name='btnTaskInfo']", function () {
-        taskId = $(this).closest("tr").attr("id");
-        $('#modalTaskDetail').modal();
-    })
-
-    $(document).on("click", "button[name='btnReject']", function () {
-        taskId = $(this).closest("tr").attr("id");
-        $('#modalRejectTask').modal();
-    })
-
-
-
-
-
-    function LoadTasks() {
-        $.ajax({
-            url: '/qa/task/personal',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-                search,
-                page,
-                status
-            },
-            success: function (data) {
-                $('#tbdTasks').empty();
-                let idx = 1;
-
-                data.tasks.forEach(t => {
-                    let tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '">';
-                    tr += '<td>' + (idx++) + '</td>';
-                    tr += '<td class="font-weight-bold text-primary">' + t.job.customer.firstname + ' ' + t.job.customer.lastname + '</td>';
-                    tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
-                    tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
-                    tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>'
-                    tr += '<td>' + t.remark + '</td>';
-                    tr += '<td class="text-right">' + t.amount + '</td>';
-
-
-                    tr += '<td>';
-                    if (typeof t.editor !== 'undefined' && t.editor !== null) {
-                        tr += t.editor.fullname
-                    }
-                    tr += '</td>';
-
-
-                    tr += '<td class="font-italic">';
-                    switch (t.status) {
-
-                        case 0: tr += '<span class="text-info">Processing</span>'; break;
-                        case 1: {
-                            if (t.edited_time > 1) {
-                                tr += '<span class="text-primary">Fixed</span>';
-                            } else {
-                                tr += '<span class="text-primary">Edited</span>';
-                            }
-                            break;
+                switch (fnc) {
+                    case 'reject-task':
+                        $('#modalRejectTask').modal();
+                        break;
+                    case 'submit-task':
+                        if (confirm('Are you sure want to submit this task?')) {
+                            $.ajax({
+                                url: '/qa/task/submit',
+                                type: 'put',
+                                headers: {
+                                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                                },
+                                data: {
+                                    taskId
+                                },
+                                success: function (data) {
+                                    alert(data.msg);
+                                    LoadTasks();
+                                }, error: function (request, status, error) {
+                                    alert(request.responseJSON.msg);
+                                }
+                            })
                         }
-                        case 2: tr += '<span class="text-success">Q.A ok</span>'; break;
-                        case 3: tr += '<span class="text-success">DC ok</span>'; break;
-                        case -1: tr += '<span class="text-info">Initial</span>'; break;
-                        case -2: tr += '<span class="text-danger">Q.A reject</span>'; break;
-                        case -3: tr += '<span class="text-danger">DC reject</span>'; break;
-                        case -4: tr += '<span class="text-danger">Canceled</span>'; break;
+                        break;
+                }
+            });
 
+
+            $(document).on("click", "button[name='functions']", function (e) {
+                var $contextMenu = $("#contextMenu");
+                $contextMenu.css({
+                    display: "block",
+                    left: e.pageX,
+                    top: e.pageY
+                });
+
+                taskId = $(this).closest('tr').attr('id');
+
+                $.ajax({
+                    url: '/qa/task/detail',
+                    type: 'get',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                    data: {
+                        taskId
+                    },
+                    success: function (data) {
+                        customerId = data.customer._id;
+                        levelId = data.task.level._id;
+
+                        $('#funcMenu').empty();
+                        let mn = '';
+                        switch (data.task.status) {
+                            case 1:
+                                mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Q.A ok</a></li>';
+                                mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
+                                break;
+                            case 0:
+                                mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Q.A ok</a></li>';
+                                break;
+                            default:
+                                $contextMenu.css({
+                                    display: "none"
+                                });
+                                break;
+
+                        }
+                        $('#funcMenu').append(mn);
                     }
-                    tr += '</td>';
+                })
 
-                    tr += '<td class="text-right">';
-                    tr += '<button class="btn btn-xs btn-info" name="btnTaskInfo">';
-                    tr += '<i class="fa fa-info"></i> Detail';
-                    tr += '</button>';
-                    if (t.status == 1) {
-                        tr += '<button class="btn btn-xs btn-primary ml-2" name="btnSubmitTask">';
-                        tr += '<i class="fa fa-check" aria-hidden="true"></i> Q.A ok';
-                        tr += '</button>';
-                        tr += '<button class="btn btn-xs btn-warning ml-2" name="btnReject">';
-                        tr += '<i class="fa fa-close text-danger"></i> Reject';
-                        tr += '</button>';
+
+                $('html').click(function () {
+                    $contextMenu.hide();
+                });
+
+            });
+
+            $('#slStatus').on('change', function () {
+                status = this.value;
+                LoadTasks();
+            })
+
+
+
+            $('#modalRejectTask').on('hidden.bs.modal', function () {
+                LoadTasks();
+            })
+           
+
+            $(document).on("click", "button[name='btnTaskInfo']", function () {
+                taskId = $(this).closest("tr").attr("id");
+                $('#modalTaskDetail').modal();
+            })
+
+
+
+
+            function LoadTasks() {
+                $.ajax({
+                    url: '/qa/task/personal',
+                    type: 'get',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                    data: {
+                        search,
+                        page,
+                        status
+                    },
+                    success: function (data) {
+                        $('#tbdTasks').empty();
+                        let idx = 1;
+
+                        data.tasks.forEach(t => {
+                            let tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '">';
+                            tr += '<td>';
+                            tr += '<button class="btn btn-xs btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
+                            tr += '</td>';
+                            tr += '<td>' + (idx++) + '</td>';
+
+                            tr += '<td class="font-weight-bold text-primary">' + t.job.customer.firstname + ' ' + t.job.customer.lastname + '</td>';
+                            tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
+                            tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
+                            tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>'
+                            tr += '<td>' + t.remark + '</td>';
+                            tr += '<td class="text-right">' + t.amount + '</td>';
+                            tr += '<td class="text-right">' + t.edited_time + '</td>';
+
+
+                            tr += '<td>';
+                            if (typeof t.editor !== 'undefined' && t.editor !== null) {
+                                tr += t.editor.fullname
+                            }
+                            tr += '</td>';
+
+
+                            tr += '<td class="font-italic">';
+                            switch (t.status) {
+
+                                case 0: tr += '<span class="text-info">Processing</span>'; break;
+                                case 1: {
+                                    if (t.edited_time > 1) {
+                                        tr += '<span class="text-primary">Fixed</span>';
+                                    } else {
+                                        tr += '<span class="text-primary">Edited</span>';
+                                    }
+                                    break;
+                                }
+                                case 2: tr += '<span class="text-success">Q.A ok</span>'; break;
+                                case 3: tr += '<span class="text-success">DC ok</span>'; break;
+                                case -1: tr += '<span class="text-info">Initial</span>'; break;
+                                case -2: tr += '<span class="text-danger">Q.A reject</span>'; break;
+                                case -3: tr += '<span class="text-danger">DC reject</span>'; break;
+                                case -4: tr += '<span class="text-danger">Canceled</span>'; break;
+
+                            }
+                            tr += '</td>';
+
+                            tr += '<td class="text-right">';
+                            tr += '<button class="btn btn-xs btn-info" name="btnTaskInfo">';
+                            tr += '<i class="fa fa-info"></i>';
+                            tr += '</button>';
+                            tr += '</td>';
+
+
+                            tr += '</tr>';
+                            $('#tbdTasks').append(tr);
+                        })
                     }
 
-
-                    tr += '</tr>';
-                    $('#tbdTasks').append(tr);
                 })
             }
+        </script>
 
-        })
-    }
-</script>
+        <style>
+            #contextMenu {
+                position: absolute;
+                display: none;
+            }
+
+            tr:hover {
+                background: #c9e8f7;
+                position: relative;
+            }
+        </style>

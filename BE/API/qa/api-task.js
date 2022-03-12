@@ -5,28 +5,24 @@ const { getWage,getModule, getCustomer,getTaskDetail } = require('../common');
 const _MODULE = 'QA';
 
 router.put('/submit', authenticateQAToken, (req, res) => {
-    let { taskId, job_lv } = req.body;
+    let { taskId} = req.body;
 
     Task.findById(taskId)
         .exec()
-        .then(t => {
+        .then(async t => {
             if (!t) {
                 return res.status(404).json({
                     msg: `Task not found!`
                 })
             }
-            if (t.qa !== req.user._id) {
-                return res.status(403).json({
-                    msg: `This task has been already submited by another Q.A!`
-                })
-            }
-            getModule(_MODULE)
-            .then(m=>{
-                getWage(req.user._id, job_lv, m._id)
+            
+
+            await getModule(_MODULE)
+            .then(async m=>{
+                await getWage(req.user._id, t.job, m._id)
                 .then(w => {
                     Task
-                        .findByIdAndUpdate(taskId, {
-                            qa: req.user._id,
+                        .findByIdAndUpdate(taskId, {                          
                             qa_wage: w.wage,
                             qa_done: new Date(),
                             status: 2
@@ -38,7 +34,8 @@ router.put('/submit', authenticateQAToken, (req, res) => {
                             }                           
 
                             return res.status(200).json({
-                                msg: `The task has been submited!`
+                                msg: `The task has been submited!`,
+                                task
                             })
                         })
 
