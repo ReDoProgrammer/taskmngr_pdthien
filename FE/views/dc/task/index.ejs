@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-md-2 col-sm-2 col-xs-4 mt-2">
+  <div class="col-md-offset-6 col-sm-offset-6 col-md-2 col-sm-2 col-xs-4 mt-2">
     <select name="" id="slStatus" class="form-control">
       <option value="100">All</option>
       <option value="1">Editor submited</option>
@@ -40,11 +40,18 @@
         <th scope="col">Editor</th>
         <th scope="col">Q.A</th>
         <th scope="col">Status</th>
+        <th scope="col"></th>
       </tr>
     </thead>
     <tbody id="tbdTasks">
     </tbody>
   </table>
+</div>
+
+<div id="contextMenu" class="dropdown clearfix">
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu"
+    style="display:block;position:static;margin-bottom:5px;" id="funcMenu">
+  </ul>
 </div>
 
 <%-include('task_detail')%>
@@ -63,8 +70,121 @@
         LoadTasks();
       })
 
+      $(document).on('click', '#funcMenu  li', function () {
+        let fnc = $(this).attr('id');
+
+        switch (fnc) {
+          case 'reject-task':
+            $('#modalRejectTask').modal();
+            break;
+          case 'submit-task':
+            if (confirm('Are you sure want to submit this task?')) {
+              $.ajax({
+                url: '/qa/task/submit',
+                type: 'put',
+                headers: {
+                  authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                  taskId
+                },
+                success: function (data) {
+                  alert(data.msg);
+                  LoadTasks();
+                }, error: function (request, status, error) {
+                  alert(request.responseJSON.msg);
+                }
+              })
+            }
+            break;
+
+          case 'unregister-task':
+            if (confirm('Are you sure want to unregister this task?')) {
+              $.ajax({
+                url: '/qa/task/unregister',
+                type: 'put',
+                headers: {
+                  authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                  taskId
+                },
+                success: function (data) {
+                  alert(data.msg);
+                  LoadTasks();
+                }, error: function (request, status, error) {
+                  alert(request.responseJSON.msg);
+                }
+              })
+            }
+            break;
+        }
+      });
+
+
+      $(document).on("click", "button[name='functions']", function (e) {
+        var $contextMenu = $("#contextMenu");
+        $contextMenu.css({
+          display: "block",
+          left: e.pageX,
+          top: e.pageY
+        });
+
+        taskId = $(this).closest('tr').attr('id');
+
+        $.ajax({
+          url: '/dc/task/detail',
+          type: 'get',
+          headers: {
+            authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+          data: {
+            taskId
+          },
+          success: function (data) {
+            customerId = data.customer._id;
+            levelId = data.task.level._id;
+
+            $('#funcMenu').empty();
+            let mn = '';
+            switch (data.task.status) {
+              case 1:
+                if (typeof data.task.qa === 'undefined' || data.task.qa === null) {
+                  mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Submit</a></li>';
+                  mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
+                } else {
+                  $contextMenu.css({
+                    display: "none"
+                  });
+                }
+
+                break;
+              case 2:
+                mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Q.A ok</a></li>';
+                mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
+                break;
+
+              default:
+                $contextMenu.css({
+                  display: "none"
+                });
+                break;
+
+            }
+            $('#funcMenu').append(mn);
+          }
+        })
+
+
+        $('html').click(function () {
+          $contextMenu.hide();
+        });
+
+      });
+
+
       $(document).on("click", "button[name='btnSubmitTask']", function () {
-        taskId = $(this).closest("tr").attr("id");       
+        taskId = $(this).closest("tr").attr("id");
         if (confirm("Are you sure want to submit this task?")) {
           $.ajax({
             url: '/dc/task/submit',
@@ -73,7 +193,7 @@
               authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
             data: {
-              taskId             
+              taskId
             },
             success: function (data) {
               alert(data.msg);
@@ -121,32 +241,13 @@
 
             data.tasks.forEach(t => {
               let tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '">';
-              tr += '<td>' + (idx++) + '</td>';
 
               tr += '<td>';
-              if (t.status > 0) {
-                if (
-                  (typeof t.qa !== 'undefined' && t.status == 2) // nếu cột qa có giá trị <=> có qa can thiệp và đã được submited
-                  || (typeof t.qa === 'undefined' && t.status == 1)// nếu không có Q.A và đã được editor submit
-                ) {
-
-                  tr += '<button class="btn btn-xs btn-danger ml-2" name="btnRejectTask">';
-                  tr += '<i class="fa fa-stop-circle"></i> Reject';
-                  tr += '</button>';
-                  tr += '<button class="btn btn-xs btn-primary ml-2" name="btnSubmitTask">';
-                  tr += '<i class="fa fa-send-o"></i> Submit';
-                  tr += '</button>';
-
-                }
-              } else {
-                tr += '';
-              }
-
-
-              tr += '<button class="btn btn-xs btn-info ml-2" name="btnTaskInfo">';
-              tr += '<i class="fa fa-info"></i> Detail';
-              tr += '</button>';
+              tr += '<button class="btn btn-xs btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
               tr += '</td>';
+              tr += '<td>' + (idx++) + '</td>';
+
+
               tr += '<td class="font-weight-bold text-primary">' + t.job.customer.firstname + ' ' + t.job.customer.lastname + '</td>';
               tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
               tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
@@ -155,14 +256,15 @@
               tr += '<td class="text-right">' + t.edited_time + '</td>';
               tr += '<td class="text-right">' + t.amount + '</td>';
 
+
+
               tr += '<td>';
               if (typeof t.editor !== 'undefined' && t.editor !== null) {
                 tr += t.editor.fullname
               }
               tr += '</td>';
-
               tr += '<td>';
-              if (typeof t.qa !== 'undefined' && t.qa !==null) {
+              if (typeof t.qa !== 'undefined' && t.qa !== null) {
                 tr += t.qa.fullname
               }
               tr += '</td>';
@@ -186,10 +288,16 @@
                 case -1: tr += '<span class="text-info">Initial</span>'; break;
                 case -2: tr += '<span class="text-danger">Q.A reject</span>'; break;
                 case -3: tr += '<span class="text-danger">DC reject</span>'; break;
+                case -4: tr += '<span class="text-danger">Canceled</span>'; break;
 
               }
               tr += '</td>';
 
+              tr += '<td>';
+              tr += '<button class="btn btn-xs btn-info ml-2" name="btnTaskInfo">';
+              tr += '<i class="fa fa-info"></i>';
+              tr += '</button>';
+              tr += '</td>';
 
               tr += '</tr>';
               $('#tbdTasks').append(tr);
@@ -200,3 +308,15 @@
       }
 
     </script>
+
+    <style>
+      #contextMenu {
+        position: absolute;
+        display: none;
+      }
+
+      tr:hover {
+        background: #c9e8f7;
+        position: relative;
+      }
+    </style>
