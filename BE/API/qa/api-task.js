@@ -15,7 +15,7 @@ router.put('/submit', authenticateQAToken, (req, res) => {
                     msg: `Task not found!`
                 })
             }
-            if (!t.qa) {
+            if (t.qa !== req.user._id) {
                 return res.status(403).json({
                     msg: `This task has been already submited by another Q.A!`
                 })
