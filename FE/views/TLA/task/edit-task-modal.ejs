@@ -209,8 +209,11 @@
             },
             success: function (data) {
                 levelId = data.task.level._id;               
-                LoadEditor();
-                LoadQA();
+                LoadEditors();
+                LoadQAs();
+                $('#name_case').text(data.task.job.name);
+                $('#customer').text(data.customer.firstname+' '+data.customer.lastname);
+
                 $('#slJobLevels').val(data.task.level._id);
                 $('#slJobLevels').attr("disabled", true);
                 $('#txtAssignDate').val(convertISODateToTimeFormat(data.task.assigned_date));
@@ -277,8 +280,8 @@
 
     $("#slJobLevels").change(function () {
         let levelId = $("#slJobLevels option:selected").val();
-        LoadEditor();
-        LoadQA();
+        LoadEditors();
+        LoadQAs();
     });
 
     function LoadJobLevels() {
@@ -306,7 +309,7 @@
         })
     }
 
-    function LoadEditor() {
+    function LoadEditors() {
         console.log('levelid: ',levelId);
         $.ajax({
             url: '/tla/user/list-editor',
@@ -337,7 +340,7 @@
     }
 
 
-    function LoadQA() {
+    function LoadQAs() {
         $.ajax({
             url: '/tla/user/list-qa',
             type: 'get',

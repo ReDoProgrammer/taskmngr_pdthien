@@ -8,10 +8,6 @@ const {
     getCustomer } = require('../common');
 
 
-const _EDITOR = 'EDITOR';
-const _QA = 'QA';
-
-
 
 router.get('/list', authenticateTLAToken, (req, res) => {
     let { jobId } = req.query;
@@ -331,6 +327,8 @@ router.put('/', authenticateTLAToken, async (req, res) => {
         qa: (qa_assigned == 'true' ? qa : null),
         editor: (editor_assigned == 'true' ? editor : null),
         status: (editor_assigned == 'true' ? 0 : -1),
+        editor_assigned_date: new Date(),
+        qa_assigned_date: new Date(),
         updated_by:req.user._id,
         updated_at: new Date()
     }, { new: true }, (err, task) => {
