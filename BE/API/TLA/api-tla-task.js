@@ -9,6 +9,7 @@ const {
     getCustomer,
     getModule,
     getWage } = require('../common');
+const { log } = require('npm');
 
 
 const _EDITOR = 'EDITOR';
@@ -174,60 +175,60 @@ router.post('/', authenticateTLAToken, (req, res) => {
                             //thiết lập các thông tin liên quan khi Editor đc gán
                             if (editor_assigned == 'true') {
                                 await getModule(_EDITOR)
-                                .then(async m=>{
-                                    await getWage(editor,level,m._id)
-                                    .then(async w=>{
-                                        task.editor_assigned = true;
-                                        task.editor = editor;
-                                        task.status = 0;
-                                        task.editor_wage=w.wage;
-                                        task.editor_assigned_date = new Date();
-                                        task.editor_assigner = req.user._id;
+                                    .then(async m => {
+                                        await getWage(editor, level, m._id)
+                                            .then(async w => {
+                                                task.editor_assigned = true;
+                                                task.editor = editor;
+                                                task.status = 0;
+                                                task.editor_wage = w.wage;
+                                                task.editor_assigned_date = new Date();
+                                                task.editor_assigner = req.user._id;
+                                            })
+                                            .catch(err => {
+                                                return res.status(err.code).json({
+                                                    msg: err.msg
+                                                })
+                                            })
                                     })
-                                    .catch(err=>{
+                                    .catch(err => {
                                         return res.status(err.code).json({
-                                            msg:err.msg
+                                            msg: err.msg
                                         })
                                     })
-                                })
-                                .catch(err=>{
-                                    return res.status(err.code).json({
-                                        msg:err.msg
-                                    })
-                                })
-                                
+
                             }
 
                             //thiết lập các thông tin khi Q.A được gán
                             if (qa_assigned == 'true') {
                                 await getModule(_QA)
-                                .then(async m=>{
-                                    await getWage(qa,level,m._id)
-                                    .then(async w=>{                                       
-                                        task.qa_assigned = true;
-                                        task.qa = qa;
-                                        task.qa_wage=w.wage;
-                                        task.qa_assigned_date = new Date();
-                                        task.qa_assigner = req.user._id;
+                                    .then(async m => {
+                                        await getWage(qa, level, m._id)
+                                            .then(async w => {
+                                                task.qa_assigned = true;
+                                                task.qa = qa;
+                                                task.qa_wage = w.wage;
+                                                task.qa_assigned_date = new Date();
+                                                task.qa_assigner = req.user._id;
+                                            })
+                                            .catch(err => {
+                                                return res.status(err.code).json({
+                                                    msg: err.msg
+                                                })
+                                            })
                                     })
-                                    .catch(err=>{
+                                    .catch(err => {
                                         return res.status(err.code).json({
-                                            msg:err.msg
+                                            msg: err.msg
                                         })
                                     })
-                                })
-                                .catch(err=>{
-                                    return res.status(err.code).json({
-                                        msg:err.msg
-                                    })
-                                })
-                              
+
                             }
 
 
 
 
-                            task.save()
+                            await task.save()
                                 .then(_ => {
                                     return res.status(201).json({
                                         msg: `Task has been created`
@@ -294,97 +295,97 @@ router.put('/cancel', authenticateTLAToken, (req, res) => {
 router.put('/assign-editor', authenticateTLAToken, (req, res) => {
     let { editor, taskId } = req.body;
     getTaskDetail(taskId)
-    .then(async t=>{
-        await getModule(_EDITOR)
-        .then(async m=>{
-            await getWage(editor,t.level._id,m._id)
-            .then(async w=>{
-                console.log('wage ne: ',w);
-                Task
-                .findByIdAndUpdate(taskId,{
-                    editor_assigned_date:new Date(),
-                    status:0,
-                    editor_assigned:true,
-                    editor_wage:w.wage,
-                    editor:editor,
-                    editor_assigner:req.user._id
-                },{new:true},(err,task)=>{
-                    if(err){
-                        return res.status(500).json({
-                            msg:`Can not assign editor with error: ${new Error(err.message)}`
-                        })
-                    }
+        .then(async t => {
+            await getModule(_EDITOR)
+                .then(async m => {
+                    await getWage(editor, t.level._id, m._id)
+                        .then(async w => {
+                            console.log('wage ne: ', w);
+                            Task
+                                .findByIdAndUpdate(taskId, {
+                                    editor_assigned_date: new Date(),
+                                    status: 0,
+                                    editor_assigned: true,
+                                    editor_wage: w.wage,
+                                    editor: editor,
+                                    editor_assigner: req.user._id
+                                }, { new: true }, (err, task) => {
+                                    if (err) {
+                                        return res.status(500).json({
+                                            msg: `Can not assign editor with error: ${new Error(err.message)}`
+                                        })
+                                    }
 
-                    return res.status(200).json({
-                        msg:`Assign editor into task successfully!`,
-                        task
+                                    return res.status(200).json({
+                                        msg: `Assign editor into task successfully!`,
+                                        task
+                                    })
+                                })
+                        })
+                        .catch(err => {
+                            return res.status(err.code).json({
+                                msg: err.msg
+                            })
+                        })
+                })
+                .catch(err => {
+                    return res.status(err.code).json({
+                        msg: err.msg
                     })
                 })
-            })
-            .catch(err=>{
-                return res.status(err.code).json({
-                    msg:err.msg
-                })
-            })
-        })  
-        .catch(err=>{
+        })
+        .catch(err => {
             return res.status(err.code).json({
-                msg:err.msg
+                msg: err.msg
             })
         })
-    })
-    .catch(err=>{
-        return res.status(err.code).json({
-            msg:err.msg
-        })
-    })
 })
 
 router.put('/assign-qa', authenticateTLAToken, (req, res) => {
     let { qa, taskId } = req.body;
     getTaskDetail(taskId)
-    .then(async t=>{
-        await getModule(_QA)
-        .then(async m=>{
-            await getWage(qa,t.level._id,m._id)
-            .then(async w=>{
-                Task
-                .findByIdAndUpdate(taskId,{
-                    qa_assigned_date:new Date(),
-                    qa_assigned:true,
-                    qa_wage:w.wage,
-                    qa:qa,
-                    qa_assigner:req.user._id
-                },{new:true},(err,task)=>{
-                    if(err){
-                        return res.status(500).json({
-                            msg:`Can not assign Q.A with error: ${new Error(err.message)}`
-                        })
-                    }
+        .then(async t => {
+            await getModule(_QA)
+                .then(async m => {
+                    await getWage(qa, t.level._id, m._id)
+                        .then(async w => {
+                            Task
+                                .findByIdAndUpdate(taskId, {
+                                    qa_assigned_date: new Date(),
+                                    qa_assigned: true,
+                                    qa_wage: w.wage,
+                                    qa: qa,
+                                    qa_assigner: req.user._id
+                                }, { new: true }, (err, task) => {
+                                    if (err) {
+                                        return res.status(500).json({
+                                            msg: `Can not assign Q.A with error: ${new Error(err.message)}`
+                                        })
+                                    }
 
-                    return res.status(200).json({
-                        msg:`Assign Q.A into task successfully!`,
-                        task
+                                    return res.status(200).json({
+                                        msg: `Assign Q.A into task successfully!`,
+                                        task
+                                    })
+                                })
+                        })
+                        .catch(err => {
+                            return res.status(err.code).json({
+                                msg: err.msg
+                            })
+                        })
+                })
+                .catch(err => {
+                    return res.status(err.code).json({
+                        msg: err.msg
                     })
                 })
-            })
-            .catch(err=>{
-                return res.status(err.code).json({
-                    msg:err.msg
-                })
-            })
-        })  
-        .catch(err=>{
+        })
+        .catch(err => {
             return res.status(err.code).json({
-                msg:err.msg
+                msg: err.msg
             })
         })
-    })
-    .catch(err=>{
-        return res.status(err.code).json({
-            msg:err.msg
-        })
-    })
 })
 
 router.put('/', authenticateTLAToken, async (req, res) => {
@@ -400,38 +401,101 @@ router.put('/', authenticateTLAToken, async (req, res) => {
         editor
     } = req.body;
 
+    let task = await Task.findById(taskId);
 
-
-    await Task.findByIdAndUpdate(taskId, {
-        assigned_date,
-        deadline,
-        input_link,
-        remark,
-        qa_assigned,
-        editor_assigned,
-        qa: (qa_assigned == 'true' ? qa : null),
-        editor: (editor_assigned == 'true' ? editor : null),
-        status: (editor_assigned == 'true' ? 0 : -1),
-        editor_assigned_date: new Date(),
-        qa_assigned_date: new Date(),
-        updated_by: req.user._id,
-        updated_at: new Date()
-    }, { new: true }, (err, task) => {
-        if (err) {
-            return res.status(500).json({
-                msg: `Can not update task with caught error: ${new Error(err.message)}`
-            })
-        }
-        if (!task) {
-            return res.status(404).json({
-                msg: `Task not found!`
-            })
-        }
-        return res.status(200).json({
-            msg: `The task has been updated!`,
-            task
+    if (!task) {
+        return res.status(404).json({
+            msg: `Can not update task because it\'s not found!`
         })
-    })
+    }
+
+
+
+    task.assigned_date = assigned_date;
+    task.deadline = deadline;
+    task.input_link = input_link;
+    task.remark = remark;
+
+
+    //thiết lập các thông tin liên quan khi Editor đc gán
+    if (editor_assigned == 'true') {
+        await getModule(_EDITOR)
+            .then(async m => {
+                await getWage(editor, level, m._id)
+                    .then(async w => {
+                        task.editor_assigned = true;
+                        task.editor = editor;
+                        task.status = 0;
+                        task.editor_wage = w.wage;
+                        task.editor_assigned_date = new Date();
+                        task.editor_assigner = req.user._id;
+                    })
+                    .catch(err => {
+                        return res.status(err.code).json({
+                            msg: err.msg
+                        })
+                    })
+            })
+            .catch(err => {
+                return res.status(err.code).json({
+                    msg: err.msg
+                })
+            })
+
+    } else {
+        task.editor_assigned = false;
+        task.editor = null;
+        task.status = -1;
+        task.editor_wage = 0;
+        task.editor_assigned_date = new Date();
+        task.editor_assigner = null;
+    }
+
+    //thiết lập các thông tin khi Q.A được gán
+    if (qa_assigned == 'true') {
+        await getModule(_QA)
+            .then(async m => {
+                await getWage(qa, level, m._id)
+                    .then(async w => {
+                        task.qa_assigned = true;
+                        task.qa = qa;
+                        task.qa_wage = w.wage;
+                        task.qa_assigned_date = new Date();
+                        task.qa_assigner = req.user._id;
+                    })
+                    .catch(err => {
+                        return res.status(err.code).json({
+                            msg: err.msg
+                        })
+                    })
+            })
+            .catch(err => {
+                return res.status(err.code).json({
+                    msg: err.msg
+                })
+            })
+
+    } else {
+        task.qa_assigned = false;
+        task.qa = null;
+        task.qa_wage = 0;
+        task.qa_assigned_date = new Date();
+        task.qa_assigner = null;
+    }
+
+    await task.save()
+        .then(t => {
+            return res.status(200).json({
+                msg:`Task has been updated!`,
+                t
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg:`Can not update the task with error: ${new Error(err.message)}`
+            })
+        })
+
 
 })
 
