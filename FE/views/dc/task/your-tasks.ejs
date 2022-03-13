@@ -81,7 +81,7 @@
           case 'submit-task':
             if (confirm('Are you sure want to submit this task?')) {
               $.ajax({
-                url: '/qa/task/submit',
+                url: '/dc/task/submit',
                 type: 'put',
                 headers: {
                   authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -102,7 +102,7 @@
           case 'unregister-task':
             if (confirm('Are you sure want to unregister this task?')) {
               $.ajax({
-                url: '/qa/task/unregister',
+                url: '/dc/task/unregister',
                 type: 'put',
                 headers: {
                   authorization: "Bearer " + localStorage.getItem("accessToken"),

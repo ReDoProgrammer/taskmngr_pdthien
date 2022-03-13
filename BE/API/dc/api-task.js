@@ -45,6 +45,31 @@ router.put('/submit',authenticateDCToken,(req,res)=>{
    
 })
 
+router.put('/unregister',authenticateDCToken,(req,res)=>{
+    let {taskId} = req.body;
+    Task
+    .findByIdAndUpdate(taskId,{
+        dc:null
+    },{new:true},(err,task)=>{
+        if(err){
+            return res.status(500).json({
+                msg:`Can not unregister this task with error: ${new Error(err.message)}`
+            })
+        }
+
+        if(!task){
+            return res.status(404).json({
+                msg:`Can not unregister this task because it\' not found!`
+            })
+        }
+
+        return res.status(200).json({
+            msg:`You have unregister this task successfully!`,
+            task
+        })
+    })
+})
+
 
 router.put('/get-task',authenticateDCToken,(req,res)=>{
     let {taskId} = req.body;
