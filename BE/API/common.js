@@ -204,9 +204,9 @@ const getModule = (_module) => {
 const getWage = (staffId, job_lv, moduleId) => {
     return new Promise((resolve, reject) => {
         getUser(staffId)
-            .then(u => {    
-                console.log({moduleId,u});         
-                Wage
+            .then(async u => {   
+                  
+                await Wage
                     .findOne({
                         module: moduleId,
                         job_lv,
