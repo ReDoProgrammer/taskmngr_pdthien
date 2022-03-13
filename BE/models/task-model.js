@@ -34,6 +34,30 @@ const taskSchema = new Schema({
         type:Boolean,
         default:false
     },
+    qa_assigner:{
+        //đánh dấu TLA nào gán Q.A cho task
+        type: Schema.Types.ObjectId,
+        ref:'user'
+    },
+    qa_assigned_date: {
+        /*
+           Thuộc tính để đánh dấu 3 thao tác:
+           1: thời điểm Q.A được TLA assign
+           2: Thời điểm Q.A nhận task
+           3: Thời điểm Q.A hủy nhận task
+       */
+       type: Date,
+       default: new Date()
+   },
+   
+
+   qa_done:{
+       //ngày giờ Q.A submit task
+       type:Date
+   },
+
+
+
     editor: {
         //lưu id nhân viên làm Editor
         type: Schema.Types.ObjectId,
@@ -50,6 +74,69 @@ const taskSchema = new Schema({
         type:Boolean,
         default:false
     },
+    editor_assigner:{
+        //đánh dấu TLA nào gán editor cho task
+        type: Schema.Types.ObjectId,
+        ref:'user'
+    },
+    editor_assigned_date: {
+        //ngày editor đc TLA gán cho task
+        type: Date,
+        default: new Date()
+    },
+    editor_done:{
+        //ngày editor submit done task
+        type:Date
+    },
+
+    edited_time: {
+        //thuộc tính đánh dấu số lần edit
+
+        type: Number,
+        default: 0
+    },
+   
+    remark: {
+        //phần ghi chú cho task/level
+        //cả tla, sale,admin,dc đều có thể can thiệp
+        type: String,
+        default: ''
+    },
+    
+  
+    assigned_date:{   
+        //ngày tạo task
+        type: Date,
+        default: new Date()
+    },
+    deadline: {
+        //ngày task cần hoàn thành
+        type: Date,
+        require: true
+    },
+
+  
+   
+
+    dc:{
+        //DC nào nhận và submit/reject task
+        type:Schema.Types.ObjectId,
+        ref:'user'
+    },
+    dc_get:{
+        //thời gian DC nhận task
+        type:Date
+    },
+    dc_done:{
+        //Thời gian DC submit task
+        type:Date
+    },
+    dc_wage:{
+        //Tiền công của DC
+        type:Number
+    },
+
+
     status: {
         type: Number,
         default: -1
@@ -67,74 +154,7 @@ const taskSchema = new Schema({
 
     },
 
-    edited_time: {
-        //thuộc tính đánh dấu số lần edit
 
-        type: Number,
-        default: 0
-    },
-   
-    remark: {
-        //phần ghi chú cho task/level
-        //cả tla, sale,admin,dc đều có thể can thiệp
-        type: String,
-        default: ''
-    },
-    editor_assigner:{
-        type: Schema.Types.ObjectId,
-        ref:'user'
-    },
-    qa_assigner:{
-        type: Schema.Types.ObjectId,
-        ref:'user'
-    },
-    assigned_date:{   
-        type: Date,
-        default: new Date()
-    },
-    deadline: {
-        type: Date,
-        require: true
-    },
-
-    editor_assigned_date: {
-        type: Date,
-        default: new Date()
-    },
-    qa_assigned_date: {
-         /*
-            Thuộc tính để đánh dấu 3 thao tác:
-            1: thời điểm Q.A được TLA assign
-            2: Thời điểm Q.A nhận task
-            3: Thời điểm Q.A hủy nhận task
-        */
-        type: Date,
-        default: new Date()
-    },
-    editor_done:{
-        type:Date
-    },
-
-    qa_done:{
-        type:Date
-    },
-
-    dc:{
-        type:Schema.Types.ObjectId,
-        ref:'user'
-    },
-    dc_get:{
-        //thời gian DC nhận task
-        type:Date
-    },
-    dc_done:{
-        //Thời gian DC submit task
-        type:Date
-    },
-    dc_wage:{
-        //Tiền công của DC
-        type:Number
-    },
     input_link:{
         //link hình ảnh của task khi TLA giao việc cho editor,qa
         type:String,

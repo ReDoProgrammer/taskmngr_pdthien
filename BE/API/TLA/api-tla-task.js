@@ -3,11 +3,16 @@ const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const Task = require('../../models/task-model');
 const CustomerLevel = require('../../models/customer-level-model');
 const Job = require('../../models/job-model');
-const {  
+
+const {
     getTaskDetail,
-    getCustomer } = require('../common');
+    getCustomer,
+    getModule,
+    getWage } = require('../common');
 
 
+const _EDITOR = 'EDITOR';
+const _QA = 'QA';
 
 router.get('/list', authenticateTLAToken, (req, res) => {
     let { jobId } = req.query;
@@ -34,59 +39,59 @@ router.get('/list', authenticateTLAToken, (req, res) => {
 
 router.get('/all', authenticateTLAToken, (req, res) => {
     let { page, search, status } = req.query;
-    if(status == 100){
+    if (status == 100) {
         Task
-        .find(
-            {
-                // $or: [
-                //     { firstname: { "$regex": search, "$options": "i" } },
-                // ]
-            }
-        )
-        .populate('level')
-        .populate('job')
-        .populate('qa', 'fullname -_id')
-        .populate('editor', 'fullname -_id')
-        .exec()
-        .then(tasks => {
-            return res.status(200).json({
-                msg: 'Load tasks list successfully!',
-                tasks
+            .find(
+                {
+                    // $or: [
+                    //     { firstname: { "$regex": search, "$options": "i" } },
+                    // ]
+                }
+            )
+            .populate('level')
+            .populate('job')
+            .populate('qa', 'fullname -_id')
+            .populate('editor', 'fullname -_id')
+            .exec()
+            .then(tasks => {
+                return res.status(200).json({
+                    msg: 'Load tasks list successfully!',
+                    tasks
+                })
             })
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not load taks list with error: ${new Error(err.message)}`
+            .catch(err => {
+                return res.status(500).json({
+                    msg: `Can not load taks list with error: ${new Error(err.message)}`
+                })
             })
-        })
-    }else{
+    } else {
         Task
-        .find(
-            {
-                status
-                // $or: [
-                //     { firstname: { "$regex": search, "$options": "i" } },
-                // ]
-            }
-        )
-        .populate('level')
-        .populate('job')
-        .populate('qa', 'fullname -_id')
-        .populate('editor', 'fullname -_id')
-        .exec()
-        .then(tasks => {
-            return res.status(200).json({
-                msg: 'Load tasks list successfully!',
-                tasks
+            .find(
+                {
+                    status
+                    // $or: [
+                    //     { firstname: { "$regex": search, "$options": "i" } },
+                    // ]
+                }
+            )
+            .populate('level')
+            .populate('job')
+            .populate('qa', 'fullname -_id')
+            .populate('editor', 'fullname -_id')
+            .exec()
+            .then(tasks => {
+                return res.status(200).json({
+                    msg: 'Load tasks list successfully!',
+                    tasks
+                })
             })
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not load taks list with error: ${new Error(err.message)}`
+            .catch(err => {
+                return res.status(500).json({
+                    msg: `Can not load taks list with error: ${new Error(err.message)}`
+                })
             })
-        })
     }
-   
+
 
 })
 
@@ -128,7 +133,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
         remark,
         qa_assigned,
         qa,
-        editor_assigned,        
+        editor_assigned,
         editor
     } = req.body;
 
@@ -164,7 +169,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
                             task.assigned_date = assigned_date;
                             task.deadline = deadline;
                             task.input_link = input_link;
-                          
+
 
                             if (editor_assigned == 'true') {
                                 task.editor_assigned = true;
@@ -213,92 +218,129 @@ router.post('/', authenticateTLAToken, (req, res) => {
 })
 
 
-router.put('/cancel',authenticateTLAToken,(req,res)=>{
-    let {taskId,canceled_reason,remark} = req.body;
+router.put('/cancel', authenticateTLAToken, (req, res) => {
+    let { taskId, canceled_reason, remark } = req.body;
     Task
-    .findByIdAndUpdate(taskId,{
-        status:-4,
-        canceled_reason,
-        remark,
-        canceled_by: req.user._id,
-        canceled_at: new Date()
-    },{new:true},(err,task)=>{
-        if(err){
-            console.log(err);
-            return res.status(500).json({
-                msg:`Can not cancel task with error: ${new Error(err.message)}`
-            })
-        }
+        .findByIdAndUpdate(taskId, {
+            status: -4,
+            canceled_reason,
+            remark,
+            canceled_by: req.user._id,
+            canceled_at: new Date()
+        }, { new: true }, (err, task) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({
+                    msg: `Can not cancel task with error: ${new Error(err.message)}`
+                })
+            }
 
-        if(!task){
-            return res.status(404).json({
-                msg:`Can not cancel task because it not found!`
-            })
-        }
+            if (!task) {
+                return res.status(404).json({
+                    msg: `Can not cancel task because it not found!`
+                })
+            }
 
-        return res.status(200).json({
-            msg:`The task has been canceled!`,
-            task
+            return res.status(200).json({
+                msg: `The task has been canceled!`,
+                task
+            })
+        })
+})
+
+router.put('/assign-editor', authenticateTLAToken, (req, res) => {
+    let { editor, taskId } = req.body;
+    getTaskDetail(taskId)
+    .then(async t=>{
+        await getModule(_EDITOR)
+        .then(async m=>{
+            await getWage(editor,t.level._id,m._id)
+            .then(async w=>{
+                console.log('wage ne: ',w);
+                Task
+                .findByIdAndUpdate(taskId,{
+                    editor_assigned_date:new Date(),
+                    status:0,
+                    editor_assigned:true,
+                    editor_wage:w.wage,
+                    editor:editor,
+                    editor_assigner:req.user._id
+                },{new:true},(err,task)=>{
+                    if(err){
+                        return res.status(500).json({
+                            msg:`Can not assign editor with error: ${new Error(err.message)}`
+                        })
+                    }
+
+                    return res.status(200).json({
+                        msg:`Assign editor into task successfully!`,
+                        task
+                    })
+                })
+            })
+            .catch(err=>{
+                return res.status(err.code).json({
+                    msg:err.msg
+                })
+            })
+        })  
+        .catch(err=>{
+            return res.status(err.code).json({
+                msg:err.msg
+            })
+        })
+    })
+    .catch(err=>{
+        return res.status(err.code).json({
+            msg:err.msg
         })
     })
 })
 
-router.put('/assign-editor',authenticateTLAToken,(req,res)=>{
-    let {editor,taskId} = req.body;
-    Task
-    .findByIdAndUpdate(taskId,{
-        status:0,
-        editor_assigned:true,
-        editor,
-        editor_assigner:req.user._id,
-        editor_assigned_date: new Date()
-    },{new:true},(err,task)=>{
-        if(err=>{
-            return res.status(500).json({
-                msg:`Can not assign editor into task with error: ${new Error(err.message)}`
+router.put('/assign-qa', authenticateTLAToken, (req, res) => {
+    let { qa, taskId } = req.body;
+    getTaskDetail(taskId)
+    .then(async t=>{
+        await getModule(_QA)
+        .then(async m=>{
+            await getWage(qa,t.level._id,m._id)
+            .then(async w=>{
+                Task
+                .findByIdAndUpdate(taskId,{
+                    qa_assigned_date:new Date(),
+                    qa_assigned:true,
+                    qa_wage:w.wage,
+                    qa:qa,
+                    qa_assigner:req.user._id
+                },{new:true},(err,task)=>{
+                    if(err){
+                        return res.status(500).json({
+                            msg:`Can not assign Q.A with error: ${new Error(err.message)}`
+                        })
+                    }
+
+                    return res.status(200).json({
+                        msg:`Assign Q.A into task successfully!`,
+                        task
+                    })
+                })
+            })
+            .catch(err=>{
+                return res.status(err.code).json({
+                    msg:err.msg
+                })
+            })
+        })  
+        .catch(err=>{
+            return res.status(err.code).json({
+                msg:err.msg
             })
         })
-
-        if(!task){
-            return res.status(404).json({
-                msg:`Task not found to assign editor!`
-            })
-        }
-
-        return res.status(200).json({
-            msg:`Assign editor into task successfully!`,
-            task
-        })
-
     })
-})
-
-router.put('/assign-qa',authenticateTLAToken,(req,res)=>{
-    let {qa,taskId} = req.body;
-    Task
-    .findByIdAndUpdate(taskId,{
-        qa_assigned:true,
-        qa,
-        qa_assigner:req.user._id,
-        qa_assigned_date: new Date()
-    },{new:true},(err,task)=>{
-        if(err=>{
-            return res.status(500).json({
-                msg:`Can not assign qa into task with error: ${new Error(err.message)}`
-            })
+    .catch(err=>{
+        return res.status(err.code).json({
+            msg:err.msg
         })
-
-        if(!task){
-            return res.status(404).json({
-                msg:`Task not found to assign qa!`
-            })
-        }
-
-        return res.status(200).json({
-            msg:`Assign qa into task successfully!`,
-            task
-        })
-
     })
 })
 
@@ -329,7 +371,7 @@ router.put('/', authenticateTLAToken, async (req, res) => {
         status: (editor_assigned == 'true' ? 0 : -1),
         editor_assigned_date: new Date(),
         qa_assigned_date: new Date(),
-        updated_by:req.user._id,
+        updated_by: req.user._id,
         updated_at: new Date()
     }, { new: true }, (err, task) => {
         if (err) {
