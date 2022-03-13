@@ -4,30 +4,30 @@ const { authenticateQAToken } = require("../../../middlewares/qa-middleware");
 const { getWage, getModule, getCustomer, getTaskDetail } = require('../common');
 const _MODULE = 'QA';
 
-router.put('/unregister',authenticateQAToken,(req,res)=>{
-    let {taskId} = req.body;
+router.put('/unregister', authenticateQAToken, (req, res) => {
+    let { taskId } = req.body;
     Task
-    .findByIdAndUpdate(taskId,{
-        qa:null,
-        qa_assigned_date: new Date()//danh dau thoi gian Q.A huy nhan task
-    },{new:true},(err,task)=>{
-        if(err){
-            return res.status(500).json({
-                msg:`Can not unregister task with error: ${new Error(err.message)}`
-            })
-        }
+        .findByIdAndUpdate(taskId, {
+            qa: null,
+            qa_assigned_date: new Date()//danh dau thoi gian Q.A huy nhan task
+        }, { new: true }, (err, task) => {
+            if (err) {
+                return res.status(500).json({
+                    msg: `Can not unregister task with error: ${new Error(err.message)}`
+                })
+            }
 
-        if(!task){
-            return res.status(404).json({
-                msg:`Can not unregister this task because it\'s not found`
-            })
-        }
+            if (!task) {
+                return res.status(404).json({
+                    msg: `Can not unregister this task because it\'s not found`
+                })
+            }
 
-        return res.status(200).json({
-            msg:`The task have been unregisted successfully!`,
-            task
+            return res.status(200).json({
+                msg: `The task have been unregisted successfully!`,
+                task
+            })
         })
-    })
 
 })
 
@@ -41,7 +41,7 @@ router.put('/get-task', authenticateQAToken, (req, res) => {
             */
             qa: req.user._id,
             qa_assigned: false,
-            status: { $in: [0,1] }
+            status: { $in: [0, 1] }
         }, async (err, count) => {
             if (err) {
                 return res.status(500).json({
@@ -65,21 +65,22 @@ router.put('/get-task', authenticateQAToken, (req, res) => {
                             getWage(req.user._id, task.level._id, m._id)//kiem tra xem level va q.a nay da duoc set tien cong chua
                                 .then(async w => {
                                     await Task
-                                    .findByIdAndUpdate(taskId,{
-                                        qa: req.user._id,
-                                        assigned_date: new Date()
-                                    },{new:true},(err,task)=>{
-                                        if(err){
-                                            return res.status(500).json({
-                                                msg:`Can not get task with error: ${new Error(err.message)}`
-                                            })
-                                        }
+                                        .findByIdAndUpdate(taskId, {
+                                            qa: req.user._id,
+                                            assigned_date: new Date(),
+                                            qa_wage: w.wage
+                                        }, { new: true }, (err, task) => {
+                                            if (err) {
+                                                return res.status(500).json({
+                                                    msg: `Can not get task with error: ${new Error(err.message)}`
+                                                })
+                                            }
 
-                                        return res.status(200).json({
-                                            msg:`Get task successfully!`,
-                                            task
+                                            return res.status(200).json({
+                                                msg: `Get task successfully!`,
+                                                task
+                                            })
                                         })
-                                    })
                                 })
                                 .catch(err => {
                                     return res.status(err.code).json({
@@ -101,7 +102,7 @@ router.put('/get-task', authenticateQAToken, (req, res) => {
                     })
                 })
 
-            
+
 
         })
 })
@@ -109,48 +110,24 @@ router.put('/get-task', authenticateQAToken, (req, res) => {
 router.put('/submit', authenticateQAToken, (req, res) => {
     let { taskId } = req.body;
 
-    getTaskDetail(taskId)
-    .then(async t=>{
-        await getModule(_MODULE)
-        .then(async m=>{
-            await getWage(req.user._id,t.level._id,m._id)
-            .then(w=>{
-                Task
-                .findByIdAndUpdate(taskId,{
-                    qa_done: new Date(),
-                    status:2,
-                    qa_wage: w.wage
-                },{new:true},(err,task)=>{
-                    if(err){
-                        return res.status(500).json({
-                            msg:`Can not submit this task with error: ${new Error(err.message)}`
-                        })
-                    }
-
-                    return res.status(200).json({
-                        msg:`The task has been submited!`,
-                        task
-                    })
+    Task
+        .findByIdAndUpdate(taskId, {
+            qa_done: new Date(),
+            status: 2
+        }, { new: true }, (err, task) => {
+            if (err) {
+                return res.status(500).json({
+                    msg: `Can not submit this task with error: ${new Error(err.message)}`
                 })
-            })
-            .catch(err=>{
-                return res.status(err.code).json({
-                    msg:err.msg
-                })
-            })
-        })
-        .catch(err=>{
-            return res.status(err.code).json({
-                msg:err.msg
-            })
-        })
+            }
 
-    })
-    .catch(err=>{
-        return res.status(err.code).json({
-            msg:err.msg
+            return res.status(200).json({
+                msg: `The task has been submited!`,
+                task
+            }
+
+            )
         })
-    })
 
 
 
