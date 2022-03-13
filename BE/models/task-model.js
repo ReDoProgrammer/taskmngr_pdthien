@@ -114,8 +114,26 @@ const taskSchema = new Schema({
     editor_done:{
         type:Date
     },
+
     qa_done:{
         type:Date
+    },
+
+    dc:{
+        type:Schema.Types.ObjectId,
+        ref:'user'
+    },
+    dc_get:{
+        //thời gian DC nhận task
+        type:Date
+    },
+    dc_done:{
+        //Thời gian DC submit task
+        type:Date
+    },
+    dc_wage:{
+        //Tiền công của DC
+        type:Number
     },
     input_link:{
         //link hình ảnh của task khi TLA giao việc cho editor,qa

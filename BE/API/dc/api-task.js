@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
 const { authenticateDCToken } = require("../../../middlewares/dc-middleware");
-const {getCustomer,getTaskDetail } = require('../common');
+const {getCustomer,getTaskDetail,getModule,getWage } = require('../common');
 const _MODULE = 'DC';
 
 
@@ -43,6 +43,59 @@ router.put('/submit',authenticateDCToken,(req,res)=>{
     })
 
    
+})
+
+
+router.put('/get-task',authenticateDCToken,(req,res)=>{
+    let {taskId} = req.body;
+    getTaskDetail(taskId)
+    .then(async t=>{
+        if(t.dc !==null && typeof t.dc !== 'undefined'){
+            return res.status(403).json({
+                msg:`This task has been already registed by another DC`
+            })
+        }
+
+        await getModule(_MODULE)
+        .then(async m=>{
+            await getWage(req.user._id,t.level._id,m._id)
+            .then(async w=>{
+                await Task
+                .findByIdAndUpdate(taskId,{
+                    dc:req.user._id,
+                    dc_get:new Date(),
+                    dc_wage:w.wage
+                },{new:true},(err,task)=>{
+                    if(err){
+                        return res.status(500).json({
+                            msg:`Can not register this task with error: ${new Error(err.message)}`
+                        })
+                    }
+
+                    return res.status(200).json({
+                        msg:`The task has been registed successfully!`,
+                        task
+                    })
+                })
+            })
+            .catch(err=>{
+                return res.status(err.code).json({
+                    msg:err.msg
+                })
+            })
+        })
+        .catch(err=>{
+            return res.status(err.code).json({
+                msg:err.msg
+            })
+        })
+        
+    })
+    .catch(err=>{
+        return res.status(err.code).json({
+            msg:err.msg
+        })
+    })
 })
 
 router.put('/reject', authenticateDCToken, (req, res) => {

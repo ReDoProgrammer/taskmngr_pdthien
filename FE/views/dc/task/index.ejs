@@ -29,7 +29,6 @@
     <thead class="thead-dark">
       <tr>
         <th scope="col">#</th>
-        <th scope="col"></th>
         <th scope="col">Customer</th>
         <th scope="col">Job</th>
         <th scope="col">Level</th>
@@ -183,11 +182,13 @@
       });
 
 
-      $(document).on("click", "button[name='btnSubmitTask']", function () {
+      
+
+      $(document).on("click", "button[name='get-task']", function () {
         taskId = $(this).closest("tr").attr("id");
-        if (confirm("Are you sure want to submit this task?")) {
+        if (confirm('Are you sure want to get this task?')) {
           $.ajax({
-            url: '/dc/task/submit',
+            url: '/dc/task/get-task',
             type: 'put',
             headers: {
               authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -198,15 +199,11 @@
             success: function (data) {
               alert(data.msg);
               LoadTasks();
+            }, error: function (request, status, error) {
+              alert(request.responseJSON.msg);
             }
           })
         }
-
-      })
-
-      $(document).on("click", "button[name='btnRejectTask']", function () {
-        taskId = $(this).closest("tr").attr("id");
-        $('#modalRejectTask').modal();
       })
       $('#modalRejectTask').on('hidden.bs.modal', function () {
         LoadTasks();
@@ -242,9 +239,6 @@
             data.tasks.forEach(t => {
               let tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '">';
 
-              tr += '<td>';
-              tr += '<button class="btn btn-xs btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
-              tr += '</td>';
               tr += '<td>' + (idx++) + '</td>';
 
 
@@ -293,7 +287,12 @@
               }
               tr += '</td>';
 
-              tr += '<td>';
+              tr += '<td class="text-right">';
+
+              if ((t.status === 1 && (typeof t.qa === 'undefined' || t.qa === null)) || t.status === 2) {
+                tr += '<button class="btn btn-xs btn-success ml-2" name="get-task"><i class="fa fa-plus" aria-hidden="true"></i></button>';
+              }
+
               tr += '<button class="btn btn-xs btn-info ml-2" name="btnTaskInfo">';
               tr += '<i class="fa fa-info"></i>';
               tr += '</button>';
