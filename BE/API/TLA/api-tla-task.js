@@ -152,7 +152,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
                 .then(result => {
 
                     getCustomerLevelPrice(result.customerId, level)
-                        .then(result => {
+                        .then(async result => {
 
                             if (result.cl.price == 0) {
                                 return res.status(403).json({
@@ -171,14 +171,57 @@ router.post('/', authenticateTLAToken, (req, res) => {
                             task.input_link = input_link;
 
 
+                            //thiết lập các thông tin liên quan khi Editor đc gán
                             if (editor_assigned == 'true') {
-                                task.editor_assigned = true;
-                                task.editor = editor;
-                                task.status = 0;
+                                await getModule(_EDITOR)
+                                .then(async m=>{
+                                    await getWage(editor,level,m._id)
+                                    .then(async w=>{
+                                        task.editor_assigned = true;
+                                        task.editor = editor;
+                                        task.status = 0;
+                                        task.editor_wage=w.wage;
+                                        task.editor_assigned_date = new Date();
+                                        task.editor_assigner = req.user._id;
+                                    })
+                                    .catch(err=>{
+                                        return res.status(err.code).json({
+                                            msg:err.msg
+                                        })
+                                    })
+                                })
+                                .catch(err=>{
+                                    return res.status(err.code).json({
+                                        msg:err.msg
+                                    })
+                                })
+                                
                             }
+
+                            //thiết lập các thông tin khi Q.A được gán
                             if (qa_assigned == 'true') {
-                                task.qa_assigned = true;
-                                task.qa = qa;
+                                await getModule(_QA)
+                                .then(async m=>{
+                                    await getWage(qa,level,m._id)
+                                    .then(async w=>{                                       
+                                        task.qa_assigned = true;
+                                        task.qa = qa;
+                                        task.qa_wage=w.wage;
+                                        task.qa_assigned_date = new Date();
+                                        task.qa_assigner = req.user._id;
+                                    })
+                                    .catch(err=>{
+                                        return res.status(err.code).json({
+                                            msg:err.msg
+                                        })
+                                    })
+                                })
+                                .catch(err=>{
+                                    return res.status(err.code).json({
+                                        msg:err.msg
+                                    })
+                                })
+                              
                             }
 
 
