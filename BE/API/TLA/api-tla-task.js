@@ -300,7 +300,6 @@ router.put('/assign-editor', authenticateTLAToken, (req, res) => {
                 .then(async m => {
                     await getWage(editor, t.level._id, m._id)
                         .then(async w => {
-                            console.log('wage ne: ', w);
                             Task
                                 .findByIdAndUpdate(taskId, {
                                     editor_assigned_date: new Date(),

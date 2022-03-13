@@ -275,17 +275,14 @@
                 levelId
             },
             success: function (data) {
-                $('#slEditor').empty();
-                $('#slEditorInEditDiv').empty();
+                $('#slEditor').empty();             
                 data.editors.forEach(e => {
                     let opt = '<option value="' + e._id + '">' + e.fullname + '</option>';
                     $('#slEditor').append(opt);
                     $('#slEditorInEditDiv').append(opt);
                 })
-                $('#slEditor').selectpicker();
-                $('#slEditorInEditDiv').selectpicker();
-                $('#slEditor').selectpicker('refresh');
-                $('#slEditorInEditDiv').selectpicker('refresh');
+                $('#slEditor').selectpicker();              
+                $('#slEditor').selectpicker('refresh');              
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 $('#msgError').text(jqXHR.responseJSON.msg);
