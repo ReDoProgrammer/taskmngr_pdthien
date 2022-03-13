@@ -141,6 +141,7 @@ router.get('/list', authenticateDCToken, (req, res) => {
         .populate('level')
         .populate('editor')
         .populate('qa')
+        .populate('dc')
         .exec()
         .then(tasks => {
             return res.status(200).json({

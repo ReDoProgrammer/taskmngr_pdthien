@@ -38,6 +38,7 @@
         <th scope="col" class="text-right">I-N</th>
         <th scope="col">Editor</th>
         <th scope="col">Q.A</th>
+        <th scope="col">DC</th>
         <th scope="col">Status</th>
         <th scope="col"></th>
       </tr>
@@ -262,6 +263,11 @@
                 tr += t.qa.fullname
               }
               tr += '</td>';
+              tr += '<td>';
+              if (typeof t.dc !== 'undefined' && t.dc !== null) {
+                tr += t.dc.fullname
+              }
+              tr += '</td>';
 
 
 
@@ -289,7 +295,10 @@
 
               tr += '<td class="text-right">';
 
-              if ((t.status === 1 && (typeof t.qa === 'undefined' || t.qa === null)) || t.status === 2) {
+              if (
+                    ((t.status === 1 && (typeof t.qa === 'undefined' || t.qa === null)) || t.status === 2) 
+                    && (typeof t.dc ==='undefined' || t.dc ===null)
+                    ) {
                 tr += '<button class="btn btn-xs btn-success ml-2" name="get-task"><i class="fa fa-plus" aria-hidden="true"></i></button>';
               }
 
