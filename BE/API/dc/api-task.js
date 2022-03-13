@@ -127,6 +127,66 @@ router.put('/reject', authenticateDCToken, (req, res) => {
             })
 })
 
+
+router.get('/personal-tasks', authenticateDCToken, (req, res) => {
+    let { page, search, status } = req.query;
+    if(status == 100){
+        Task
+        .find({dc:req.user._id})
+        .populate({
+            path : 'job',
+            populate : {
+              path : 'customer'
+            }
+          })
+        .populate('level')
+        .populate('editor')
+        .populate('qa')
+        .populate('dc')
+        .exec()
+        .then(tasks => {
+            return res.status(200).json({
+                msg: `Load tasks list successfully!`,
+                tasks
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not get tasks list with error: ${new Error(err.message)}`
+            })
+        })
+    }else{
+        Task
+        .find({
+            status,
+            dc:req.user._id
+        })
+        .populate({
+            path : 'job',
+            populate : {
+              path : 'customer'
+            }
+          })
+        .populate('level')
+        .populate('editor')
+        .populate('qa')
+        .exec()
+        .then(tasks => {
+            return res.status(200).json({
+                msg: `Load tasks list successfully!`,
+                tasks
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not get tasks list with error: ${new Error(err.message)}`
+            })
+        })
+    }
+    
+})
+
+
 router.get('/list', authenticateDCToken, (req, res) => {
     let { page, search, status } = req.query;
     if(status == 100){

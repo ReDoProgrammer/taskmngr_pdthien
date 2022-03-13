@@ -70,120 +70,7 @@
         LoadTasks();
       })
 
-      $(document).on('click', '#funcMenu  li', function () {
-        let fnc = $(this).attr('id');
-
-        switch (fnc) {
-          case 'reject-task':
-            $('#modalRejectTask').modal();
-            break;
-          case 'submit-task':
-            if (confirm('Are you sure want to submit this task?')) {
-              $.ajax({
-                url: '/qa/task/submit',
-                type: 'put',
-                headers: {
-                  authorization: "Bearer " + localStorage.getItem("accessToken"),
-                },
-                data: {
-                  taskId
-                },
-                success: function (data) {
-                  alert(data.msg);
-                  LoadTasks();
-                }, error: function (request, status, error) {
-                  alert(request.responseJSON.msg);
-                }
-              })
-            }
-            break;
-
-          case 'unregister-task':
-            if (confirm('Are you sure want to unregister this task?')) {
-              $.ajax({
-                url: '/qa/task/unregister',
-                type: 'put',
-                headers: {
-                  authorization: "Bearer " + localStorage.getItem("accessToken"),
-                },
-                data: {
-                  taskId
-                },
-                success: function (data) {
-                  alert(data.msg);
-                  LoadTasks();
-                }, error: function (request, status, error) {
-                  alert(request.responseJSON.msg);
-                }
-              })
-            }
-            break;
-        }
-      });
-
-
-      $(document).on("click", "button[name='functions']", function (e) {
-        var $contextMenu = $("#contextMenu");
-        $contextMenu.css({
-          display: "block",
-          left: e.pageX,
-          top: e.pageY
-        });
-
-        taskId = $(this).closest('tr').attr('id');
-
-        $.ajax({
-          url: '/dc/task/detail',
-          type: 'get',
-          headers: {
-            authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-          data: {
-            taskId
-          },
-          success: function (data) {
-            customerId = data.customer._id;
-            levelId = data.task.level._id;
-
-            $('#funcMenu').empty();
-            let mn = '';
-            switch (data.task.status) {
-              case 1:
-                if (typeof data.task.qa === 'undefined' || data.task.qa === null) {
-                  mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Submit</a></li>';
-                  mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
-                } else {
-                  $contextMenu.css({
-                    display: "none"
-                  });
-                }
-
-                break;
-              case 2:
-                mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Q.A ok</a></li>';
-                mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
-                break;
-
-              default:
-                $contextMenu.css({
-                  display: "none"
-                });
-                break;
-
-            }
-            $('#funcMenu').append(mn);
-          }
-        })
-
-
-        $('html').click(function () {
-          $contextMenu.hide();
-        });
-
-      });
-
-
-      
+          
 
       $(document).on("click", "button[name='get-task']", function () {
         taskId = $(this).closest("tr").attr("id");
@@ -211,8 +98,7 @@
       })
 
 
-      $('#slStatus').on('change', function () {
-        status = this.value;
+      $('#slStatus').on('change', function () {      
         LoadTasks();
       })
 

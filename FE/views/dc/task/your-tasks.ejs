@@ -1,5 +1,192 @@
-<script>
-    $(document).on("click", "button[name='btnSubmitTask']", function () {
+<div class="row">
+  <div class="col-md-offset-6 col-sm-offset-6 col-md-2 col-sm-2 col-xs-4 mt-2">
+    <select name="" id="slStatus" class="form-control">
+      <option value="100">All</option>
+      <option value="1">Editor submited</option>
+      <option value="-1">Initial</option>
+      <option value="0">Editing</option>
+      <option value="2">Submited</option>
+      <option value="-2">Rejected</option>
+    </select>
+  </div>
+  <div class="col-md-4 col-sm-4 col-xs-8 mt-2">
+    <!-- Another variation with a button -->
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="Seach your job..." id="txtSearch" />
+      <div class="input-group-btn">
+        <button class="btn btn-info" type="submit" id="btnSearch">
+          <i class="fa fa-search" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="col-md-6 col-dm-6 col-xs-12 mt-2"></div>
+
+<hr />
+<div class="table-responsive mt-2">
+  <table class="table table-striped text-nowrap">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">#</th>
+        <th scope="col">Customer</th>
+        <th scope="col">Job</th>
+        <th scope="col">Level</th>
+        <th scope="col">Deadline</th>
+        <th scope="col">Remark</th>
+        <th scope="col" class="text-right">E-T</th>
+        <th scope="col" class="text-right">I-N</th>
+        <th scope="col">Editor</th>
+        <th scope="col">Q.A</th>
+        <th scope="col">DC</th>
+        <th scope="col">Status</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody id="tbdTasks">
+    </tbody>
+  </table>
+</div>
+
+<div id="contextMenu" class="dropdown clearfix">
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu"
+    style="display:block;position:static;margin-bottom:5px;" id="funcMenu">
+  </ul>
+</div>
+
+<%-include('task_detail')%>
+  <%-include('reject-modal')%>
+
+
+
+    <script src="/js/common.js"></script>
+    <script>
+      var page = 1;
+      var search = '';
+      var status = 100;
+      var taskId = '';
+
+      $(document).ready(function () {
+        LoadTasks();
+      })
+
+      $(document).on('click', '#funcMenu  li', function () {
+        let fnc = $(this).attr('id');
+
+        switch (fnc) {
+          case 'reject-task':
+            $('#modalRejectTask').modal();
+            break;
+          case 'submit-task':
+            if (confirm('Are you sure want to submit this task?')) {
+              $.ajax({
+                url: '/qa/task/submit',
+                type: 'put',
+                headers: {
+                  authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                  taskId
+                },
+                success: function (data) {
+                  alert(data.msg);
+                  LoadTasks();
+                }, error: function (request, status, error) {
+                  alert(request.responseJSON.msg);
+                }
+              })
+            }
+            break;
+
+          case 'unregister-task':
+            if (confirm('Are you sure want to unregister this task?')) {
+              $.ajax({
+                url: '/qa/task/unregister',
+                type: 'put',
+                headers: {
+                  authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                  taskId
+                },
+                success: function (data) {
+                  alert(data.msg);
+                  LoadTasks();
+                }, error: function (request, status, error) {
+                  alert(request.responseJSON.msg);
+                }
+              })
+            }
+            break;
+        }
+      });
+
+
+      $(document).on("click", "button[name='functions']", function (e) {
+        var $contextMenu = $("#contextMenu");
+        $contextMenu.css({
+          display: "block",
+          left: e.pageX,
+          top: e.pageY
+        });
+
+        taskId = $(this).closest('tr').attr('id');
+
+        $.ajax({
+          url: '/dc/task/detail',
+          type: 'get',
+          headers: {
+            authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+          data: {
+            taskId
+          },
+          success: function (data) {
+            customerId = data.customer._id;
+            levelId = data.task.level._id;
+
+            $('#funcMenu').empty();
+            let mn = '';
+            switch (data.task.status) {
+              case 1:
+                if (typeof data.task.qa === 'undefined' || data.task.qa === null) {
+                  mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Submit</a></li>';
+                  mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
+                  mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
+                } else {
+                  $contextMenu.css({
+                    display: "none"
+                  });
+                }
+
+                break;
+              case 2:
+                mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Submit</a></li>';
+                mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
+                mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
+                break;
+
+              default:
+                $contextMenu.css({
+                  display: "none"
+                });
+                break;
+
+            }
+            $('#funcMenu').append(mn);
+          }
+        })
+
+
+        $('html').click(function () {
+          $contextMenu.hide();
+        });
+
+      });
+
+
+      $(document).on("click", "button[name='btnSubmitTask']", function () {
         taskId = $(this).closest("tr").attr("id");
         if (confirm("Are you sure want to submit this task?")) {
           $.ajax({
@@ -19,4 +206,129 @@
         }
 
       })
-</script>
+
+
+      $('#modalRejectTask').on('hidden.bs.modal', function () {
+        LoadTasks();
+      })
+
+
+      $('#slStatus').on('change', function () {
+        status = this.value;
+        LoadTasks();
+      })
+
+
+      $(document).on("click", "button[name='btnTaskInfo']", function () {
+        taskId = $(this).closest("tr").attr("id");
+        $('#modalTaskDetail').modal();
+      })
+      function LoadTasks() {
+        $.ajax({
+          url: '/dc/task/personal-tasks',
+          type: 'get',
+          headers: {
+            authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+          data: {
+            search: $('#txtSearch').val(),
+            page,
+            status: $('#slStatus option:selected').val()
+          },
+          success: function (data) {
+            $('#tbdTasks').empty();
+            let idx = 1;
+
+            data.tasks.forEach(t => {
+              let tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '">';
+              tr += '<td>';
+              tr += '<button class="btn btn-xs btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
+              tr += '</td>';
+              tr += '<td>' + (idx++) + '</td>';
+              tr += '<td class="font-weight-bold text-primary">' + t.job.customer.firstname + ' ' + t.job.customer.lastname + '</td>';
+              tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
+              tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
+              tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>'
+              tr += '<td>' + t.remark + '</td>';
+              tr += '<td class="text-right">' + t.edited_time + '</td>';
+              tr += '<td class="text-right">' + t.amount + '</td>';
+
+
+
+              tr += '<td>';
+              if (typeof t.editor !== 'undefined' && t.editor !== null) {
+                tr += t.editor.fullname
+              }
+              tr += '</td>';
+              tr += '<td>';
+              if (typeof t.qa !== 'undefined' && t.qa !== null) {
+                tr += t.qa.fullname
+              }
+              tr += '</td>';
+              tr += '<td>';
+              if (typeof t.dc !== 'undefined' && t.dc !== null) {
+                tr += t.dc.fullname
+              }
+              tr += '</td>';
+
+
+
+              tr += '<td class="font-italic font-weight-bold">';
+              switch (t.status) {
+
+                case 0: tr += '<span class="text-info">Processing</span>'; break;
+                case 1: {
+                  if (t.edited_time > 1) {
+                    tr += '<span class="text-primary">Fixed</span>';
+                  } else {
+                    tr += '<span class="text-primary">Edited</span>';
+                  }
+                  break;
+                }
+                case 2: tr += '<span class="text-success">Q.A ok</span>'; break;
+                case 3: tr += '<span class="text-success">DC ok</span>'; break;
+                case -1: tr += '<span class="text-info">Initial</span>'; break;
+                case -2: tr += '<span class="text-danger">Q.A reject</span>'; break;
+                case -3: tr += '<span class="text-danger">DC reject</span>'; break;
+                case -4: tr += '<span class="text-danger">Canceled</span>'; break;
+
+              }
+              tr += '</td>';
+
+              tr += '<td class="text-right">';
+
+              if (
+                ((t.status === 1 && (typeof t.qa === 'undefined' || t.qa === null)) || t.status === 2)
+                && (typeof t.dc === 'undefined' || t.dc === null)
+              ) {
+                tr += '<button class="btn btn-xs btn-success ml-2" name="get-task"><i class="fa fa-plus" aria-hidden="true"></i></button>';
+              }
+
+              tr += '<button class="btn btn-xs btn-info ml-2" name="btnTaskInfo">';
+              tr += '<i class="fa fa-info"></i>';
+              tr += '</button>';
+              tr += '</td>';
+
+              tr += '</tr>';
+              $('#tbdTasks').append(tr);
+            })
+          }
+
+        })
+      }
+
+
+
+    </script>
+
+    <style>
+      #contextMenu {
+        position: absolute;
+        display: none;
+      }
+
+      tr:hover {
+        background: #c9e8f7;
+        position: relative;
+      }
+    </style>
