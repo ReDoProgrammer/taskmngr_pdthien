@@ -611,10 +611,19 @@ router.delete('/', authenticateTLAToken, (req, res) => {
     let { _id } = req.body;
     Task.findByIdAndDelete(_id)
         .exec()
-        .then(_ => {
-            return res.status(200).json({
-                msg: 'Task has been deleted!'
+        .then(async _ => {
+            Remark
+            .deleteMany({tid:_id},err=>{
+                if(err){
+                    return res.status(500).json({
+                        msg:`Can not delete remarks belong to this task with error: ${new Error(err.message)}`
+                    })
+                }
+                return res.status(200).json({
+                    msg: 'Task has been deleted!'
+                })
             })
+           
         })
         .catch(err => {
             return res.status(500).json({
