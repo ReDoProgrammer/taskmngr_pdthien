@@ -40,7 +40,7 @@
                 <th scope="col" class="text-right">E-N</th>
                 <th scope="col" class="text-right">E-T</th>
                 <th scope="col">Editor</th>
-                <th scope="col">Status</th>
+                <th scope="col">Status</th>                
                 <th scope="col"></th>
             </tr>
         </thead>
@@ -99,12 +99,12 @@
                             })
                         }
                         break;
-                        
+
                     case 'unregister-task':
-                        if(confirm('Are you sure want to unregister this task?')){
+                        if (confirm('Are you sure want to unregister this task?')) {
                             $.ajax({
-                                url:'/qa/task/unregister',
-                                type:'put',
+                                url: '/qa/task/unregister',
+                                type: 'put',
                                 headers: {
                                     authorization: "Bearer " + localStorage.getItem("accessToken"),
                                 },
@@ -120,7 +120,7 @@
                             })
                         }
                         break;
-                    }
+                }
             });
 
 
@@ -150,8 +150,8 @@
                         $('#funcMenu').empty();
                         let mn = '';
                         switch (data.task.status) {
-                            case -1:                               
-                            case 0:                                
+                            case -1:
+                            case 0:
                                 mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
                                 break;
                             case 1:
@@ -225,7 +225,13 @@
                             tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
                             tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
                             tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>'
-                            tr += '<td>' + t.remark + '</td>';
+                           
+                            tr += '<td>';
+                            if (typeof t.remarks[0] !== 'undefined') {
+                                tr += t.remarks[0].content;
+                            }
+                            tr += '</td>';
+
                             tr += '<td class="text-right">' + t.amount + '</td>';
                             tr += '<td class="text-right">' + t.edited_time + '</td>';
 
@@ -258,6 +264,9 @@
 
                             }
                             tr += '</td>';
+
+                           
+                           
 
                             tr += '<td class="text-right">';
                             tr += '<button class="btn btn-xs btn-info" name="btnTaskInfo">';

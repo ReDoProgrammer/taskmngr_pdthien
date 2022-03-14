@@ -327,7 +327,11 @@
                                         tr += '</td>';
 
 
-                                        tr += '<td>' + t.remarks[0].content + '</td>';
+                                        tr += '<td>';
+                                        if (typeof t.remarks[0] !== 'undefined') {
+                                            tr += t.remarks[0].content;
+                                        }
+                                        tr += '</td>';
 
 
                                         tr += '<td><i>';

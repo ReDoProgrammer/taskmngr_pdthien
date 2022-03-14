@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
+const Remark = require('../../models/remark-model');
 const { authenticateQAToken } = require("../../../middlewares/qa-middleware");
 const { getWage, getModule, getCustomer, getTaskDetail } = require('../common');
 const _MODULE = 'QA';
@@ -137,32 +138,41 @@ router.put('/submit', authenticateQAToken, (req, res) => {
 router.put('/reject', authenticateQAToken, (req, res) => {
     let { taskId, remark } = req.body;
 
-    Task
-        .findByIdAndUpdate(taskId, {
-            qa_done: new Date(),
-            status: -2,
-            qa: req.user._id,
-            remark
-        },
-            { new: true },
-            (err, task) => {
-                if (err) {
-                    return res.status(500).json({
-                        msg: `Can not reject task with error: ${new Error(err.message)}`
-                    })
-                }
+    getTaskDetail(taskId)
+        .then(async task => {
+            let rm = new Remark({
+                user: req.user._id,
+                content: remark,
+                tid: task._id
+            });
 
-                if (!task) {
-                    return res.status(404).json({
-                        msg: `Task not found!!`
-                    })
-                }
+            await rm.save()
+                .then(async r => {
+                    task.remarks.push(r);
+                    await task.save()
+                        .then(t => {
+                            return res.status(200).json({
+                                msg: `The task has been rejected!`
+                            })
+                        })
+                        .catch(err => {
+                            return res.status(500).json({
+                                msg: `Can not reject this task with error: ${new Error(err.message)}`
+                            })
+                        })
 
-                return res.status(200).json({
-                    msg: `The task has been rejected!`,
-                    task
                 })
+                .catch(err => {
+                    return res.status(500).json({
+                        msg: `Can not insert reject remark with error: ${new Error(err.message)}`
+                    })
+                })
+        })
+        .catch(err => {
+            return res.status(err.code).json({
+                msg: err.msg
             })
+        })
 })
 
 router.get('/list', authenticateQAToken, (req, res) => {
@@ -181,10 +191,10 @@ router.get('/list', authenticateQAToken, (req, res) => {
             .populate('qa')
             .populate('dc')
             .populate({
-                path:'remarks',
+                path: 'remarks',
                 options: {
                     limit: 1,
-                    sort: { timestamp: -1}   
+                    sort: { timestamp: -1 }
                 }
             })
             .exec()
@@ -267,6 +277,13 @@ router.get('/personal', authenticateQAToken, (req, res) => {
             .populate('level')
             .populate('editor')
             .populate('qa')
+            .populate({
+                path: 'remarks',
+                options: {
+                    limit: 1,
+                    sort: { timestamp: -1 }
+                }
+            })
             .exec()
             .then(tasks => {
                 return res.status(200).json({

@@ -128,7 +128,15 @@
               tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
               tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
               tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>'
-              tr += '<td>' + t.remark + '</td>';
+
+
+              tr += '<td>';
+              if (typeof t.remarks[0] !== 'undefined') {
+                tr += t.remarks[0].content;
+              }
+              tr += '</td>';
+
+
               tr += '<td class="text-right">' + t.amount + '</td>';
               tr += '<td class="text-right">' + t.edited_time + '</td>';
 

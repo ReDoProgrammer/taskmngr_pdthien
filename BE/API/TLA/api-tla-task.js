@@ -573,9 +573,11 @@ router.put('/', authenticateTLAToken, async (req, res) => {
            
             await Remark
             .findOneAndUpdate({
-                user:req.user._id
+                user:req.user._id,
+                tid:task._id
             },{
-                content:remark
+                content:remark,
+                timestamp: new Date()
             },{new:true},(err,remark)=>{
                 if(err){
                     return res.status(500).json({
