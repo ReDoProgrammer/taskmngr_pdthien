@@ -2,7 +2,8 @@ const router = require('express').Router();
 const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const Job = require('../../models/job-model');
 const Task = require('../../models/task-model');
-const {setJobStatus} = require('../common');
+const Link = require('../../models/link-model');
+
 
 
 
@@ -57,40 +58,53 @@ router.get('/detail',authenticateTLAToken,(req,res)=>{
 })
 
 router.put('/submit',authenticateTLAToken,(req,res)=>{
-    let {jobId} = req.body;
-    console.log(jobId);
-    Task
-    .countDocuments({
-        job: jobId,
-        status:{$in:[3,-4]}
-    },async (err,count)=>{
-        if(err){
-            console.log(err);
+    let {jobId,link,remark} = req.body;
+
+   Job
+   .findById(jobId)
+   .exec()
+   .then(async job=>{
+        if(!job){
+            return res.status(404).json({
+                msg:`Job not found!`
+            })
+        }
+
+        let lnk = new Link({
+            job:job._id,
+            url:link,
+            remark,
+            created_by: req.user._id
+        });
+        await lnk
+        .save()
+        .then(async l=>{
+            job.links.push(l);
+            job.status = 1;
+            await job.save()
+            .then(_=>{
+                return res.status(200).json({
+                    msg:`The job has been uploaded successfully!`
+                })
+            })
+            .catch(err=>{
+                return res.status(500).json({
+                    msg:`Can not stored link into job with error: ${new Error(err.message)}`
+                })
+            })
+        })
+        .catch(err=>{
             return res.status(500).json({
-                msg:`Can not check tasks belong to this job with error: ${new Error(err.message)}`
+                msg:`Can not save link with error: ${new Error(err.mesage)}`
             })
-        }
-        if(count>0){
-            return res.status(403).json({
-                msg:`Can not sumbit this job because having tasks have been not submited done!`
-            })
-        }
-       await setJobStatus(jobId,1,req.user._id)
-       .then(job=>{
-           return res.status(200).json({
-               msg:`The job has been submited!`,
-               job
-           })
+        })
+   })
+   .catch(err=>{
+       return res.status(500).json({
+           msg:`Can not get job with error: ${new Error(err.message)}`
        })
-       .catch(err=>{
-           console.log(err);
-           return res.status(err.code).json({
-               msg:err.msg
-           })
-       })
-    })
-
-
+   })
+    
    
 })
 

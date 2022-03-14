@@ -52,11 +52,11 @@ const jobSchema = new Schema({
         type:String,
         default:''
     },    
-    output_link:{
+    links:[{
         //link này chứa hình ảnh output khi eidtor,qa,dc submit done TLA sẽ tổng hợp lại để post lên cho sale giao cho khách
-        type:String,
-        default:''
-    },
+       type:Schema.Types.ObjectId,
+       ref:'link'
+    }],
     cb_ticked:{
         //đánh dấu có lựa chọn combo hay không
         type:Boolean,
