@@ -101,6 +101,9 @@ app.use('/qa',qaHomeController);
 const editorAuthController = require('./BE/API/editor/authenticate');
 app.use('/editor/auth',editorAuthController);
 
+const editorTaskController = require('./BE/controllers/editor/task-controller');
+app.use('/editor/task',editorTaskController);
+
 const editorHomeController = require("./BE/controllers/editor/home-controller");
 app.use("/editor", editorHomeController);
 
