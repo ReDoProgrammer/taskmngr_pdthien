@@ -1,22 +1,43 @@
 <div class="modal" tabindex="-1" id="submitJobModal">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-body text-dark">
-          <div class="panel panel-info mb-3">
-            <div class="panel-heading font-weight-bold">
-              <i class="fa fa-tasks" aria-hidden="true"></i>
-              <label id="name_case" class="text-uppercase"></label> - <label id="customer" class="text-danger"></label>
-            </div>
-            <div class="panel-body">
-  
-            </div>
-          </div>          
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body text-dark">
+        <div class="panel panel-info mb-3">
+          <div class="panel-heading font-weight-bold">
+            <i class="fa fa-tasks" aria-hidden="true"></i>
+            <label id="name_case" class="text-uppercase"></label> - <label id="customer" class="text-danger"></label>
+          </div>
+          <div class="panel-body">
+
+          </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
-            Close
-          </button>
-        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
       </div>
     </div>
   </div>
+</div>
+
+<script>
+  $('#btnSubmitJob').click(function () {
+    $.ajax({
+      url: '/tla/job/submit',
+      type: 'put',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        jobId
+      },
+      success: function (data) {
+        alert(data.msg);
+        LoadJob();
+      }, error: function (request, status, error) {
+        alert(request.responseJSON.msg);
+      }
+    })
+  })
+</script>

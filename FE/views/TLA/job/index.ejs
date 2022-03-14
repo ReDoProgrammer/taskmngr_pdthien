@@ -49,6 +49,7 @@
 
 
 <%-include('manage-job-modal')%>    
+<%-include('submit-job-modal')%>    
 
         <script>
             var search = '';
@@ -63,24 +64,8 @@
 
             $(document).on("click", "button[name='submit-job']", function () {
                 jobId = $(this).closest('tr').attr('id');
-                if (confirm('Are you sure want to submit this job?')) {
-                    
-                    $.ajax({
-                        url: '/tla/job/submit',
-                        type: 'put',
-                        headers: {
-                            authorization: "Bearer " + localStorage.getItem("accessToken"),
-                        },
-                        data: {
-                            jobId
-                        },
-                        success: function (data) {
-                            alert(data.msg);
-                            LoadJob();
-                        }, error: function (request, status, error) {
-                            alert(request.responseJSON.msg);
-                        }
-                    })
+                if (confirm('Are you sure want to submit this job?')) {                    
+                    $('#submitJobModal').modal();
                 }
             })
 
@@ -105,9 +90,10 @@
 
                             tr += '<td>';
                             if (job.status == -1 || job.status == 0) {
-                                tr += '<button class="btn btn-xs btn-primary" name="process-job"><i class="fa fa-cog" aria-hidden="true"></i> Manage</button>'
+                                tr += '<button class="btn btn-xs btn-primary" name="process-job"><i class="fa fa-cog" aria-hidden="true"></i> Manage</button>';
+                                tr += '<button class="btn btn-xs btn-success ml-2" name="submit-job"><i class="fa fa-paper-plane" aria-hidden="true"></i> Submit</button>';
                             }
-                            tr += '<button class="btn btn-xs btn-success ml-2" name="submit-job"><i class="fa fa-paper-plane" aria-hidden="true"></i> Submit</button>'
+                            
                             tr += '</td>';
 
                             tr += '<td>' + (idx++) + '</td>'
