@@ -114,10 +114,13 @@
         taskId
       },
       success: function (data) {
+
+        console.log(data);
+
         $('#divAddOrUpdateTask').slideUp(200);
         $('#divAddOrUpdateTask').slideDown(1000);
 
-        $('#slJobLevels').val(data.task.level);
+        $('#slJobLevels').val(data.task.level._id);
         $('#slJobLevels').attr("disabled", true);
 
         $('#txtAssignDate').val(convertISODateToTimeFormat(data.task.assigned_date));
@@ -163,7 +166,7 @@
 
   $(document).on("click", "button[name='btnAssignStaffAuto']", function () {
 
-    if (confirm('Are you sure want to set editor automatically')) {
+    if (confirm('Are you sure want to set editor automatically?')) {
       $.ajax({
         url: '/tla/queue',
         type: 'post',
