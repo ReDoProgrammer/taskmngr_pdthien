@@ -137,6 +137,52 @@ router.get('/detail', authenticateTLAToken, (req, res) => {
 })
 
 
+router.get('/detail-to-edit',authenticateTLAToken,(req,res)=>{
+    let { taskId } = req.query;
+    Task
+        .findById(taskId)
+        .populate('job')
+        .populate('level')
+        .populate({
+            path: 'remarks',
+            populate: {
+                path: 'user'
+            },
+            options: {
+                sort: { timestamp: -1 },
+                user: req.user._id
+            }
+        })
+        .exec()
+        .then(async task => {
+            if (!task) {
+                return res.status(404).json({
+                    msg: `Task not found!`
+                })
+            }
+
+            await getCustomer(task.job.customer)
+                .then(customer => {
+                    return res.status(200).json({
+                        msg: `Load task detail successfully!`,
+                        task,
+                        customer
+                    })
+                })
+                .catch(err => {
+                    return res.status(err.code).json({
+                        msg: err.msg
+                    })
+                })
+
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not get task detail with error: ${new Error(err.message)}`
+            })
+        })
+})
+
 
 
 router.post('/', authenticateTLAToken, (req, res) => {
@@ -452,14 +498,14 @@ router.put('/', authenticateTLAToken, async (req, res) => {
     task.assigned_date = assigned_date;
     task.deadline = deadline;
     task.input_link = input_link;
-    task.remark = remark;
+   
 
 
     //thiết lập các thông tin liên quan khi Editor đc gán
     if (editor_assigned == 'true') {
         await getModule(_EDITOR)
             .then(async m => {
-                await getWage(editor, level, m._id)
+                await getWage(editor, task.level._id, m._id)
                     .then(async w => {
                         task.editor_assigned = true;
                         task.editor = editor;
@@ -475,6 +521,7 @@ router.put('/', authenticateTLAToken, async (req, res) => {
                     })
             })
             .catch(err => {
+                console.log('editor: ',err);
                 return res.status(err.code).json({
                     msg: err.msg
                 })
@@ -493,7 +540,7 @@ router.put('/', authenticateTLAToken, async (req, res) => {
     if (qa_assigned == 'true') {
         await getModule(_QA)
             .then(async m => {
-                await getWage(qa, level, m._id)
+                await getWage(qa, task.level._id, m._id)
                     .then(async w => {
                         task.qa_assigned = true;
                         task.qa = qa;
@@ -522,13 +569,34 @@ router.put('/', authenticateTLAToken, async (req, res) => {
     }
 
     await task.save()
-        .then(t => {
-            return res.status(200).json({
-                msg:`Task has been updated!`,
-                t
+        .then(async t => {
+           
+            await Remark
+            .findOneAndUpdate({
+                user:req.user._id
+            },{
+                content:remark
+            },{new:true},(err,remark)=>{
+                if(err){
+                    return res.status(500).json({
+                        msg:`Can not update remark with error: ${new Error(err.message)}`
+                    })
+                }
+                if(!remark){
+                    return res.status(404).json({
+                        msg:`Remark not found!`
+                    })
+                }
+                return res.status(200).json({
+                    msg:`Task has been updated!`,
+                    t
+                })
+                
             })
+          
         })
         .catch(err => {
+            console.log('errrrrrrrrr: ',err);
             return res.status(500).json({
                 msg:`Can not update the task with error: ${new Error(err.message)}`
             })

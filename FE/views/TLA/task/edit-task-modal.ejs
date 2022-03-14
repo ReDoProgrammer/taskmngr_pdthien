@@ -199,7 +199,7 @@
 
     function LoadTask() {
         $.ajax({
-            url: '/tla/task/detail',
+            url: '/tla/task/detail-to-edit',
             type: 'get',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -220,7 +220,7 @@
                 $('#txtAssignDate').prop('readonly', true);
                 $('#txtDeadline').val(convertISODateToTimeFormat(data.task.deadline));
                 $('#txtInputLink').val(data.task.input_link);
-                $('#txtRemark').val(data.task.remark);
+                $('#txtRemark').val(data.task.remarks[0].content);
 
                 //xu ly checkbox va dropdown lien quan toi editor va qa
                 $('#ckbAssignEditor').prop('checked', data.task.editor_assigned);
