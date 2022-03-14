@@ -149,6 +149,7 @@ router.put('/reject', authenticateQAToken, (req, res) => {
             await rm.save()
                 .then(async r => {
                     task.remarks.push(r);
+                    task.status = -2;
                     await task.save()
                         .then(t => {
                             return res.status(200).json({

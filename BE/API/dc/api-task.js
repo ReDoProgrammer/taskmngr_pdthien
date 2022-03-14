@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
+const Remark = require('../../models/remark-model');
 const { authenticateDCToken } = require("../../../middlewares/dc-middleware");
 const { getCustomer, getTaskDetail, getModule, getWage } = require('../common');
 const _MODULE = 'DC';
@@ -147,30 +148,42 @@ router.put('/get-task', authenticateDCToken, (req, res) => {
 router.put('/reject', authenticateDCToken, (req, res) => {
     let { taskId, remark } = req.body;
 
-    Task
-        .findByIdAndUpdate(taskId, {
-            status: -3,
-            remark
-        },
-            { new: true },
-            (err, task) => {
-                if (err) {
-                    return res.status(500).json({
-                        msg: `Can not reject task with error: ${new Error(err.message)}`
-                    })
-                }
+    getTaskDetail(taskId)
+        .then(async task => {
+            let rm = new Remark({
+                user: req.user._id,
+                content: remark,
+                tid: task._id
+            });
 
-                if (!task) {
-                    return res.status(404).json({
-                        msg: `Task not found!!`
-                    })
-                }
+            await rm.save()
+                .then(async r => {
+                    task.remarks.push(r);
+                    task.status = -3;
+                    await task.save()
+                        .then(t => {
+                            return res.status(200).json({
+                                msg: `The task has been rejected!`
+                            })
+                        })
+                        .catch(err => {
+                            return res.status(500).json({
+                                msg: `Can not reject this task with error: ${new Error(err.message)}`
+                            })
+                        })
 
-                return res.status(200).json({
-                    msg: `The task has been rejected!`,
-                    task
                 })
+                .catch(err => {
+                    return res.status(500).json({
+                        msg: `Can not insert reject remark with error: ${new Error(err.message)}`
+                    })
+                })
+        })
+        .catch(err => {
+            return res.status(err.code).json({
+                msg: err.msg
             })
+        })
 })
 
 
