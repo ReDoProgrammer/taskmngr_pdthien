@@ -23,6 +23,13 @@ router.get('/', authenticateEditorToken, (req, res) => {
             }
         })
         .populate('qa')
+        .populate({
+            path:'remarks',
+            options: {
+                limit: 1,
+                sort: { timestamp: -1}   
+            }
+        })
         .sort({ deadline: -1 })//sắp xếp giảm dần theo deadline
         .sort({ status: 1 })//sắp xếp tăng dần theo trạng thái của task
         .exec()

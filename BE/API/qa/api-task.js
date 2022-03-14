@@ -180,6 +180,13 @@ router.get('/list', authenticateQAToken, (req, res) => {
             .populate('editor')
             .populate('qa')
             .populate('dc')
+            .populate({
+                path:'remarks',
+                options: {
+                    limit: 1,
+                    sort: { timestamp: -1}   
+                }
+            })
             .exec()
             .then(tasks => {
                 return res.status(200).json({
