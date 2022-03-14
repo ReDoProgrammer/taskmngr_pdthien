@@ -3,6 +3,7 @@ const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const Task = require('../../models/task-model');
 const CustomerLevel = require('../../models/customer-level-model');
 const Job = require('../../models/job-model');
+const Remark = require('../../models/remark-model');
 
 const {
     getTaskDetail,
@@ -22,8 +23,15 @@ router.get('/list', authenticateTLAToken, (req, res) => {
         .populate('level', 'name')
         .populate('qa', 'fullname -_id')
         .populate('editor', 'fullname -_id')
+        .populate({
+            path:'remarks',
+            options: {
+                limit: 1,
+                sort: { timestamp: -1}   
+            }
+        })
         .exec()
-        .then(tasks => {
+        .then(tasks => {           
             return res.status(200).json({
                 tasks,
                 msg: 'Load tasks by job id successfully!'
@@ -53,6 +61,13 @@ router.get('/all', authenticateTLAToken, (req, res) => {
             .populate('job')
             .populate('qa', 'fullname -_id')
             .populate('editor', 'fullname -_id')
+            .populate({
+                path:'remarks',
+                options: {
+                    limit: 1,
+                    sort: { timestamp: -1}   
+                }
+            })
             .exec()
             .then(tasks => {
                 return res.status(200).json({
@@ -99,7 +114,7 @@ router.get('/all', authenticateTLAToken, (req, res) => {
 router.get('/detail', authenticateTLAToken, (req, res) => {
     let { taskId } = req.query;
     getTaskDetail(taskId)
-        .then(async task => {
+        .then(async task => {           
             await getCustomer(task.job.customer)
                 .then(customer => {
                     return res.status(200).json({
@@ -164,8 +179,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
                             let task = new Task();
                             task.created_by = req.user._id;
                             task.job = job;
-                            task.level = level;
-                            task.remark = remark;
+                            task.level = level;                           
                             task.level_price = result.cl.price;
                             task.assigned_date = assigned_date;
                             task.deadline = deadline;
@@ -229,10 +243,35 @@ router.post('/', authenticateTLAToken, (req, res) => {
 
 
                             await task.save()
-                                .then(_ => {
-                                    return res.status(201).json({
-                                        msg: `Task has been created`
+                                .then(async t => {
+                                    let rm = new Remark({
+                                        user: req.user._id,
+                                        content: remark,
+                                        tid: t._id
+                                    });
+                                    await rm.save()
+                                    .then(async r=>{
+                                        task.remarks.push(r);
+                                        await task.save()
+                                        .then(tk=>{
+                                            return res.status(200).json({
+                                                msg:`Task has been created!`,
+                                                tk
+                                            })
+                                        })
+                                        .catch(err=>{
+                                            return res.status(500).json({
+                                                msg:`Can not add remark into task with error: ${new Error(err.message)}`
+                                            })
+                                        })
+
                                     })
+                                    .catch(err=>{
+                                        return res.status(500).json({
+                                            msg:`Can not insert remark with error: ${new Error(err.message)}`
+                                        })
+                                    })
+                                   
                                 })
                                 .catch(err => {
                                     return res.status(500).json({

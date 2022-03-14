@@ -17,6 +17,10 @@ const remarkSchema = new Schema({
     },
     content:{
         type:String
+    },
+    tid:{
+        type: Schema.Types.ObjectId,
+        ref:'task'
     }   
     
 });

@@ -303,6 +303,15 @@ const getTaskDetail = (taskId)=>{
         .findById(taskId)
         .populate('job')
         .populate('level')
+        .populate({
+            path : 'remarks',
+            populate : {
+              path : 'user'
+            },
+            options: {               
+                sort: { timestamp: -1}   
+            }
+          })
         .exec()
         .then(t=>{
             if(!t){
