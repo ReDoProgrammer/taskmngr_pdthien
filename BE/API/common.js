@@ -11,6 +11,7 @@ const Customer = require('../models/customer-model');
 
 
 const getJobLevelBasedOnConditons = (staffId, moduleName) => {
+    //hàm này trả về những job level mà nhân viên có thể làm
     return new Promise((resolve, reject) => {
         Promise.all([getModule(moduleName), getUser(staffId)])
             .then(rs => {
@@ -21,6 +22,12 @@ const getJobLevelBasedOnConditons = (staffId, moduleName) => {
                     })
                     .exec()
                     .then(ws => {
+                        if(ws.length == 0){
+                            return reject({
+                                code:404,
+                                msg:`Can not get any job level that is suitable with you!`
+                            })
+                        }
                         let levels = ws.map(x => {
                             return x.job_lv
                         })

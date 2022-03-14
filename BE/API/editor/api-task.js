@@ -136,7 +136,7 @@ router.put('/get-more', authenticateEditorToken, (req, res) => {
     Task
         .countDocuments({
             editor: req.user._id,
-            status: 0//task đang được xử lý 
+            status: {$in:[0,-2,-3]}//task chưa submit hoặc bị reject bởi QA/DC
         }, (err, count) => {
             if (err) {
                 return res.status(500).json({
@@ -145,12 +145,12 @@ router.put('/get-more', authenticateEditorToken, (req, res) => {
             }
             if (count > 0) {
                 return res.status(403).json({
-                    msg: `You can not get more task till your editing tasks have been submited!`
+                    msg: `You can not get more task ultil your editing tasks have been submited!`
                 })
             }
 
             getJobLevelBasedOnConditons(req.user._id, _MODULE)
-                .then(levels => {
+                .then(levels => {                    
                     Task
                         .findOne({
                             level: { $in: levels },

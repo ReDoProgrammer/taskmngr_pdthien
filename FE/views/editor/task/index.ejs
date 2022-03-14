@@ -1,4 +1,4 @@
-<div class="row mt-2">  
+<div class="row mt-2">
   <div class="col-md-offset-4 col-md-2 col-sm-offset-4 col-sm-2 col-xs-4">
     <select name="" id="slStatus" class="form-control">
       <option value="100">All</option>
@@ -65,7 +65,7 @@
         LoadTask();
       })
 
-      $('#slStatus').on('change', function () {       
+      $('#slStatus').on('change', function () {
         LoadTask();
       })
 
@@ -127,7 +127,7 @@
 
 
       function LoadTask() {
-       
+
         $.ajax({
           url: '/editor/task',
           type: 'get',
@@ -196,17 +196,23 @@
               }
               tr += '</td>';
 
-              tr += '<td>' + t.remarks[0].content + '</td>';
+              tr += '<td>';
+              if (typeof t.remarks[0] != 'undefined') {
+                tr += t.remarks[0].content;
+              }
+              tr += '</td>';
+
 
               tr += '<td class="text-right">';
-              tr += '<button class="btn btn-xs btn-info" name="btnTaskInfo">';
-              tr += '<i class="fa fa-info"></i> Detail';
-              tr += '</button>';
               if (t.status == 0 || t.status == -1 || t.status == -2 || t.status == -3) {
-                tr += '<button class="btn btn-xs btn-primary ml-2" name="btnSubmitTask">';
+                tr += '<button class="btn btn-xs btn-primary" name="btnSubmitTask">';
                 tr += '<i class="fa fa-send-o"></i> Submit';
                 tr += '</button>';
               }
+              tr += '<button class="btn btn-xs btn-info ml-2" name="btnTaskInfo">';
+              tr += '<i class="fa fa-info"></i> Detail';
+              tr += '</button>';
+
 
               tr += '</td>';
 
