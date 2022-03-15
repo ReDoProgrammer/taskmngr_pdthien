@@ -50,6 +50,7 @@
 
 <%-include('manage-job-modal')%>    
 <%-include('upload-job-modal')%>    
+<%-include('job-detail-modal')%>    
 
         <script>
             var search = '';
@@ -61,6 +62,12 @@
             $(document).ready(function () {
                 LoadJob();
             })
+
+            $(document).on("click", "button[name='job-info']", function () {
+                jobId = $(this).closest('tr').attr('id');                            
+                $('#JobDetailModal').modal();                
+            })
+
 
             $(document).on("click", "button[name='upload-job']", function () {
                 jobId = $(this).closest('tr').attr('id');                            
@@ -87,12 +94,13 @@
                             let tr = '<tr id = "' + job._id + '" data-customer="' + job.customer._id + '"  >';
 
                             tr += '<td>';
+          
+                           
+                            tr += '<button class="btn btn-xs btn-info" name="job-info"><i class="fa fa-info-circle" aria-hidden="true"></i></button>';
+                            tr += '<button class="btn btn-xs btn-warning ml-2" name="upload-job"><i class="fa fa-upload" aria-hidden="true"></i></button>';
                             if (job.status == -1 || job.status == 0) {
-                                tr += '<button class="btn btn-xs btn-primary" name="process-job"><i class="fa fa-cog" aria-hidden="true"></i></button>';
-                               
+                                tr += '<button class="btn btn-xs btn-primary ml-2" name="process-job"><i class="fa fa-cog" aria-hidden="true"></i></button>';                               
                             }
-                            tr += '<button class="btn btn-xs btn-warning ml-2" name="upload-job"><i class="fa fa-upload" aria-hidden="true"></i> Upload</button>';
-                            
                             tr += '</td>';
 
                             tr += '<td>' + (idx++) + '</td>'
@@ -110,7 +118,7 @@
                             tr += '<td>' + job.intruction + '</td>';
                             tr += "<td>" + convertISODateToTimeFormat(job.received_date) + "</td>";
                             tr += "<td>" + convertISODateToTimeFormat(job.delivery_date) + "</td>";
-                            tr += '<td class = "font-weight-bold"><i>';
+                            tr += '<td><i>';
                             switch (job.status) {
                                 case -1:
                                     tr += '<span class = "text-warning">Initial</span>';

@@ -1,0 +1,168 @@
+<div class="modal" tabindex="-1" id="JobDetailModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body text-dark">
+                <div class="panel panel-info mb-3">
+                    <div class="panel-heading font-weight-bold">
+                        <i class="fa fa-tasks" aria-hidden="true"></i>
+                        <label id="lblJobName" class="text-uppercase"></label> - <label id="lblCustomer"
+                            class="text-danger"></label>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-md-2 col-sm-3 col-xs-4">
+                                <label class="font-weight-bold">Style note:</label>
+                            </div>
+                            <div class="col-md-10 col-sm-9 col-xs-8">
+                                <label id="lblStyleNote" class="text-danger"></label>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-2 col-sm-3 col-xs-4">
+                                <label class="font-weight-bold">Intruction:</label>
+                            </div>
+                            <div class="col-md-10 col-sm-9 col-xs-8">
+                                <label id="lblIntruction" class="text-warning"></label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="table-responsive  table-responsive-sm table-responsive-xs mt-2">
+                    <table class="table mt-1 table-striped bg-white text-dark nowrap text-nowrap">
+                        <thead class="thead-dark">
+                            <tr>
+
+                                <th scope="col">#</th>
+                                <th scope="col">Level</th>
+                                <th scope="col">Assign date</th>
+                                <th scope="col">Deadline</th>
+                                <th scope="col">Remark</th>
+                                <th scope="col">Editor</th>
+                                <th scope="col">Q.A</th>
+                                <th scope="col">E-T</th>
+                                <th scope="col">I-N</th>                                
+                                <th scope="col">Link</th>
+                                <th scope="col">Status</th>                              
+                            </tr>
+                        </thead>
+                        <tbody id="tblTasksList"></tbody>
+                    </table>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/js/common.js"></script>
+<script>
+    $("#JobDetailModal").on('shown.bs.modal', function (e) {
+        LoadTasks();
+    })
+
+    function LoadTasks() {
+        console.log(jobId);
+        $('#tblTasksList').empty();
+        $.ajax({
+            url: '/tla/task/list',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                jobId
+            },
+            success: function (data) {
+                console.log(data);
+                let idx = 1;
+                data.tasks.forEach(t => {
+                    let tr = '<tr>';
+
+                    tr += '<td>' + (idx++) + '</td>';
+                    tr += '<td class="text-warning font-weight-bold">' + t.level.name + '</td>';
+                    tr += '<td>' + convertISODateToTimeFormat(t.assigned_date) + '</td>';
+                    tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>';
+
+                    tr += '<td>';
+                    if (typeof t.remarks[0] !== 'undefined') {
+                        tr += t.remarks[0].content;
+                    }
+                    tr += '</td>';
+
+                    tr += '<td>';
+                    if (t.editor) {
+                        tr += t.editor.fullname
+                    }
+                    tr += '</td>';
+                    tr += '<td>';
+                    if (t.qa) {
+                        tr += t.qa.fullname
+                    }
+                    tr += '</td>';
+
+                    tr += '<td class="text-right">' + t.edited_time + '</td>';
+                   
+                   
+                    tr += '<td class="text-right">';
+                    if (t.editor) {
+                        tr += t.amount
+                    } 
+                    tr += '</td>';
+                   
+
+
+
+                    tr += '<td><i>';
+
+                    switch (t.status) {
+                        case -1: tr += '<span class="text-info">Initial</span>';
+                            break;
+                        case 0: tr += '<span class="text-info">Processing</span>';
+                            break;
+                        case 1:
+                            {
+                                if (t.edited_time > 1) {
+                                    tr += '<span class="text-primary">Fixed</span>';
+                                } else {
+                                    tr += '<span class="text-primary">Edited</span>';
+                                }
+                                break;
+                            }
+                        case 2:
+                            tr += '<span class="text-success">Q.A ok!</span>';
+                            break;
+                        case 3:
+                            tr += '<span class="text-success">DC ok!</span>'
+                            break;
+                        case -2:
+                            tr += '<span class="text-danger">Q.A rejected</span>';
+                            break;
+                        case -3:
+                            tr += '<span class="text-danger">DC rejected</span>';
+                            break;
+
+                    }
+                    tr += '</i></td>';
+                  
+
+                    tr += '</tr>';
+                    $('#tblTasksList').append(tr);
+                })
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+            }
+        })
+    }
+</script>
