@@ -27,8 +27,7 @@ router.get('/list', authenticateTLAToken, (req, res) => {
         .populate('updated_by', 'fullname -_id')
         .populate({
             path:'remarks',
-            options: {
-                limit: 1,
+            options: {               
                 sort: { timestamp: -1}   
             }
         })
@@ -65,8 +64,7 @@ router.get('/all', authenticateTLAToken, (req, res) => {
             .populate('editor', 'fullname -_id')
             .populate({
                 path:'remarks',
-                options: {
-                    limit: 1,
+                options: {                  
                     sort: { timestamp: -1}   
                 }
             })
