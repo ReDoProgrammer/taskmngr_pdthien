@@ -68,11 +68,10 @@
 <script src="/js/common.js"></script>
 <script>
     $("#JobDetailModal").on('shown.bs.modal', function (e) {
-        LoadTasks();
+        LoadTasksList();
     })
 
-    function LoadTasks() {
-        console.log(jobId);
+    function LoadTasksList() {
         $('#tblTasksList').empty();
         $.ajax({
             url: '/tla/task/list',
