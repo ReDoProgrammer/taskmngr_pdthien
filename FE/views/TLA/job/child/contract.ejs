@@ -1,0 +1,96 @@
+<div class="panel panel-primary mt-2">
+  <div class="panel-heading font-weight-bold">
+    <i class="fa fa-info-circle" aria-hidden="true"></i>
+    Contract info
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-xs-12 form-group">
+            <label for="">Job level</label>
+            <select name="" id="slLevel" class="form-control"></select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4 col-sm-4 col-xs-4">
+            <label for="">Price ($):</label>
+          </div>
+          <div class="col-md-4 col-sm-4 col-xs-4">
+            <input type="text" class="form-control text-right" id="txtPrice" placeholder="Level price" value="0"
+              name="price" />
+          </div>
+          <div class="col-md-4 col-sm-4 col-xs-4">
+            <button class="btn btn-success" id="btnAddNewLevel">
+              <span>
+                <i class="fa fa-plus" aria-hidden="true"></i>
+              </span>
+
+              Add new
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-8 col-sm-6 col-xs-12 table-responsive">
+        <table class="table mt-2">
+          <thead>
+            <tr class="form-row">
+              <th scope="col">#</th>
+              <th scope="col">Level</th>
+              <th scope="col" class="text-right">Price ($)</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody id="tblData"></tbody>
+        </table>
+
+        <label id="lblMsg" class="text-danger font-weight-bold font-italic mt-2"></label>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<script>
+  $(document).ready(function () {
+    LoadLevel();
+  });
+
+  function LoadLevel() {
+    $.ajax({
+      url: "/accountant/job-level",
+      type: "get",
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      success: function (data, textStatus, xhr) {
+        $("#slLevel").empty();
+        data.jl.forEach((lv) => {
+          let opt = '<option value="' + lv._id + '">' + lv.name + "</option>";
+          $("#slLevel").append(opt);
+        });
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      },
+    });
+  }
+
+  //ràng buộc nhập dữ liệu, chỉ cho nhập kiểu số thực
+  $("#txtPrice").on("keypress keyup blur", function (event) {
+    //this.value = this.value.replace(/[^0-9\.]/g,'');
+    $(this).val(
+      $(this)
+        .val()
+        .replace(/[^0-9\.]/g, "")
+    );
+    if (
+      (event.which != 46 || $(this).val().indexOf(".") != -1) &&
+      (event.which < 48 || event.which > 57)
+    ) {
+      event.preventDefault();
+    }
+  });
+</script>

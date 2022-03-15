@@ -149,13 +149,13 @@
                 taskId
             },
             success: function (data) {
-                console.log(data.customer);
+               
 
                 $('#divNationalStyle').html(data.customer.nation.name)
                 $('#divColor').html(data.customer.color.name)
                 $('#divOutput').html(data.customer.output.name)
 
-                $('#divSize').html(data.customer.size.name)
+                $('#divSize').html(data.customer.size.name);
 
 
                 $('#lblJobName').text(data.task.job.name);

@@ -60,29 +60,31 @@
 
 
                 $(document).ready(function () {
-                    LoadJob();
+                    LoadJobs();
                 })
 
                 $(document).on("click", "button[name='job-info']", function () {
                     jobId = $(this).closest('tr').attr('id');
+                    customerId = $(this).closest('tr').data('customer');
                     $('#JobDetailModal').modal();
+
                 })
 
 
                 $(document).on("click", "button[name='upload-job']", function () {
                     jobId = $(this).closest('tr').attr('id');
-                    $('#uploadJobModal').modal();
+                    $('#upLoadJobsModal').modal();
                 })
 
 
                 $(document).on("click", "button[name='process-job']", function () {
-                    jobId = $(this).closest('tr').attr('id');
-                    customerId = $(this).closest('tr').data('customer');
+                    jobId = $(this).closest('tr').attr('id');    
+                    customerId = $(this).closest('tr').data('customer');                
                     $('#JobMngrModal').modal();
                 })
 
 
-                function LoadJob() {
+                function LoadJobs() {
                     $.ajax({
                         url: '/tla/job/list',
                         type: 'get',

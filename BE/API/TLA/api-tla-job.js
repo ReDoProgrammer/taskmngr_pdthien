@@ -36,7 +36,8 @@ router.get('/detail',authenticateTLAToken,(req,res)=>{
     .populate({path:'customer',populate:({path:'color_mode',select:'name -_id'})})       
     .populate({path:'customer',populate:({path:'national_style',select:'name -_id'})})       
     .populate({path:'customer',populate:({path:'output',select:'name -_id'})})       
-    .populate({path:'customer',populate:({path:'size',select:'name -_id'})})        
+    .populate({path:'customer',populate:({path:'size',select:'name -_id'})})      
+    .populate({path:'links',populate:({path:'created_by',select:'fullname'})})  
     .exec()
     .then(job=>{
         if(!job){

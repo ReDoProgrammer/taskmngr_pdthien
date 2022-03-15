@@ -36,23 +36,29 @@ router.get('/list',authenticateTLAToken,(req,res)=>{
 
 router.get('/detail',(req,res)=>{
     let {id} = req.query;
-    Job.findById(id)
-    .populate({path:'customer',populate:({path:'cloud', select:'name -_id'})})   
-    .populate({path:'customer',populate:({path:'color_mode',select:'name -_id'})})       
-    .populate({path:'customer',populate:({path:'national_style',select:'name -_id'})})       
-    .populate({path:'customer',populate:({path:'output',select:'name -_id'})})       
-    .populate({path:'customer',populate:({path:'size',select:'name -_id'})})        
+    Customer
+    .findById(id)
+    .populate('output')
+    .populate('size')
+    .populate('color')
+    .populate('cloud')
+    .populate('nation')
     .exec()
-    .then(job=>{
+    .then(customer=>{
+        if(!customer){
+            return res.status(404).json({
+                msg:`Customer not found!`
+            })
+        }
+        
         return res.status(200).json({
-            msg:'Get job detail successfully!',
-            job:job
+            msg:`Get customer detail successfully!`,
+            customer
         })
     })
     .catch(err=>{
         return res.status(500).json({
-            msg:'Get job information failed!',
-            error: new Error(err.message)
+            msg:`Can not get customer detail with error: ${new Error(err.message)}`
         })
     })
 })

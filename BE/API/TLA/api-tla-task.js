@@ -23,6 +23,8 @@ router.get('/list', authenticateTLAToken, (req, res) => {
         .populate('level', 'name')
         .populate('qa', 'fullname -_id')
         .populate('editor', 'fullname -_id')
+        .populate('created_by', 'fullname -_id')
+        .populate('updated_by', 'fullname -_id')
         .populate({
             path:'remarks',
             options: {
