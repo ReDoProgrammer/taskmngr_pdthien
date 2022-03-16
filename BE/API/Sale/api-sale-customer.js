@@ -37,18 +37,29 @@ router.get('/list',authenticateSaleToken,(req,res)=>{
 
 router.get('/detail',(req,res)=>{
     let {id} = req.query;
-    Customer.findById(id)   
+    Customer
+    .findById(id)
+    .populate('output')
+    .populate('size')
+    .populate('color')
+    .populate('cloud')
+    .populate('nation')
     .exec()
     .then(customer=>{
+        if(!customer){
+            return res.status(404).json({
+                msg:`Customer not found!`
+            })
+        }
+        
         return res.status(200).json({
-            msg:'Get Customer detail successfully!',
-           customer
+            msg:`Get customer detail successfully!`,
+            customer
         })
     })
     .catch(err=>{
         return res.status(500).json({
-            msg:'Can not get customer detail!',
-            error: new Error(err.message)
+            msg:`Can not get customer detail with error: ${new Error(err.message)}`
         })
     })
 })

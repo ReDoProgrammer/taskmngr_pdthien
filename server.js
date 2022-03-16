@@ -215,6 +215,10 @@ app.use('/sale/customer',apiSaleCustomer);
 const apiSaleJob = require('./BE/API/Sale/api-sale-job');
 app.use('/sale/job',apiSaleJob);
 
+
+const apiSaleTask = require('./BE/API/Sale/api-sale-task');
+app.use('/sale/task',apiSaleTask);
+
 // // /*
 // //   TLA Controllers
 // // */
