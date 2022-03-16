@@ -21,9 +21,8 @@
         <th scope="col">Combo</th>
         <th scope="col">Receive date</th>
         <th scope="col">Delivery date</th>
-        <th scope="col">Intruction</th>
-        <th scope="col" class="text-center">Source link</th>
-        <th scope="col" class="text-center">Product link</th>
+        <th scope="col">I-link</th>
+        <th scope="col">O-link</th>
         <th scope="col" class="text-right">Status</th>
         <th scope="col" class="text-right"></th>
       </tr>
@@ -42,6 +41,12 @@
     <li class="page-item"><a class="page-link" href="#">3</a></li>
   </ul>
 </nav>
+
+<div id="contextMenu" class="dropdown clearfix">
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu"
+    style="display:block;position:static;margin-bottom:5px;" id="funcMenu">
+  </ul>
+</div>
 
 <%-include('edit-job')%>
 
@@ -98,6 +103,8 @@
         success: function (data) {
           $("#tblData").empty();
           // $("#pagination").empty();
+
+          console.log(data);
           let idx = 1;
           data.jobs.forEach((job) => {
             let tr = "  <tr id='" + job._id + "' >";
@@ -106,22 +113,44 @@
               " <td class='font-weight-bold'>" + job.customer.firstname + " " + job.customer.lastname + "</td>";
             tr += "<td class='text-info font-weight-bold'>" + job.name + "</td>";
 
+            tr += '<td>';
+            if (job.cb_ticked) {
+              tr += job.cb.name
+            } else {
+              tr += '';
+            }
+            tr += '</td>';
+            tr += "<td>" + convertISODateToTimeFormat(job.received_date) + "</td>";
+            tr += "<td>" +convertISODateToTimeFormat(job.delivery_date) + "</td>";
+            
+
             tr+= '<td>';
-            if(job.cb_ticked){
-              tr+= job.cb.name
-            }else{
-              tr+= '';
+            if (isValidHttpUrl(job.input_link)) {
+              tr += "<a href='" + job.input_link + "' target='_blank'>Link</a>";
+            } else {
+              tr +=  job.input_link;
+            }
+
+            tr+= '</td>';
+
+            tr+= '<td>';
+            if(typeof job.links !== 'undefined'){
+              if(job.links.length ==1 && job.links[0].checked){
+                if(isValidHttpUrl(job.links[0].url)){
+                  tr += '<a href="' + job.links[0].url + '" target="_blank"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                }else{
+                  tr+= job.links[0].url
+                }
+                
+              }else  if(job.links.length >1){
+                tr += '<button class="btn btn-xs btn-info">';
+                  tr+='<i class="fa fa-list" aria-hidden="true"></i>';
+                  tr+= '<i class="fa fa-link" aria-hidden="true"></i>';
+                tr+=  '</button>';
+              }
             }
             tr+= '</td>';
-            tr += "<td>" + new Date(job.received_date).toLocaleString() + "</td>";
-            tr += "<td>" + new Date(job.delivery_date).toLocaleString() + "</td>";
-            tr += "<td class='text-warning'>" + job.intruction + "</td>";
 
-            if (isValidHttpUrl(job.input_link)) {
-              tr += "<td class='font-italic font-weight-bold text-center'><a href='" + job.input_link + "' target='_blank'>Link</a></td>";
-            } else {
-              tr += '<td>' + job.input_link + '</td>'
-            }
             if (isValidHttpUrl(job.output_link)) {
               tr += "<td class='font-italic font-weight-bold text-center'><a href='" + job.output_link + "' target='_blank'>Link</a></td>";
             } else {
@@ -151,11 +180,18 @@
                 tr += '<span class = "text-muted">Canceled</span>';
                 break;
             }
-            tr += '</i></td>';
 
-            tr += '<td class="text-right"><button class="btn btn-xs btn-warning" name="edit-job"><i class="fa fa-edit"></i></button></td>'
+            tr += '<td class="text-right">';
+            tr += '<button class="btn btn-xs btn-info" name="btnTaskInfo">';
+            tr += '<i class="fa fa-info"></i>';
+            tr += '</button>';
+            tr += '</td>';
 
-            tr += '</tr>';
+            // tr += '</i></td>';
+
+            // tr += '<td class="text-right"><button class="btn btn-xs btn-warning" name="edit-job"><i class="fa fa-edit"></i></button></td>'
+
+            // tr += '</tr>';
 
             $("#tblData").append(tr);
           });
@@ -176,3 +212,15 @@
 
 
   </script>
+
+  <style>
+    #contextMenu {
+      position: absolute;
+      display: none;
+    }
+
+    tr:hover {
+      background: #c9e8f7;
+      position: relative;
+    }
+  </style>

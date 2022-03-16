@@ -8,6 +8,7 @@ router.get('/detail', authenticateSaleToken, (req, res) => {
   Job
     .findById(jobId)
     .populate('customer')
+    .populate({path:'links',populate:({path:'created_by',select:'fullname'})})  
     .exec()
     .then(job => {
       if (!job) {
@@ -47,6 +48,7 @@ router.get("/list", authenticateSaleToken, (req, res) => {
 
     })
     .populate('cb')
+    .populate({path:'links',populate:({path:'created_by',select:'fullname'})})  
     .exec()
     .then((jobs) => {
       let result = jobs.slice(process.env.PAGE_SIZE * (page - 1), process.env.PAGE_SIZE);
