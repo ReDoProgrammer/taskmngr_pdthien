@@ -41,7 +41,7 @@
                         <div class="row ">
                             <div class="form-group col-md-12 col-sm-12 col-xs-12">
                                 <label class="text-warning font-weight-bold">Intruction:</label>
-                                <div id="lblIntruction" style="margin-left: 10px; margin-top: 5px;">54423532</div>
+                                <div id="lblIntruction" style="margin-left: 10px; margin-top: 5px;"></div>
                             </div>
                         </div>
 
@@ -207,7 +207,7 @@
                 $('#lblCustomer').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
                 $('#lblReceivedDate').text(convertISODateToTimeFormat(data.job.received_date));
                 $('#lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.delivery_date));
-                $('#lblIntruction').text(data.job.remark);
+                $('#lblIntruction').text(data.job.intruction);
 
                 let idx = 1;
                 $('#tblLinks').empty(); 

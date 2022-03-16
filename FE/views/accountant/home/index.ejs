@@ -78,7 +78,7 @@
 
         if (confirm("Are you sure want to submit this task?")) {
           $.ajax({
-            url: '/qa/task/submit',
+            url: '/accountant/task/submit',
             type: 'put',
             headers: {
               authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -112,7 +112,7 @@
 
       function LoadTasks() {
         $.ajax({
-          url: '/qa/task/list',
+          url: '/accountant/task/list',
           type: 'get',
           headers: {
             authorization: "Bearer " + localStorage.getItem("accessToken"),
