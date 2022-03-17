@@ -200,6 +200,11 @@ app.use('/sale/customer',saleCustomerController);
 const saleJobController = require('./BE/controllers/Sale/sale-job-controller');
 app.use('/sale/job',saleJobController);
 
+
+const saleTaskController = require('./BE/controllers/Sale/sale-task-controller');
+app.use('/sale/task',saleTaskController);
+
+
 // // /*
 // //   SALE API 
 // // */

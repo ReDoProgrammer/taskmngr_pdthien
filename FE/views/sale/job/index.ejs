@@ -65,6 +65,64 @@
     var jobId='';
     var customerId = '';
 
+
+    $(document).on("click", "button[name='btn-job-functions']", function (e) {
+                var $contextMenu = $("#contextMenu");
+                $contextMenu.css({
+                    display: "block",
+                    left: e.pageX,
+                    top: e.pageY
+                });
+
+                jobId = $(this).closest('tr').attr('id');
+
+                $.ajax({
+                    url: '/sale/job/detail',
+                    type: 'get',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                    data: {
+                        jobId
+                    },
+                    success: function (data) {
+                       
+
+                        $('#funcMenu').empty();
+                        let mn = '';
+                        mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Q.A ok</a></li>';
+                        
+                        // switch (data.task.status) {
+                        //     case -1:
+                        //     case 0:
+                        //         mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
+                        //         break;
+                        //     case 1:
+                        //         mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Q.A ok</a></li>';
+                        //         mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
+                        //         mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
+                        //         break;
+
+                        //     default:
+                        //         $contextMenu.css({
+                        //             display: "none"
+                        //         });
+                        //         break;
+
+                        // }
+                        $('#funcMenu').append(mn);
+                    }
+                })
+
+
+                $('html').click(function () {
+                    $contextMenu.hide();
+                });
+
+            });
+
+
+
     $(document).on("click", "button[name='btn-job-info']", function () {
       jobId = $(this).closest("tr").attr("id");
       customerId = $(this).closest("tr").data("customer");
