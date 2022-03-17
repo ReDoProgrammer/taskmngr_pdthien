@@ -145,30 +145,7 @@
                         </div>
                     </div>
                 </div>
-
-
-
-                <div class="panel panel-success mt-2">
-                    <div class="panel-heading">Ouput links:</div>
-                    <div class="panel-body">
-                        <div class="table-responsive  table-responsive-sm table-responsive-xs mt-2">
-                            <table class="table mt-1 table-striped bg-white text-dark nowrap text-nowrap">
-                                <thead class="thead-dark">
-                                    <tr>
-
-                                        <th scope="col">#</th>
-                                        <th scope="col">Link</th>
-                                        <th scope="col">Remark</th>
-                                        <th scope="col">Uploader</th>
-                                        <th scope="col">Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tblLinks"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
+ 
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -208,26 +185,7 @@
                 $('#lblReceivedDate').text(convertISODateToTimeFormat(data.job.received_date));
                 $('#lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.delivery_date));
                 $('#lblIntruction').text(data.job.intruction);
-
-                let idx = 1;
-                $('#tblLinks').empty(); 
-
-                data.job.links.forEach(l => {
-                    let tr = '<tr>';
-                    tr += '<td>' + (idx++) + '</td>';
-                    tr += '<td>';
-                    if (isValidHttpUrl(l.url) && l.checked) {
-                        tr += '<a href="' + l.url + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>'
-                    }
-                    tr += '</td>';
-
-                    tr+= '<td>'+l.remark+'</td>';
-                    tr+= '<td class="font-weight-bold">'+l.created_by.fullname+'</td>';
-                    tr+= '<td>'+convertISODateToTimeFormat(l.created_at)+'</td>';
-                    tr += '</tr>';                  
-                  
-                    $('#tblLinks').append(tr);
-                })
+                
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 alert(jqXHR.responseJSON.msg);

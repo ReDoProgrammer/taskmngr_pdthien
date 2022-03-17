@@ -59,7 +59,8 @@ router.get('/all', authenticateSaleToken, (req, res) => {
             }
         })
         .exec()
-        .then(tasks => {           
+        .then(tasks => {      
+            console.log(tasks);     
             return res.status(200).json({
                 tasks,
                 msg: 'Load taskslist successfully!'

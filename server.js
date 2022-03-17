@@ -263,9 +263,6 @@ app.use('/tla/job-level',apiTLAJobLevel);
 const apiTLALevel = require('./BE/API/TLA/api-tla-level');
 app.use('/tla/level',apiTLALevel);
 
-const apiTLALink = require('./BE/API/TLA/api-tla-link');
-app.use('/tla/link',apiTLALink);
-
 const apiTLAQueue = require('./BE/API/TLA/api-queue');
 app.use('/tla/queue',apiTLAQueue);
 

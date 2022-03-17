@@ -1,8 +1,6 @@
 const router = require('express').Router();
 const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const Job = require('../../models/job-model');
-const Task = require('../../models/task-model');
-const Link = require('../../models/link-model');
 
 
 

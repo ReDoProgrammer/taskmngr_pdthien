@@ -170,6 +170,10 @@ const taskSchema = new Schema({
         type:String,
         require:true
     },
+    uploaded_link:{
+        type:String,
+        default:''
+    },
     amount:{
         //số lượng file xuất ra của editor
         type: Number,
