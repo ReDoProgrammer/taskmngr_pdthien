@@ -3,9 +3,9 @@
         <div class="modal-content">
             <div class="modal-body">
                 <div class="panel panel-primary text-white bg-dark">
-                    <div class="panel-heading"><i class="fa fa-info-circle" aria-hidden="true"></i> Job description
-                    </div>
-                    <div class="panel-body">
+                    <div class="panel-heading"> <button class="btn btn-xs btn-primary" id="btn-task-info">Show job info
+                            <i class="fa fa-arrow-down" aria-hidden="true"></i></button> </div>
+                    <div class="panel-body" id="job-info">
 
                         <div class="row">
                             <div class="col-md-2 col-sm-4 col-xs-4">Job name:</div>
@@ -102,15 +102,12 @@
                             </div>
                         </div>
 
-                        <div class="panel panel-warning mt-2">
-                            <div class="panel-heading font-weight-bold">Remark:</div>
-                            <div class="panel-body" id="remarks">
+                    </div>
+                    <div class="panel panel-warning mt-2">
+                        <div class="panel-heading font-weight-bold">Remark:</div>
+                        <div class="panel-body" id="remarks">
 
-                            </div>
                         </div>
-
-
-
                     </div>
                     <div class="panel-footer">
                         <div class="form-group text-right">
@@ -128,7 +125,18 @@
 <script src="/js/common.js"></script>
 
 <script>
+    $('#btn-task-info').click(function () {
+        if ($('#job-info').is(":hidden")) {
+            $('#job-info').slideDown(1000);
+            $('#btn-task-info').html('Hide job info <i class="fa fa-arrow-up" aria-hidden="true"></i>')
+        } else {
+            $('#btn-task-info').html('Show job info <i class="fa fa-arrow-down" aria-hidden="true"></i>');
+            $('#job-info').slideUp(1000);
+        }
+    })
+
     $("#modalTaskDetail").on('shown.bs.modal', function (e) {
+        $('#job-info').hide();
         $.ajax({
             url: '/tla/task/detail',
             type: 'get',
@@ -158,8 +166,8 @@
                 $('#remarks').empty();
                 data.task.remarks.forEach(r => {
                     let item = '<div class="row mt-2">';
-                    item += '<div class="col-md-4 col-sm-4 col-xs-12"><span class="font-weight-bold text-primary">' +r.user.fullname+'</span>('+ convertISODateToTimeFormat(r.timestamp) + '):</div>';                                 
-                    item += '<div class="col-md-8 col-sm-8 col-xs-12 text-danger font-italic">' + r.content + '</div>';                
+                    item += '<div class="col-md-4 col-sm-4 col-xs-12"><span class="font-weight-bold text-primary">' + r.user.fullname + '</span>(' + convertISODateToTimeFormat(r.timestamp) + '):</div>';
+                    item += '<div class="col-md-8 col-sm-8 col-xs-12 text-danger font-italic">' + r.content + '</div>';
                     item += '</div>';
 
                     $('#remarks').append(item);
