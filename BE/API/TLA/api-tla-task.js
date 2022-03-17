@@ -111,6 +111,37 @@ router.get('/all', authenticateTLAToken, (req, res) => {
 
 })
 
+router.get('/list-uploaded',authenticateTLAToken,(req,res)=>{
+    let {jobId} = req.query;
+
+    Task
+    .find({
+        job:jobId,
+        status: { $gt: 3 }// lấy các task có trạng thái đã được upload trở lên
+    })
+    .populate('uploadted_at','fullname')
+    .populate('level','name')   
+    .populate({
+        path : 'remarks',       
+        options: {               
+            sort: { timestamp: -1}   
+        }
+      })
+    .exec()
+    .then(tasks=>{
+        console.log(tasks);
+        return res.status(200).json({
+            msg:`Load uploaded tasks list successfully!`,
+            tasks
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not list uploaded tasks list with error: ${new Error(err.message)}`
+        })
+    })
+})
+
 router.get('/list-unuploaded',authenticateTLAToken,(req,res)=>{
     let {jobId} = req.query;
     Task
@@ -380,6 +411,18 @@ router.put('/upload',authenticateTLAToken,async (req,res)=>{
         })
     }
 
+    if(task.status == 1 && typeof task.qa !=='undefined' && task.qa !== null){
+        return res.status(403).json({
+            msg:`You can not upload this task ultil Q.A submit it!`
+        })
+    }
+
+    if(task.status == 2 && typeof task.dc !=='undefined' && task.dc !== null){
+        return res.status(403).json({
+            msg:`You can not upload this task ultil DC submit it!`
+        })
+    }
+
     let rmk = new Remark({
         user:req.user._id,
         content:remark,
@@ -391,7 +434,7 @@ router.put('/upload',authenticateTLAToken,async (req,res)=>{
         task.status = 4;
         task.uploaded_link = uploaded_link;
         task.uploaded_at = new Date();
-        task.uploaed_by = req.user._id;
+        task.uploaded_by = req.user._id;
         task.remarks.push(r);
         await task.save()
         .then(_=>{

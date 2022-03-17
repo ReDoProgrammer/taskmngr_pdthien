@@ -61,9 +61,11 @@
                         <th scope="col">Level</th>
                         <th scope="col">Remark</th>
                         <th scope="col">Link</th>
+                        <th scope="col">Uploaded by</th>
+                        <th scope="col">Uploaded at</th>
                       </tr>
                     </thead>
-                    <tbody id="tblUploadedTasks"></tbody>
+                    <tbody id="tbdyUploadedTasks"></tbody>
                   </table>
                 </div>
               </div>
@@ -161,6 +163,37 @@
   }
 
   function LoadUploadedTask(){
-
+    $.ajax({
+      url:'/tla/task/list-uploaded',
+      type:'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data:{
+        jobId      
+      },
+      success:function(data){   
+        $('#tbdyUploadedTasks').empty();
+        let idx = 1;
+        data.tasks.forEach(t=>{
+          let tr = '<tr>';
+            tr+= '<td>'+(idx++)+'</td>';
+            tr+= '<td class="font-weight-bold text-primary">'+t.level.name+'</td>';
+            tr+= '<td>'+t.remarks[0].content+'</td>';
+            tr+= '<td><a href="'+t.uploaded_link+'" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a></td>';
+            tr+= '<td>'+t.uploaded_by.fullname+'</td>';
+            tr += "<td>" + convertISODateToTimeFormat(t.uploaded_at) + "</td>";
+            tr+= '</tr>';
+            console.log(tr);
+            $('#tbdyUploadedTasks').append(tr);
+        })
+        $('#lblUploadTaskMessage').html('<span class="text-success">'+data.msg+'</span>');
+        $('#lblUploadTaskMessage').show().delay(3000).fadeOut();       
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      }
+    })
   }
 </script>
+
