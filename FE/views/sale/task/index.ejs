@@ -12,9 +12,9 @@
             <option value="3">DC ok</option>
             <option value="4">Upload</option>
             <option value="5">Done</option>
-            <option value="6">Finish</option>           
-           
-          
+            <option value="6">Finish</option>
+
+
             <option value="-2">Q.A reject</option>
             <option value="-3">DC reject</option>
             <option value="-4">Cancel</option>
@@ -38,6 +38,7 @@
     <table class="table table-striped text-nowrap">
         <thead class="thead-dark">
             <tr>
+                <th scope="col"></th>
                 <th scope="col">#</th>
                 <th scope="col">Customer</th>
                 <th scope="col">Job</th>
@@ -49,6 +50,9 @@
                 <th scope="col">Editor</th>
                 <th scope="col">Q.A</th>
                 <th scope="col">DC</th>
+                <th scope="col">Uploaded by</th>
+                <th scope="col">Uploaded at</th>
+                <th scope="col">Link</th>
                 <th scope="col">Status</th>
                 <th scope="col"></th>
             </tr>
@@ -57,6 +61,17 @@
         </tbody>
     </table>
 </div>
+
+
+
+
+<div id="contextMenu" class="dropdown clearfix">
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu"
+        style="display:block;position:static;margin-bottom:5px;" id="funcMenu">
+    </ul>
+</div>
+
+
 
 <%-include('task_detail')%>
     <%-include('reject-modal')%>
@@ -70,6 +85,68 @@
             $(document).ready(function () {
                 LoadTasks();
             })
+
+
+
+            $(document).on("click", "button[name='btn-job-functions']", function (e) {
+                var $contextMenu = $("#contextMenu");
+                $contextMenu.css({
+                    display: "block",
+                    left: e.pageX,
+                    top: e.pageY
+                });
+
+                taskId = $(this).closest('tr').attr('id');
+
+                $.ajax({
+                    url: '/sale/task/detail',
+                    type: 'get',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                    data: {
+                        taskId
+                    },
+                    success: function (data) {
+
+
+                        $('#funcMenu').empty();
+                        let mn = '';
+
+
+                        switch (data.task.status) {
+
+                            case 4:
+                                mn = '<li id="submit-task-done"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Submit done</a></li>';
+                                break;
+                            case 5:
+                                mn = '<li id="submit-task-finished"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Submit finish</a></li>';
+                                mn += '<li id="customer-cancel-task"><a tabindex="-1" href="#"> <i class="fa fa-times text-danger" aria-hidden="true"></i> Submit finish</a></li>';
+                                break;
+
+                            default:
+                                $contextMenu.css({
+                                    display: "none"
+                                });
+                                break;
+
+                        }
+                        $('#funcMenu').append(mn);
+                    }
+                })
+
+
+                $('html').click(function () {
+                    $contextMenu.hide();
+                });
+
+            });
+
+
+
+
+
+
 
             $('#slStatus').on('change', function () {
                 status = this.value;
@@ -99,8 +176,15 @@
                         $('#tbdTasks').empty();
                         let idx = 1;
 
+
                         data.tasks.forEach(t => {
                             let tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '">';
+
+                            tr += '<td>';
+                            tr += '<button class="btn btn-xs btn-warning ml-2" name="btn-job-functions">';
+                            tr += '<i class="fa fa-cog" aria-hidden="true"></i>';
+                            tr += '</button>';
+                            tr += '</td>';
 
                             tr += '<td>' + (idx++) + '</td>';
 
@@ -126,6 +210,7 @@
                                 tr += t.editor.fullname
                             }
                             tr += '</td>';
+
                             tr += '<td>';
                             if (typeof t.qa !== 'undefined' && t.qa !== null) {
                                 tr += t.qa.fullname
@@ -139,32 +224,57 @@
                             tr += '</td>';
 
 
-                            tr += '<td class="font-italic">';
-                            switch (t.status) {                              
-                                case 0: tr += '<span class="text-info">Editing</span>'; break;
-                                case 1: {
-                                    if (t.edited_time > 1) {
-                                        tr += '<span class="text-primary">Fixed</span>';
-                                    } else {
-                                        tr += '<span class="text-primary">Edited</span>';
-                                    }
-                                    break;
-                                }
-                                case 2: tr += '<span class="text-success">Q.A ok</span>'; break;
-                                case 3: tr += '<span class="text-success">DC ok</span>'; break;
-                                case 4: tr += '<span class="text-success"Upload</span>'; break;
-                                case 5: tr += '<span class="text-success">Done</span>'; break;
-                                case 6: tr += '<span class="text-success">Finish</span>'; break;
 
-                                case -1: tr += '<span class="text-info">Initial</span>'; break;
-                                case -2: tr += '<span class="text-danger font-weight-bold">Q.A reject</span>'; break;
-                                case -3: tr += '<span class="text-danger font-weight-bold">DC reject</span>'; break;
-                                case -4: tr += '<span class="text-danger font-weight-bold">Canceled</span>'; break;
 
+                            tr += '<td>';
+                            if (typeof t.uploaded_by !== 'undefined' && t.uploaded_by !== null) {
+                                tr += t.uploaded_by.fullname
                             }
                             tr += '</td>';
+                            tr += '<td>' + convertISODateToTimeFormat(t.uploaded_at) + '</td>';
 
-                            tr += '<td class="text-right">';                            
+                            tr+='<td><a href="'+t.uploaded_link+'" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a></td>'
+
+
+                            tr += '<td><i>';
+
+                            switch (t.status) {
+                                case -1: tr += '<span class="text-info">Initial</span>';
+                                    break;
+                                case 0: tr += '<span class="text-info">Processing</span>';
+                                    break;
+                                case 1:
+                                    {
+                                        if (t.edited_time > 1) {
+                                            tr += '<span class="text-primary">Fixed</span>';
+                                        } else {
+                                            tr += '<span class="text-primary">Edited</span>';
+                                        }
+                                        break;
+                                    }
+                                case 2:
+                                    tr += '<span class="text-success">Q.A ok!</span>';
+                                    break;
+                                case 3:
+                                    tr += '<span class="text-success">DC ok!</span>'
+                                    break;
+                                case -2:
+                                    tr += '<span class="text-danger">Q.A rejected</span>';
+                                    break;
+                                case -3:
+                                    tr += '<span class="text-danger">DC rejected</span>';
+                                    break;
+                                case -4:
+                                    tr += '<span class="text-danger">Canceled</span>';
+                                    break;
+                                case 4: tr += '<span class="text-success font-weight-bold">Upload</span>'; break;
+                                case 5: tr += '<span class="text-success font-weight-bold">Done</span>'; break;
+                                case 6: tr += '<span class="text-success font-weight-bold">Finish</span>'; break;
+
+                            }
+                            tr += '</i></td>';
+
+                            tr += '<td class="text-right">';
                             tr += '<button class="btn btn-xs btn-info ml-2" name="btn-task-info">';
                             tr += '<i class="fa fa-info-circle" aria-hidden="true"></i>';
                             tr += '</button>';
@@ -180,3 +290,16 @@
                 })
             }
         </script>
+
+
+        <style>
+            #contextMenu {
+                position: absolute;
+                display: none;
+            }
+
+            tr:hover {
+                background: #c9e8f7;
+                position: relative;
+            }
+        </style>

@@ -5,8 +5,9 @@
 
 
                 <div class="panel panel-primary text-white bg-dark">
-                    <div class="panel-heading"><i class="fa fa-info-circle" aria-hidden="true"></i> Job detail</div>
-                    <div class="panel-body">
+                    <div class="panel-heading"> <button class="btn btn-xs btn-primary" id="btn-job-info">Show job info
+                            <i class="fa fa-arrow-down" aria-hidden="true"></i></button> </div>
+                    <div class="panel-body" id="job-info">
 
                         <div class="row">
                             <div class="col-md-2 col-sm-4 col-xs-4">Job name:</div>
@@ -146,29 +147,6 @@
                     </div>
                 </div>
 
-
-
-                <div class="panel panel-success mt-2">
-                    <div class="panel-heading">Ouput links:</div>
-                    <div class="panel-body">
-                        <div class="table-responsive  table-responsive-sm table-responsive-xs mt-2">
-                            <table class="table mt-1 table-striped bg-white text-dark nowrap text-nowrap">
-                                <thead class="thead-dark">
-                                    <tr>
-
-                                        <th scope="col">#</th>
-                                        <th scope="col">Link</th>
-                                        <th scope="col">Remark</th>
-                                        <th scope="col">Uploader</th>
-                                        <th scope="col">Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tblLinks"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -188,6 +166,17 @@
         LoadTasksList();
         LoadCustomer();
         LoadJobDetail();
+        $('#job-info').hide();
+    })
+
+    $('#btn-job-info').click(function () {
+        if ($('#job-info').is(":hidden")) {
+            $('#job-info').slideDown(1000);
+            $('#btn-job-info').html('Hide job info <i class="fa fa-arrow-up" aria-hidden="true"></i>')
+        } else {
+            $('#btn-job-info').html('Show job info <i class="fa fa-arrow-down" aria-hidden="true"></i>');
+            $('#job-info').slideUp(1000);
+        }
     })
 
     function LoadJobDetail() {
@@ -200,8 +189,8 @@
             data: {
                 jobId
             },
-            success: function (data) {       
-               
+            success: function (data) {
+
                 $('#lblStyleNote').text(data.job.customer.remark);
                 $('#lblJobName').text(data.job.name);
                 $('#lblCustomer').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
@@ -209,25 +198,6 @@
                 $('#lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.delivery_date));
                 $('#lblIntruction').text(data.job.intruction);
 
-                let idx = 1;
-                $('#tblLinks').empty(); 
-
-                data.job.links.forEach(l => {
-                    let tr = '<tr>';
-                    tr += '<td>' + (idx++) + '</td>';
-                    tr += '<td>';
-                    if (isValidHttpUrl(l.url) && l.checked) {
-                        tr += '<a href="' + l.url + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>'
-                    }
-                    tr += '</td>';
-
-                    tr+= '<td>'+l.remark+'</td>';
-                    tr+= '<td class="font-weight-bold">'+l.created_by.fullname+'</td>';
-                    tr+= '<td>'+convertISODateToTimeFormat(l.created_at)+'</td>';
-                    tr += '</tr>';                  
-                  
-                    $('#tblLinks').append(tr);
-                })
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 alert(jqXHR.responseJSON.msg);
