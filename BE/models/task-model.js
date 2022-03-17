@@ -146,6 +146,11 @@ const taskSchema = new Schema({
              1: editor done
              2: QA ok
              3: DC ok --> job ok
+             4: Upload
+             5: Done
+             6: Finish
+
+             
              -1: khởi tạo
              -2: Q.A reject            
              -3: DC reject

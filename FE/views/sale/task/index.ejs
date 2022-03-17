@@ -1,0 +1,182 @@
+<div class="row">
+    <div class="col-md-6 col-sm-6 col-xs-8 mt-2">
+        <label for=""></label>
+    </div>
+    <div class="col-md-2 col-sm-2 col-xs-4 mt-2">
+        <select name="" id="slStatus" class="form-control">
+            <option value="100">All</option>
+            <option value="-1">Initial</option>
+            <option value="0">Editing</option>
+            <option value="1">Edited</option>
+            <option value="2">Q.A ok</option>
+            <option value="3">DC ok</option>
+            <option value="4">Upload</option>
+            <option value="5">Done</option>
+            <option value="6">Finish</option>           
+           
+          
+            <option value="-2">Q.A reject</option>
+            <option value="-3">DC reject</option>
+            <option value="-4">Cancel</option>
+        </select>
+    </div>
+    <div class="col-md-4 col-sm-4 col-xs-12 mt-2">
+        <!-- Another variation with a button -->
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Seach your job..." id="txtSearch" />
+            <div class="input-group-btn">
+                <button class="btn btn-info" type="submit" id="btnSearch">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="table-responsive mt-2">
+    <table class="table table-striped text-nowrap">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Customer</th>
+                <th scope="col">Job</th>
+                <th scope="col">Level</th>
+                <th scope="col">Deadline</th>
+                <th scope="col">Remark</th>
+                <th scope="col" class="text-right">E-N</th>
+                <th scope="col" class="text-right">E-T</th>
+                <th scope="col">Editor</th>
+                <th scope="col">Q.A</th>
+                <th scope="col">DC</th>
+                <th scope="col">Status</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody id="tbdTasks">
+        </tbody>
+    </table>
+</div>
+
+<%-include('task_detail')%>
+    <%-include('reject-modal')%>
+
+        <script src="/js/common.js"></script>
+
+        <script>
+            var page = 1;
+            var search = '';
+            var status = 100;
+            $(document).ready(function () {
+                LoadTasks();
+            })
+
+            $('#slStatus').on('change', function () {
+                status = this.value;
+                LoadTasks();
+            })
+
+
+            $(document).on("click", "button[name='btn-task-info']", function () {
+                taskId = $(this).closest("tr").attr("id");
+                $('#modalTaskDetail').modal();
+            })
+
+
+            function LoadTasks() {
+                $.ajax({
+                    url: '/sale/task/all',
+                    type: 'get',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                    data: {
+                        search,
+                        page,
+                        status
+                    },
+                    success: function (data) {
+                        $('#tbdTasks').empty();
+                        let idx = 1;
+
+                        data.tasks.forEach(t => {
+                            let tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '">';
+
+                            tr += '<td>' + (idx++) + '</td>';
+
+                            tr += '<td class="font-weight-bold text-primary">' + t.job.customer.firstname + ' ' + t.job.customer.lastname + '</td>';
+                            tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
+                            tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
+                            tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>'
+
+
+                            tr += '<td>';
+                            if (typeof t.remarks[0] !== 'undefined') {
+                                tr += t.remarks[0].content;
+                            }
+                            tr += '</td>';
+
+
+                            tr += '<td class="text-right">' + t.amount + '</td>';
+                            tr += '<td class="text-right">' + t.edited_time + '</td>';
+
+
+                            tr += '<td>';
+                            if (typeof t.editor !== 'undefined' && t.editor !== null) {
+                                tr += t.editor.fullname
+                            }
+                            tr += '</td>';
+                            tr += '<td>';
+                            if (typeof t.qa !== 'undefined' && t.qa !== null) {
+                                tr += t.qa.fullname
+                            }
+                            tr += '</td>';
+
+                            tr += '<td>';
+                            if (typeof t.dc !== 'undefined' && t.dc !== null) {
+                                tr += t.dc.fullname
+                            }
+                            tr += '</td>';
+
+
+                            tr += '<td class="font-italic">';
+                            switch (t.status) {                              
+                                case 0: tr += '<span class="text-info">Editing</span>'; break;
+                                case 1: {
+                                    if (t.edited_time > 1) {
+                                        tr += '<span class="text-primary">Fixed</span>';
+                                    } else {
+                                        tr += '<span class="text-primary">Edited</span>';
+                                    }
+                                    break;
+                                }
+                                case 2: tr += '<span class="text-success">Q.A ok</span>'; break;
+                                case 3: tr += '<span class="text-success">DC ok</span>'; break;
+                                case 4: tr += '<span class="text-success"Upload</span>'; break;
+                                case 5: tr += '<span class="text-success">Done</span>'; break;
+                                case 6: tr += '<span class="text-success">Finish</span>'; break;
+
+                                case -1: tr += '<span class="text-info">Initial</span>'; break;
+                                case -2: tr += '<span class="text-danger font-weight-bold">Q.A reject</span>'; break;
+                                case -3: tr += '<span class="text-danger font-weight-bold">DC reject</span>'; break;
+                                case -4: tr += '<span class="text-danger font-weight-bold">Canceled</span>'; break;
+
+                            }
+                            tr += '</td>';
+
+                            tr += '<td class="text-right">';                            
+                            tr += '<button class="btn btn-xs btn-info ml-2" name="btn-task-info">';
+                            tr += '<i class="fa fa-info-circle" aria-hidden="true"></i>';
+                            tr += '</button>';
+
+                            tr += '</td>';
+
+
+                            tr += '</tr>';
+                            $('#tbdTasks').append(tr);
+                        })
+                    }
+
+                })
+            }
+        </script>
