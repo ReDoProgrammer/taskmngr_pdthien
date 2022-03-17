@@ -3,9 +3,9 @@
         <div class="modal-content">
             <div class="modal-body">
                 <div class="panel panel-primary text-white bg-dark">
-                    <div class="panel-heading"><i class="fa fa-info-circle" aria-hidden="true"></i> Job description
-                    </div>
-                    <div class="panel-body">
+                    <div class="panel-heading"> <button class="btn btn-xs btn-primary" id="btn-task-info">Show job info
+                            <i class="fa fa-arrow-down" aria-hidden="true"></i></button> </div>
+                    <div class="panel-body" id="job-info">
 
                         <div class="row">
                             <div class="col-md-2 col-sm-4 col-xs-4">Job name:</div>
@@ -36,7 +36,7 @@
 
 
                         <hr />
-                        
+
 
                         <div class="row">
                             <div class="col-md-2 col-sm-2 col-xs-4">
@@ -47,9 +47,9 @@
                                 <label id="lblIntruction"></label>
                             </div>
                         </div>
-                       
 
-                        <hr/>
+
+                        <hr />
                         <div class="row mt-2">
                             <div class="col-md-2 col-sm-2 col-xs-4">Source:</div>
                             <div class="col-md-10 col-sm-10 col-xs-8" id="lblInputLink"></div>
@@ -75,12 +75,12 @@
                                 <div class="row">
                                     <div class="col-md-2 col-sm-3 col-xs-4">Size:</div>
                                     <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold" id="divSize"></div>
-                                   
+
                                     <div class="col-md-2 col-sm-3 col-xs-4">Output:</div>
                                     <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold" id="divOutput"></div>
                                 </div>
 
-                               
+
 
                                 <hr />
                                 <div class="row">
@@ -99,10 +99,10 @@
                                     <div id="divTV" class=" font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1"></div>
                                 </div>
 
-                                <hr/>
+                                <hr />
                                 <div class="row mt-2">
                                     <div class="col-md-2 col-sm-2 col-xs-4">
-                                       Style note:
+                                        Style note:
                                     </div>
                                     <div class="col-md-10 col-sm-10 col-xs-8">
                                         <label id="lblNoteStyle" class="text-danger font-weight-bold"></label>
@@ -112,15 +112,10 @@
 
                             </div>
                         </div>
-
-                        
-                        <div class="panel panel-warning mt-2">
-                            <div class="panel-heading font-weight-bold">Remarks:</div>
-                            <div class="panel-body" id="remarks"></div>
-                        </div>
-
-
-
+                    </div>
+                    <div class="panel panel-warning mt-2">
+                        <div class="panel-heading font-weight-bold">Remarks:</div>
+                        <div class="panel-body" id="remarks"></div>
                     </div>
                     <div class="panel-footer">
                         <div class="form-group text-right">
@@ -138,7 +133,18 @@
 <script src="/js/common.js"></script>
 
 <script>
+    $('#btn-task-info').click(function () {
+        if ($('#job-info').is(":hidden")) {
+            $('#job-info').slideDown(1000);
+            $('#btn-task-info').html('Hide job info <i class="fa fa-arrow-up" aria-hidden="true"></i>')
+        } else {
+            $('#btn-task-info').html('Show job info <i class="fa fa-arrow-down" aria-hidden="true"></i>');
+            $('#job-info').slideUp(1000);
+        }
+    })
+
     $("#modalTaskDetail").on('shown.bs.modal', function (e) {
+        $('#job-info').hide();
         $.ajax({
             url: '/dc/task/detail',
             type: 'get',
@@ -152,7 +158,7 @@
                 console.log(data);
 
                 $('#divNationalStyle').html(data.customer.nation.name)
-                $('#divColor').html(data.customer.color.name)              
+                $('#divColor').html(data.customer.color.name)
                 $('#divOutput').html(data.customer.output.name)
 
                 $('#divSize').html(data.customer.size.name)
@@ -163,28 +169,28 @@
                 $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.assigned_date));
                 $('#lblDeadline').text(convertISODateToTimeFormat(data.task.deadline));
                 $('#lblIntruction').text(data.task.job.intruction);
-              
+
                 $('#remarks').empty();
                 data.task.remarks.forEach(r => {
                     let item = '<div class="row mt-2">';
-                    item += '<div class="col-md-4 col-sm-4 col-xs-12"><span class="font-weight-bold text-primary">' +r.user.fullname+'</span>('+ convertISODateToTimeFormat(r.timestamp) + '):</div>';                                 
-                    item += '<div class="col-md-8 col-sm-8 col-xs-12 text-danger font-italic">' + r.content + '</div>';                
+                    item += '<div class="col-md-4 col-sm-4 col-xs-12"><span class="font-weight-bold text-primary">' + r.user.fullname + '</span>(' + convertISODateToTimeFormat(r.timestamp) + '):</div>';
+                    item += '<div class="col-md-8 col-sm-8 col-xs-12 text-danger font-italic">' + r.content + '</div>';
                     item += '</div>';
 
                     $('#remarks').append(item);
                 })
 
 
-                if(isValidHttpUrl(data.task.input_link)){
-                    $('#lblInputLink').html('<a href="'+data.task.input_link+'" target="_blank" rel="noopener noreferrer">Link</a>')
-                }else{
-                    $('#lblInputLink').html('<span class="font-weight-bold font-italic">'+data.task.input_link+'</span>');
+                if (isValidHttpUrl(data.task.input_link)) {
+                    $('#lblInputLink').html('<a href="' + data.task.input_link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                } else {
+                    $('#lblInputLink').html('<span class="font-weight-bold font-italic">' + data.task.input_link + '</span>');
                 }
 
-                if(isValidHttpUrl(data.task.output_link)){
-                    $('#lblOutputLink').html('<a href="'+data.task.output_link+'" target="_blank" rel="noopener noreferrer">Link</a>')
-                }else{
-                    $('#lblOutputLink').html('<span class="font-weight-bold font-italic">'+data.task.output_link+'</span>');
+                if (isValidHttpUrl(data.task.output_link)) {
+                    $('#lblOutputLink').html('<a href="' + data.task.output_link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                } else {
+                    $('#lblOutputLink').html('<span class="font-weight-bold font-italic">' + data.task.output_link + '</span>');
                 }
 
 
