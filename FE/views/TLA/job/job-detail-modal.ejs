@@ -5,7 +5,8 @@
 
 
                 <div class="panel panel-primary text-white bg-dark">
-                    <div class="panel-heading"> <button class="btn btn-xs btn-primary" id="btn-job-info">Show job info <i class="fa fa-arrow-down" aria-hidden="true"></i></button> </div>
+                    <div class="panel-heading"> <button class="btn btn-xs btn-primary" id="btn-job-info">Show job info
+                            <i class="fa fa-arrow-down" aria-hidden="true"></i></button> </div>
                     <div class="panel-body" id="job-info">
 
                         <div class="row">
@@ -145,7 +146,7 @@
                         </div>
                     </div>
                 </div>
- 
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -168,11 +169,11 @@
         $('#job-info').hide();
     })
 
-    $('#btn-job-info').click(function(){
-        if($('#job-info').is(":hidden")){
+    $('#btn-job-info').click(function () {
+        if ($('#job-info').is(":hidden")) {
             $('#job-info').slideDown(1000);
             $('#btn-job-info').html('Hide job info <i class="fa fa-arrow-up" aria-hidden="true"></i>')
-        }else{
+        } else {
             $('#btn-job-info').html('Show job info <i class="fa fa-arrow-down" aria-hidden="true"></i>');
             $('#job-info').slideUp(1000);
         }
@@ -188,15 +189,15 @@
             data: {
                 id: jobId
             },
-            success: function (data) {       
-               
+            success: function (data) {
+
                 $('#lblStyleNote').text(data.job.customer.remark);
                 $('#lblJobName').text(data.job.name);
                 $('#lblCustomer').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
                 $('#lblReceivedDate').text(convertISODateToTimeFormat(data.job.received_date));
                 $('#lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.delivery_date));
                 $('#lblIntruction').text(data.job.intruction);
-                
+
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 alert(jqXHR.responseJSON.msg);
@@ -352,6 +353,9 @@
                         case -3:
                             tr += '<span class="text-danger">DC rejected</span>';
                             break;
+                        case 4: tr += '<span class="text-success">Upload</span>'; break;
+                        case 5: tr += '<span class="text-success">Done</span>'; break;
+                        case 6: tr += '<span class="text-success">Finish</span>'; break;
 
                     }
                     tr += '</i></td>';

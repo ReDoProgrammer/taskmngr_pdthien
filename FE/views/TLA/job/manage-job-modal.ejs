@@ -67,7 +67,7 @@
           </table>
         </div>
 
- 
+
         <div class="panel panel-primary" id="divAddOrUpdateTask">
           <div class="panel-heading font-w">
             <div class="row">
@@ -552,7 +552,9 @@
             case -1: tr += '<span class="text-info">Initial</span>'; break;
             case -2: tr += '<span class="text-danger">Q.A reject</span>'; break;
             case -3: tr += '<span class="text-danger">DC reject</span>'; break;
-
+            case 4: tr += '<span class="text-success">Upload</span>'; break;
+            case 5: tr += '<span class="text-success">Done</span>'; break;
+            case 6: tr += '<span class="text-success">Finish</span>'; break;
           }
           tr += '</td>';
 
@@ -693,7 +695,7 @@
         },
         success: function (data) {
           alert(data.msg);
-          LoadTasks();         
+          LoadTasks();
           $('#divAddOrUpdateTask').slideUp(500);
         },
         error: function (jqXHR, textStatus, errorThrown) {
