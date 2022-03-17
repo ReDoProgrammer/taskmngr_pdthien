@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { authenticateSaleToken } = require("../../../middlewares/sale-middleware");
 const Task = require('../../models/task-model');
+const Remark = require('../../models/remark-model');
 const { getCustomer, getTaskDetail, getModule, getWage } = require('../common');
 
 
@@ -129,4 +130,17 @@ router.put('/submit',authenticateSaleToken,(req,res)=>{
     })
 })
 
+
+router.put('/reject',authenticateSaleToken,async (req,res)=>{
+    let {taskId,remark} = req.body;
+
+    let  task = await Task.findById(taskId);
+    if(!task){
+        return res.status(404).json({
+            msg:`Task not found!`
+        })
+    }
+
+    let rmk = new Remark
+})
 module.exports = router;

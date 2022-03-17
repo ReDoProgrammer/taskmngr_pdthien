@@ -99,10 +99,10 @@
                                 headers: {
                                     authorization: "Bearer " + localStorage.getItem("accessToken"),
                                 },
-                                data:{
+                                data: {
                                     taskId
                                 },
-                                success:function(data){
+                                success: function (data) {
                                     alert(data.msg);
                                     LoadTasks();
                                 }, error: function (request, status, error) {
@@ -111,7 +111,10 @@
                             })
                         }
                         break;
-                    case 'customer-cancel-task':
+                    case 'reject-task':
+                        $('#modalRejectTask').modal();
+                        break;
+                    case 'cancel-task':
                         break;
 
                 }
@@ -152,7 +155,8 @@
                                 break;
                             case 5:
                                 mn = '<li id="submit-task-finished"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Submit finish</a></li>';
-                                mn += '<li id="customer-cancel-task"><a tabindex="-1" href="#"> <i class="fa fa-times text-danger" aria-hidden="true"></i> Submit finish</a></li>';
+                                mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-warning" aria-hidden="true"></i> Reject</a></li>';
+                                mn += '<li id="cancel-task"><a tabindex="-1" href="#"> <i class="fa fa-times text-danger" aria-hidden="true"></i> Cancel</a></li>';
                                 break;
 
                             default:

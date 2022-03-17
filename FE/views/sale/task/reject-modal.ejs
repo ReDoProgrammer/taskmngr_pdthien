@@ -3,8 +3,17 @@
         <div class="modal-content">
             <div class="modal-body">
                 <div class="panel panel-warning text-white bg-dark">
-                    <div class="panel-heading font-weight-bold"><i class="fa fa-info-circle" aria-hidden="true"></i>
-                        Reject task
+                    <div class="panel-heading font-weight-bold">
+                        <div class="row">
+                            <div class="col-md-11 col-sm-10 col-xs-10">
+                                Reject task
+                            </div>
+                            <div class="col-md-1 col-sm-2 col-xs-2 text-right">
+                                <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div class="panel-body">
 
@@ -15,18 +24,13 @@
                             </div>
 
                             <div class="col-md-2 col-sm-2 col-xs-2">
-                                <button class="btn btn-sm btn-warning" id="btnSubmitReject">
-                                    <i class="fa fa-close"></i> Reject
+                                <button class="btn btn-sm btn-danger" id="btnSubmitReject">
+                                    <i class="fa fa-close"></i> Submit Reject
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="panel-footer">
-                        <div class="form-group text-right">
-                            <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -37,16 +41,16 @@
     $('#btnSubmitReject').click(function () {
         let remark = $('#txtRejectReason').val();
         $.ajax({
-            url: '/qa/task/reject',
+            url: '/sale/task/reject',
             type: 'put',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
-            data:{
+            data: {
                 taskId,
                 remark
             },
-            success:function(data){
+            success: function (data) {
                 alert(data.msg);
                 $('#modalRejectTask').modal('hide');
             },

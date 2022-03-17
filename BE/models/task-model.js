@@ -215,6 +215,13 @@ const taskSchema = new Schema({
         type:Date
     },
 
+    rejected_by:[{
+        type: Schema.Types.ObjectId,
+        ref: 'user'
+    }],
+    rejected_at:{
+        type:Date
+    },
     updated_by: {
         type: Schema.Types.ObjectId,
         ref: 'user'
