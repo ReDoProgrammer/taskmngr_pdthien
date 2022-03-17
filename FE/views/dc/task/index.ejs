@@ -70,7 +70,7 @@
         LoadTasks();
       })
 
-          
+
 
       $(document).on("click", "button[name='get-task']", function () {
         taskId = $(this).closest("tr").attr("id");
@@ -98,7 +98,7 @@
       })
 
 
-      $('#slStatus').on('change', function () {      
+      $('#slStatus').on('change', function () {
         LoadTasks();
       })
 
@@ -175,16 +175,19 @@
                 case -2: tr += '<span class="text-danger">Q.A reject</span>'; break;
                 case -3: tr += '<span class="text-danger">DC reject</span>'; break;
                 case -4: tr += '<span class="text-danger">Canceled</span>'; break;
+                case 4: case 5: case 6:
+                  tr += '<span class="text-info">Finish</span>'; break;
 
               }
               tr += '</td>';
 
               tr += '<td class="text-right">';
 
+              console.log(t.status);
               if (
-                    ((t.status === 1 && (typeof t.qa === 'undefined' || t.qa === null)) || t.status === 2) 
-                    && (typeof t.dc ==='undefined' || t.dc ===null)
-                    ) {
+                ((t.status === 1 && (typeof t.qa === 'undefined' || t.qa === null)) || t.status === 2)
+                && (typeof t.dc === 'undefined' || t.dc === null)
+              ) {
                 tr += '<button class="btn btn-xs btn-success ml-2" name="get-task"><i class="fa fa-plus" aria-hidden="true"></i></button>';
               }
 
