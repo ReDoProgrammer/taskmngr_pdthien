@@ -114,6 +114,7 @@
         LoadUnuploadedTask();
         $('#lblUploadTaskMessage').html('<span class="text-success">'+data.msg+'</span>');
         $('#lblUploadTaskMessage').show().delay(3000).fadeOut();
+        $('#txtUploadRemark').val('');
        
       },
       error: function (jqXHR, textStatus, errorThrown) {
