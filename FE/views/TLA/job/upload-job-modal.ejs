@@ -42,6 +42,12 @@
               </div>
             </div>
 
+            <div class="row">
+              <div class="col-md-12 col-sm-12 col-xs-12 mt-2" >
+                <label id="lblUploadTaskMessage" class="font-weight-bold"></label>
+              </div>
+            </div>
+
             <hr />
             <div class="panel panel-info">
               <div class="panel-heading">Uploaded tasks</div>
@@ -75,8 +81,50 @@
 
 <script src="/js/common.js"></script>
 <script>
+
+  $('#btnSubmitUploadTask').click(function(){
+    let taskId = $('#slTasks option:selected').val();
+    let uploaded_link =  $('#txtUploadLink').val();
+    let remark = $('#txtUploadRemark').val();
+    if(typeof taskId === 'undefined'){
+      $('#lblUploadTaskMessage').html('<span class="text-danger">(!) No task is choosen!</span>');
+      $('#lblUploadTaskMessage').show().delay(3000).fadeOut();
+      return;
+    }
+
+    if(!uploaded_link.trim() && !confirm('Upload link is blank. Do you want to continue?')){
+      return;
+    }
+
+    $.ajax({
+      url:'/tla/task/upload',
+      type:'put',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data:{
+        taskId,
+        uploaded_link,
+        remark
+      },
+      success:function(data){
+        LoadUploadedTask();
+        LoadUnuploadedTask();
+        $('#lblUploadTaskMessage').html('<span class="text-success">'+data.msg+'</span>');
+        $('#lblUploadTaskMessage').show().delay(3000).fadeOut();
+       
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      }
+    })
+  })
+
+
+
   $("#uploadJobModal").on('shown.bs.modal', function (e) {
     LoadUnuploadedTask();
+    LoadUploadedTask();
   })
 
   $('#slTasks').change(function () {
@@ -112,4 +160,7 @@
     })
   }
 
+  function LoadUploadedTask(){
+
+  }
 </script>

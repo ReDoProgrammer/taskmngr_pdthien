@@ -371,6 +371,46 @@ router.post('/', authenticateTLAToken, (req, res) => {
         })
 })
 
+router.put('/upload',authenticateTLAToken,async (req,res)=>{
+    let {taskId,uploaded_link,remark} = req.body;
+    let task = await Task.findById(taskId);
+    if(!task){
+        return res.status(404).json({
+            msg:`Task not found!`
+        })
+    }
+
+    let rmk = new Remark({
+        user:req.user._id,
+        content:remark,
+        tid:task._id
+    });
+
+    await rmk.save()
+    .then(async r=>{
+        task.status = 4;
+        task.uploaded_link = uploaded_link;
+        task.uploaded_at = new Date();
+        task.uploaed_by = req.user._id;
+        task.remarks.push(r);
+        await task.save()
+        .then(_=>{
+            return res.status(200).json({
+                msg:`The task has been uploaded!`
+            })
+        })
+        .catch(err=>{
+            return res.status(500).json({
+                msg:`Can not upload this task with error: ${new Error(err.message)}`
+            })
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not create remark when upload this task with error: ${new Error(err.message)}`
+        })
+    })
+})
 
 router.put('/cancel', authenticateTLAToken, (req, res) => {
     let { taskId, canceled_reason, remark } = req.body;
