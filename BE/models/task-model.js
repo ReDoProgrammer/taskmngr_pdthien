@@ -199,6 +199,22 @@ const taskSchema = new Schema({
         type: Date,
         default: new Date()
     },
+    done_submited_by:{
+        type: Schema.Types.ObjectId,
+        ref: 'user'
+    },
+    done_submited_at:{
+        type:Date
+    },
+
+    finish_submited_by:{
+        type: Schema.Types.ObjectId,
+        ref: 'user'
+    },
+    finish_submited_at:{
+        type:Date
+    },
+
     updated_by: {
         type: Schema.Types.ObjectId,
         ref: 'user'

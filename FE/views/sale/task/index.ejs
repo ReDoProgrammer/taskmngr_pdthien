@@ -82,8 +82,39 @@
             var page = 1;
             var search = '';
             var status = 100;
+            var taskId = '';
             $(document).ready(function () {
                 LoadTasks();
+            })
+
+            $(document).on('click', '#funcMenu  li', function () {
+                let fnc = $(this).attr('id');
+
+                switch (fnc) {
+                    case 'submit-task-done':
+                        if (confirm('Are you sure want to submit done for this task?')) {
+                            $.ajax({
+                                url: '/sale/task/submit',
+                                type: 'put',
+                                headers: {
+                                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                                },
+                                data:{
+                                    taskId
+                                },
+                                success:function(data){
+                                    alert(data.msg);
+                                    LoadTasks();
+                                }, error: function (request, status, error) {
+                                    alert(request.responseJSON.msg);
+                                }
+                            })
+                        }
+                        break;
+                    case 'customer-cancel-task':
+                        break;
+
+                }
             })
 
 
@@ -141,11 +172,6 @@
                 });
 
             });
-
-
-
-
-
 
 
             $('#slStatus').on('change', function () {
@@ -233,7 +259,7 @@
                             tr += '</td>';
                             tr += '<td>' + convertISODateToTimeFormat(t.uploaded_at) + '</td>';
 
-                            tr+='<td><a href="'+t.uploaded_link+'" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a></td>'
+                            tr += '<td><a href="' + t.uploaded_link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a></td>'
 
 
                             tr += '<td><i>';
