@@ -119,7 +119,7 @@ router.get('/list-uploaded',authenticateTLAToken,(req,res)=>{
         job:jobId,
         status: { $gt: 3 }// lấy các task có trạng thái đã được upload trở lên
     })
-    .populate('uploadted_at','fullname')
+    .populate('uploaded_by','fullname')
     .populate('level','name')   
     .populate({
         path : 'remarks',       
@@ -129,7 +129,6 @@ router.get('/list-uploaded',authenticateTLAToken,(req,res)=>{
       })
     .exec()
     .then(tasks=>{
-        console.log(tasks);
         return res.status(200).json({
             msg:`Load uploaded tasks list successfully!`,
             tasks

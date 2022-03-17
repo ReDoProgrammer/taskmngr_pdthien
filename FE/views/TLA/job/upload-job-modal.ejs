@@ -184,7 +184,6 @@
             tr+= '<td>'+t.uploaded_by.fullname+'</td>';
             tr += "<td>" + convertISODateToTimeFormat(t.uploaded_at) + "</td>";
             tr+= '</tr>';
-            console.log(tr);
             $('#tbdyUploadedTasks').append(tr);
         })
         $('#lblUploadTaskMessage').html('<span class="text-success">'+data.msg+'</span>');
