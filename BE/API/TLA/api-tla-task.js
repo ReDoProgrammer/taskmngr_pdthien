@@ -111,6 +111,31 @@ router.get('/all', authenticateTLAToken, (req, res) => {
 
 })
 
+router.get('/list-unuploaded',authenticateTLAToken,(req,res)=>{
+    let {jobId} = req.query;
+    Task
+    .find({
+        job:jobId,
+        status:{$in:[1,2,3]}//chỉ lấy những task có trạng thái đã được editor submit/Q.A submit/DC submit
+    })
+    .populate('level')
+    .populate('editor')
+    .exec()
+    .then(tasks=>{
+        
+        return res.status(200).json({
+            msg:`Load unuploaded tasks successfully!`,
+            tasks
+        })
+    })  
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not list unuploaded tasks with error: ${new Error(err.message)}`
+        })
+    })  
+})
+
+
 router.get('/detail', authenticateTLAToken, (req, res) => {
     let { taskId } = req.query;
     getTaskDetail(taskId)

@@ -14,48 +14,54 @@
             </div>
           </div>
           <div class="panel-body">
-            <div class="form-group">
-              <label for="">
-                Output link:
-              </label>
-              <input type="text" placeholder="Output link" id="txtOuputLink" class="form-control">
-            </div>
-            <div class="form-group">
-              <label for="">
-                Remark:
-              </label>
-              <input type="text" placeholder="Remark" id="txtLinkRemark" class="form-control">
-            </div>
 
             <div class="row">
-              <div class="col-xs-12 text-center">
-                <button class="btn btn-primary" id="btnSubmitUploadJob">
-                  <i class="fa fa-floppy-o" aria-hidden="true"></i>
-                  Submit upload</button>
+              <div class="col-md-4 col-sm-4 col-xs-12 mt-2 form-group">
+                <label for="">Task:</label>
+                <select name="" id="slTasks" class="form-control"></select>
+              </div>
+              <div class="col-md-8 col-sm-8 col-xs-12 mt-2 form-group">
+                <label for="">Link:</label>
+                <input type="text" class="form-control" id="txtUploadLink" placeholder="Upload link">
               </div>
             </div>
 
-
-            <div class="tableFixHead table-responsive mt-2">
-              <table class="table mt-1 table-striped bg-white text-dark text-nowrap">
-                <thead class="thead-dark">
-                  <tr>
-                    <th scope="col"></th>
-                    <th scope="col">#</th>
-                    <th scope="col">User</th>
-                    <th scope="col">Remark</th>
-                    <th scope="col">Date</th>
-                    <th scope="col">Link</th>
-                  </tr>
-                </thead>
-                <tbody id="tblOutputLinks">
-                </tbody>
-              </table>
+            <div class="row">
+              <div class="col-md-12 col-sm-12 col-xs-12 mt-2">
+                <label for="">Remark:</label>
+                <input type="text" class="form-control" id="txtUploadRemark" placeholder="Upload remark">
+              </div>
             </div>
+
             <div class="row mt-2">
-              <div class="col-sm-12" id="message"></div>
+              <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                <button class="btn btn-success" id="btnSubmitUploadTask">
+                  <i class="fa fa-upload" aria-hidden="true"></i>
+                  Submit upload
+                </button>
+              </div>
             </div>
 
+            <hr />
+            <div class="panel panel-info">
+              <div class="panel-heading">Uploaded tasks</div>
+              <div class="panel-body">
+                <div class="table-responsive  table-responsive-sm table-responsive-xs mt-2">
+                  <table class="table mt-1 table-striped bg-white text-dark nowrap text-nowrap">
+                    <thead class="thead-dark">
+                      <tr>
+
+                        <th scope="col">#</th>
+                        <th scope="col">Level</th>
+                        <th scope="col">Remark</th>
+                        <th scope="col">Link</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tblUploadedTasks"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -69,40 +75,17 @@
 
 <script src="/js/common.js"></script>
 <script>
-
-  $(document).on("change", "input[name='checked']", function () {
-    let lId = $(this).closest('tr').attr('id');
-    $.ajax({
-      url: '/tla/link',
-      type: 'put',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        lId
-      },
-      success: function (data) {
-        $('#message').html('<label class="text-success font-weight-bold">' + data.msg + '</label>');
-        $('#message').show().delay(500).fadeOut();
-      },
-      error: function (request, status, error) {
-        $('#message').html('<label class="text-danger font-weight-bold">' + request.responseJSON.msg + '</label>');
-        $('#message').show().delay(3000).fadeOut();
-      }
-    })
-
-  })
-
   $("#uploadJobModal").on('shown.bs.modal', function (e) {
-    $('#txtOuputLink').val('');
-    $('#txtLinkRemark').val('');
-    LoadLinks();
+    LoadUnuploadedTask();
   })
 
+  $('#slTasks').change(function () {
+    $('#txtUploadLink').val($('#slTasks option:selected').data('link'));
+  });
 
-  function LoadLinks() {
+  function LoadUnuploadedTask() {
     $.ajax({
-      url: '/tla/link',
+      url: '/tla/task/list-unuploaded',
       type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -111,68 +94,22 @@
         jobId
       },
       success: function (data) {
-        console.log(data);
-        $('#tblOutputLinks').empty();
-        let idx = 1;
-        data.links.forEach(l => {
-          let tr = '<tr id="' + l._id + '">';
-          if (l.checked) {
-            tr += '<td><input type="checkbox" name="checked" checked></td>';
-          } else {
-            tr += '<td><input type="checkbox" name="checked"></td>';
-          }
-
-          tr += '<td>' + (idx++) + '</td>';
-          tr += '<td>' + l.created_by.fullname + '</td>';
-          tr += '<td>' + l.remark + '</td>';
-          tr += '<td>' + convertISODateToTimeFormat(l.created_at) + '</td>';
-
-          tr += '<td>';
-          if (isValidHttpUrl(l.url)) {
-            tr += '<a href="' + l.url + '" target="_blank" rel="noopener noreferrer">Link</a>'
-          } else {
-            tr += l.url
-          }
-          tr += '</td>';
-
-          tr += '</tr>';
-          $('#tblOutputLinks').append(tr);
-
+        $('#slTasks').empty();
+        data.tasks.forEach(t => {
+          let opt = '<option value = "' + t._id + '" data-link="' + t.output_link + '">';
+            opt+= t.level.name;
+            opt+=' - ['+t.editor.fullname+']';           
+            opt+= '</option>';
+          $('#slTasks').append(opt);
         })
-      }, error: function (request, status, error) {
-        alert(request.responseJSON.msg);
+
+        $('#txtUploadLink').val($('#slTasks option:selected').data('link'));
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
       }
+
     })
   }
 
-  $('#btnSubmitUploadJob').click(function () {
-    let link = $('#txtOuputLink').val();
-    let remark = $('#txtLinkRemark').val();
-
-    if ((link.trim()).length === 0 && !confirm('Link is blank. Do you want to continue upload this job?')) {
-      return;
-    }
-
-    $.ajax({
-      url: '/tla/job/submit',
-      type: 'put',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        jobId,
-        link,
-        remark
-      },
-      success: function (data) {
-        $('#message').html('<label class="text-success font-weight-bold">' + data.msg + '</label>');
-        $('#message').show().delay(500).fadeOut();
-        LoadLinks();
-        $('#txtOuputLink').val('');
-        $('#txtLinkRemark').val('');
-      }, error: function (request, status, error) {
-        alert(request.responseJSON.msg);
-      }
-    })
-  })
 </script>
