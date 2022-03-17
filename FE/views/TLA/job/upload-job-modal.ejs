@@ -173,6 +173,8 @@
         jobId      
       },
       success:function(data){   
+        $('#lblUploadTaskMessage').html('<span class="text-success">'+data.msg+'</span>');
+        $('#lblUploadTaskMessage').show().delay(500).fadeOut();   
         $('#tbdyUploadedTasks').empty();
         let idx = 1;
         data.tasks.forEach(t=>{
@@ -186,8 +188,7 @@
             tr+= '</tr>';
             $('#tbdyUploadedTasks').append(tr);
         })
-        $('#lblUploadTaskMessage').html('<span class="text-success">'+data.msg+'</span>');
-        $('#lblUploadTaskMessage').show().delay(3000).fadeOut();       
+           
       },
       error: function (jqXHR, textStatus, errorThrown) {
         alert(jqXHR.responseJSON.msg);

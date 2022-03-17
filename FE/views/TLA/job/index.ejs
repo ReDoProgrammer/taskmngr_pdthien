@@ -30,8 +30,7 @@
                 <th scope="col">#</th>
                 <th scope="col">Customer</th>
                 <th scope="col">Job name</th>
-                <th scope="col">Combo</th>
-                <th scope="col">Intruction</th>
+                <th scope="col">Combo</th>               
                 <th scope="col">Received date</th>
                 <th scope="col">Delivery date</th>
                 <th scope="col">Status</th>
@@ -121,9 +120,9 @@
                                 } else {
                                     tr += '';
                                 }
-                                tr += '</td>'
+                                tr += '</td>';
 
-                                tr += '<td>' + job.intruction + '</td>';
+                             
                                 tr += "<td>" + convertISODateToTimeFormat(job.received_date) + "</td>";
                                 tr += "<td>" + convertISODateToTimeFormat(job.delivery_date) + "</td>";
                                 tr += '<td><i>';
