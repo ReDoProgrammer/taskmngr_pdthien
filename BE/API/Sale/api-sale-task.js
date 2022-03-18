@@ -141,6 +141,36 @@ router.put('/reject',authenticateSaleToken,async (req,res)=>{
         })
     }
 
-    let rmk = new Remark
+    let rmk = new Remark({
+        tid: taskId,
+        user: req.user._id,
+        content: remark
+    });
+    await rmk.save()
+    .then(async r=>{
+        task.remarks.push(rmk);
+        task.rejected_by = req.user._id;
+        task.rejected_at = new Date();
+        task.status = -4;
+        task.updated_by = req.user._id;
+        task.updated_at = new Date();
+        
+        await task.save()
+        .then(_=>{
+            return res.status(200).json({
+                msg:`The task has been rejected!`
+            })
+        })
+        .catch(err=>{
+            return res.status(500).json({
+                msg:`Can not reject this task with error: ${new Error(err.message)}`
+            })
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not insert reject remark with error: ${new Error(err.message)}`
+        })
+    })
 })
 module.exports = router;

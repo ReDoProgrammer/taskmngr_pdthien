@@ -154,7 +154,8 @@ const taskSchema = new Schema({
               -1: khởi tạo
               -2: Q.A reject            
               -3: DC reject
-              -4: cancel
+              -4: Sale reject
+              -5: Cancel
             */
 
     },
