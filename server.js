@@ -249,7 +249,8 @@ app.use('/tla/task',TLATaskController);
 const apiTLAAuth = require('./BE/API/TLA/api-auth');
 app.use('/tla/auth',apiTLAAuth);
 
-
+const apiTLAComboLine = require('./BE/API/TLA/api-tla-combo-line');
+app.use('/tla/combo-line',apiTLAComboLine);
 
 const apiTLACustomer = require('./BE/API/TLA/api-tla-customer');
 app.use('/tla/customer',apiTLACustomer);
