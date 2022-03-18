@@ -5,115 +5,9 @@
 
 
                 <div class="panel panel-primary text-white bg-dark">
-                    <div class="panel-heading"> <button class="btn btn-xs btn-primary" id="btn-job-info">Show job info
+                    <div class="panel-heading"> <button class="btn btn-xs btn-primary btn-job-info">Show job info
                             <i class="fa fa-arrow-down" aria-hidden="true"></i></button> </div>
-                    <div class="panel-body" id="job-info">
-
-                        <div class="row">
-                            <div class="col-md-2 col-sm-4 col-xs-4">Job name:</div>
-                            <div class="col-md-4 col-sm-8 col-xs-8">
-                                <label id="lblJobName" class="text-info font-weight-bold"></label>
-                            </div>
-
-                            <div class="col-md-2 col-sm-4 col-xs-4">Customer:</div>
-                            <div class="col-md-4 col-sm-8 col-xs-8">
-                                <label id="lblCustomer" class="text-info font-weight-bold"></label>
-                            </div>
-                        </div>
-
-
-
-                        <div class="row mt-2">
-                            <div class="col-md-2 co-sm-4 col-xs-4">Received date:</div>
-                            <div class="col-md-4 col-sm-8 col-xs-8">
-                                <label id="lblReceivedDate"></label>
-                            </div>
-                            <div class="col-md-2 co-sm-4 col-xs-4">Deadline:</div>
-                            <div class="col-md-4 col-sm-8 col-xs-8">
-                                <label id="lblDeliveriedDate" class="text-danger"></label>
-                            </div>
-                        </div>
-
-
-
-
-                        <hr />
-
-                        <div class="row ">
-                            <div class="form-group col-md-12 col-sm-12 col-xs-12">
-                                <label class="text-warning font-weight-bold">Intruction:</label>
-                                <div id="lblIntruction" style="margin-left: 10px; margin-top: 5px;"></div>
-                            </div>
-                        </div>
-
-
-                        <hr />
-                        <div class="row mt-2">
-                            <div class="col-md-2 col-sm-2 col-xs-4">Source:</div>
-                            <div class="col-md-10 col-sm-10 col-xs-8" id="lblInputLink"></div>
-                        </div>
-
-
-
-
-
-
-
-
-                        <div class="panel panel-info mt-2">
-                            <div class="panel-heading">Job style info</div>
-                            <div class="panel-body">
-                                <div class="row">
-                                    <div class="col-md-2 col-sm-3 col-xs-4">National style:</div>
-                                    <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold" id="divNationalStyle">
-                                    </div>
-                                    <div class="col-md-2 col-sm-3 col-xs-4">Color:</div>
-                                    <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold" id="divColor"></div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-2 col-sm-3 col-xs-4">Size:</div>
-                                    <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold" id="divSize"></div>
-
-                                    <div class="col-md-2 col-sm-3 col-xs-4">Output:</div>
-                                    <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold" id="divOutput"></div>
-                                </div>
-
-
-
-                                <hr />
-                                <div class="row">
-                                    <div class="col-md-1 col-sm-1 col-xs-2 mt-1">Align: </div>
-                                    <div id="divAlign" class="font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1"></div>
-
-                                    <div class="col-md-1 col-sm-1 col-xs-2 mt-1">Sky:</div>
-                                    <div id="divSky" class=" font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1"></div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-1 col-sm-1 col-xs-2 mt-1">Fire:</div>
-                                    <div id="divFire" class="font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1"></div>
-
-                                    <div class="col-md-1 col-sm-1 col-xs-2 mt-1">TV:</div>
-                                    <div id="divTV" class=" font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1"></div>
-                                </div>
-
-                                <hr />
-                                <div class="row mt-2">
-                                    <div class="col-md-2 col-sm-2 col-xs-4">
-                                        Style note:
-                                    </div>
-
-                                    <div class="col-md-10 col-sm-10 col-xs-8">
-                                        <label id="lblStyleNote" class="text-danger font-weight-bold"></label>
-                                    </div>
-                                </div>
-
-
-                            </div>
-                        </div>
-
-                    </div>
+                    <%-include('panel-job-info')%>
                 </div>
 
 
@@ -165,45 +59,11 @@
     $("#JobDetailModal").on('shown.bs.modal', function (e) {
         LoadTasksList();
         LoadCustomer();
-        LoadJobDetail();
-        $('#job-info').hide();
+       LoadJob();
+
     })
 
-    $('#btn-job-info').click(function () {
-        if ($('#job-info').is(":hidden")) {
-            $('#job-info').slideDown(1000);
-            $('#btn-job-info').html('Hide job info <i class="fa fa-arrow-up" aria-hidden="true"></i>')
-        } else {
-            $('#btn-job-info').html('Show job info <i class="fa fa-arrow-down" aria-hidden="true"></i>');
-            $('#job-info').slideUp(1000);
-        }
-    })
-
-    function LoadJobDetail() {
-        $.ajax({
-            url: '/tla/job/detail',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-                id: jobId
-            },
-            success: function (data) {
-
-                $('#lblStyleNote').text(data.job.customer.remark);
-                $('#lblJobName').text(data.job.name);
-                $('#lblCustomer').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
-                $('#lblReceivedDate').text(convertISODateToTimeFormat(data.job.received_date));
-                $('#lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.delivery_date));
-                $('#lblIntruction').text(data.job.intruction);
-
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                alert(jqXHR.responseJSON.msg);
-            }
-        })
-    }
+    
 
     function LoadCustomer() {
         $.ajax({

@@ -30,7 +30,7 @@
                 <th scope="col">#</th>
                 <th scope="col">Customer</th>
                 <th scope="col">Job name</th>
-                <th scope="col">Combo</th>               
+                <th scope="col">Combo</th>
                 <th scope="col">Received date</th>
                 <th scope="col">Delivery date</th>
                 <th scope="col">Status</th>
@@ -71,14 +71,14 @@
 
 
                 $(document).on("click", "button[name='btn-upload-job']", function () {
-                    jobId = $(this).closest('tr').attr('id');                  
+                    jobId = $(this).closest('tr').attr('id');
                     $('#uploadJobModal').modal();
                 })
 
 
                 $(document).on("click", "button[name='process-job']", function () {
-                    jobId = $(this).closest('tr').attr('id');    
-                    customerId = $(this).closest('tr').data('customer');                
+                    jobId = $(this).closest('tr').attr('id');
+                    customerId = $(this).closest('tr').data('customer');
                     $('#JobMngrModal').modal();
                 })
 
@@ -122,7 +122,7 @@
                                 }
                                 tr += '</td>';
 
-                             
+
                                 tr += "<td>" + convertISODateToTimeFormat(job.received_date) + "</td>";
                                 tr += "<td>" + convertISODateToTimeFormat(job.delivery_date) + "</td>";
                                 tr += '<td><i>';
@@ -160,4 +160,114 @@
 
 
 
+                //phan xu ly lien quan toi job detail
+                $(document).ready(function () {
+                    $('.job-info').hide();
+                })
+
+                var isShown = false;
+                $('.btn-job-info').click(function () {
+                    if (!isShown) {
+                        $('.job-info').slideDown(1000);
+                        $('.btn-job-info').html('Hide job info <i class="fa fa-arrow-up" aria-hidden="true"></i>');
+
+                    } else {                     
+                        $('.btn-job-info').html('Show job info <i class="fa fa-arrow-down" aria-hidden="true"></i>');
+                        $('.job-info').slideUp(1000);
+                    }
+                    isShown = !isShown;
+                })
+
+
+                function LoadJob() {
+                    $.ajax({
+                        url: '/tla/job/detail',
+                        type: 'get',
+                        headers: {
+                            authorization: "Bearer " + localStorage.getItem("accessToken"),
+                        },
+                        data: {
+                            id: jobId
+                        },
+                        success: function (data, textStatus, xhr) {
+                            console.log(data.job);
+
+                            $('.lblCustomer').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
+                            $('.lblJobName').text(data.job.name);
+                            $('.lblReceivedDate').text(convertISODateToTimeFormat(data.job.received_date));
+                            $('.lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.delivery_date));
+
+                            $('.lblIntruction').text(data.job.intruction);
+
+                            $('.lblInputLink').html('<a href="'+data.job.input_link+'" target="_blank" rel="noopener noreferrer">Click here</a>');
+
+                            $('.divNationalStyle').html('<i class="text-warning font-weight-bold">' + data.job.customer.nation.name + '</i>');
+                            $('.divColor').html('<i class="text-warning font-weight-bold">' + data.job.customer.color.name + '</i>');
+                            $('.divSize').html('<i class="text-warning font-weight-bold">' + data.job.customer.size.name + '</i>');
+                            $('.divOutput').html('<i class="text-warning font-weight-bold">' + data.job.customer.output.name + '</i>');
+                            $('.divCloud').html('<i class="text-warning font-weight-bold">' + data.job.customer.cloud.name + '</i>')
+
+                            if (data.job.customer.is_align) {
+                                if (data.job.customer.align_note.trim().length > 0) {
+                                    $('.divAlign').html(data.job.customer.align_note);
+                                } else {
+                                    $('.divAlign').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                                }
+                            } else {
+                                $('.divAlign').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+                            }
+
+                            if (data.job.customer.has_sky) {
+                                if (data.job.customer.sky_note.trim().length > 0) {
+                                    $('.divSky').html(data.job.customer.sky_note);
+                                } else {
+                                    $('.divSky').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                                }
+                            } else {
+                                $('.divSky').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+                            }
+
+                            if (data.job.customer.has_fire) {
+                                if (data.job.customer.fire_note.trim().length > 0) {
+                                    $('.divFire').html(data.job.customer.fire_note);
+                                } else {
+                                    $('.divFire').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                                }
+                            } else {
+                                $('.divFire').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+                            }
+
+                            if (data.job.customer.has_TV) {
+                                if (data.job.customer.TV_note.trim().length > 0) {
+                                    $('.divTV').html(data.job.customer.TV_note);
+                                } else {
+                                    $('.divTV').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                                }
+                            } else {
+                                $('.divTV').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+                            }
+
+                            if (data.job.customer.has_grass) {
+                                if (data.job.customer.grass_note.trim().length > 0) {
+                                    $('.divGrass').html(data.job.customer.grass_note);
+                                } else {
+                                    $('.divGrass').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                                }
+                            } else {
+                                $('.divGrass').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+                            }
+
+
+
+
+                            
+                            $('.lblStyleNote').text(data.job.customer.remark);
+                         
+
+                        }
+                    })
+                }
+
             </script>
+
+          

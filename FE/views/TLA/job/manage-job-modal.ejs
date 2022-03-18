@@ -9,37 +9,18 @@
     <div class="modal-content">
       <div class="modal-body text-dark">
         <div class="panel panel-info mb-3">
-          <div class="panel-heading font-weight-bold">
-            <i class="fa fa-tasks" aria-hidden="true"></i>
-            <label id="name_case" class="text-uppercase"></label> - <label id="customer" class="text-danger"></label>
-          </div>
-          <div class="panel-body">
+          <div class="panel-heading"> <button class="btn btn-xs btn-primary btn-job-info">Show job info
+              <i class="fa fa-arrow-down" aria-hidden="true"></i></button> </div>
+            <%-include('panel-job-info')%>
 
-            <div class="row">
-              <div class="col-md-2 col-sm-3 col-xs-4">
-                <label class="font-weight-bold">Style note:</label>
-              </div>
-              <div class="col-md-10 col-sm-9 col-xs-8">
-                <label id="style_note" class="text-danger"></label>
-              </div>
-            </div>
-
-
-            <div class="row">
-              <div class="col-md-2 col-sm-3 col-xs-4">
-                <label class="font-weight-bold">Intruction:</label>
-              </div>
-              <div class="col-md-10 col-sm-9 col-xs-8">
-                <label id="job_intruction" class="text-warning"></label>
-              </div>
-            </div>
-
+          <div class="panel-footer">
             <div class="row mt-2">
               <div class="col-md-12 col-sm-12 col-xs-12">
                 <button class="btn btn-sm btn-success" id="btnAddTask"><i class="fa fa-plus"></i> Add Task</button>
               </div>
             </div>
           </div>
+
         </div>
 
 
@@ -196,6 +177,9 @@
   let idx = 1;
   var taskId = '';
   var levelId = '';
+
+
+
 
 
   //sự kiện click button sửa task trên table
@@ -400,86 +384,7 @@
 
 
 
-  function LoadJob() {
-    $.ajax({
-      url: '/tla/job/detail',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        id: jobId
-      },
-      success: function (data, textStatus, xhr) {
-
-        $('#customer_fullname').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
-        $('#name_case').text(data.job.name);
-        $('#job_intruction').text(data.job.intruction);
-        $('#txtDeadline').val(convertISODateToTimeFormat(data.job.delivery_date));
-        $('#style_note').text(data.job.customer.remark);
-        $('#customer').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
-
-        if (data.job.customer.has_fire) {
-          if (data.job.customer.fire_note.trim().length > 0) {
-            $('#customer_fire').html(data.job.customer.fire_note);
-          } else {
-            $('#customer_fire').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-          }
-        } else {
-          $('#customer_fire').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-        }
-
-        if (data.job.customer.has_grass) {
-          if (data.job.customer.grass_note.trim().length > 0) {
-            $('#customer_grass').html(data.job.customer.grass_note);
-          } else {
-            $('#customer_grass').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-          }
-        } else {
-          $('#customer_grass').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-        }
-
-        if (data.job.customer.has_sky) {
-          if (data.job.customer.sky_note.trim().length > 0) {
-            $('#customer_sky').html(data.job.customer.sky_note);
-          } else {
-            $('#customer_sky').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-          }
-        } else {
-          $('#customer_sky').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-        }
-
-        if (data.job.customer.has_TV) {
-          if (data.job.customer.TV_note.trim().length > 0) {
-            $('#customer_tv').html(data.job.customer.TV_note);
-          } else {
-            $('#customer_tv').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-          }
-        } else {
-          $('#customer_tv').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-        }
-
-        if (data.job.customer.is_align) {
-          if (data.job.customer.align_note.trim().length > 0) {
-            $('#customer_align').html(data.job.customer.align_note);
-          } else {
-            $('#customer_align').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-          }
-        } else {
-          $('#customer_align').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-        }
-
-
-
-        $('#customer_colormode').html('<i class="text-warning font-weight-bold">' + data.job.customer.color.name + '</i>')
-        $('#customer_cloud').html('<i class="text-warning font-weight-bold">' + data.job.customer.cloud.name + '</i>')
-        $('#customer_nationalstyle').html('<i class="text-warning font-weight-bold">' + data.job.customer.nation.name + '</i>')
-        $('#customer_output').html('<i class="text-warning font-weight-bold">' + data.job.customer.output.name + '</i>')
-        $('#customer_size').html('<i class="text-warning font-weight-bold">' + data.job.customer.size.name + '</i>')
-
-      }
-    })
-  }
+ 
 
   function LoadTasks() {
     $.ajax({

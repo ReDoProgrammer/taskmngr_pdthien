@@ -1,0 +1,154 @@
+<div class="panel-body job-info">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href=".basic_tab">Basic</a></li>
+        <li><a data-toggle="tab" href=".style_tab">Style</a></li>
+        <li><a data-toggle="tab" href=".combo_tab">Combo</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="basic_tab" class="tab-pane fade in active basic_tab">
+            <div class="panel panel-primary mt-2">
+                <div class="panel-heading">Basic infomation</div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-2 col-sm-4 col-xs-4">Job name:</div>
+                        <div class="col-md-4 col-sm-8 col-xs-8">
+                            <label class="text-info font-weight-bold lblJobName"></label>
+                        </div>
+
+                        <div class="col-md-2 col-sm-4 col-xs-4">Customer:</div>
+                        <div class="col-md-4 col-sm-8 col-xs-8">
+                            <label class="text-info font-weight-bold lblCustomer"></label>
+                        </div>
+                    </div>
+
+
+
+                    <div class="row mt-2">
+                        <div class="col-md-2 co-sm-4 col-xs-4">Received date:</div>
+                        <div class="col-md-4 col-sm-8 col-xs-8">
+                            <label class="lblReceivedDate"></label>
+                        </div>
+                        <div class="col-md-2 co-sm-4 col-xs-4">Deadline:</div>
+                        <div class="col-md-4 col-sm-8 col-xs-8">
+                            <label class="text-danger lblDeliveriedDate"></label>
+                        </div>
+                    </div>
+
+
+
+
+                    <hr />
+
+                    <div class="row ">
+                        <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                            <label class="text-warning font-weight-bold">Intruction:</label>
+                            <div class="lblIntruction" style="margin-left: 10px; margin-top: 5px;"></div>
+                        </div>
+                    </div>
+
+
+                    <hr />
+                    <div class="row mt-2">
+                        <div class="col-md-2 col-sm-2 col-xs-4">Source:</div>
+                        <div class="col-md-10 col-sm-10 col-xs-8 lblInputLink"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="style_tab" class="tab-pane fade style_tab">
+            <div class="panel panel-info mt-2">
+                <div class="panel-heading">Job style info</div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-2 col-sm-3 col-xs-4">National style:</div>
+                        <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold divNationalStyle">
+                        </div>
+                        <div class="col-md-2 col-sm-3 col-xs-4">Color:</div>
+                        <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold divColor"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-2 col-sm-3 col-xs-4">Size:</div>
+                        <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold divSize"></div>
+
+                        <div class="col-md-2 col-sm-3 col-xs-4">Output:</div>
+                        <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold divOutput"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-2 col-sm-3 col-xs-4">Cloud:</div>
+                        <div class="col-md-10 col-sm-9 col-xs-8 font-weight-bold divCloud"></div>
+                    </div>
+
+
+
+
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-1 col-sm-1 col-xs-2 mt-1">Align: </div>
+                        <div class="font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1 divAlign"></div>
+
+                        <div class="col-md-1 col-sm-1 col-xs-2 mt-1">Sky:</div>
+                        <div class=" font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1 divSky"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-1 col-sm-1 col-xs-2 mt-1">Fire:</div>
+                        <div class="font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1 divFire"></div>
+
+                        <div class="col-md-1 col-sm-1 col-xs-2 mt-1">TV:</div>
+                        <div class=" font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1 divTV"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-1 col-sm-1 col-xs-2 mt-1">Grass:</div>
+                        <div class="font-weight-bold col-md-11 col-sm-11 col-xs-10 mt-1 divGrass"></div>
+                    </div>
+
+                    <hr />
+                    <div class="row mt-2">
+                        <div class="col-md-2 col-sm-2 col-xs-4">
+                            Style note:
+                        </div>
+
+                        <div class="col-md-10 col-sm-10 col-xs-8">
+                            <label class="text-danger font-weight-bold lblStyleNote"></label>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+        <div id="combo_tab" class="tab-pane fade combo_tab">
+            <div class="panel panel-success mt-2" id="panelCombo">
+                <div class="panel-heading">Combo detail</div>
+                <div class="panel-body">
+                    <div class="table-responsive  table-responsive-sm table-responsive-xs mt-2">
+                        <table class="table mt-1 table-striped bg-white text-dark nowrap text-nowrap">
+                            <thead class="thead-dark">
+                                <tr>
+
+                                    <th scope="col">#</th>
+                                    <th scope="col">Level</th>
+                                    <th scope="col">Quantity</th>
+
+                                </tr>
+                            </thead>
+                            <tbody id="tblComboLines"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+</div>
