@@ -122,41 +122,15 @@
           '</thead>' +
           '<tbody>';
         jobId = $(this).closest('tr').attr('id');
-        $.ajax({
-          url: '/accountant/task/list-by-job',
-          type: 'get',
-          headers: {
-            authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-          data: {
-            jobId
-          },
-          success: function (data) {
-            console.log(data);
-            let sIdx = 1;
-            data.tasks.forEach(t => {
-              newRow += '<tr id="' + t._id + '">';
-              newRow += '<td class="text-right">' + (sIdx++) + '</td>';
-              newRow += '<td class="font-weight-bold">' + t.level.name + '</td>';
-              newRow += '<td>';
-              newRow += '</td>';
-              newRow += '<td>';
-              newRow += '</td>';
-              newRow += '<td>';
-              newRow += '</td>';
-              newRow += '<td>';
-              newRow += '</td>';
-              newRow += '<td>';
-              newRow += '</td>';
-              newRow += '<td>';
-              newRow += '</td>';
-              newRow += '<td>';
-              newRow += '</td>';
-              newRow += '</tr>';
-            })
 
-          }
-        })
+        GetTasksByJob(jobId)
+          .then(data => {
+            newRow += data;
+            console.log(data);
+          })
+          .catch(err => {
+            console.log(err);
+          })
         // if (parentsData.parents) {
         //   $.each(parentsData.parents, function (i, parent) {
         //     newRow += '<tr>' +
@@ -178,7 +152,47 @@
     });
 
 
+    GetTasksByJob = (jobId) => {
+      return new Promise((resolve, reject) => {
+        $.ajax({
+          url: '/accountant/task/list-by-job',
+          type: 'get',
+          headers: {
+            authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+          data: {
+            jobId
+          },
+          success: async function (data) {
+            let sIdx = 1;
+            let tr = '';
+            await data.tasks.forEach(t => {
+              tr += '<tr id="' + t._id + '">';
+              tr += '<td class="text-right">' + (sIdx++) + '</td>';
+              tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
+              tr += '<td>';
+              tr += '</td>';
+              tr += '<td>';
+              tr += '</td>';
+              tr += '<td>';
+              tr += '</td>';
+              tr += '<td>';
+              tr += '</td>';
+              tr += '<td>';
+              tr += '</td>';
+              tr += '<td>';
+              tr += '</td>';
+              tr += '<td>';
+              tr += '</td>';
+              tr += '</tr>';
+            })
+            return resolve(tr);
 
+          }
+        })
+      })
+
+    }
 
 
     $(document).on("click", "button[name='btn-job-functions']", function (e) {
