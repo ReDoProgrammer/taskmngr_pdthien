@@ -31,6 +31,12 @@ app.use(layout); //set layout
 const accountantHomeController = require('./BE/controllers/accountant/home-controller');
 app.use('/accountant',accountantHomeController);
 
+const accountantJobController = require('./BE/controllers/accountant/job-controller');
+app.use('/accountant/job',accountantJobController);
+
+const accountantTaskController = require('./BE/controllers/accountant/task-controller');
+app.use('/accountant/task',accountantTaskController);
+
 const accountantAuthAPI = require('./BE/API/accountant/authenticate');
 app.use('/accountant/auth',accountantAuthAPI);
 
