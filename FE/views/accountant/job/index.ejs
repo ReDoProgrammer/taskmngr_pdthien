@@ -11,25 +11,21 @@
     </div>
   </div>
 </div>
-<div class="table-responsive mt-2">
-  <table id="jobsTable" data-detail-view="true">
-    <thead>
-      <tr>
-        <th data-field="id" data-align="center" data-width="20px">#</th>
-        <th data-field="customer">Customer</th>
-        <th data-field="jobname">Job name</th>
-        <th data-field="combo">Combo</th>
-        <th data-field="receivedate">Receive date</th>
-        <th data-field="deliverydate">Delivery date</th>
-        <th data-field="ilink">I-link</th>
-        <th data-field=""></th>
-      </tr>
-    </thead>
-  </table>
-  <br>
-  <!--<p>TABLE 2</p>-->
-  <table id="tasksTable"></table>
-</div>
+
+
+<table class="table table-striped table-hover js-table mt-2">
+  <thead>
+    <th><input type="checkbox" name="job_checked"></th>
+    <th>#</th>
+    <th>Customer</th>
+    <th>Job</th>
+    <th>Receive date</th>
+    <th>Delivery date</th>
+    <th>Status</th>
+    <th></th>
+  </thead>
+  <tbody id="tblJobs"></tbody>
+</table>
 
 
 
@@ -43,27 +39,143 @@
   </ul>
 </nav>
 
-<div id="contextMenu" class="dropdown clearfix">
+<!-- <div id="contextMenu" class="dropdown clearfix">
   <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu"
     style="display:block;position:static;margin-bottom:5px;" id="funcMenu">
   </ul>
-</div>
+</div> -->
+
+
 
 <%-include('job-detail-modal')%>
 
 
-  <script type='text/javascript'
-    src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
-
-  <link rel="stylesheet" href="/css/bootstrap-table.min.css">
+  <!-- <link rel="stylesheet" href="/css/bootstrap-table.min.css"> -->
   <script src="/js/common.js"></script>
-  <script src="/js/bootstrap-table.min.js"></script>
+  <!-- <script src="/js/bootstrap-table.min.js"></script> -->
 
   <script>
     var search = "";
     var page = 1;
     var jobId = '';
     var customerId = '';
+
+    var parentsData = {
+      "success": true,
+      "parents": [{
+        "id": 1531,
+        "Firstname": "Austin",
+        "Surname": "Ana\u00eblle",
+        "schoolId": "046039",
+        "schoolName": "ARCAMBAL",
+        "commune": "ARCAMBAL"
+      }, {
+        "id": 2032,
+        "Firstname": "Ramos",
+        "Surname": "L\u00e8i",
+        "schoolId": "046043",
+        "schoolName": "J CALVET",
+        "commune": "CAHORS"
+      }, {
+        "id": 3036,
+        "Firstname": "Baker",
+        "Surname": "Salom\u00e9",
+        "schoolId": "046043",
+        "schoolName": "Z LAFAGE",
+        "commune": "CAHORS"
+      }, {
+        "id": 1724,
+        "Firstname": "Berry",
+        "Surname": "Marl\u00e8ne",
+        "schoolId": "046044",
+        "schoolName": "J CALVET",
+        "commune": "CAHORS"
+      }]
+    };
+
+    var $table = $('.js-table');
+
+    // $table.find('.js-view-parents').on('click', function (e) {
+    $(document).on("click", "button[name='js-view-parents']", function (e) {
+      var $btn = $(e.target), $row = $btn.closest('tr'), $nextRow = $row.next('tr.expand-child');
+      $btn.toggleClass('fa-minus');
+      // if .expand-chid row exist already, toggle
+      if ($nextRow.length) {
+        $nextRow.toggle($btn.hasClass('fa-minus'));
+        // if not, create .expand-child row
+      } else {
+        var newRow = '<tr class="expand-child" id="collapse' + $btn.data('id') + '">' +
+          '<td colspan="8">' +
+          '<table class="table table-condensed table-bordered" width=100% >' +
+          '<thead>' +
+          '<tr>' +
+          '<th class="text-right  ">#</th>' +
+          '<th>Level</th>' +
+          '<th>Editor</th>' +
+          '<th>Q.A</th>' +
+          '<th>DC</th>' +
+          '<th>Uploaded by</th>' +
+          '<th>Uploaded at</th>' +
+          '<th>Status</th>' +
+          '<th><input type="checkbox" name="check_all_tasks"></th>' +
+          '</tr>' +
+          '</thead>' +
+          '<tbody>';
+        jobId = $(this).closest('tr').attr('id');
+        $.ajax({
+          url: '/accountant/task/list-by-job',
+          type: 'get',
+          headers: {
+            authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+          data: {
+            jobId
+          },
+          success: function (data) {
+            console.log(data);
+            let sIdx = 1;
+            data.tasks.forEach(t => {
+              newRow += '<tr id="' + t._id + '">';
+              newRow += '<td class="text-right">' + (sIdx++) + '</td>';
+              newRow += '<td class="font-weight-bold">' + t.level.name + '</td>';
+              newRow += '<td>';
+              newRow += '</td>';
+              newRow += '<td>';
+              newRow += '</td>';
+              newRow += '<td>';
+              newRow += '</td>';
+              newRow += '<td>';
+              newRow += '</td>';
+              newRow += '<td>';
+              newRow += '</td>';
+              newRow += '<td>';
+              newRow += '</td>';
+              newRow += '<td>';
+              newRow += '</td>';
+              newRow += '</tr>';
+            })
+
+          }
+        })
+        // if (parentsData.parents) {
+        //   $.each(parentsData.parents, function (i, parent) {
+        //     newRow += '<tr>' +
+        //       '<td>' + parent.Firstname + '</td>' +
+        //       '<td>' + parent.Surname + '</td>' +
+        //       '<td>' + parent.schoolId + '</td>' +
+        //       '<td>' + parent.schoolName + ' ' + parent.commune + '</td>' +
+        //       '</tr>';
+        //   });
+        // }
+        newRow += '</tbody></table></td></tr>';
+        // set next row
+        $nextRow = $(newRow).insertAfter($row);
+
+
+        /*}
+            });*/
+      }
+    });
 
 
 
@@ -173,74 +285,51 @@
           page,
         },
         success: function (data) {
-
+          $('#tblJobs').empty();
           let idx = 1;
-          jList = data.jobs.map(j => {
-            let el = {};
-            el.id = idx++;
-            el.customer = j.customer.firstname + ' ' + j.customer.lastname;
-            el.jobname = j.name;
-            el.combo = typeof j.cb !== 'undefined' ? j.cb.name : '';
-            el.receivedate = convertISODateToTimeFormat(j.received_date);
-            el.deliverydate = convertISODateToTimeFormat(j.delivery_date);
-            el.ilink = j.input_link;
-            return el;
-          })
+          data.jobs.forEach(j => {
+            let tr = '<tr id="' + j._id + '">';
+            tr += '<td>  <input type="checkbox" name="ckb_ticked"></td>';
+            tr += '<td>' + (idx++) + '</td>';
+            tr += '<td class="font-weight-bold text-primary">' + j.customer.firstname + ' ' + j.customer.lastname + '</td>';
+            tr += '<td class="font-weight-bold text-warning">' + j.name + '</td>';
+            tr += '<td>' + convertISODateToTimeFormat(j.received_date) + '</td>';
+            tr += '<td>' + convertISODateToTimeFormat(j.delivery_date) + '</td>';
 
-          function detailFormatter(index, row, element) {
-            $(element).html($('#tasksTable').clone(true).attr('id', "tbl_" + row.id).show());
-          }
-          //TABLE 1
-          $('#jobsTable').bootstrapTable({
-            checkboxHeader: true,
-            data: jList,
-            detailFormatter: detailFormatter,
-            columns: [{
-              field: 'checked',
-              checkbox: true
-            }]
+            tr += '<td>';
 
-          });
+            /*            
+           0: Processing
+           1:Upload   
+           2:Done
+           3: finish
 
-          //TABLE 2
-          var t2 = [
-            {
-              "id": "6",
-              "task": "bike",
-              
-            },
-            {
-              "id": "7",
-              "task": "car"
-            }
-          ];
-          $('#tasksTable').bootstrapTable({
-            data: t2,
-            columns: [{
-              field: 'id',
-              title: 'id'
-            }, {
-              field: 'task',
-              title: 'task detail'
-            }, {
-              field: 'status',
-              checkbox: true
-            }
-            ],
-            checkboxHeader: false
-
-          });
-
-          $('#tasksTable').on('check.bs.table', function (e, row, $el) {
-         
-            console.log('check',row);
-
-          });
-          $('#tasksTable').on('uncheck.bs.table', function (e, row, $el) {
+           -1: initial
+           -2:'Rejected
            
-            console.log(row);
-          });
-          $("#tasksTable").hide();
+           - 3: Canceled           
+       */
+
+            switch (j.status) {
+              case -1: tr += '<i class="text-info">Initial</i>'; break;
+              case 0: tr += '<i class="text-primary">Processing</i>'; break;
+              case 1: tr += '<i class="text-warning">Uploaded</i>'; break;
+              case 2: tr += '<i class="text-warning">Done</i>'; break;
+              case 3: tr += '<i class="text-success">Finish</i>'; break;
+              case -2: tr += '<i class="text-danger">Rejected</i>'; break;
+              case -3: tr += '<i class="text-danger">Canceled</i>'; break;
+            }
+
+            tr += '</td>';
+
+
+            tr += '<td>';
+            tr += '<button class="btn btn-xs parents js-view-parents fa fa-plus" name="js-view-parents"></button>';
+            tr += '</td>';
+            tr += '</tr> ';
+            $('#tblJobs').append(tr);
+
+          })
 
 
         },
@@ -254,7 +343,7 @@
   </script>
 
   <style>
-    #contextMenu {
+    /* #contextMenu {
       position: absolute;
       display: none;
     }
@@ -262,5 +351,16 @@
     tr:hover {
       background: #c9e8f7;
       position: relative;
+    } */
+
+
+    /* #myTable thead>tr>th.detail,
+    #myTable tbody>tr:not(.detail-view)>td:first-of-type {
+      display: none;
     }
+
+    #myTable thead>tr>th:nth-child(2),
+    #myTable tbody>tr:not(.detail-view)>td:nth-child(2) {
+      border-left: none !important;
+    } */
   </style>
