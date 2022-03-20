@@ -146,7 +146,7 @@ router.get('/list-unuploaded',authenticateTLAToken,(req,res)=>{
     Task
     .find({
         job:jobId,
-        status:{$in:[1,2,3]}//chỉ lấy những task có trạng thái đã được editor submit/Q.A submit/DC submit
+        status:3//chỉ lấy những task đã được DC submit: status = 3
     })
     .populate('level')
     .populate('editor')
