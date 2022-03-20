@@ -138,7 +138,8 @@ router.get('/', authenticateAdminToken, (req, res) => {
         .populate('staff_lv', 'name -_id')
         .populate('module', 'name -_id')
         .exec()
-        .then(wages => {          
+        .then(wages => {     
+            console.log(wages);     
             return res.status(200).json({
                 msg: 'Load user group wages successfully',
                 wages

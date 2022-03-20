@@ -197,6 +197,7 @@
                 $('#lblReceivedDate').text(convertISODateToTimeFormat(data.job.received_date));
                 $('#lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.delivery_date));
                 $('#lblIntruction').text(data.job.intruction);
+                $('#lblInputLink').html('<a href="'+data.job.input_link+'" target="_blank" rel="noopener noreferrer">Link</a>')
 
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -379,3 +380,4 @@
         })
     }
 </script>
+

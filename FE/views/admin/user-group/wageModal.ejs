@@ -90,8 +90,8 @@
             })
 
             $("#slModule").change(function () {
-                LoadWages($('#slModule option:selected').val());
-            });
+                LoadWages();
+            }); 
 
 
             $("#tblWages").on("click", "button[name='deleteWage']", function () {
@@ -159,8 +159,7 @@
 
 
 
-            $('#modalWage').on('shown.bs.modal', function (e) {
-                LoadWages();
+            $('#modalWage').on('shown.bs.modal', function (e) {               
                 $('#lblError').text('');
                 $('#lblError').hide();
                 $('#txtWage').text('0');
@@ -259,7 +258,7 @@
             })
 
 
-            function LoadWages(moduleId) {
+            function LoadWages() {
                 $.ajax({
                     url: '/admin/user-group-wage',
                     type: 'get',
@@ -268,7 +267,7 @@
                     },
                     data: {
                         ugId,
-                        moduleId
+                        moduleId: $('#slModule option:selected').val()
                     },
                     success: function (data) {
                         $('#tblWages').empty();
@@ -366,7 +365,7 @@
                             let opt = '<option value="' + s._id + '">' + s.name + '</option>';
                             $('#slModule').append(opt);
                         })
-                        LoadWages($('#moduleId option:selected').val());
+                        LoadWages();
                     }
                 })
             }
