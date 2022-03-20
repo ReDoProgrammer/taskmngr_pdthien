@@ -2,21 +2,35 @@ const router = require('express').Router();
 const Task = require('../../models/task-model');
 const { authenticateAccountantToken } = require("../../../middlewares/accountant-middleware");
 
-router.get('/list-by-job',authenticateAccountantToken,(req,res)=>{
-    let {jobId} = req.query;
+router.get('/list-by-job', authenticateAccountantToken, (req, res) => {
+    let { jobId } = req.query;
     Task
-    .find({job:jobId})
-    .then(tasks=>{
-        return res.status(200).json({
-            msg:`Load tasks list by job id successfully!`,
-            tasks
+        .find({ job: jobId })
+        .populate('level', 'name')
+        .populate('qa', 'fullname -_id')
+        .populate('editor', 'fullname -_id')
+        .populate('created_by', 'fullname -_id')
+        .populate('updated_by', 'fullname -_id')
+        .populate({
+            path: 'remarks',
+            options: {
+                sort: { timestamp: -1 }
+            }
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not get tasks list by job id with error: ${new Error(err.message)}`
+        .exec()
+        .then(tasks => {
+            return res.status(200).json({
+                tasks,
+                msg: 'Load tasks by job id successfully!'
+            })
         })
-    })
+        .catch(err => {
+            console.log(`Can not load task with job ${jobId}`);
+            return res.status(500).json({
+                msg: `Can not load task with job ${jobId}`,
+                error: new Error(err.message)
+            })
+        })
 })
 
 

@@ -181,13 +181,13 @@
 
     function LoadJobDetail() {
         $.ajax({
-            url: '/sale/job/detail',
+            url: '/accountant/job/detail',
             type: 'get',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
             data: {
-                jobId
+                id:jobId
             },
             success: function (data) {
 
@@ -208,13 +208,13 @@
 
     function LoadCustomer() {
         $.ajax({
-            url: '/sale/customer/detail',
+            url: '/accountant/customer/detail',
             type: 'get',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
             data: {
-                id: customerId
+                customerId
             },
             success: function (data) {
                 $('#divNationalStyle').html(data.customer.nation.name);
@@ -261,7 +261,7 @@
     function LoadTasksList() {
         $('#tblTasksList').empty();
         $.ajax({
-            url: '/sale/task/list',
+            url: '/accountant/task/list-by-job',
             type: 'get',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),

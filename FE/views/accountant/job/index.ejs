@@ -1,291 +1,266 @@
 <div class="row">
-    <div class="offset-md-9 col-md-3 text-right">
-      <!-- Another variation with a button -->
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="Seach any job" id="txtSearch" />
-        <div class="input-group-btn">
-          <button class="btn btn-info" type="submit" id="btnSearch">
-            <i class="fa fa-search" aria-hidden="true"></i>
-          </button>
-        </div>
+  <div class="offset-md-9 col-md-3 text-right">
+    <!-- Another variation with a button -->
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="Seach any job" id="txtSearch" />
+      <div class="input-group-btn">
+        <button class="btn btn-info" type="submit" id="btnSearch">
+          <i class="fa fa-search" aria-hidden="true"></i>
+        </button>
       </div>
     </div>
   </div>
-  <div class="table-responsive mt-2">
-    <table class="table mt-1 table-striped bg-white text-dark">
-      <thead class="thead-dark">
-        <tr>
-          <th scope="col"></th>
-          <th scope="col">#</th>
-          <th scope="col">Customer</th>
-          <th scope="col">Job name</th>
-          <th scope="col">Combo</th>
-          <th scope="col">Receive date</th>
-          <th scope="col">Delivery date</th>
-          <th scope="col">I-link</th>
-          <th scope="col">O-link</th>
-          <th scope="col" class="text-right">Status</th>
-          <th scope="col" class="text-right"></th>
-        </tr>
-      </thead>
-      <tbody id="tblData">
-      </tbody>
-    </table>
-  </div>
-  
-  <nav aria-label="..." class="mt-3">
-    <ul class="pagination pagination-sm">
-      <li class="page-item disabled">
-        <a class="page-link" href="#" tabindex="-1">1</a>
-      </li>
-      <li class="page-item"><a class="page-link" href="#">2</a></li>
-      <li class="page-item"><a class="page-link" href="#">3</a></li>
-    </ul>
-  </nav>
-  
-  <div id="contextMenu" class="dropdown clearfix">
-    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu"
-      style="display:block;position:static;margin-bottom:5px;" id="funcMenu">
-    </ul>
-  </div>
-  
-  <%-include('job-detail-modal')%>
-  
-  
-    <script type='text/javascript'
-      src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
-  
-  
-    <script src="/js/common.js"></script>
-  
-    <script>
-      var search = "";
-      var page = 1;
-      var jobId='';
-      var customerId = '';
-  
-  
-      $(document).on("click", "button[name='btn-job-functions']", function (e) {
-                  var $contextMenu = $("#contextMenu");
-                  $contextMenu.css({
-                      display: "block",
-                      left: e.pageX,
-                      top: e.pageY
-                  });
-  
-                  jobId = $(this).closest('tr').attr('id');
-  
-                  $.ajax({
-                      url: '/sale/job/detail',
-                      type: 'get',
-                      headers: {
-                          authorization: "Bearer " + localStorage.getItem("accessToken"),
-                      },
-                      data: {
-                          jobId
-                      },
-                      success: function (data) {
-                         
-  
-                          $('#funcMenu').empty();
-                          let mn = '';
-                          mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Q.A ok</a></li>';
-                          
-                          // switch (data.task.status) {
-                          //     case -1:
-                          //     case 0:
-                          //         mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
-                          //         break;
-                          //     case 1:
-                          //         mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Q.A ok</a></li>';
-                          //         mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
-                          //         mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
-                          //         break;
-  
-                          //     default:
-                          //         $contextMenu.css({
-                          //             display: "none"
-                          //         });
-                          //         break;
-  
-                          // }
-                          $('#funcMenu').append(mn);
-                      }
-                  })
-  
-  
-                  $('html').click(function () {
-                      $contextMenu.hide();
-                  });
-  
-              });
-  
-  
-  
-      $(document).on("click", "button[name='btn-job-info']", function () {
-        jobId = $(this).closest("tr").attr("id");
-        customerId = $(this).closest("tr").data("customer");
-        $('#JobDetailModal').modal();
-  
-      })
-  
-      $(document).on("click", "button[name='edit-job']", function () {
-        jobId = $(this).closest("tr").attr("id");
-        $('#updateJobModal').modal();
-  
-      })
-  
-      $(document).ready(function () {
-        // LoadJobs();
+</div>
+<div class="table-responsive mt-2">
+  <table id="jobsTable" data-detail-view="true">
+    <thead>
+      <tr>
+        <th data-field="id" data-align="center" data-width="20px">#</th>
+        <th data-field="customer">Customer</th>
+        <th data-field="jobname">Job name</th>
+        <th data-field="combo">Combo</th>
+        <th data-field="receivedate">Receive date</th>
+        <th data-field="deliverydate">Delivery date</th>
+        <th data-field="ilink">I-link</th>
+        <th data-field=""></th>
+      </tr>
+    </thead>
+  </table>
+  <br>
+  <!--<p>TABLE 2</p>-->
+  <table id="tasksTable"></table>
+</div>
+
+
+
+<nav aria-label="..." class="mt-3">
+  <ul class="pagination pagination-sm">
+    <li class="page-item disabled">
+      <a class="page-link" href="#" tabindex="-1">1</a>
+    </li>
+    <li class="page-item"><a class="page-link" href="#">2</a></li>
+    <li class="page-item"><a class="page-link" href="#">3</a></li>
+  </ul>
+</nav>
+
+<div id="contextMenu" class="dropdown clearfix">
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu"
+    style="display:block;position:static;margin-bottom:5px;" id="funcMenu">
+  </ul>
+</div>
+
+<%-include('job-detail-modal')%>
+
+
+  <script type='text/javascript'
+    src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
+
+  <link rel="stylesheet" href="/css/bootstrap-table.min.css">
+  <script src="/js/common.js"></script>
+  <script src="/js/bootstrap-table.min.js"></script>
+
+  <script>
+    var search = "";
+    var page = 1;
+    var jobId = '';
+    var customerId = '';
+
+
+
+
+
+    $(document).on("click", "button[name='btn-job-functions']", function (e) {
+      var $contextMenu = $("#contextMenu");
+      $contextMenu.css({
+        display: "block",
+        left: e.pageX,
+        top: e.pageY
       });
-  
-      $('#updateJobModal').on('hidden.bs.modal', function () {
-        LoadJobs();
-      })
-  
-      $('#btnSearch').click(function () {
-        search = $('#txtSearch').val();
-        LoadJobs();
-      })
-  
-  
-  
-      $('#txtSearch').keyup(function (e) {
-        if (e.keyCode == 13) {
-          $("#btnSearch").click()
+
+      jobId = $(this).closest('tr').attr('id');
+
+      $.ajax({
+        url: '/sale/job/detail',
+        type: 'get',
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: {
+          jobId
+        },
+        success: function (data) {
+
+
+          $('#funcMenu').empty();
+          let mn = '';
+          mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Q.A ok</a></li>';
+
+          // switch (data.task.status) {
+          //     case -1:
+          //     case 0:
+          //         mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
+          //         break;
+          //     case 1:
+          //         mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Q.A ok</a></li>';
+          //         mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
+          //         mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
+          //         break;
+
+          //     default:
+          //         $contextMenu.css({
+          //             display: "none"
+          //         });
+          //         break;
+
+          // }
+          $('#funcMenu').append(mn);
         }
+      })
+
+
+      $('html').click(function () {
+        $contextMenu.hide();
       });
-  
-  
-      function LoadJobs() {
-        $.ajax({
-          url: "/sale/job/list",
-          type: "get",
-          headers: {
-            authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-          data: {
-            search,
-            page,
-          },
-          success: function (data) {
-            $("#tblData").empty();
-            // $("#pagination").empty();
-  
-         
-            let idx = 1;
-            data.jobs.forEach((job) => {
-              let tr = "  <tr id='" + job._id + "' data-customer='"+job.customer._id+"'>";
-  
-              tr += '<td class="text-right">';         
-  
-              tr += '<button class="btn btn-xs btn-warning ml-2" name="btn-job-functions">';
-              tr += '<i class="fa fa-cog" aria-hidden="true"></i>';
-              tr += '</button>';
-              tr += '</td>';
-  
-  
-              tr += '<th scope="row">' + idx++ + "</th>";
-              tr +=
-                " <td class='font-weight-bold'>" + job.customer.firstname + " " + job.customer.lastname + "</td>";
-              tr += "<td class='text-info font-weight-bold'>" + job.name + "</td>";
-  
-              tr += '<td>';
-              if (job.cb_ticked) {
-                tr += job.cb.name
-              } else {
-                tr += '';
-              }
-              tr += '</td>';
-              tr += "<td>" + convertISODateToTimeFormat(job.received_date) + "</td>";
-              tr += "<td>" + convertISODateToTimeFormat(job.delivery_date) + "</td>";
-  
-  
-              tr += '<td>';
-              if (isValidHttpUrl(job.input_link)) {
-                tr += "<a href='" + job.input_link + "' target='_blank'>Link</a>";
-              } else {
-                tr += job.input_link;
-              }
-  
-              tr += '</td>';
-  
-              tr += '<td>';
-              if (typeof job.links !== 'undefined') {
-                if (job.links.length == 1 && job.links[0].checked) {
-                  if (isValidHttpUrl(job.links[0].url)) {
-                    tr += '<a href="' + job.links[0].url + '" target="_blank"><i class="fa fa-link" aria-hidden="true"></i></a>';
-                  } else {
-                    tr += job.links[0].url
-                  }
-  
-                } else if (job.links.length > 1) {
-                  tr += '<button class="btn btn-xs btn-info">';
-                  tr += '<i class="fa fa-list" aria-hidden="true"></i>';
-                  tr += '<i class="fa fa-link" aria-hidden="true"></i>';
-                  tr += '</button>';
-                }
-              }
-              tr += '</td>';
-  
-  
-  
-              tr += '<td class = "font-italic text-right"><i>';
-              switch (job.status) {
-                case -1:
-                  tr += '<span class = "text-warning">Initial</span>';
-                  break;
-                case 0:
-                  tr += '<span class = "text-info">Processing</span>';
-                  break;
-                case 1:
-                  tr += '<span class = "text-primary">Upload</span>';
-                  break;
-                case 2:
-                  tr += '<span class = "text-success">Done</span>';
-                  break;
-                case -2:
-                  tr += '<span class = "text-danger">Rejected</span>';
-                  break;
-                case -3:
-                  tr += '<span class = "text-muted">Canceled</span>';
-                  break;
-              }
-  
-              tr += '<td class="text-right">';
-              tr += '<button class="btn btn-xs btn-info" name="btn-job-info">';
-              tr += '<i class="fa fa-info-circle" aria-hidden="true"></i>';
-              tr += '</button>';
-              tr += '</td>';          
-  
-              $("#tblData").append(tr);
-            });
-  
-            for (let i = 1; i <= data.pages; i++) {
-              let li =
-                '<li class="page-item"><a class="page-link" href="#">' +
-                i +
-                "</a></li>";
-              $("#pagination").append(li);
+
+    });
+
+
+
+    $(document).on("click", "button[name='btn-job-info']", function () {
+      jobId = $(this).closest("tr").attr("id");
+      customerId = $(this).closest("tr").data("customer");
+      $('#JobDetailModal').modal();
+
+    })
+
+    $(document).on("click", "button[name='edit-job']", function () {
+      jobId = $(this).closest("tr").attr("id");
+      $('#updateJobModal').modal();
+
+    })
+
+    $(document).ready(function () {
+      LoadJobs();
+    });
+
+    $('#updateJobModal').on('hidden.bs.modal', function () {
+      LoadJobs();
+    })
+
+    $('#btnSearch').click(function () {
+      search = $('#txtSearch').val();
+      LoadJobs();
+    })
+
+
+
+    $('#txtSearch').keyup(function (e) {
+      if (e.keyCode == 13) {
+        $("#btnSearch").click()
+      }
+    });
+
+
+    function LoadJobs() {
+      $.ajax({
+        url: "/accountant/job/list",
+        type: "get",
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: {
+          search,
+          page,
+        },
+        success: function (data) {
+
+          let idx = 1;
+          jList = data.jobs.map(j => {
+            let el = {};
+            el.id = idx++;
+            el.customer = j.customer.firstname + ' ' + j.customer.lastname;
+            el.jobname = j.name;
+            el.combo = typeof j.cb !== 'undefined' ? j.cb.name : '';
+            el.receivedate = convertISODateToTimeFormat(j.received_date);
+            el.deliverydate = convertISODateToTimeFormat(j.delivery_date);
+            el.ilink = j.input_link;
+            return el;
+          })
+
+          function detailFormatter(index, row, element) {
+            $(element).html($('#tasksTable').clone(true).attr('id', "tbl_" + row.id).show());
+          }
+          //TABLE 1
+          $('#jobsTable').bootstrapTable({
+            checkboxHeader: true,
+            data: jList,
+            detailFormatter: detailFormatter,
+            columns: [{
+              field: 'checked',
+              checkbox: true
+            }]
+
+          });
+
+          //TABLE 2
+          var t2 = [
+            {
+              "id": "6",
+              "task": "bike",
+              
+            },
+            {
+              "id": "7",
+              "task": "car"
             }
-          },
-          error: function (jqXHR, textStatus, errorThrown) {
-            alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
-          },
-        });
-      }
-  
-  
-    </script>
-  
-    <style>
-      #contextMenu {
-        position: absolute;
-        display: none;
-      }
-  
-      tr:hover {
-        background: #c9e8f7;
-        position: relative;
-      }
-    </style>
+          ];
+          $('#tasksTable').bootstrapTable({
+            data: t2,
+            columns: [{
+              field: 'id',
+              title: 'id'
+            }, {
+              field: 'task',
+              title: 'task detail'
+            }, {
+              field: 'status',
+              checkbox: true
+            }
+            ],
+            checkboxHeader: false
+
+          });
+
+          $('#tasksTable').on('check.bs.table', function (e, row, $el) {
+         
+            console.log('check',row);
+
+          });
+          $('#tasksTable').on('uncheck.bs.table', function (e, row, $el) {
+           
+            console.log(row);
+          });
+          $("#tasksTable").hide();
+
+
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
+        },
+      });
+    }
+
+
+  </script>
+
+  <style>
+    #contextMenu {
+      position: absolute;
+      display: none;
+    }
+
+    tr:hover {
+      background: #c9e8f7;
+      position: relative;
+    }
+  </style>
