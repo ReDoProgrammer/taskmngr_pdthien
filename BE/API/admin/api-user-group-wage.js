@@ -128,14 +128,18 @@ router.put('/', authenticateAdminToken, (req, res) => {
 })
 
 router.get('/', authenticateAdminToken, (req, res) => {
-    let { ugId } = req.query;
-    Wage.find({ user_group: ugId })
+    let { ugId,moduleId } = req.query;
+    Wage.find({ 
+        user_group: ugId,
+        module:moduleId
+     })
         .populate('user_group', 'name -_id')
         .populate('job_lv', 'name -_id')
         .populate('staff_lv', 'name -_id')
         .populate('module', 'name -_id')
         .exec()
         .then(wages => {
+            console.log(wages);
             return res.status(200).json({
                 msg: 'Load user group wages successfully',
                 wages
