@@ -1,0 +1,383 @@
+<div class="modal" tabindex="-1" id="JobDetailModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body text-dark">
+
+
+                <div class="panel panel-primary text-white bg-dark">
+                    <div class="panel-heading"> <button class="btn btn-xs btn-primary" id="btn-job-info">Show job info
+                            <i class="fa fa-arrow-down" aria-hidden="true"></i></button> </div>
+                    <div class="panel-body" id="job-info">
+
+                        <div class="row">
+                            <div class="col-md-2 col-sm-4 col-xs-4">Job name:</div>
+                            <div class="col-md-4 col-sm-8 col-xs-8">
+                                <label id="lblJobName" class="text-info font-weight-bold"></label>
+                            </div>
+
+                            <div class="col-md-2 col-sm-4 col-xs-4">Customer:</div>
+                            <div class="col-md-4 col-sm-8 col-xs-8">
+                                <label id="lblCustomer" class="text-info font-weight-bold"></label>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row mt-2">
+                            <div class="col-md-2 co-sm-4 col-xs-4">Received date:</div>
+                            <div class="col-md-4 col-sm-8 col-xs-8">
+                                <label id="lblReceivedDate"></label>
+                            </div>
+                            <div class="col-md-2 co-sm-4 col-xs-4">Deadline:</div>
+                            <div class="col-md-4 col-sm-8 col-xs-8">
+                                <label id="lblDeliveriedDate" class="text-danger"></label>
+                            </div>
+                        </div>
+
+
+
+
+                        <hr />
+
+                        <div class="row ">
+                            <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                <label class="text-warning font-weight-bold">Intruction:</label>
+                                <div id="lblIntruction" style="margin-left: 10px; margin-top: 5px;"></div>
+                            </div>
+                        </div>
+
+
+                        <hr />
+                        <div class="row mt-2">
+                            <div class="col-md-2 col-sm-2 col-xs-4">Source:</div>
+                            <div class="col-md-10 col-sm-10 col-xs-8" id="lblInputLink"></div>
+                        </div>
+
+
+
+
+
+
+
+
+                        <div class="panel panel-info mt-2">
+                            <div class="panel-heading">Job style info</div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-2 col-sm-3 col-xs-4">National style:</div>
+                                    <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold" id="divNationalStyle">
+                                    </div>
+                                    <div class="col-md-2 col-sm-3 col-xs-4">Color:</div>
+                                    <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold" id="divColor"></div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-2 col-sm-3 col-xs-4">Size:</div>
+                                    <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold" id="divSize"></div>
+
+                                    <div class="col-md-2 col-sm-3 col-xs-4">Output:</div>
+                                    <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold" id="divOutput"></div>
+                                </div>
+
+
+
+                                <hr />
+                                <div class="row">
+                                    <div class="col-md-1 col-sm-1 col-xs-2 mt-1">Align: </div>
+                                    <div id="divAlign" class="font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1"></div>
+
+                                    <div class="col-md-1 col-sm-1 col-xs-2 mt-1">Sky:</div>
+                                    <div id="divSky" class=" font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1"></div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-1 col-sm-1 col-xs-2 mt-1">Fire:</div>
+                                    <div id="divFire" class="font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1"></div>
+
+                                    <div class="col-md-1 col-sm-1 col-xs-2 mt-1">TV:</div>
+                                    <div id="divTV" class=" font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1"></div>
+                                </div>
+
+                                <hr />
+                                <div class="row mt-2">
+                                    <div class="col-md-2 col-sm-2 col-xs-4">
+                                        Style note:
+                                    </div>
+
+                                    <div class="col-md-10 col-sm-10 col-xs-8">
+                                        <label id="lblStyleNote" class="text-danger font-weight-bold"></label>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="panel panel-warning">
+                    <div class="panel-heading">Tasks list</div>
+                    <div class="panel-body">
+                        <div class="table-responsive  table-responsive-sm table-responsive-xs mt-2">
+                            <table class="table mt-1 table-striped bg-white text-dark nowrap text-nowrap">
+                                <thead class="thead-dark">
+                                    <tr>
+
+                                        <th scope="col">#</th>
+                                        <th scope="col">Level</th>
+                                        <th scope="col">Assign date</th>
+                                        <th scope="col">Deadline</th>
+                                        <th scope="col">Remark</th>
+                                        <th scope="col">Editor</th>
+                                        <th scope="col">Q.A</th>
+                                        <th scope="col">E-T</th>
+                                        <th scope="col">I-N</th>
+                                        <th scope="col">ILink</th>
+                                        <th scope="col">OLink</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Created by</th>
+                                        <th scope="col">Updated by</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblTasksList"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="/js/common.js"></script>
+<script>
+    $("#JobDetailModal").on('shown.bs.modal', function (e) {
+        LoadTasksList();
+        LoadCustomer();
+        LoadJobDetail();
+        $('#job-info').hide();
+    })
+
+    $('#btn-job-info').click(function () {
+        if ($('#job-info').is(":hidden")) {
+            $('#job-info').slideDown(1000);
+            $('#btn-job-info').html('Hide job info <i class="fa fa-arrow-up" aria-hidden="true"></i>')
+        } else {
+            $('#btn-job-info').html('Show job info <i class="fa fa-arrow-down" aria-hidden="true"></i>');
+            $('#job-info').slideUp(1000);
+        }
+    })
+
+    function LoadJobDetail() {
+        $.ajax({
+            url: '/sale/job/detail',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                jobId
+            },
+            success: function (data) {
+
+                $('#lblStyleNote').text(data.job.customer.remark);
+                $('#lblJobName').text(data.job.name);
+                $('#lblCustomer').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
+                $('#lblReceivedDate').text(convertISODateToTimeFormat(data.job.received_date));
+                $('#lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.delivery_date));
+                $('#lblIntruction').text(data.job.intruction);
+                $('#lblInputLink').html('<a href="'+data.job.input_link+'" target="_blank" rel="noopener noreferrer">Link</a>')
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+            }
+        })
+    }
+
+    function LoadCustomer() {
+        $.ajax({
+            url: '/sale/customer/detail',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                id: customerId
+            },
+            success: function (data) {
+                $('#divNationalStyle').html(data.customer.nation.name);
+                $('#divColor').html(data.customer.color.name);
+                $('#divOutput').html(data.customer.output.name);
+                $('#divSize').html(data.customer.size.name);
+                $('#lblStyleNote').text(data.customer.remark);
+
+                if (data.customer.is_align) {
+                    $('#divAlign').html('<i class="fa fa-check-square-o"></i>  <span class="text-warning">' + data.customer.align_note + '</span>');
+                } else {
+                    $('#divAlign').html('<i class="fa fa-square-o"></i>');
+                }
+
+
+                if (data.customer.has_sky) {
+                    $('#divSky').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.sky_note + '</span>');
+                } else {
+                    $('#divSky').html('<i class="fa fa-square-o"></i>');
+                }
+
+
+                if (data.customer.has_TV) {
+                    $('#divTV').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.TV_note + '</span>');
+                } else {
+                    $('#divTV').html('<i class="fa fa-square-o"></i>');
+                }
+
+
+                if (data.customer.has_fire) {
+                    $('#divFire').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.fire_note + '</span>');
+                } else {
+                    $('#divFire').html('<i class="fa fa-square-o"></i>');
+                }
+
+
+            }, error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+            }
+        })
+
+    }
+
+    function LoadTasksList() {
+        $('#tblTasksList').empty();
+        $.ajax({
+            url: '/sale/task/list',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                jobId
+            },
+            success: function (data) {
+                let idx = 1;
+                data.tasks.forEach(t => {
+                    let tr = '<tr>';
+
+                    tr += '<td>' + (idx++) + '</td>';
+                    tr += '<td class="text-warning font-weight-bold">' + t.level.name + '</td>';
+                    tr += '<td>' + convertISODateToTimeFormat(t.assigned_date) + '</td>';
+                    tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>';
+
+                    tr += '<td>';
+                    if (typeof t.remarks[0] !== 'undefined') {
+                        tr += t.remarks[0].content;
+                    }
+                    tr += '</td>';
+
+                    tr += '<td>';
+                    if (t.editor) {
+                        tr += t.editor.fullname
+                    }
+                    tr += '</td>';
+                    tr += '<td>';
+                    if (t.qa) {
+                        tr += t.qa.fullname
+                    }
+                    tr += '</td>';
+
+                    tr += '<td class="text-right">' + t.edited_time + '</td>';
+
+
+                    tr += '<td class="text-right">';
+                    if (t.editor) {
+                        tr += t.amount
+                    }
+                    tr += '</td>';
+
+                    tr += '<td>';
+                    if (isValidHttpUrl(t.input_link)) {
+                        tr += '<a href="' + t.input_link + '" target="_blank" rel="noopener noreferrer">Link</a>'
+                    } else {
+                        tr += t.input_link;
+                    }
+                    tr += '</td>';
+
+                    tr += '<td>';
+                    if (typeof t.links !== 'undefined') {
+                        if (t.links.length == 1) {
+                            tr += '<a href="' + t.linksp[0].url + '" target="_blank" rel="noopener noreferrer">Link</a>'
+                        } else {
+                            tr += '<button class="btn btn-xs btn-info" name="btn-links-list"><i class="fa fa-link" aria-hidden="true"></i></button>';
+                        }
+                    }
+                    tr += '</td>';
+
+
+
+
+                    tr += '<td><i>';
+
+                    switch (t.status) {
+                        case -1: tr += '<span class="text-info">Initial</span>';
+                            break;
+                        case 0: tr += '<span class="text-info">Processing</span>';
+                            break;
+                        case 1:
+                            {
+                                if (t.edited_time > 1) {
+                                    tr += '<span class="text-primary">Fixed</span>';
+                                } else {
+                                    tr += '<span class="text-primary">Edited</span>';
+                                }
+                                break;
+                            }
+                        case 2:
+                            tr += '<span class="text-success">Q.A ok!</span>';
+                            break;
+                        case 3:
+                            tr += '<span class="text-success">DC ok!</span>'
+                            break;
+                        case -2:
+                            tr += '<span class="text-danger">Q.A rejected</span>';
+                            break;
+                        case -3:
+                            tr += '<span class="text-danger">DC rejected</span>';
+                            break;
+
+                    }
+                    tr += '</i></td>';
+
+                    tr += '<td>';
+                    tr += t.created_by.fullname;
+                    tr += '</td>';
+
+                    tr += '<td>';
+                    if (typeof t.updated_by !== 'undefined') {
+                        tr += t.updated_by.fullname;
+                    }
+                    tr += '</td>';
+
+
+
+                    tr += '</tr>';
+                    $('#tblTasksList').append(tr);
+                })
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+            }
+        })
+    }
+</script>
+

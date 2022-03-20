@@ -37,6 +37,11 @@ app.use('/accountant/job',accountantJobController);
 const accountantTaskController = require('./BE/controllers/accountant/task-controller');
 app.use('/accountant/task',accountantTaskController);
 
+const accountantStatisticController = require('./BE/controllers/accountant/statistic-controller');
+app.use('/accountant/statistic',accountantStatisticController);
+
+
+
 const accountantAuthAPI = require('./BE/API/accountant/authenticate');
 app.use('/accountant/auth',accountantAuthAPI);
 
@@ -58,6 +63,9 @@ app.use('/accountant/customer-level',accountantCustomerLevelAPI);
 const accountantFFAPI = require('./BE/API/accountant/api-file-format');
 app.use('/accountant/file-format',accountantFFAPI);
 
+const accountantJobAPI = require('./BE/API/accountant/api-job');
+app.use('/accountant/job',accountantJobAPI);
+
 const accountantJobLevelAPI = require('./BE/API/accountant/api-job-level');
 app.use('/accountant/job-level',accountantJobLevelAPI);
 
@@ -67,11 +75,12 @@ app.use('/accountant/national-style',accountantNationalStyleAPI);
 const accountantSizeAPI = require('./BE/API/accountant/api-size');
 app.use('/accountant/size',accountantSizeAPI);
 
-const accountantStatisticController = require('./BE/controllers/accountant/statistic-controller');
-app.use('/accountant/statistic',accountantStatisticController);
+
 const accountantStatisticAPI = require('./BE/API/accountant/api-statistic');
 app.use('/accountant/statistic',accountantStatisticAPI);
 
+const accountantTaskAPI = require('./BE/API/accountant/api-task');
+app.use('/accountant/task',accountantTaskAPI);
 
 
 //DC zone
