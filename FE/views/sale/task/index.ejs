@@ -261,7 +261,12 @@
                                 tr += t.uploaded_by.fullname
                             }
                             tr += '</td>';
-                            tr += '<td>' + convertISODateToTimeFormat(t.uploaded_at) + '</td>';
+
+                            tr += '<td>';
+                                if (typeof t.uploaded_by !== 'undefined' && t.uploaded_by !== null) {
+                                tr += convertISODateToTimeFormat(t.uploaded_at);
+                            }
+                            tr += '</td>';
 
                             tr += '<td><a href="' + t.uploaded_link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a></td>'
 
@@ -297,7 +302,7 @@
                                 case -4:
                                     tr += '<span class="text-danger">Sale rejected</span>';
                                     break;
-                                    case -5:
+                                case -5:
                                     tr += '<span class="text-danger">Canceled</span>';
                                     break;
                                 case 4: tr += '<span class="text-success font-weight-bold">Upload</span>'; break;
