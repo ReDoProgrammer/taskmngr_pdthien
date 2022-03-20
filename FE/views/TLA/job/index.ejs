@@ -65,6 +65,10 @@
                 $(document).on("click", "button[name='job-info']", function () {
                     jobId = $(this).closest('tr').attr('id');
                     customerId = $(this).closest('tr').data('customer');
+                    isShown = false;
+                    $('.btn-job-info').html('Show job info<i class="fa fa-arrow-down" aria-hidden="true"></i>');
+                    $('.combo_tab').hide();
+                    $('.liCombo').hide();
                     $('#JobDetailModal').modal();
 
                 })
@@ -79,7 +83,11 @@
                 $(document).on("click", "button[name='process-job']", function () {
                     jobId = $(this).closest('tr').attr('id');
                     customerId = $(this).closest('tr').data('customer');
+                    isShown = false;
+                    $('.btn-job-info').html('Show job info<i class="fa fa-arrow-down" aria-hidden="true"></i>');
                     $('#JobMngrModal').modal();
+                    $('.combo_tab').hide();
+                    $('.liCombo').hide();
                 })
 
 
@@ -260,10 +268,12 @@
                             $('.lblStyleNote').text(data.job.customer.remark);
 
                            if(data.job.cb_ticked){
-                               $('#liCombo').show();
+                               $('.liCombo').show();
+                               $('.combo_tab').show();
                                LoadComboLine(data.job.cb);
                            }else{
-                               $('#liCombo').hide();
+                               $('.liCombo').hide();
+                               $('.combo_tab').show();
                            }
                          
 
