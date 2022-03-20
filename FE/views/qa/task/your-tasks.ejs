@@ -40,7 +40,7 @@
                 <th scope="col" class="text-right">E-N</th>
                 <th scope="col" class="text-right">E-T</th>
                 <th scope="col">Editor</th>
-                <th scope="col">Status</th>                
+                <th scope="col">Status</th>
                 <th scope="col"></th>
             </tr>
         </thead>
@@ -225,7 +225,7 @@
                             tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
                             tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
                             tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>'
-                           
+
                             tr += '<td>';
                             if (typeof t.remarks[0] !== 'undefined') {
                                 tr += t.remarks[0].content;
@@ -243,31 +243,49 @@
                             tr += '</td>';
 
 
-                            tr += '<td class="font-italic">';
-                            switch (t.status) {
+                            tr += '<td><i>';
 
-                                case 0: tr += '<span class="text-info">Processing</span>'; break;
-                                case 1: {
-                                    if (t.edited_time > 1) {
-                                        tr += '<span class="text-primary">Fixed</span>';
-                                    } else {
-                                        tr += '<span class="text-primary">Edited</span>';
-                                    }
+                            switch (t.status) {
+                                case -1: tr += '<span class="text-info">Initial</span>';
                                     break;
-                                }
-                                case 2: tr += '<span class="text-success">Q.A ok</span>'; break;
-                                case 3: tr += '<span class="text-success">DC ok</span>'; break;
-                                case 4:case 5: case 6: tr += '<span class="text-success font-weight-bold">Finish</span>'; break;
-                                case -1: tr += '<span class="text-info">Initial</span>'; break;
-                                case -2: tr += '<span class="text-danger">Q.A reject</span>'; break;
-                                case -3: tr += '<span class="text-danger">DC reject</span>'; break;
-                                case -4: tr += '<span class="text-danger">Canceled</span>'; break;
+                                case 0: tr += '<span class="text-info">Processing</span>';
+                                    break;
+                                case 1:
+                                    {
+                                        if (t.edited_time > 1) {
+                                            tr += '<span class="text-primary">Fixed</span>';
+                                        } else {
+                                            tr += '<span class="text-primary">Edited</span>';
+                                        }
+                                        break;
+                                    }
+                                case 2:
+                                    tr += '<span class="text-success">Q.A ok!</span>';
+                                    break;
+                                case 3:
+                                    tr += '<span class="text-success">DC ok!</span>'
+                                    break;
+                                case -2:
+                                    tr += '<span class="text-danger">Q.A rejected</span>';
+                                    break;
+                                case -3:
+                                    tr += '<span class="text-danger">DC rejected</span>';
+                                    break;
+                                case -4:
+                                    tr += '<span class="text-danger">Sale rejected</span>';
+                                    break;
+                                case -5:
+                                    tr += '<span class="text-danger">Canceled</span>';
+                                    break;
+                                case 4: tr += '<span class="text-success font-weight-bold">Upload</span>'; break;
+                                case 5: tr += '<span class="text-success font-weight-bold">Done</span>'; break;
+                                case 6: tr += '<span class="text-success font-weight-bold">Finish</span>'; break;
 
                             }
-                            tr += '</td>';
+                            tr += '</i></td>';
 
-                           
-                           
+
+
 
                             tr += '<td class="text-right">';
                             tr += '<button class="btn btn-xs btn-info" name="btnTaskInfo">';

@@ -363,11 +363,14 @@
                                                 tr += '<span class="text-danger">DC rejected</span>';
                                                 break;
                                             case -4:
+                                                tr += '<span class="text-danger">Sale rejected</span>';
+                                                break;
+                                            case -5:
                                                 tr += '<span class="text-danger">Canceled</span>';
                                                 break;
-                                            case 4: tr += '<span class="text-success">Upload</span>'; break;
-                                            case 5: tr += '<span class="text-success">Done</span>'; break;
-                                            case 6: tr += '<span class="text-success">Finish</span>'; break;
+                                            case 4: tr += '<span class="text-success font-weight-bold">Upload</span>'; break;
+                                            case 5: tr += '<span class="text-success font-weight-bold">Done</span>'; break;
+                                            case 6: tr += '<span class="text-success font-weight-bold">Finish</span>'; break;
 
                                         }
                                         tr += '</i></td>';
