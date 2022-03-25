@@ -354,11 +354,20 @@ router.post('/', authenticateTLAToken, (req, res) => {
                                     .then(async r=>{
                                         task.remarks.push(r);
                                         await task.save()
-                                        .then(tk=>{
+                                        .then(async tk=>{
+                                          j.tasks.push(tk);
+                                          await j.save()
+                                          .then(_=>{
                                             return res.status(200).json({
                                                 msg:`Task has been created!`,
                                                 tk
                                             })
+                                          })
+                                          .catch(err=>{
+                                              return res.status(500).json({
+                                                  msg:`Can not push this task to parent job with error: ${new Error(err.message)}`
+                                              })
+                                          })
                                         })
                                         .catch(err=>{
                                             return res.status(500).json({

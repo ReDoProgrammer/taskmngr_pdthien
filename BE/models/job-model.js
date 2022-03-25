@@ -27,8 +27,6 @@ const jobSchema = new Schema({
     },
     intruction: {
         type: String,
-
-
         default: ''
     },
     status: {
@@ -66,6 +64,10 @@ const jobSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'combo'
     },
+    tasks:[{
+        type: Schema.Types.ObjectId,
+        ref:'task'
+    }]
    
 });
 

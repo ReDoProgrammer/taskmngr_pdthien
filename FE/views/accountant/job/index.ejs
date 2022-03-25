@@ -61,40 +61,7 @@
     var customerId = '';
 
     var tasksList = [];
-    var jobsList = [];
-
-    var parentsData = {
-      "success": true,
-      "parents": [{
-        "id": 1531,
-        "Firstname": "Austin",
-        "Surname": "Ana\u00eblle",
-        "schoolId": "046039",
-        "schoolName": "ARCAMBAL",
-        "commune": "ARCAMBAL"
-      }, {
-        "id": 2032,
-        "Firstname": "Ramos",
-        "Surname": "L\u00e8i",
-        "schoolId": "046043",
-        "schoolName": "J CALVET",
-        "commune": "CAHORS"
-      }, {
-        "id": 3036,
-        "Firstname": "Baker",
-        "Surname": "Salom\u00e9",
-        "schoolId": "046043",
-        "schoolName": "Z LAFAGE",
-        "commune": "CAHORS"
-      }, {
-        "id": 1724,
-        "Firstname": "Berry",
-        "Surname": "Marl\u00e8ne",
-        "schoolId": "046044",
-        "schoolName": "J CALVET",
-        "commune": "CAHORS"
-      }]
-    };
+    var jobsList = [];    
 
     var $table = $('.js-table');
 
@@ -312,7 +279,7 @@
           search,
           page,
         },
-        success: async function (data) {
+        success: function (data) {
           $('#tblJobs').empty();
           let idx = 1;
           data.jobs.forEach(j => {
@@ -361,7 +328,7 @@
           })
 
           console.log(jobsList);
-         await LoadTasksBasedOnJobs(jobsList);
+          LoadTasksBasedOnJobs(jobsList);
           console.log(tasksList);
 
 
