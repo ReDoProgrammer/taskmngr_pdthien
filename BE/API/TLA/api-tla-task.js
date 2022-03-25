@@ -26,13 +26,13 @@ router.get('/list', authenticateTLAToken, (req, res) => {
         .populate('created_by', 'fullname -_id')
         .populate('updated_by', 'fullname -_id')
         .populate({
-            path:'remarks',
-            options: {               
-                sort: { timestamp: -1}   
+            path: 'remarks',
+            options: {
+                sort: { timestamp: -1 }
             }
         })
         .exec()
-        .then(tasks => {           
+        .then(tasks => {
             return res.status(200).json({
                 tasks,
                 msg: 'Load tasks by job id successfully!'
@@ -63,9 +63,9 @@ router.get('/all', authenticateTLAToken, (req, res) => {
             .populate('qa', 'fullname -_id')
             .populate('editor', 'fullname -_id')
             .populate({
-                path:'remarks',
-                options: {                  
-                    sort: { timestamp: -1}   
+                path: 'remarks',
+                options: {
+                    sort: { timestamp: -1 }
                 }
             })
             .exec()
@@ -111,65 +111,65 @@ router.get('/all', authenticateTLAToken, (req, res) => {
 
 })
 
-router.get('/list-uploaded',authenticateTLAToken,(req,res)=>{
-    let {jobId} = req.query;
+router.get('/list-uploaded', authenticateTLAToken, (req, res) => {
+    let { jobId } = req.query;
 
     Task
-    .find({
-        job:jobId,
-        status: { $gt: 3 }// lấy các task có trạng thái đã được upload trở lên
-    })
-    .populate('uploaded_by','fullname')
-    .populate('level','name')   
-    .populate({
-        path : 'remarks',       
-        options: {               
-            sort: { timestamp: -1}   
-        }
-      })
-    .exec()
-    .then(tasks=>{
-        return res.status(200).json({
-            msg:`Load uploaded tasks list successfully!`,
-            tasks
+        .find({
+            job: jobId,
+            status: { $gt: 3 }// lấy các task có trạng thái đã được upload trở lên
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not list uploaded tasks list with error: ${new Error(err.message)}`
+        .populate('uploaded_by', 'fullname')
+        .populate('level', 'name')
+        .populate({
+            path: 'remarks',
+            options: {
+                sort: { timestamp: -1 }
+            }
         })
-    })
+        .exec()
+        .then(tasks => {
+            return res.status(200).json({
+                msg: `Load uploaded tasks list successfully!`,
+                tasks
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not list uploaded tasks list with error: ${new Error(err.message)}`
+            })
+        })
 })
 
-router.get('/list-unuploaded',authenticateTLAToken,(req,res)=>{
-    let {jobId} = req.query;
+router.get('/list-unuploaded', authenticateTLAToken, (req, res) => {
+    let { jobId } = req.query;
     Task
-    .find({
-        job:jobId,
-        status:3//chỉ lấy những task đã được DC submit: status = 3
-    })
-    .populate('level')
-    .populate('editor')
-    .exec()
-    .then(tasks=>{
-        
-        return res.status(200).json({
-            msg:`Load unuploaded tasks successfully!`,
-            tasks
+        .find({
+            job: jobId,
+            status: 3//chỉ lấy những task đã được DC submit: status = 3
         })
-    })  
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not list unuploaded tasks with error: ${new Error(err.message)}`
+        .populate('level')
+        .populate('editor')
+        .exec()
+        .then(tasks => {
+
+            return res.status(200).json({
+                msg: `Load unuploaded tasks successfully!`,
+                tasks
+            })
         })
-    })  
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not list unuploaded tasks with error: ${new Error(err.message)}`
+            })
+        })
 })
 
 
 router.get('/detail', authenticateTLAToken, (req, res) => {
     let { taskId } = req.query;
     getTaskDetail(taskId)
-        .then(async task => {           
+        .then(async task => {
             await getCustomer(task.job.customer)
                 .then(customer => {
                     return res.status(200).json({
@@ -192,7 +192,7 @@ router.get('/detail', authenticateTLAToken, (req, res) => {
 })
 
 
-router.get('/detail-to-edit',authenticateTLAToken,(req,res)=>{
+router.get('/detail-to-edit', authenticateTLAToken, (req, res) => {
     let { taskId } = req.query;
     Task
         .findById(taskId)
@@ -280,7 +280,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
                             let task = new Task();
                             task.created_by = req.user._id;
                             task.job = job;
-                            task.level = level;                           
+                            task.level = level;
                             task.level_price = result.cl.price;
                             task.assigned_date = assigned_date;
                             task.deadline = deadline;
@@ -351,37 +351,37 @@ router.post('/', authenticateTLAToken, (req, res) => {
                                         tid: t._id
                                     });
                                     await rm.save()
-                                    .then(async r=>{
-                                        task.remarks.push(r);
-                                        await task.save()
-                                        .then(async tk=>{
-                                          j.tasks.push(tk);
-                                          await j.save()
-                                          .then(_=>{
-                                            return res.status(200).json({
-                                                msg:`Task has been created!`,
-                                                tk
-                                            })
-                                          })
-                                          .catch(err=>{
-                                              return res.status(500).json({
-                                                  msg:`Can not push this task to parent job with error: ${new Error(err.message)}`
-                                              })
-                                          })
+                                        .then(async r => {
+                                            task.remarks.push(r);
+                                            await task.save()
+                                                .then(async tk => {
+                                                    j.tasks.push(tk);
+                                                    await j.save()
+                                                        .then(_ => {
+                                                            return res.status(200).json({
+                                                                msg: `Task has been created!`,
+                                                                tk
+                                                            })
+                                                        })
+                                                        .catch(err => {
+                                                            return res.status(500).json({
+                                                                msg: `Can not push this task to parent job with error: ${new Error(err.message)}`
+                                                            })
+                                                        })
+                                                })
+                                                .catch(err => {
+                                                    return res.status(500).json({
+                                                        msg: `Can not add remark into task with error: ${new Error(err.message)}`
+                                                    })
+                                                })
+
                                         })
-                                        .catch(err=>{
+                                        .catch(err => {
                                             return res.status(500).json({
-                                                msg:`Can not add remark into task with error: ${new Error(err.message)}`
+                                                msg: `Can not insert remark with error: ${new Error(err.message)}`
                                             })
                                         })
 
-                                    })
-                                    .catch(err=>{
-                                        return res.status(500).json({
-                                            msg:`Can not insert remark with error: ${new Error(err.message)}`
-                                        })
-                                    })
-                                   
                                 })
                                 .catch(err => {
                                     return res.status(500).json({
@@ -410,57 +410,57 @@ router.post('/', authenticateTLAToken, (req, res) => {
         })
 })
 
-router.put('/upload',authenticateTLAToken,async (req,res)=>{
-    let {taskId,uploaded_link,remark} = req.body;
+router.put('/upload', authenticateTLAToken, async (req, res) => {
+    let { taskId, uploaded_link, remark } = req.body;
     let task = await Task.findById(taskId);
-    if(!task){
+    if (!task) {
         return res.status(404).json({
-            msg:`Task not found!`
+            msg: `Task not found!`
         })
     }
 
-    if(task.status == 1 && typeof task.qa !=='undefined' && task.qa !== null){
+    if (task.status == 1 && typeof task.qa !== 'undefined' && task.qa !== null) {
         return res.status(403).json({
-            msg:`You can not upload this task ultil Q.A submit it!`
+            msg: `You can not upload this task ultil Q.A submit it!`
         })
     }
 
-    if(task.status == 2 && typeof task.dc !=='undefined' && task.dc !== null){
+    if (task.status == 2 && typeof task.dc !== 'undefined' && task.dc !== null) {
         return res.status(403).json({
-            msg:`You can not upload this task ultil DC submit it!`
+            msg: `You can not upload this task ultil DC submit it!`
         })
     }
 
     let rmk = new Remark({
-        user:req.user._id,
-        content:remark,
-        tid:task._id
+        user: req.user._id,
+        content: remark,
+        tid: task._id
     });
 
     await rmk.save()
-    .then(async r=>{
-        task.status = 4;
-        task.uploaded_link = uploaded_link;
-        task.uploaded_at = new Date();
-        task.uploaded_by = req.user._id;
-        task.remarks.push(r);
-        await task.save()
-        .then(_=>{
-            return res.status(200).json({
-                msg:`The task has been uploaded!`
-            })
+        .then(async r => {
+            task.status = 4;
+            task.uploaded_link = uploaded_link;
+            task.uploaded_at = new Date();
+            task.uploaded_by = req.user._id;
+            task.remarks.push(r);
+            await task.save()
+                .then(_ => {
+                    return res.status(200).json({
+                        msg: `The task has been uploaded!`
+                    })
+                })
+                .catch(err => {
+                    return res.status(500).json({
+                        msg: `Can not upload this task with error: ${new Error(err.message)}`
+                    })
+                })
         })
-        .catch(err=>{
+        .catch(err => {
             return res.status(500).json({
-                msg:`Can not upload this task with error: ${new Error(err.message)}`
+                msg: `Can not create remark when upload this task with error: ${new Error(err.message)}`
             })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not create remark when upload this task with error: ${new Error(err.message)}`
-        })
-    })
 })
 
 router.put('/cancel', authenticateTLAToken, (req, res) => {
@@ -614,7 +614,7 @@ router.put('/', authenticateTLAToken, async (req, res) => {
     task.assigned_date = assigned_date;
     task.deadline = deadline;
     task.input_link = input_link;
-   
+
 
 
     //thiết lập các thông tin liên quan khi Editor đc gán
@@ -637,7 +637,7 @@ router.put('/', authenticateTLAToken, async (req, res) => {
                     })
             })
             .catch(err => {
-                console.log('editor: ',err);
+                console.log('editor: ', err);
                 return res.status(err.code).json({
                     msg: err.msg
                 })
@@ -686,37 +686,37 @@ router.put('/', authenticateTLAToken, async (req, res) => {
 
     await task.save()
         .then(async t => {
-           
+
             await Remark
-            .findOneAndUpdate({
-                user:req.user._id,
-                tid:task._id
-            },{
-                content:remark,
-                timestamp: new Date()
-            },{new:true},(err,remark)=>{
-                if(err){
-                    return res.status(500).json({
-                        msg:`Can not update remark with error: ${new Error(err.message)}`
+                .findOneAndUpdate({
+                    user: req.user._id,
+                    tid: task._id
+                }, {
+                    content: remark,
+                    timestamp: new Date()
+                }, { new: true }, (err, remark) => {
+                    if (err) {
+                        return res.status(500).json({
+                            msg: `Can not update remark with error: ${new Error(err.message)}`
+                        })
+                    }
+                    if (!remark) {
+                        return res.status(404).json({
+                            msg: `Remark not found!`
+                        })
+                    }
+                    return res.status(200).json({
+                        msg: `Task has been updated!`,
+                        t
                     })
-                }
-                if(!remark){
-                    return res.status(404).json({
-                        msg:`Remark not found!`
-                    })
-                }
-                return res.status(200).json({
-                    msg:`Task has been updated!`,
-                    t
+
                 })
-                
-            })
-          
+
         })
         .catch(err => {
-            console.log('errrrrrrrrr: ',err);
+            console.log('errrrrrrrrr: ', err);
             return res.status(500).json({
-                msg:`Can not update the task with error: ${new Error(err.message)}`
+                msg: `Can not update the task with error: ${new Error(err.message)}`
             })
         })
 
@@ -729,19 +729,41 @@ router.delete('/', authenticateTLAToken, (req, res) => {
     let { _id } = req.body;
     Task.findByIdAndDelete(_id)
         .exec()
-        .then(async _ => {
-            Remark
-            .deleteMany({tid:_id},err=>{
-                if(err){
-                    return res.status(500).json({
-                        msg:`Can not delete remarks belong to this task with error: ${new Error(err.message)}`
-                    })
-                }
-                return res.status(200).json({
-                    msg: 'Task has been deleted!'
+        .then(async task => {
+            await Remark
+                .deleteMany({ tid: _id }, async err => {
+                    if (err) {
+                        console.log(`Can not delete remarks belong to this task with error: ${new Error(err.message)}`);
+                        return res.status(500).json({
+                            msg: `Can not delete remarks belong to this task with error: ${new Error(err.message)}`
+                        })
+                    }
+
+
+
+                    await Job.findByIdAndUpdate(task.job,
+                        {
+                            $pull: { tasks: _id }
+                        }, { new: true }, (err, job) => {
+                            if (err) {
+                                return res.status(500).json({
+                                    msg: `Can not pull this task from parent job with error: ${new Error(err.message)}`
+                                })
+                            }
+                            if (!job) {
+                                console.log(`Can not find parent job of this task!`);
+                                return res.status(404).json({
+                                    msg: `Can not find parent job of this task!`
+                                })
+                            }
+                            return res.status(200).json({
+                                msg:`The task has been deleted!`
+                            })
+                        })
+
                 })
-            })
-           
+
+
         })
         .catch(err => {
             return res.status(500).json({
