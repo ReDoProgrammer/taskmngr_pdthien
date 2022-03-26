@@ -75,8 +75,7 @@ router.delete('/',authenticateSaleToken,(req,res)=>{
   .countDocuments({
     job:jobId,
     status: {$ne: -1}
-  },(err,count)=>{
-    console.log(count);
+  },async (err,count)=>{   
     if(err){
       return res.status(500).json({
         msg:`Can not check tasks belong to this job with error: ${new Error(err.message)}`
@@ -87,10 +86,32 @@ router.delete('/',authenticateSaleToken,(req,res)=>{
         msg:`Can not delete this job after processing!`
       })
     }
-    
-    return res.status(200).json({
-      msg:`The job has been deleted!`
+    let job = await Job.findById(jobId);
+    if(!job){
+      return res.status(404).json({
+        msg:`Job not found!`
+      })
+    }
+
+    await Promise.all([DeleteTasksBasedJob(jobId),DeleteRemarks(job.tasks)])
+    .then(async _=>{
+      Job.findByIdAndDelete(jobId,(err)=>{
+        if(err){
+          return res.status(500).json({
+            msg:`Can not delete this job with error: ${new Error(err.message)}`
+          })
+        }
+        return res.status(200).json({
+          msg:`This job has been deleted!`
+        })
+      })
     })
+    .catch(err=>{
+      return res.status(err.code).json({
+        msg:err.msg
+      })
+    })
+    
   })
 })
 
@@ -190,6 +211,21 @@ const DeleteTasksBasedJob = (jobId)=>{
         return reject({
           code:500,
           msg:`Can not delete tasks belongs to this job with error: ${new Error(err.message)}`
+        })
+      }
+      return resolve();
+    })
+  })
+}
+
+const DeleteRemarks = (taskIds)=>{
+  return new Promise((resolve,reject)=>{
+    Remark
+    .deleteMany({ids:{$in: taskIds}},(err)=>{
+      if(err){
+        return reject({
+          code:500,
+          msg:`Can not delete remarks belong to this job with error: ${new Error(err.message)}`
         })
       }
       return resolve();
