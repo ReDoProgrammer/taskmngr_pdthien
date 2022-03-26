@@ -10,6 +10,35 @@ const { authenticateEditorToken } = require("../../../middlewares/editor-middlew
 
 const _MODULE = 'EDITOR';
 
+router.get('/statistic',authenticateEditorToken,(req,res)=>{
+    Task
+    .find({editor:req.user._id})
+    .exec()
+    .then(tasks=>{
+       var total = tasks.length;
+        var rejected = (tasks.filter(x=>x.status <= -2 && x.status >= -4 )).length;
+        var canceled = (tasks.filter(x=>x.status === -5)).length;
+        var done = (tasks.filter(x=>x.status >= 5)).length;
+        var edited = (tasks.filter(x=>x.status >= 1 && x.status<5 && x.edited_time===1)).length;
+        var fixed = (tasks.filter(x=>x.edited_time >1)).length;
+        var processing = (tasks.filter(x=>x.status === 0)).length;
+        return res.status(200).json({
+            msg:`Get tasks statistic successfully!`,
+            total,
+            rejected,
+            canceled,
+            done,
+            edited,
+            fixed,
+            processing
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not get tasks statistic with error: ${new Error(err.message)}`
+        })
+    })
+})
 
 router.get('/', authenticateEditorToken, (req, res) => {
     let { page, search,status } = req.query;
