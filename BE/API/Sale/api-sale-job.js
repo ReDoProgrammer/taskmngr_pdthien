@@ -74,7 +74,9 @@ router.delete('/',authenticateSaleToken,(req,res)=>{
   Task
   .countDocuments({
     job:jobId,
-    status: {$ne: -1}
+    status: {   
+      $nin:[0,-1,-2,-3,-4,-5]//và không bị cancel,reject
+    }
   },async (err,count)=>{   
     if(err){
       return res.status(500).json({
