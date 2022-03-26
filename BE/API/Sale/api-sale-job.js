@@ -1,5 +1,7 @@
 const router = require("express").Router();
 const Job = require("../../models/job-model");
+const Task = require('../../models/task-model');
+const Remark = require('../../models/remark-model');
 const { authenticateSaleToken } = require("../../../middlewares/sale-middleware");
 
 
@@ -66,6 +68,31 @@ router.get("/list", authenticateSaleToken, (req, res) => {
       });
     });
 });
+
+router.delete('/',authenticateSaleToken,(req,res)=>{
+  let {jobId} = req.body;
+  Task
+  .countDocuments({
+    job:jobId,
+    status: {$ne: -1}
+  },(err,count)=>{
+    console.log(count);
+    if(err){
+      return res.status(500).json({
+        msg:`Can not check tasks belong to this job with error: ${new Error(err.message)}`
+      })
+    }
+    if(count>0){
+      return res.status(403).json({
+        msg:`Can not delete this job after processing!`
+      })
+    }
+    
+    return res.status(200).json({
+      msg:`The job has been deleted!`
+    })
+  })
+})
 
 router.put("/", authenticateSaleToken, (req, res) => {
   let {
@@ -154,5 +181,22 @@ router.post("/", authenticateSaleToken, (req, res) => {
 });
 
 module.exports = router;
+
+const DeleteTasksBasedJob = (jobId)=>{
+  return new Promise((resolve,reject)=>{
+    Task
+    .deleteMany({job:jobId},err=>{
+      if(err){
+        return reject({
+          code:500,
+          msg:`Can not delete tasks belongs to this job with error: ${new Error(err.message)}`
+        })
+      }
+      return resolve();
+    })
+  })
+}
+
+
 
 

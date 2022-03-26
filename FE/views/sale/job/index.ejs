@@ -128,6 +128,30 @@
 
       })
 
+      $(document).on("click", "button[name='delete-job']", function () {
+        jobId = $(this).closest("tr").attr("id");
+        if (confirm('Are you sure want to delete this job?')) {
+          $.ajax({
+            url: '/sale/job',
+            type: 'delete',
+            headers: {
+              authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+              jobId
+            },
+            success: function (data) {
+              alert(data.msg);
+              LoadJobs();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              alert(jqXHR.responseJSON.msg);
+            },
+          })
+        }
+
+      })
+
       $(document).on("click", "button[name='edit-job']", function () {
         jobId = $(this).closest("tr").attr("id");
         $('#updateJobModal').modal();
@@ -238,21 +262,21 @@
                 newRow += '</td>';
 
                 newRow += '<td  class="text-center">';
-                  if(isValidHttpUrl(t.input_link)){
-                    newRow+= '<a href="'+t.input_link+'" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
-                  }else{
-                    newRow+= t.input_link;
-                  }
+                if (isValidHttpUrl(t.input_link)) {
+                  newRow += '<a href="' + t.input_link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                } else {
+                  newRow += t.input_link;
+                }
                 newRow += '</td>';
 
                 newRow += '<td  class="text-center">';
-                  if(isValidHttpUrl(t.uploaded_link)){
-                    newRow+= '<a href="'+t.uploaded_link+'" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
-                  }else{
-                    newRow+=t.uploaded_link
-                  }
+                if (isValidHttpUrl(t.uploaded_link)) {
+                  newRow += '<a href="' + t.uploaded_link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                } else {
+                  newRow += t.uploaded_link
+                }
                 newRow += '</td>';
-               
+
 
                 newRow += '<td><i>';
 
@@ -366,8 +390,10 @@
 
               tr += '</td>';
 
-              tr += '<td>';
+              tr += '<td class="text-right">';
               tr += '<button class="btn btn-xs btn-info" name="btn-job-info"><i class="fa fa-info-circle" aria-hidden="true" ></i></button>';
+              tr += '<button class="btn btn-xs btn-warning ml-2" name="edit-job"><i class="fa fa-refresh" aria-hidden="true"></i></button>';
+              tr += '<button class="btn btn-xs btn-danger ml-2" name="delete-job"><i class="fa fa-trash" aria-hidden="true"></i></button>';
               tr += '</td>';
 
               tr += '</tr> ';
@@ -396,4 +422,3 @@
         position: relative;
       }
     </style>
-
