@@ -184,6 +184,8 @@
             '<th>DC</th>' +
             '<th>Uploaded by</th>' +
             '<th>Uploaded at</th>' +
+            '<th>I-Link</th>' +
+            '<th>O-Link</th>' +
             '<th>Status</th>' +
             '</tr>' +
             '</thead>' +
@@ -235,6 +237,22 @@
                 }
                 newRow += '</td>';
 
+                newRow += '<td  class="text-center">';
+                  if(isValidHttpUrl(t.input_link)){
+                    newRow+= '<a href="'+t.input_link+'" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                  }else{
+                    newRow+= t.input_link;
+                  }
+                newRow += '</td>';
+
+                newRow += '<td  class="text-center">';
+                  if(isValidHttpUrl(t.uploaded_link)){
+                    newRow+= '<a href="'+t.uploaded_link+'" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                  }else{
+                    newRow+=t.uploaded_link
+                  }
+                newRow += '</td>';
+               
 
                 newRow += '<td><i>';
 
@@ -312,7 +330,7 @@
             $('#tblJobs').empty();
             let idx = 1;
             data.jobs.forEach(j => {
-              let tr = '<tr id="' + j._id + '" data-customer="'+j.customer._id+'">';
+              let tr = '<tr id="' + j._id + '" data-customer="' + j.customer._id + '">';
               tr += '<td>';
               tr += '<button class="btn btn-xs parents js-view-parents fa fa-plus" name="js-view-parents"></button>';
               tr += '</td>';
@@ -378,3 +396,4 @@
         position: relative;
       }
     </style>
+
