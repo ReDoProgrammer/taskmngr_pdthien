@@ -11,15 +11,15 @@
         <div class="panel panel-info mb-3">
           <div class="panel-heading"> <button class="btn btn-xs btn-primary btn-job-info">Show job info
               <i class="fa fa-arrow-down" aria-hidden="true"></i></button> </div>
-            <%-include('panel-job-info')%>
+          <%-include('panel-job-info')%>
 
-          <div class="panel-footer">
-            <div class="row mt-2">
-              <div class="col-md-12 col-sm-12 col-xs-12">
-                <button class="btn btn-sm btn-success" id="btnAddTask"><i class="fa fa-plus"></i> Add Task</button>
+            <div class="panel-footer">
+              <div class="row mt-2">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                  <button class="btn btn-sm btn-success" id="btnAddTask"><i class="fa fa-plus"></i> Add Task</button>
+                </div>
               </div>
             </div>
-          </div>
 
         </div>
 
@@ -65,21 +65,28 @@
           <div class="panel-body">
 
             <div class="row">
-              <div class="col-md-6 col-sm-12 col-xs-12">
+              <div class="col-md-4 col-sm-12 col-xs-12">
                 <div class="form-group">
                   <label for="">Job level</label>
                   <select name="" id="slJobLevels" class="form-control"></select>
                 </div>
 
               </div>
-              <div class="col-md-3 col-sm-6 col-xs-6">
+              <div class="col-md-3 col-sm-5 col-xs-5">
                 <div class="form-group">
                   <label for="">Assign Date<span class="text-danger font-weight-bold">(*)</span>: </label>
                   <input type="text" class="inputDate form-control" id="txtAssignDate">
                 </div>
               </div>
 
-              <div class="col-md-3 col-sm-6 col-xs-6">
+              <div class="col-md-2 col-sm-2 col-xs-2">
+                <div class="form-group">
+                  <label for="">Duration <span class="text-danger">(hours)</span>:</label>
+                  <input type="text" class="form-control text-right" id="txtDuration" value="0">
+                </div>
+              </div>
+
+              <div class="col-md-3 col-sm-5 col-xs-5">
                 <div class=" form-group">
                   <label for="">Deadline<span class="text-danger font-weight-bold">(*)</span>:</label>
                   <input type="text" class="inputDate form-control" id="txtDeadline">
@@ -252,6 +259,19 @@
     })
   })
 
+
+
+  $('#txtDuration').keyup(function (e) {
+    if (/\D/g.test(this.value)) {
+      // Filter non-digits from input value.
+      this.value = this.value.replace(/\D/g, '');
+    }
+    let duration = parseInt($('#txtDuration').val());
+    let assigned_date = strToDate($('#txtAssignDate').val());
+    let deadline = assigned_date.addHours(duration);
+    $('#txtDeadline').val(convertISODateToTimeFormat(deadline));
+  });
+
   $(document).on("click", "button[name='btnAssignStaffAuto']", function () {
 
     if (confirm('Are you sure want to set editor automatically?')) {
@@ -386,7 +406,7 @@
 
 
 
- 
+
 
   function LoadTasks() {
     $.ajax({

@@ -16,6 +16,11 @@ function convertISODateToTimeFormat(ISO_Date) {
   return dateTemplate;
 }
 
+Date.prototype.addHours= function(h){
+  this.setHours(this.getHours()+h);
+  return this;
+}
+
 function strToDate(dtStr) {
   if (!dtStr) return null
   try {
