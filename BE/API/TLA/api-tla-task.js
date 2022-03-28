@@ -254,16 +254,17 @@ router.post('/', authenticateTLAToken, (req, res) => {
         editor
     } = req.body;
 
+
     Job
         .findById(job)
         .exec()
         .then(j => {
 
-            if (new Date(deadline) > j.delivery_date) {
-                return res.status(403).json({
-                    msg: `Staff's deadline can not be later than job's deadline!`
-                })
-            }
+            // if (new Date(deadline) > j.delivery_date) {
+            //     return res.status(403).json({
+            //         msg: `Staff's deadline can not be later than job's deadline!`
+            //     })
+            // }
 
             getCustomerIdFromJob(job)
                 .then(result => {
@@ -283,7 +284,11 @@ router.post('/', authenticateTLAToken, (req, res) => {
                             task.level = level;
                             task.level_price = result.cl.price;
                             task.assigned_date = assigned_date;
-                            task.deadline = deadline;
+
+                          
+                            if(deadline.length !== 0){
+                                task.deadline = deadline;
+                            }
                             task.input_link = input_link;
 
 
