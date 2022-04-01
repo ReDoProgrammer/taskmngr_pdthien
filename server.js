@@ -145,7 +145,7 @@ const adminJobLevelController = require('./BE/controllers/Admin/job-leve-control
 
 const adminLevelController = require("./BE/controllers/Admin/level-controller");
 const adminModuleController = require('./BE/controllers/Admin/module-controller');
-
+const adminPenaltyController = require('./BE/controllers/Admin/penalty-controller');
 const adminStaffLevelController = require("./BE/controllers/Admin/staff-level-controller");
 
 const adminNationalStyleController = require('./BE/controllers/Admin/national-style-controller');
@@ -192,6 +192,7 @@ const apiAdminStaffLevel = require('./BE/API/admin/api-staff-level');
 const apiAdminStaffJobLevel = require('./BE/API/admin/api-staff-job-level');
 const apiAdminModule = require('./BE/API/admin/api-module');
 const apiAdminNationalStyle = require('./BE/API/admin/api-national-style');
+const apiAdminPenalty = require('./BE/API/admin/api-penalty');
 const apiAdminSize = require('./BE/API/admin/api-size');
 const apiAdminUser = require('./BE/API/admin/api-user');
 const apiAdminStatus = require('./BE/API/admin/api-status');
@@ -304,7 +305,7 @@ app.use('/admin/customer',apiAdminCustomer);//quản lý thông tin khách hàng
 app.use('/admin/customer-level',apiAdminCustomerLevel);//quản lý thông tin các level mặt hàng của khách, liên quan tới thông tin hợp đồng của từng khách hàng
 app.use('/admin/file-format',apiAdminFileFormat);//quản lý thông tin định dạng file hình ảnh xuất cho khách
 app.use('/admin/job-level',apiAdminJobLevel);//quản lý thông tin danh sách level, khác với apiAdminCustomerLevel
-
+app.use('/admin/penalty',apiAdminPenalty);//quản lý các hình thức phạt đối với nhân viên
 app.use('/admin/module',apiAdminModule);// quản lý danh sách module của web
 app.use('/admin/national-style',apiAdminNationalStyle);//quản lý thông tin style của khách hàng theo quốc gia
 app.use('/admin/size',apiAdminSize);//quản lý thông tin kích thước file hình ảnh 
@@ -329,6 +330,7 @@ app.use("/admin/customer", adminCustomerController);
 app.use("/admin/customer-style", adminCustomerStyleController);
 
 
+
 app.use('/admin/setting/bank',adminBankController);
 app.use('/admin/setting/color-mode',adminColorModeController);
 app.use('/admin/setting/cloud',adminCloudController);
@@ -338,6 +340,7 @@ app.use('/admin/setting/job-level',adminJobLevelController);
 app.use("/admin/setting/level", adminLevelController);
 app.use('/admin/setting/module',adminModuleController);
 app.use('/admin/setting/national-style',adminNationalStyleController);
+app.use('/admin/setting/penalty',adminPenaltyController);
 app.use("/admin/setting/size", adminSizeController);
 app.use("/admin/setting/status", adminStatusController);
 app.use("/admin/setting/style", adminStyleController);

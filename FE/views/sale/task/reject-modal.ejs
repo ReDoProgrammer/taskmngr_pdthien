@@ -53,6 +53,7 @@
             success: function (data) {
                 alert(data.msg);
                 $('#modalRejectTask').modal('hide');
+                LoadTasks();
             },
             error: function (request, status, error) {
                 alert(request.responseJSON.msg);               
