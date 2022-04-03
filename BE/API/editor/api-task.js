@@ -10,6 +10,31 @@ const { authenticateEditorToken } = require("../../../middlewares/editor-middlew
 
 const _MODULE = 'EDITOR';
 
+
+router.post('/change-amount',authenticateEditorToken,(req,res)=>{
+    let {amount,taskId} = req.body;
+    Task
+    .findByIdAndUpdate(taskId,
+        {amount},{new:true},(err,task)=>{
+            if(err){
+                return res.status(500).json({
+                    msg:`Can not change amount of image with error: ${new Error(err.message)}`
+                })
+            }
+
+            if(!task){
+                return res.status(404).json({
+                    msg:`Task not found!`
+                })
+            }
+
+            return res.status(200).json({
+                msg:`Change number of image successfully!`,
+                task
+            })
+        })
+})
+
 router.get('/statistic',authenticateEditorToken,(req,res)=>{
     Task
     .find({editor:req.user._id})

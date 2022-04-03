@@ -53,6 +53,7 @@
 
 <%-include('task_detail')%>
   <%-include('submit_modal')%>
+  <%-include('modal_change')%>
 
     <script src="/js/common.js"></script>
     <script>
@@ -115,6 +116,11 @@
       $(document).on("click", "button[name='btnSubmitTask']", function () {
         taskId = $(this).closest("tr").attr("id");
         $('#modalSubmitTask').modal();
+      })
+
+      $(document).on("click", "button[name='btnChangeQuantity']", function () {
+        taskId = $(this).closest("tr").attr("id");
+        $('#modalChangeNumber').modal();
       })
 
 
@@ -211,12 +217,17 @@
 
               tr += '<td class="text-right">';
               if (t.status == 0 || t.status == -1 || t.status == -2 || t.status == -3 || t.status == -4) {
-                tr += '<button class="btn btn-xs btn-primary" name="btnSubmitTask">';
-                tr += '<i class="fa fa-send-o"></i> Submit';
+                tr += '<button class="btn btn-xs btn-success" name="btnSubmitTask">';
+                tr += '<i class="fa fa-send-o"></i>';
+                tr += '</button>';
+              }
+              if(t.status === 1){
+                tr += '<button class="btn btn-xs btn-warning" name="btnChangeQuantity">';
+                tr += ' <i class="fa fa-edit"></i> ';
                 tr += '</button>';
               }
               tr += '<button class="btn btn-xs btn-info ml-2" name="btnTaskInfo">';
-              tr += '<i class="fa fa-info"></i> Detail';
+              tr += '<i class="fa fa-info-circle" aria-hidden="true"></i>';
               tr += '</button>';
 
 

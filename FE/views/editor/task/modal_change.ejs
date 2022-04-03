@@ -1,0 +1,81 @@
+<div class="modal" tabindex="-1" role="dialog" id="modalChangeNumber">
+    <div class="modal-dialog modal-xs" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Change number of image</h4>
+            </div>
+            <div class="modal-body panel-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="">
+                            Số lượng ảnh:
+                        </label>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="number" name="" id="txtNumberOfImage" class="form-control text-right">
+                    </div>
+                    <div class="col-md-4 text-right">
+                        <button class="btn btn-success" id="btnSumitChangeNumber"><i class="fa fa-save"></i> Xác
+                            nhận</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    $("#modalChangeNumber").on('shown.bs.modal', function (e) {
+        $.ajax({
+            url: '/editor/task/detail',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                taskId
+            },
+            success: function (data) {
+                console.log(data);
+                $('#txtNumberOfImage').val(data.task.amount);
+
+            }, error: function (request, status, error) {
+                alert(request.responseJSON.msg);
+            }
+        })
+    });
+
+    $('#btnSumitChangeNumber').click(function () {
+        let amount = $('#txtNumberOfImage').val();
+        if (amount < 0) {
+            alert('Number is invalid!');
+            return;
+        }
+
+        $.ajax({
+            url: '/editor/task/change-amount',
+            type: 'post',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                taskId,
+                amount
+            },
+            success: function (data) {
+                alert(data.msg);
+                $('#modalChangeNumber').modal('hide');
+                LoadTask();
+            },
+            error: function (request, status, error) {
+                alert(request.responseJSON.msg)
+            }
+
+        })
+    })
+
+
+</script>
