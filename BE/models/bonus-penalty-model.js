@@ -7,14 +7,18 @@ const Schema = mongoose.Schema;
 
     Model này dùng để quản lý nguyên nhân phạt
 */
-const penaltySchema = new Schema({
+const bonusPenaltySchema = new Schema({
     name:{
         type: String       
     },
     description:{
         type:String
+    },
+    is_bonus:{
+        type:Boolean,
+        default:false
     }
    
 });
 
-module.exports = mongoose.model('penalty',penaltySchema);
+module.exports = mongoose.model('bonus-penalty',bonusPenaltySchema);

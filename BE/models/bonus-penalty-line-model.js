@@ -8,12 +8,12 @@ const Schema = mongoose.Schema;
     Model này dùng để quản lý mức phạt của nhân viên
     Liên quan tới từng task cụ thể
 */
-const penaltyTimeSchema = new Schema({
+const bonusPenaltyLineSchema = new Schema({
     task:{
         type: Schema.Types.ObjectId,
         ref:'task'
     },
-    penalty:{// tham chiếu tới lí do phạt
+    bpId:{// tham chiếu tới lí do thưởng/phạt
         type: Schema.Types.ObjectId,
         ref:'penalty'  
     },
@@ -31,4 +31,4 @@ const penaltyTimeSchema = new Schema({
     ]
 });
 
-module.exports = mongoose.model('penalty_time',penaltyTimeSchema);
+module.exports = mongoose.model('bonus-penalty_time',bonusPenaltyLineSchema);

@@ -1,0 +1,84 @@
+<div class="modal" tabindex="-1" id="modalBonusPenalty">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add or update bonus penalty</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="">Name</label>
+                        <input type="text" name="txtName" id="txtName" class="form-control" placeholder="Bonus panelty name">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="">Description</label>
+                        <input type="text" name="txtDescription" id="txtDescription" class="form-control"
+                            placeholder="Description">
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="">Is bonus</label>
+                        <input type="checkbox" name="" id="ckbIsBonus" checked class="mt-1">
+                    </div>
+                </div>               
+            </div>
+            <div class="modal-footer">              
+                <button type="button" class="btn btn-primary" id="btnSubmit">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $('#btnSubmit').click(function () {
+        let name = $('#txtName').val().trim();
+        let description = $('#txtDescription').val().trim();      
+
+        if (bpId.length > 0) {
+            $.ajax({
+                url: '/admin/bonus-penalty',
+                type: 'put',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem('accessToken'),
+                },
+                data: {
+                    bpId,
+                    name,
+                    description,
+                    is_bonus:$("#ckbIsBonus").is(':checked')                   
+                },
+                success: function (data, textStatus, xhr) {
+                    alert(data.msg);
+                    $('#modalBonusPenalty').modal('hide');
+                    bpId = '';
+                }, error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseJSON.msg);
+                }
+            })
+        } else {
+            $.ajax({
+                url: '/admin/bonus-penalty',
+                type: 'post',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem('accessToken'),
+                },
+                data: {
+                    name,
+                    description,
+                    is_bonus:$("#ckbIsBonus").is(':checked')                    
+                },
+                success: function (data, textStatus, xhr) {
+                    alert(data.msg);
+                    $('#modalBonusPenalty').modal('hide');
+                    bpId = '';
+                }, error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseJSON.msg);
+                }
+            })
+        }
+
+    })
+</script>

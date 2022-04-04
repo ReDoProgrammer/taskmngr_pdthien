@@ -1,0 +1,130 @@
+<button type="button" class="btn btn-primary" id="btnAddNew">
+    <span>
+      <i class="fa fa-plus" aria-hidden="true"></i>
+    </span>
+    Add New
+  </button>
+  <table class="table table-striped mt-2">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Level</th>
+        <th scope="col">Description</th>       
+        <th scope="col">Bonus/Penalty</th>       
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody id="tblData">   
+  
+  
+    </tbody>
+  </table>
+  
+  
+  
+  
+  <script>
+  
+    var bpId = '';
+  
+    function LoadData() {
+      $('#tblData').empty();
+      $.ajax({
+        url: '/admin/bonus-penalty/list',
+        type: 'get',
+        headers: {
+            authorization: "Bearer " + localStorage.getItem('accessToken'),
+          },       
+        success: function (data, textStatus, xhr) {
+          let idx = 1;
+          data.bplist.forEach(bp => {
+            let tr = '<tr id=' + bp._id + ' data-name = '+bp.name+'>';
+            tr += '<th scope="row">' + (idx++) + '</th>';
+            tr += '<td class="font-weight-bold text-info">' + bp.name + '</td>';
+            tr += '<td>' + bp.description + '</td>';           
+              tr+= '<td class="font-weight-bold">';
+                tr+= bp.is_bonus?'<span class="text-success">Bonus</span>':'<span class="text-danger">Penalty</span>';
+                tr+= '</td>';
+            tr += '<td class="text-right"><button class="btn btn-xs btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+            tr += '<button class="btn btn-xs btn-danger ml-1" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
+            tr += '</tr>';
+            $('#tblData').append(tr);
+          });
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          alert(jqXHR.responseJSON.msg);
+        }
+      })
+    }
+  
+    $(document).ready(function () {
+      $('#btnAddNew').click(function () {
+        bpId = '';
+        $('#modalBonusPenalty').modal();
+      });
+      LoadData();
+    });
+  
+    //sự kiện modal shown --> set các giá trị mặc định cho component trên form
+    $(document).on('show.bs.modal', '.modal', function () {
+      $('#txtName').val('');
+      $('#txtDescription').val('');    
+    });
+  
+    //sự kiện load lại hàm ds level khi modal đc đóng lại
+    $(document).on('hidden.bs.modal', '#modalBonusPenalty', function () {
+      LoadData();
+    });
+  
+  
+    $(document).on("click", "button[name='delete']", function () {
+  
+      var r = confirm("Are you sure watnt to delete this bonus penalty?");
+      if (r == true) {
+        $.ajax({
+          url: '/admin/bonus-penalty',
+          type: 'delete',
+          headers: {
+            authorization: "Bearer " + localStorage.getItem('accessToken'),
+          },
+          data: {
+            pId: $(this).closest("tr").attr("id")
+          },
+          success: function (data, textStatus, xhr) {
+            alert(data.msg);
+            LoadData();
+          }, error: function (jqXHR, textStatus, errorThrown) {
+            alert(jqXHR.responseJSON.msg);
+          }
+        })
+      }
+  
+  
+    });
+  
+    $(document).on("click", "button[name='update']", function () {
+       
+        bpId =$(this).closest("tr").attr("id");
+      $.ajax({
+        url: "/admin/bonus-penalty/detail",
+        type: "get",
+        headers: {
+          authorization: "Bearer " + localStorage.getItem('accessToken'),
+        },
+        data: {
+          bpId
+        },
+        success: function (data, textStatus, xhr) {
+          $('#modalBonusPenalty').modal();
+          $('#txtName').val(data.bp.name);
+          $('#txtDescription').val(data.bp.description); 
+          $('#ckbIsBonus').prop('checked', data.bp.is_bonus);        
+        }, error: function (jqXHR, textStatus, errorThrown) {
+          alert(jqXHR.responseJSON.msg);
+        }
+      });
+  
+    });
+  </script>
+  
+  <%-include('modal')%>
