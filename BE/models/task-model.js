@@ -245,6 +245,14 @@ const taskSchema = new Schema({
     canceled_at: {
         type: Date,
         default: new Date()
+    },
+    dc_mark:{
+        //cột này dùng để áp thuộc tính đánh dấu do DC set
+        //mặc định 0: không thưởng, k phạt
+        //-1: phạt
+        //1: thưởng
+        type:Number,
+        default:0
     }
 
 });

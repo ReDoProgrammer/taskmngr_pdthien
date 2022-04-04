@@ -6,6 +6,51 @@ const { getCustomer, getTaskDetail, getModule, getWage } = require('../common');
 const _MODULE = 'DC';
 
 
+router.put('/mark',authenticateDCToken,async (req,res)=>{
+    let {taskId,dc_mark,remark}=req.body;
+    let task = await Task.findById(taskId);
+    if(!task){
+        return res.status(404).json({
+            msg:`Task not found!`
+        });
+    }
+
+    let rmk = new Remark({
+        user: req.user._id,
+        content: remark,
+        tid: taskId
+    });
+     
+    await rmk.save()
+    .then(async r=>{
+        task.dc_mark = dc_mark;
+        task.updated_at = new Date();
+        task.updated_by = req.user._id;
+        task.remarks.push(r);
+
+        await task.save()
+        .then(_=>{
+            return res.status(200).json({
+                msg:`Mark task successfully!`
+            })
+        })
+        .catch(err=>{
+            return res.status(500).json({
+                msg:`Can not set mark into this task with error: ${new Error(err.message)}`
+            })
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not create bonus penalty remark with error: ${new Error(err.message)}`
+        })
+    })
+
+    
+
+
+})
+
 router.put('/submit', authenticateDCToken, (req, res) => {
     let { taskId } = req.body;
 
