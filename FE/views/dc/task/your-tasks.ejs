@@ -30,6 +30,7 @@
       <tr>
         <th scope="col"></th>
         <th scope="col">#</th>
+        <th scope="col"></th>
         <th scope="col">Customer</th>
         <th scope="col">Job</th>
         <th scope="col">Level</th>
@@ -253,12 +254,19 @@
 
               data.tasks.forEach(t => {
                 let tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '">';
-                if (t.dc_mark === 1) {
-                  tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '" style="background-color:#CEF6F5;">'
-                }
-                if (t.dc_mark === -1) {
-                  tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '" style="background-color:#F6E3CE;">'
-                }
+                  tr+= '<td>'+(idx++)+'</td>';
+                  tr+= '<td>';
+                    if(t.dc_mark === 1){
+                      tr+= '<span class="text-success"><i class="fa fa-trophy" aria-hidden="true"></i></span>'
+                      console.log(1);
+                    }
+
+                    if(t.dc_mark === -1){
+                      tr+= '<span class="text-danger"><i class="fa fa-credit-card" aria-hidden="true"></i></span>'
+                      console.log(1);
+                    }
+                    tr+='</td>'
+               
                 tr += '<td>';
                 tr += '<button class="btn btn-sm btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
                 tr += '</td>';
