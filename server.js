@@ -265,6 +265,9 @@ app.use('/tla/task',TLATaskController);
 const apiTLAAuth = require('./BE/API/TLA/api-auth');
 app.use('/tla/auth',apiTLAAuth);
 
+const apiTLABonusPenaltyTime = require('./BE/API/TLA/api-bonus-penalty-time');
+app.use('/tla/bonus-penalty-line',apiTLABonusPenaltyTime);
+
 const apiTLAComboLine = require('./BE/API/TLA/api-tla-combo-line');
 app.use('/tla/combo-line',apiTLAComboLine);
 
