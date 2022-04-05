@@ -26,6 +26,7 @@ router.get('/list', authenticateTLAToken, (req, res) => {
         .populate('dc', 'fullname -_id')
         .populate('created_by', 'fullname -_id')
         .populate('updated_by', 'fullname -_id')
+        .populate('uploaded_by', 'fullname -_id')
         .populate({
             path: 'remarks',
             options: {
