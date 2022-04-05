@@ -12,11 +12,14 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <label class="radio-inline"><input type="radio" name="optradio" checked
-                                        id="rbtBonus">Bonus</label>
+                                        value="rbtBonus">Bonus</label>
                                 <label class="radio-inline"><input type="radio" name="optradio"
-                                        id="rbtPenalty">Penalty</label>
+                                        value="rbtPenalty">Penalty</label>
                             </div>
-                            <div class="col-md-7">
+                            <div class="col-md-3">
+                                <select id="slBPList" class="form-control"></select>
+                            </div>
+                            <div class="col-md-4">
                                 <input type="text" placeholder="Remark" id="txtBPRemark" class="form-control">
                             </div>
                             <div class="col-md-2">
@@ -37,6 +40,10 @@
 </div>
 
 <script>
+    $('input[type=radio][name=optradio]').change(function () {
+        console.log($(this).val());
+    });
+
     $('#btnSubmitBP').click(function () {
         let dc_mark = $('#rbtBonus').is(':checked') ? 1 : -1;
         let remark = $('#txtBPRemark').val();
