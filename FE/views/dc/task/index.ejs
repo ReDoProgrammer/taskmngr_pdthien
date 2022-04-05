@@ -29,7 +29,6 @@
     <thead class="thead-dark">
       <tr>
         <th scope="col">#</th>
-        <th scope="col"></th>
         <th scope="col">Customer</th>
         <th scope="col">Job</th>
         <th scope="col">Level</th>
@@ -136,16 +135,7 @@
                 }
               }
 
-              tr += '<td>' + (idx++) + '</td>';
-              tr += '<td>';
-              if (t.dc_mark === 1) {
-                tr += '<span class="text-success"><i class="fa fa-trophy" aria-hidden="true"></i></span>';
-              }
-
-              if (t.dc_mark === -1) {
-                tr += '<span class="text-danger"><i class="fa fa-credit-card" aria-hidden="true"></i></span>';
-              }
-              tr += '</td>'
+              tr += '<td>' + (idx++) + '</td>';             
 
               tr += '<td class="font-weight-bold text-primary">' + t.job.customer.firstname + ' ' + t.job.customer.lastname + '</td>';
               tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';

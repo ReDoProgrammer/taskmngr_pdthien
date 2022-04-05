@@ -30,7 +30,6 @@
       <tr>
         <th scope="col">#</th>
         <th scope="col"></th>
-        <th scope="col"></th>
         <th scope="col">Customer</th>
         <th scope="col">Job</th>
         <th scope="col">Level</th>
@@ -59,8 +58,6 @@
 <%-include('task_detail')%>
   <%-include('reject-modal')%>
     <%-include('bonus-or-penalty')%>
-
-
 
       <script src="/js/common.js"></script>
       <script>
@@ -174,9 +171,7 @@
                   break;
 
                 case 3: case 4: case 5: case 6:
-                  if (data.task.dc_mark === 0) {
-                    mn = '<li id="bonus-or-penalty-task"><a tabindex="-1" href="#"> <i class="fa fa-cog" aria-hidden="true"></i> Bonus or Penalty</a></li>';
-                  }
+                  mn += '<li id="bonus-or-penalty-task"><a tabindex="-1" href="#"> <i class="fa fa-cog" aria-hidden="true"></i> Bonus or Penalty</a></li>';
                   break;
 
                 default:
@@ -262,16 +257,6 @@
                 }
 
                 tr += '<td>' + (idx++) + '</td>';
-
-                tr += '<td>';
-                if (t.dc_mark === 1) {
-                  tr += '<span class="text-success"><i class="fa fa-trophy" aria-hidden="true"></i></span>';
-                }
-
-                if (t.dc_mark === -1) {
-                  tr += '<span class="text-danger"><i class="fa fa-credit-card" aria-hidden="true"></i></span>';
-                }
-                tr += '</td>';
 
                 tr += '<td>';
                 tr += '<button class="btn btn-sm btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
