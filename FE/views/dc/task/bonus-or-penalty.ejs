@@ -12,9 +12,9 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <label class="radio-inline"><input type="radio" name="optradio" checked
-                                        value="rbtBonus">Bonus</label>
+                                        value="bonus">Bonus</label>
                                 <label class="radio-inline"><input type="radio" name="optradio"
-                                        value="rbtPenalty">Penalty</label>
+                                        value="penalty">Penalty</label>
                             </div>
                             <div class="col-md-3">
                                 <select id="slBPList" class="form-control"></select>
@@ -40,10 +40,34 @@
 </div>
 
 <script>
+    var is_bonus = true;
+    $(document).ready(function(){
+        LoadBonusOrPenalty();
+    })
     $('input[type=radio][name=optradio]').change(function () {
-        console.log($(this).val());
-        
+        is_bonus = $(this).val() === 'bonus' ? true : false;
+        LoadBonusOrPenalty();
     });
+
+    function LoadBonusOrPenalty() {
+        $.ajax({
+            url: '/dc/bonus-penalty/list',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data:{is_bonus},
+            success:function(data){
+                $('#slBPList').empty();
+                data.bpList.forEach(bp=>{
+                    $('#slBPList').append('<option value="'+bp._id+'">'+bp.name+'</option>');
+                })
+            },
+            error: function (request, status, error) {
+                alert(request.responseJSON.msg)              
+            }
+        })
+    }
 
     $('#btnSubmitBP').click(function () {
         let dc_mark = $('#rbtBonus').is(':checked') ? 1 : -1;
