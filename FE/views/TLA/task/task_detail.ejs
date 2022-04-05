@@ -147,7 +147,7 @@
                 taskId
             },
             success: function (data) {
-
+                console.log(data.task);
                 $('#divNationalStyle').html(data.customer.nation.name)
                 $('#divColor').html(data.customer.color.name)
 
@@ -156,17 +156,17 @@
                 $('#divSize').html(data.customer.size.name)
                 $('#lblNoteStyle').text(data.customer.remark);
 
-                $('#lblJobName').text(data.task.job.name);
-                $('#lblLevelName').text(data.task.level.name);
-                $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.assigned_date));
-                if(!data.task.deadline){
-                    $('#lblDeadline').text(convertISODateToTimeFormat(data.task.deadline));
+                $('#lblJobName').text(data.task.basic.job.name);
+                $('#lblLevelName').text(data.task.basic.level.name);
+                $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.basic.deadline.begin));
+                if(!data.task.basic.deadline.end){
+                    $('#lblDeadline').text(convertISODateToTimeFormat(data.task.basic.deadline.end));
                 }else{
                     $('#lblDeadline').text('');
                 }
                
-                $('#lblIntruction').text(data.task.job.intruction);
-                $('#lblRemark').text(data.task.remark);
+                $('#lblIntruction').text(data.task.basic.job.intruction);
+              
 
                 $('#remarks').empty();
                 data.task.remarks.forEach(r => {
@@ -179,16 +179,16 @@
                 })
 
 
-                if (isValidHttpUrl(data.task.input_link)) {
-                    $('#lblInputLink').html('<a href="' + data.task.input_link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                if (isValidHttpUrl(data.task.link.input)) {
+                    $('#lblInputLink').html('<a href="' + data.task.link.input + '" target="_blank" rel="noopener noreferrer">Link</a>')
                 } else {
-                    $('#lblInputLink').html('<span class="font-weight-bold font-italic">' + data.task.input_link + '</span>');
+                    $('#lblInputLink').html('<span class="font-weight-bold font-italic">' + data.task.link.input + '</span>');
                 }
-                if (typeof data.task.output_link !== 'undefined') {
-                    if (isValidHttpUrl(data.task.output_link)) {
-                        $('#lblOutputLink').html('<a href="' + data.task.output_link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                if (typeof data.task.link.output !== 'undefined') {
+                    if (isValidHttpUrl(data.task.link.output)) {
+                        $('#lblOutputLink').html('<a href="' + data.task.link.output + '" target="_blank" rel="noopener noreferrer">Link</a>')
                     } else {
-                        $('#lblOutputLink').html('<span class="font-weight-bold font-italic">' + data.task.output_link + '</span>');
+                        $('#lblOutputLink').html('<span class="font-weight-bold font-italic">' + data.task.link.output + '</span>');
                     }
                 }
 

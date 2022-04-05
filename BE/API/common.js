@@ -308,23 +308,42 @@ const getTaskDetail = (taskId) => {
     return new Promise((resolve, reject) => {
         Task
             .findById(taskId)
-            .populate('job')
-            .populate('level')
-            .populate({
-                path: 'remarks',
-                populate: {
-                    path: 'user'
+            .populate([
+                {
+                    path: 'basic.job',
+                    populate: {
+                        path: 'customer'
+                    }
                 },
-                options: {
-                    sort: { timestamp: -1 }
+                {
+                    path: 'basic.level',
+                    select: 'name'
+                },
+                {
+                    path: 'editor.staff',
+                    select: 'fullname'
+                },
+                {
+                    path: 'qa.staff',
+                    select: 'fullname'
+                },
+                {
+                    path: 'dc.staff',
+                    select: 'fullname'
+                },
+                {
+                    path: 'tla.created.by',
+                    select: 'fullname'
+                },
+                {
+                    path: 'remarks',
+                    populate: {
+                        path: 'user',
+                        select: 'fullname',
+                        options: { sort: { 'timestamp': -1 } }
+                    }
                 }
-            })
-            .populate({
-                path: 'bp',
-                options: {
-                    sort: { _id: -1 }
-                }
-            })
+            ])
             .exec()
             .then(t => {
                 if (!t) {
