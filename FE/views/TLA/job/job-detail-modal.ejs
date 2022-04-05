@@ -59,13 +59,13 @@
     $("#JobDetailModal").on('shown.bs.modal', function (e) {
         LoadTasksList();
         LoadCustomer();
-       LoadJob();
+        LoadJob();
 
-       $('.job-info').hide();      
+        $('.job-info').hide();
 
     })
 
-    
+
 
     function LoadCustomer() {
         $.ajax({
@@ -138,7 +138,13 @@
                     tr += '<td>' + (idx++) + '</td>';
                     tr += '<td class="text-warning font-weight-bold">' + t.level.name + '</td>';
                     tr += '<td>' + convertISODateToTimeFormat(t.assigned_date) + '</td>';
-                    tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>';
+
+                    tr += '<td>';                   
+                    if (typeof t.deadline !== 'undefined') {
+                        tr += convertISODateToTimeFormat(t.deadline);
+                    }
+                    tr += '</td>';
+
 
                     tr += '<td>';
                     if (typeof t.remarks[0] !== 'undefined') {

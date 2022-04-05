@@ -254,19 +254,19 @@
 
               data.tasks.forEach(t => {
                 let tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '">';
-                  tr+= '<td>'+(idx++)+'</td>';
-                  tr+= '<td>';
-                    if(t.dc_mark === 1){
-                      tr+= '<span class="text-success"><i class="fa fa-trophy" aria-hidden="true"></i></span>'
-                      console.log(1);
-                    }
+                tr += '<td>' + (idx++) + '</td>';
+                tr += '<td>';
+                if (t.dc_mark === 1) {
+                  tr += '<span class="text-success"><i class="fa fa-trophy" aria-hidden="true"></i></span>'
+                  console.log(1);
+                }
 
-                    if(t.dc_mark === -1){
-                      tr+= '<span class="text-danger"><i class="fa fa-credit-card" aria-hidden="true"></i></span>'
-                      console.log(1);
-                    }
-                    tr+='</td>'
-               
+                if (t.dc_mark === -1) {
+                  tr += '<span class="text-danger"><i class="fa fa-credit-card" aria-hidden="true"></i></span>'
+                  console.log(1);
+                }
+                tr += '</td>'
+
                 tr += '<td>';
                 tr += '<button class="btn btn-sm btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
                 tr += '</td>';
@@ -274,7 +274,11 @@
                 tr += '<td class="font-weight-bold text-success">' + t.job.customer.firstname + ' ' + t.job.customer.lastname + '</td>';
                 tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
                 tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
-                tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>'
+                tr += '<td class="text-danger">';
+                if (t.deadline) {
+                  tr += convertISODateToTimeFormat(t.deadline);
+                }
+                tr += '</td>';
 
                 tr += '<td>';
                 if (typeof t.remarks[0] !== 'undefined') {

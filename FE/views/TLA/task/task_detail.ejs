@@ -159,7 +159,12 @@
                 $('#lblJobName').text(data.task.job.name);
                 $('#lblLevelName').text(data.task.level.name);
                 $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.assigned_date));
-                $('#lblDeadline').text(convertISODateToTimeFormat(data.task.deadline));
+                if(!data.task.deadline){
+                    $('#lblDeadline').text(convertISODateToTimeFormat(data.task.deadline));
+                }else{
+                    $('#lblDeadline').text('');
+                }
+               
                 $('#lblIntruction').text(data.task.job.intruction);
                 $('#lblRemark').text(data.task.remark);
 

@@ -127,7 +127,11 @@
               tr += '<td class="font-weight-bold text-primary">' + t.job.customer.firstname + ' ' + t.job.customer.lastname + '</td>';
               tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
               tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
-              tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>'
+              tr += '<td class="text-danger">';
+                if (t.deadline) {
+                  tr += convertISODateToTimeFormat(t.deadline);
+                }
+                tr += '</td>';
 
 
               tr += '<td>';

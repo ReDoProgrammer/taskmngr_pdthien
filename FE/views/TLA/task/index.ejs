@@ -304,7 +304,11 @@
                                         tr += '<td class="text-primary font-weight-bold">' + t.job.name + '</td>';
                                         tr += '<td class="text-warning font-weight-bold">' + t.level.name + '</td>';
                                         tr += '<td>' + convertISODateToTimeFormat(t.job.received_date) + '</td>';
-                                        tr += '<td>' + convertISODateToTimeFormat(t.job.delivery_date) + '</td>';
+                                        tr += '<td class="text-danger">';
+                                        if (t.deadline) {
+                                            tr += convertISODateToTimeFormat(t.deadline);
+                                        }
+                                        tr += '</td>';
 
 
 
