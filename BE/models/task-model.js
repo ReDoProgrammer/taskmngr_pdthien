@@ -12,130 +12,102 @@ const taskSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'job_level'
     },
-    level_price: {
+    price: {
         //lưu thông tin đơn giá của level để tính cho khách hàng
         type: Number,
         default: 0
     },
+    deadline: {
+        begin: {
+            type: Date,
+            default: new Date()
+        },
+        end: {
+            //ngày task cần hoàn thành
+            type: Date
 
-    qa: {
-        //lưu id của nhân viên Q.A
-        type: Schema.Types.ObjectId,
-        ref: 'user'
-    },
-    qa_wage: {
-        //lưu tiền công của Q.A
-        type: Number,
-        default: 0
-    },
-    qa_assigned: {
-        //true: task này đc TLA assign trực tiếp cho 1 nhân viên làm Q.A 
-        //
-        type: Boolean,
-        default: false
-    },
-    qa_assigner: {
-        //đánh dấu TLA nào gán Q.A cho task
-        type: Schema.Types.ObjectId,
-        ref: 'user'
-    },
-    qa_assigned_date: {
-        /*
-           Thuộc tính để đánh dấu 3 thao tác:
-           1: thời điểm Q.A được TLA assign
-           2: Thời điểm Q.A nhận task
-           3: Thời điểm Q.A hủy nhận task
-       */
-        type: Date,
-        default: new Date()
+        }
     },
 
 
-    qa_done: {
-        //ngày giờ Q.A submit task
-        type: Date
-    },
-
-
-
-    editor: {
-        //lưu id nhân viên làm Editor
-        type: Schema.Types.ObjectId,
-        ref: 'user'
-    },
-    editor_wage: {
-        //lưu tiền công của editor
-        type: Number,
-        default: 0
-    },
-    editor_assigned: {
-        //khi true <=> task này đc TLA assign trực tiếp cho 1 nhân viên làm Editor
-        //false: nhân viên Editor tự nhận task
-        type: Boolean,
-        default: false
-    },
-    editor_assigner: {
-        //đánh dấu TLA nào gán editor cho task
-        type: Schema.Types.ObjectId,
-        ref: 'user'
-    },
-    editor_assigned_date: {
-        //ngày editor đc TLA gán cho task
-        type: Date,
-        default: new Date()
-    },
-    editor_done: {
-        //ngày editor submit done task
-        type: Date
-    },
-
-    edited_time: {
-        //thuộc tính đánh dấu số lần edit
-
-        type: Number,
-        default: 0
-    },
-
-    remarks: [{
-        //phần ghi chú cho task/level
-        //cả tla, sale,admin,dc đều có thể can thiệp
-        type: Schema.Types.ObjectId,
-        ref: 'remark'
+    dc: [{
+        staff: {
+            //DC nào nhận và submit/reject task
+            type: Schema.Types.ObjectId,
+            ref: 'user'
+        },
+        got_at: {
+            //thời gian DC nhận task
+            type: Date
+        },
+        submited_at: {
+            //Thời gian DC submit task
+            type: Date
+        },
+        wage: {
+            //Tiền công của DC
+            type: Number
+        }
+    }],
+    qa: [{
+        staff: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
+        },
+        wage: {
+            type: Number,
+            default: 0
+        },
+        is_assigned: {
+            type: Boolean,
+            default: false
+        },
+        assigned_by: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
+        },
+        assigned_at: {
+            type: Date,
+            default: new Date()
+        },
+        submited_at: {
+            type: Date
+        }
     }],
 
+    editor: [{
+        staff: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
+        },
+        wage: {
+            type: Number,
+            default: 0
+        },
+        is_assigned: {
+            type: Boolean,
+            default: false
+        },
+        assigner: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
+        },
+        assigned_date: {
+            type: Date,
+            default: new Date()
+        },
+        done: [
+            {
+                type: Date
+            }
+        ],
+        times: {
+            //thuộc tính đánh dấu số lần edit
 
-    assigned_date: {
-        //ngày tạo task
-        type: Date,
-        default: new Date()
-    },
-    deadline: {
-        //ngày task cần hoàn thành
-        type: Date,
-        require: true
-    },
-
-
-
-
-    dc: {
-        //DC nào nhận và submit/reject task
-        type: Schema.Types.ObjectId,
-        ref: 'user'
-    },
-    dc_get: {
-        //thời gian DC nhận task
-        type: Date
-    },
-    dc_done: {
-        //Thời gian DC submit task
-        type: Date
-    },
-    dc_wage: {
-        //Tiền công của DC
-        type: Number
-    },
-
+            type: Number,
+            default: 0
+        }
+    }],
 
     status: {
         type: Number,
@@ -149,7 +121,7 @@ const taskSchema = new Schema({
               4: Upload
               5: Done
               6: Finish
- 
+     
               
               -1: khởi tạo
               -2: Q.A reject            
@@ -160,97 +132,123 @@ const taskSchema = new Schema({
 
     },
 
+    link: {
+        input: {
+            type: String,
+            require: true
+        },
+        output: {
+            //link thành phẩm sau khi editor đã hoàn thành task của mình và submit done
+            type: String,
+            require: true
+        },
+        upload: {
+            type: String,
+            default: ''
+        }
+    },
 
-    input_link: {
-        //link hình ảnh của task khi TLA giao việc cho editor,qa
-        type: String,
-        require: true
-    },
-    output_link: {
-        //link thành phẩm sau khi editor đã hoàn thành task của mình và submit done
-        type: String,
-        require: true
-    },
-    uploaded_link: {
-        type: String,
-        default: ''
-    },
     amount: {
         //số lượng file xuất ra của editor
         type: Number,
         default: 0
     },
-    canceled_reason: {
-        /*
-            field này dùng để đánh dấu nguyên nhân task bị cancel
-            -1: TLA gán sai
-            -2: Sale thiết lập sai
-            -3: Khách hàng hủy
-            -4: Lý do khác
 
-        */
-        type: Number
+    created: {
+        at: {
+            type: Date,
+            default: new Date()
+        },
+        by: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
+        }
     },
-
-    created_by: {
-        type: Schema.Types.ObjectId,
-        ref: 'user'
+    updated: {
+        at: {
+            type: Date,
+            default: new Date()
+        },
+        by: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
+        }
     },
-    created_at: {
-        type: Date,
-        default: new Date()
-    },
-    done_submited_by:{
-        type: Schema.Types.ObjectId,
-        ref: 'user'
-    },
-    done_submited_at:{
-        type:Date
-    },
-
-    finish_submited_by:{
-        type: Schema.Types.ObjectId,
-        ref: 'user'
-    },
-    finish_submited_at:{
-        type:Date
+    submited: {
+        at: {
+            type: Date,
+            default: new Date()
+        },
+        by: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
+        }
     },
 
-    rejected_by:[{
-        type: Schema.Types.ObjectId,
-        ref: 'user'
-    }],
-    rejected_at:{
-        type:Date
+    finished: {
+        at: {
+            type: Date,
+            default: new Date()
+        },
+        by: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
+        }
     },
-    updated_by: {
-        type: Schema.Types.ObjectId,
-        ref: 'user'
+    uploaded: {
+        at: {
+            type: Date,
+            default: new Date()
+        },
+        by: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
+        }
     },
-    updated_at: {
-        type: Date,
-        default: new Date()
+    rejected: {
+        at: {
+            type: Date,
+            default: new Date()
+        },
+        by: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
+        }
     },
-    uploaded_at: {
-        type: Date
+
+    canceled: {
+        reason: {
+            /*
+           field này dùng để đánh dấu nguyên nhân task bị cancel
+           -1: TLA gán sai
+           -2: Sale thiết lập sai
+           -3: Khách hàng hủy
+           -4: Lý do khác
+    
+       */
+            type: Number
+        },
+        at: {
+            type: Date,
+            default: new Date()
+        },
+        by: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
+        }
     },
-    uploaded_by: {
-        type: Schema.Types.ObjectId,
-        ref: 'user'
-    },
-    canceled_by: {
-        type: Schema.Types.ObjectId,
-        ref: 'user'
-    },
-    canceled_at: {
-        type: Date,
-        default: new Date()
-    },
-    bp:[{
+
+    bp: [{
         // lưu lý do thưởng/phạt
         //vì cùng 1 task có thể vừa thưởng, vừa phạt nên cần lưu trữ dạng mảng
-        type:Schema.Types.ObjectId,
-        ref:'bonus-penalty'
+        type: Schema.Types.ObjectId,
+        ref: 'bonus-penalty'
+    }],
+    remarks: [{
+        //phần ghi chú cho task/level
+        //cả tla, sale,admin,dc đều có thể can thiệp
+        type: Schema.Types.ObjectId,
+        ref: 'remark'
     }]
 
 });
