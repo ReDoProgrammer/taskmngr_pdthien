@@ -47,11 +47,6 @@ const taskSchema = new Schema({
     },
 
 
-
-
-
-
-
     dc: [{
         staff: {
             //DC nào nhận và submit/reject task
@@ -109,15 +104,21 @@ const taskSchema = new Schema({
             type: Date
         },
         submited: [{
-            timestamp: {
+            at: {
                 type: Date
             },
             times: {
                 //thuộc tính đánh dấu số lần edit    
                 type: Number,
                 default: 0
+            },
+            amount: {
+                //số lượng file xuất ra của editor
+                type: Number,
+                default: 0
             }
         }],
+       
 
     }],
 
@@ -145,11 +146,7 @@ const taskSchema = new Schema({
     },
   
 
-    amount: {
-        //số lượng file xuất ra của editor
-        type: Number,
-        default: 0
-    },
+   
     tla: {
         created: {
             at: {

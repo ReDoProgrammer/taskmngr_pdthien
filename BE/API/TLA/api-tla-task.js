@@ -66,24 +66,41 @@ router.get('/all', authenticateTLAToken, (req, res) => {
                     // ]
                 }
             )
-            .populate('level')
-            .populate('job')
-            .populate('qa', 'fullname -_id')
-            .populate('editor', 'fullname -_id')
-            .populate({
-                path: 'remarks',
-                options: {
-                    sort: { _id: -1 }
+            .populate([
+                {
+                    path : 'basic.job',
+                    populate : {
+                      path : 'customer'
+                    }
+                  },
+                {
+                    path: 'basic.level',
+                    select: 'name'
+                },
+                {
+                    path: 'editor.staff',
+                    select: 'fullname'
+                },
+                {
+                    path: 'qa.staff',
+                    select: 'fullname'
+                },
+                {
+                    path: 'dc.staff',
+                    select: 'fullname'
+                },
+                {
+                    path: 'tla.created.by',
+                    select: 'fullname'
+                },
+                {
+                    path: 'remarks',
+                    select: 'content'
                 }
-            })
-            .populate({
-                path: 'bp',
-                options: {
-                    sort: { timestamp: -1 }
-                }
-            })
+            ])
+
             .exec()
-            .then(tasks => {
+            .then(tasks => {              
                 return res.status(200).json({
                     msg: 'Load tasks list successfully!',
                     tasks
@@ -276,11 +293,9 @@ router.post('/', authenticateTLAToken, (req, res) => {
 
             getCustomerIdFromJob(job)
                 .then(async result => {
-                    
-                    console.log(result)
-                     await getCustomerLevelPrice(result.customerId, level)
-                     .then(async result => {
-                        
+                    await getCustomerLevelPrice(result.customerId, level)
+                        .then(async result => {
+
                             if (result.cl.price == 0) {
                                 return res.status(403).json({
                                     msg: `Customer level price unit not available!`
@@ -289,18 +304,18 @@ router.post('/', authenticateTLAToken, (req, res) => {
 
                             let task = new Task();
 
-                           
+
 
                             //THIẾT LẬP CÁC THÔNG TIN CƠ BẢN CỦA TASK
                             let bs = {
-                                job:job,
-                                levle:level,
-                                price:result.cl.price                                
+                                job: job,
+                                level: level,
+                                price: result.cl.price
                             };
 
                             //deadline
                             let dl = {};
-                            dl.begin = assigned_date;                           
+                            dl.begin = assigned_date;
                             if (deadline.length !== 0) {
                                 dl.end = deadline;
                             }
@@ -323,12 +338,12 @@ router.post('/', authenticateTLAToken, (req, res) => {
 
                             task.tla = tla;
 
-                           
 
-                          
-                           
 
-                           
+
+
+
+
 
 
                             // THÔNG TIN LIÊN QUAN TỚI GÁN EDITOR
@@ -339,11 +354,11 @@ router.post('/', authenticateTLAToken, (req, res) => {
                                             .then(async w => {
                                                 let ed = {
                                                     staff: editor,
-                                                    wage: w.wage,                                                  
+                                                    wage: w.wage,
                                                     assigned_by: req.user._id,
                                                     assigned_at: new Date()
                                                 };
-                                                
+
                                                 task.editor = ed;
 
                                             })
@@ -369,7 +384,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
                                             .then(async w => {
                                                 let q = {
                                                     staff: qa,
-                                                    wage: w.wage,                                                    
+                                                    wage: w.wage,
                                                     assigned_by: req.user._id,
                                                     assigned_at: new Date()
                                                 };
@@ -446,7 +461,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
                             return res.status(err.code).json({
                                 msg: err.msg
                             })
-                       })
+                        })
                 })
                 .catch(err => {
                     console.log(err);
