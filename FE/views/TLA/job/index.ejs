@@ -26,14 +26,14 @@
     <table class="table mt-1 table-striped bg-white text-dark text-nowrap">
         <thead class="thead-dark">
             <tr>
-                <th></th>
-                <th scope="col">#</th>
-                <th scope="col">Customer</th>
-                <th scope="col">Job name</th>
-                <th scope="col">Combo</th>
+                <th ></th>
+                <th scope="col" >#</th>
+                <th scope="col" >Customer</th>
+                <th scope="col" >Job name</th>
+                <th scope="col" >Combo</th>
                 <th scope="col">Received date</th>
                 <th scope="col">Delivery date</th>
-                <th scope="col">Status</th>
+                <th scope="col" colspan="2">Status</th>
             </tr>
         </thead>
         <tbody id="tblData">
@@ -85,7 +85,7 @@
                             '<th>Uploaded by</th>' +
                             '<th>Uploaded at</th>' +
                             '<th>I-Link</th>' +
-                            '<th>O-Link</th>' +
+                            '<th>U-Link</th>' +
                             '<th>Status</th>' +
                             '</tr>' +
                             '</thead>' +
@@ -106,56 +106,57 @@
                                 data.tasks.forEach(t => {
                                     newRow += '<tr>';
                                     newRow += '<td class="text-right">' + (idx++) + '</td>';
-                                    newRow += '<td class="font-weight-bold text-primary">' + t.level.name + '</td>';
+                                    newRow += '<td class="font-weight-bold text-primary">' + t.basic.level.name + '</td>';
                                     newRow += '<td>';
-                                    if (typeof t.editor !== 'undefined' && t.editor !== null) {
-                                        newRow += t.editor.fullname;
+                                    if (typeof t.editor !== 'undefined' && t.editor.length > 0) {
+                                        newRow += t.editor[0].staff.fullname;
                                     }
                                     newRow += '</td>';
 
                                     newRow += '<td class="text-center">';
-                                    if (typeof t.editor !== 'undefined' && t.editor !== null) {
-                                        newRow += t.amount;
+                                    console.log(t.editor);
+                                    if (typeof t.editor !== 'undefined' && t.editor.length > 0 && typeof t.editor[0].submited !== 'undefined' && t.editor[0].submited.length > 0) {
+                                        newRow += t.editor[0].submited.amount;
                                     }
                                     newRow += '</td>';
 
                                     newRow += '<td>';
-                                    if (typeof t.qa !== 'undefined' && t.qa !== null) {
-                                        newRow += t.qa.fullname;
+                                    if (typeof t.qa !== 'undefined' && t.qa.length > 0) {
+                                        newRow += t.qa[0].staff.fullname;
                                     }
                                     newRow += '</td>';
 
                                     newRow += '<td>';
-                                    if (typeof t.dc !== 'undefined' && t.dc !== null) {
-                                        newRow += t.dc.fullname;
+                                    if (typeof t.dc !== 'undefined' && t.dc.length > 0) {
+                                        newRow += t.dc[0].staff.fullname;
                                     }
                                     newRow += '</td>';
 
                                     newRow += '<td>';
-                                    if (typeof t.uploaded_by !== 'undefined' && t.uploaded_by !== null) {
-                                        newRow += t.uploaded_by.fullname;
+                                    if (typeof t.tla.uploaded.by !== 'undefined' && t.tla.uploaded.by !== null) {
+                                        newRow += t.tla.uploaded.by.fullname;
                                     }
                                     newRow += '</td>';
 
                                     newRow += '<td>';
-                                    if (typeof t.uploaded_by !== 'undefined' && t.uploaded_by !== null) {
-                                        newRow += convertISODateToTimeFormat(t.uploaded_at);
+                                    if (typeof t.tla.uploaded.at !== 'undefined' && t.tla.uploaded.at !== null) {
+                                        newRow += convertISODateToTimeFormat(t.tla.uploaded.at);
                                     }
                                     newRow += '</td>';
 
                                     newRow += '<td  class="text-center">';
-                                    if (isValidHttpUrl(t.input_link)) {
-                                        newRow += '<a href="' + t.input_link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                                    if (isValidHttpUrl(t.basic.link.input)) {
+                                        newRow += '<a href="' + t.basic.link.input + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
                                     } else {
-                                        newRow += t.input_link;
+                                        newRow += t.basic.link.input;
                                     }
                                     newRow += '</td>';
 
                                     newRow += '<td  class="text-center">';
-                                    if (isValidHttpUrl(t.uploaded_link)) {
-                                        newRow += '<a href="' + t.uploaded_link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                                    if (isValidHttpUrl(t.basic.link.upload)) {
+                                        newRow += '<a href="' + t.basic.link.upload + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
                                     } else {
-                                        newRow += t.uploaded_link
+                                        newRow += t.basic.link.upload
                                     }
                                     newRow += '</td>';
 
@@ -169,7 +170,7 @@
                                             break;
                                         case 1:
                                             {
-                                                if (t.edited_time > 1) {
+                                                if (t.editor.submited.times > 1) {
                                                     newRow += '<span class="text-primary">Fixed</span>';
                                                 } else {
                                                     newRow += '<span class="text-primary">Edited</span>';

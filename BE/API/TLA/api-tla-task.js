@@ -48,6 +48,10 @@ router.get('/list', authenticateTLAToken, (req, res) => {
                 select: 'fullname'
             },
             {
+                path: 'tla.uploaded.by',
+                select: 'fullname'
+            },
+            {
                 path: 'remarks',
                 options: { sort: { 'timestamp': -1 } }
             }
