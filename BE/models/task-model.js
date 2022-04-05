@@ -4,30 +4,52 @@ const Schema = mongoose.Schema;
 
 
 const taskSchema = new Schema({
-    job: {
-        type: Schema.Types.ObjectId,
-        ref: 'job'
-    },
-    level: {
-        type: Schema.Types.ObjectId,
-        ref: 'job_level'
-    },
-    price: {
-        //lưu thông tin đơn giá của level để tính cho khách hàng
-        type: Number,
-        default: 0
-    },
-    deadline: {
-        begin: {
-            type: Date,
-            default: new Date()
+    basic: {
+        job: {
+            type: Schema.Types.ObjectId,
+            ref: 'job'
         },
-        end: {
-            //ngày task cần hoàn thành
-            type: Date
+        level: {
+            type: Schema.Types.ObjectId,
+            ref: 'job_level'
+        },
+        price: {
+            //lưu thông tin đơn giá của level để tính cho khách hàng
+            type: Number,
+            default: 0
+        },
+        deadline: {
+            begin: {
+                type: Date,
+                default: new Date()
+            },
+            end: {
+                //ngày task cần hoàn thành
+                type: Date
 
+            }
+        },
+        link: {
+            input: {
+                type: String,
+                default: ''
+            },
+            output: {
+                //link thành phẩm sau khi editor đã hoàn thành task của mình và submit done
+                type: String,
+                default: ''
+            },
+            upload: {
+                type: String,
+                default: ''
+            }
         }
     },
+
+
+
+
+
 
 
     dc: [{
@@ -57,22 +79,17 @@ const taskSchema = new Schema({
         wage: {
             type: Number,
             default: 0
-        },
-        is_assigned: {
-            type: Boolean,
-            default: false
-        },
+        },       
         assigned_by: {
             type: Schema.Types.ObjectId,
             ref: 'user'
         },
         assigned_at: {
-            type: Date,
-            default: new Date()
-        },
-        submited_at: {
             type: Date
-        }
+        },
+        submited_at: [{
+            type: Date
+        }]
     }],
 
     editor: [{
@@ -83,30 +100,25 @@ const taskSchema = new Schema({
         wage: {
             type: Number,
             default: 0
-        },
-        is_assigned: {
-            type: Boolean,
-            default: false
-        },
-        assigner: {
+        },      
+        assigned_by: {
             type: Schema.Types.ObjectId,
             ref: 'user'
         },
-        assigned_date: {
-            type: Date,
-            default: new Date()
+        assigned_at: {
+            type: Date
         },
-        done: [
-            {
+        submited: [{
+            timestamp: {
                 type: Date
+            },
+            times: {
+                //thuộc tính đánh dấu số lần edit    
+                type: Number,
+                default: 0
             }
-        ],
-        times: {
-            //thuộc tính đánh dấu số lần edit
+        }],
 
-            type: Number,
-            default: 0
-        }
     }],
 
     status: {
@@ -131,90 +143,85 @@ const taskSchema = new Schema({
             */
 
     },
-
-    link: {
-        input: {
-            type: String,
-            require: true
-        },
-        output: {
-            //link thành phẩm sau khi editor đã hoàn thành task của mình và submit done
-            type: String,
-            require: true
-        },
-        upload: {
-            type: String,
-            default: ''
-        }
-    },
+  
 
     amount: {
         //số lượng file xuất ra của editor
         type: Number,
         default: 0
     },
+    tla: {
+        created: {
+            at: {
+                type: Date,
+                default: new Date()
+            },
+            by: {
+                type: Schema.Types.ObjectId,
+                ref: 'user'
+            }
+        },
+        updated: {
+            at: {
+                type: Date,
+                default: new Date()
+            },
+            by: {
+                type: Schema.Types.ObjectId,
+                ref: 'user'
+            }
+        },
+        submited: {
+            at: {
+                type: Date,
+                default: new Date()
+            },
+            by: {
+                type: Schema.Types.ObjectId,
+                ref: 'user'
+            }
+        },
 
-    created: {
-        at: {
-            type: Date,
-            default: new Date()
+        uploaded: {
+            at: {
+                type: Date,
+                default: new Date()
+            },
+            by: {
+                type: Schema.Types.ObjectId,
+                ref: 'user'
+            }
         },
-        by: {
-            type: Schema.Types.ObjectId,
-            ref: 'user'
-        }
-    },
-    updated: {
-        at: {
-            type: Date,
-            default: new Date()
-        },
-        by: {
-            type: Schema.Types.ObjectId,
-            ref: 'user'
-        }
-    },
-    submited: {
-        at: {
-            type: Date,
-            default: new Date()
-        },
-        by: {
-            type: Schema.Types.ObjectId,
-            ref: 'user'
-        }
+
     },
 
+    //thông tin liên quan tới kế toán
     finished: {
         at: {
-            type: Date,
-            default: new Date()
+            type: Date
         },
         by: {
             type: Schema.Types.ObjectId,
             ref: 'user'
-        }
-    },
-    uploaded: {
-        at: {
-            type: Date,
-            default: new Date()
         },
-        by: {
-            type: Schema.Types.ObjectId,
-            ref: 'user'
+        paid: {
+            type: Boolean,
+            default: false
         }
     },
-    rejected: {
-        at: {
-            type: Date,
-            default: new Date()
-        },
-        by: {
-            type: Schema.Types.ObjectId,
-            ref: 'user'
+
+    rejected: [
+        {
+            at: {
+                type: Date,
+                default: new Date()
+            },
+            by: {
+                type: Schema.Types.ObjectId,
+                ref: 'user'
+            }
         }
-    },
+    ],
 
     canceled: {
         reason: {
@@ -229,8 +236,7 @@ const taskSchema = new Schema({
             type: Number
         },
         at: {
-            type: Date,
-            default: new Date()
+            type: Date
         },
         by: {
             type: Schema.Types.ObjectId,

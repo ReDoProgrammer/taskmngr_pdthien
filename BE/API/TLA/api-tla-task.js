@@ -275,11 +275,12 @@ router.post('/', authenticateTLAToken, (req, res) => {
         .then(j => {
 
             getCustomerIdFromJob(job)
-                .then(result => {
-
-                    getCustomerLevelPrice(result.customerId, level)
-                        .then(async result => {
-
+                .then(async result => {
+                    
+                    console.log(result)
+                     await getCustomerLevelPrice(result.customerId, level)
+                     .then(async result => {
+                        
                             if (result.cl.price == 0) {
                                 return res.status(403).json({
                                     msg: `Customer level price unit not available!`
@@ -287,31 +288,64 @@ router.post('/', authenticateTLAToken, (req, res) => {
                             }
 
                             let task = new Task();
-                            task.created_by = req.user._id;
-                            task.job = job;
-                            task.level = level;
-                            task.level_price = result.cl.price;
-                            task.assigned_date = assigned_date;
 
+                           
 
+                            //THIẾT LẬP CÁC THÔNG TIN CƠ BẢN CỦA TASK
+                            let bs = {
+                                job:job,
+                                levle:level,
+                                price:result.cl.price                                
+                            };
+
+                            //deadline
+                            let dl = {};
+                            dl.begin = assigned_date;                           
                             if (deadline.length !== 0) {
-                                task.deadline = deadline;
+                                dl.end = deadline;
                             }
-                            task.input_link = input_link;
+                            bs.deadline = dl;
+
+                            let link = {};
+                            link.input = input_link;
+                            bs.link = link;
+
+                            task.basic = bs;
 
 
-                            //thiết lập các thông tin liên quan khi Editor đc gán
+
+                            //THÔNG TIN LIÊN QUAN TỚI TLA
+                            let tla = {};
+                            tla.created = {
+                                at: new Date(),
+                                by: req.user._id
+                            };
+
+                            task.tla = tla;
+
+                           
+
+                          
+                           
+
+                           
+
+
+                            // THÔNG TIN LIÊN QUAN TỚI GÁN EDITOR
                             if (editor_assigned == 'true') {
                                 await getModule(_EDITOR)
                                     .then(async m => {
                                         await getWage(editor, level, m._id)
                                             .then(async w => {
-                                                task.editor_assigned = true;
-                                                task.editor = editor;
-                                                task.status = 0;
-                                                task.editor_wage = w.wage;
-                                                task.editor_assigned_date = new Date();
-                                                task.editor_assigner = req.user._id;
+                                                let ed = {
+                                                    staff: editor,
+                                                    wage: w.wage,                                                  
+                                                    assigned_by: req.user._id,
+                                                    assigned_at: new Date()
+                                                };
+                                                
+                                                task.editor = ed;
+
                                             })
                                             .catch(err => {
                                                 return res.status(err.code).json({
@@ -327,17 +361,19 @@ router.post('/', authenticateTLAToken, (req, res) => {
 
                             }
 
-                            //thiết lập các thông tin khi Q.A được gán
+                            //THÔNG TIN LIÊN QUAN TỚI GÁN Q.A
                             if (qa_assigned == 'true') {
                                 await getModule(_QA)
                                     .then(async m => {
                                         await getWage(qa, level, m._id)
                                             .then(async w => {
-                                                task.qa_assigned = true;
-                                                task.qa = qa;
-                                                task.qa_wage = w.wage;
-                                                task.qa_assigned_date = new Date();
-                                                task.qa_assigner = req.user._id;
+                                                let q = {
+                                                    staff: qa,
+                                                    wage: w.wage,                                                    
+                                                    assigned_by: req.user._id,
+                                                    assigned_at: new Date()
+                                                };
+                                                task.qa = q;
                                             })
                                             .catch(err => {
                                                 return res.status(err.code).json({
@@ -390,6 +426,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
 
                                         })
                                         .catch(err => {
+                                            console.log(`Can not insert remark with error: ${new Error(err.message)}`);
                                             return res.status(500).json({
                                                 msg: `Can not insert remark with error: ${new Error(err.message)}`
                                             })
@@ -397,6 +434,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
 
                                 })
                                 .catch(err => {
+                                    console.log(`Can not create task with error: ${new Error(err.message)}`);
                                     return res.status(500).json({
                                         msg: `Can not create task with error: ${new Error(err.message)}`,
                                         error: new Error(err.message)
@@ -404,12 +442,14 @@ router.post('/', authenticateTLAToken, (req, res) => {
                                 })
                         })
                         .catch(err => {
+                            console.log(err);
                             return res.status(err.code).json({
                                 msg: err.msg
                             })
-                        })
+                       })
                 })
                 .catch(err => {
+                    console.log(err);
                     return res.status(err.code).json({
                         msg: err.msg
                     })

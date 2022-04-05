@@ -622,7 +622,7 @@
         },
         error: function (jqXHR, textStatus, errorThrown) {
           $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
-          $('#msgError').show().delay(3000).fadeOut();
+          $('#msgError').show().delay(10000).fadeOut();
         },
       })
     } else {
