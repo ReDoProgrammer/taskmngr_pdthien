@@ -421,22 +421,20 @@
       success: function (data) {
         let idx = 1;
         $("#tblTasks").empty();
+        console.log(data.tasks);
         data.tasks.forEach(t => {
-          let tr = '<tr id="' + t._id + '" data-level="' + t.level._id + '" data-editor="';
-          tr += t.editor;
-          tr += '" data-qa="';
-          tr += t.qa;
-          tr += '">';
+          
+          let tr = '<tr id="' + t._id + '">';
 
           tr += "<td>" + idx++ + "</td>";
 
 
-          tr += "<td class='font-weight-bold text-info'>" + t.level.name + "</td>";
-          tr += "<td>" + convertISODateToTimeFormat(t.assigned_date) + "</td>";
+          tr += "<td class='font-weight-bold text-info'>" + t.basic.level.name + "</td>";
+          tr += "<td>" + convertISODateToTimeFormat(t.basic.deadline.begin) + "</td>";
 
           tr += '<td>';
-          if (typeof t.deadline !== 'undefined') {
-            tr += convertISODateToTimeFormat(t.deadline);
+          if (typeof t.basic.deadline.end !== 'undefined') {
+            tr += convertISODateToTimeFormat(t.basic.deadline.end);
           }
           tr += '</td>';
 
@@ -448,21 +446,21 @@
 
 
           tr += '<td>';
-          if (typeof t.editor !== 'undefined' && t.editor !== null)
-            tr += t.editor.fullname;
+          if (typeof t.editor !== 'undefined' && t.editor.length >0)
+            tr += t.editor[0].staff.fullname;
           tr += "</td>";
 
           tr += '<td>';
-          if (typeof t.qa !== 'undefined' && t.qa !== null)
-            tr += t.qa.fullname;
+          if (typeof t.qa !== 'undefined' && t.qa.length > 0)
+            tr += t.qa[0].staff.fullname;
           tr += '</td>'
 
 
           tr += '<td>';
-          if (isValidHttpUrl(t.input_link)) {
-            tr += '<a href="' + t.input_link + '" target="_blank">Link</a>'
+          if (isValidHttpUrl(t.basic.link.input)) {
+            tr += '<a href="' + t.basic.link.input + '" target="_blank">Link</a>'
           } else {
-            tr += t.input_link
+            tr += t.basic.link.input
           }
 
           tr += '</td>';
@@ -473,7 +471,7 @@
 
             case 0: tr += '<span class="text-info">Processing</span>'; break;
             case 1: {
-              if (t.edited_time > 1) {
+              if (t.editor[0].submited.times > 1) {
                 tr += '<span class="text-primary">Fixed</span>';
               } else {
                 tr += '<span class="text-primary">Edited</span>';
