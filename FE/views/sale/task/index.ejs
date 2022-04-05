@@ -221,7 +221,13 @@
                             tr += '<td class="font-weight-bold text-primary">' + t.job.customer.firstname + ' ' + t.job.customer.lastname + '</td>';
                             tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
                             tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
-                            tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>'
+
+                            tr += '<td>';
+                            if (typeof t.deadline !== 'undefined') {
+                                tr += convertISODateToTimeFormat(t.deadline);
+                            }
+                            tr += '</td>';
+
 
 
                             tr += '<td>';
@@ -263,7 +269,7 @@
                             tr += '</td>';
 
                             tr += '<td>';
-                                if (typeof t.uploaded_by !== 'undefined' && t.uploaded_by !== null) {
+                            if (typeof t.uploaded_by !== 'undefined' && t.uploaded_by !== null) {
                                 tr += convertISODateToTimeFormat(t.uploaded_at);
                             }
                             tr += '</td>';

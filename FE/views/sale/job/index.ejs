@@ -204,6 +204,7 @@
             '<th class="text-right  ">#</th>' +
             '<th>Level</th>' +
             '<th>Editor</th>' +
+            '<th class="text-center">I-N</th>' +
             '<th>Q.A</th>' +
             '<th>DC</th>' +
             '<th>Uploaded by</th>' +
@@ -234,6 +235,12 @@
                 newRow += '<td>';
                 if (typeof t.editor !== 'undefined' && t.editor !== null) {
                   newRow += t.editor.fullname;
+                }
+                newRow += '</td>';
+
+                newRow += '<td class="text-center">';
+                if (typeof t.editor !== 'undefined' && t.editor !== null) {
+                  newRow += t.amount;
                 }
                 newRow += '</td>';
 
