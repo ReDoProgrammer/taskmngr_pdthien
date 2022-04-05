@@ -70,10 +70,20 @@
     }
 
     $('#btnSubmitBP').click(function () {
-        let dc_mark = $('#rbtBonus').is(':checked') ? 1 : -1;
+       
         let remark = $('#txtBPRemark').val();
+        
+        let bpId = $('#slBPList option:selected').val();
+
         if (remark.trim().length === 0) {
             $('#lblBPMessage').text('(!) Please input remark');
+            $('#lblBPMessage').show().delay(2000).fadeOut();
+            return;
+        }
+
+         
+        if(typeof bpId === 'undefined' || bpId === null){
+            $('#lblBPMessage').text('(!) Please contact your administrator to set bonus or penalty list first');
             $('#lblBPMessage').show().delay(2000).fadeOut();
             return;
         }
@@ -85,7 +95,7 @@
             },
             data: {
                 taskId,
-                dc_mark,
+                bpId:$('#slBPList option:selected').val(),
                 remark
             },
             success: function (data) {

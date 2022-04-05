@@ -7,7 +7,7 @@ const _MODULE = 'DC';
 
 
 router.put('/mark',authenticateDCToken,async (req,res)=>{
-    let {taskId,dc_mark,remark}=req.body;
+    let {taskId,bpId,remark}=req.body;
     let task = await Task.findById(taskId);
     if(!task){
         return res.status(404).json({
@@ -23,7 +23,7 @@ router.put('/mark',authenticateDCToken,async (req,res)=>{
      
     await rmk.save()
     .then(async r=>{
-        task.dc_mark = dc_mark;
+        task.bp.push(bpId);
         task.updated_at = new Date();
         task.updated_by = req.user._id;
         task.remarks.push(r);
@@ -254,8 +254,15 @@ router.get('/personal-tasks', authenticateDCToken, (req, res) => {
                     sort: { timestamp: -1}   
                 }
             })
+            .populate({
+                path:'bp',
+                options: {
+                    limit: 1,
+                    sort: { _id: -1}   
+                }
+            })
             .exec()
-            .then(tasks => {
+            .then(tasks => {               
                 return res.status(200).json({
                     msg: `Load tasks list successfully!`,
                     tasks
@@ -318,6 +325,13 @@ router.get('/list', authenticateDCToken, (req, res) => {
                 options: {
                     limit: 1,
                     sort: { timestamp: -1}   
+                }
+            })
+            .populate({
+                path:'bp',
+                options: {
+                    limit: 1,
+                    sort: { _id: -1}   
                 }
             })
             .exec()
