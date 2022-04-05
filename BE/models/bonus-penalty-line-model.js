@@ -12,11 +12,7 @@ const bonusPenaltyLineSchema = new Schema({
     task:{
         type: Schema.Types.ObjectId,
         ref:'task'
-    },
-    bpId:{// tham chiếu tới lí do thưởng/phạt
-        type: Schema.Types.ObjectId,
-        ref:'penalty'  
-    },
+    },   
     employees:[
         {
             fines: {

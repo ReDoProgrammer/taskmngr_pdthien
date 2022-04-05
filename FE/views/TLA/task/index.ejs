@@ -30,8 +30,9 @@
         <thead class="thead-dark">
             <tr>
 
-                <th scope="col"></th>
+
                 <th scope="col">#</th>
+                <th scope="col"></th>
                 <th scope="col"></th>
                 <th scope="col">Job</th>
                 <th scope="col">Level</th>
@@ -71,6 +72,7 @@
         <%-include('assign-qa-modal')%>
             <%-include('task_detail')%>
                 <%-include('cancel-task-modal')%>
+                <%-include('bonus-penalty-modal')%>
 
                     <script src="/js/bootstrap-select.min.js"></script>
                     <script src="/js/common.js"></script>
@@ -165,6 +167,9 @@
                                 case 'edit-task':
                                     $('#editTaskModal').modal();
                                     break;
+                                case 'bonus-penalty':
+                                    $('#modalBonusPenalty').modal();
+                                    break;
                             }
                         });
 
@@ -232,11 +237,21 @@
                                         case 3://DC submited
                                             mn = '';
                                             mn += '<li id="cancel-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Cancel</a></li>';
-                                            if (data.task.dc_mark !== 0) {
-                                                if (data.task.dc_mark === 1) {
-                                                    mn += '<li id="bonus-task"><a tabindex="-1" href="#"> <i class="fa fa-trophy text-warning" aria-hidden="true"></i> Bonus</a></li>';
+                                            if (data.task.bp !== null && data.task.bp.length > 0) {
+                                                if (data.task.bp[0].is_bonus) {
+                                                    mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-trophy text-warning" aria-hidden="true"></i> Bonus</a></li>';
                                                 } else {
-                                                    mn += '<li id="penalty-task"><a tabindex="-1" href="#"> <i class="fa fa-credit-card text-danger" aria-hidden="true"></i> Penalty</a></li>';
+                                                    mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-credit-card text-danger"  aria-hidden="true"></i> Penalty</a></li>';
+                                                }
+                                            }
+                                            $('#funcMenu').append(mn);
+                                            break;
+                                        case 4: case 5: case 6:
+                                            if (data.task.bp !== null && data.task.bp.length > 0) {
+                                                if (data.task.bp[0].is_bonus) {
+                                                    mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-trophy text-warning" aria-hidden="true"></i> Bonus</a></li>';
+                                                } else {
+                                                    mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-credit-card text-danger"  aria-hidden="true"></i> Penalty</a></li>';
                                                 }
                                             }
                                             $('#funcMenu').append(mn);
@@ -297,34 +312,30 @@
 
                                     data.tasks.forEach(t => {
                                         let tr = '<tr id="' + t._id + '" data-customer = "' + t.job.customer + '" data-level="' + t.level._id + '">';
+                                        if (t.bp !== null && t.bp.length > 0) {
+                                            if (t.bp[0].is_bonus) {
+                                                tr = '<tr id="' + t._id + '" data-customer = "' + t.job.customer + '" data-level="' + t.level._id + '" style="background-color: #A9F5F2">';
+                                            } else {
+                                                tr = '<tr id="' + t._id + '" data-customer = "' + t.job.customer + '" data-level="' + t.level._id + '" style="background-color: #F6E3CE">';
+                                            }
+                                        }
+                                        tr += '<td>' + (idx++) + '</td>';
 
                                         tr += '<td>';
-                                        if (t.dc_mark === 1) {
-                                            tr += '<span class="text-success"><i class="fa fa-trophy" aria-hidden="true"></i></span>'
-                                           
-                                        }
+                                        if (t.bp !== null && t.bp.length > 0) {
+                                            if (t.bp[0].is_bonus) {
+                                                tr += '<span class="text-success"><i class="fa fa-trophy" aria-hidden="true"></i></span>'
 
-                                        if (t.dc_mark === -1) {
-                                            tr += '<span class="text-danger"><i class="fa fa-credit-card" aria-hidden="true"></i></span>'                                           
+                                            } else {
+                                                tr += '<span class="text-danger"><i class="fa fa-credit-card" aria-hidden="true"></i></span>'
+                                            }
                                         }
                                         tr += '</td>'
+
                                         tr += '<td>';
                                         tr += '<button class="btn btn-xs btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
                                         tr += '</td>';
 
-                                        tr += '<td>' + (idx++) + '</td>';
-
-
-                                        tr += '<td>';
-
-                                        if (t.dc_mark === 1) {
-                                            tr += '<span class="text-success"><i class="fa fa-trophy" aria-hidden="true"></i></span>';
-                                        }
-
-                                        if (t.dc_mark === -1) {
-                                            tr += '<span class="text-danger"><i class="fa fa-credit-card" aria-hidden="true"></i></span>';
-                                        }
-                                        tr += '</td>';
 
 
                                         tr += '<td class="text-primary font-weight-bold">' + t.job.name + '</td>';

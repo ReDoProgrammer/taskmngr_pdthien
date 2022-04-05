@@ -22,10 +22,10 @@ const getJobLevelBasedOnConditons = (staffId, moduleName) => {
                     })
                     .exec()
                     .then(ws => {
-                        if(ws.length == 0){
+                        if (ws.length == 0) {
                             return reject({
-                                code:404,
-                                msg:`Can not get any job level that is suitable with you!`
+                                code: 404,
+                                msg: `Can not get any job level that is suitable with you!`
                             })
                         }
                         let levels = ws.map(x => {
@@ -212,8 +212,8 @@ const getModule = (_module) => {
 const getWage = (staffId, job_lv, moduleId) => {
     return new Promise((resolve, reject) => {
         getUser(staffId)
-            .then(async u => {   
-                  
+            .then(async u => {
+
                 await Wage
                     .findOne({
                         module: moduleId,
@@ -304,63 +304,69 @@ const getCustomer = (customerId) => {
 
 }
 
-const getTaskDetail = (taskId)=>{
-    return new Promise((resolve,reject)=>{
+const getTaskDetail = (taskId) => {
+    return new Promise((resolve, reject) => {
         Task
-        .findById(taskId)
-        .populate('job')
-        .populate('level')
-        .populate({
-            path : 'remarks',
-            populate : {
-              path : 'user'
-            },
-            options: {               
-                sort: { timestamp: -1}   
-            }
-          })
-        .exec()
-        .then(t=>{
-            if(!t){
-                return reject({
-                    code:404,
-                    msg:`Task not found!`
-                })
-            }
-            return resolve(t);
-        })
-        .catch(err=>{
-            return reject({
-                code:500,
-                msg:`Can not get task detail with error: ${new Error(err.message)}`
+            .findById(taskId)
+            .populate('job')
+            .populate('level')
+            .populate({
+                path: 'remarks',
+                populate: {
+                    path: 'user'
+                },
+                options: {
+                    sort: { timestamp: -1 }
+                }
             })
-        })
+            .populate({
+                path: 'bp',
+                options: {
+                    sort: { _id: -1 }
+                }
+            })
+            .exec()
+            .then(t => {
+                if (!t) {
+                    return reject({
+                        code: 404,
+                        msg: `Task not found!`
+                    })
+                }
+                return resolve(t);
+            })
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not get task detail with error: ${new Error(err.message)}`
+                })
+            })
 
     })
 }
 
-const setJobStatus = (jobId,status, staff)=>{
-    return new Promise((resolve,reject)=>{
+const setJobStatus = (jobId, status, staff) => {
+    return new Promise((resolve, reject) => {
         Job
-        .findByIdAndUpdate(jobId,{
-            status
-        },{new:true},(err,job)=>{
-            if(err){
-               return reject({
-                   code:500,
-                   msg:`Can not set job status with erorr: ${new Error(err.message)}`
-               })
-            }
+            .findByIdAndUpdate(jobId, {
+                status
+            }, { new: true }, (err, job) => {
+                if (err) {
+                    return reject({
+                        code: 500,
+                        msg: `Can not set job status with erorr: ${new Error(err.message)}`
+                    })
+                }
 
-            if(!job){
-                return reject({
-                    code:404,
-                    msg:`Job not found so can not set status!`
-                })
-            }
+                if (!job) {
+                    return reject({
+                        code: 404,
+                        msg: `Job not found so can not set status!`
+                    })
+                }
 
-            return resolve(job);
-        })
+                return resolve(job);
+            })
     })
 }
 
@@ -368,7 +374,7 @@ const setJobStatus = (jobId,status, staff)=>{
 
 module.exports = {
     generateAccessToken,
-    assignOrTakeTask,  
+    assignOrTakeTask,
     getRole,
     getModule,
     getWage,

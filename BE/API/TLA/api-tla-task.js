@@ -33,6 +33,12 @@ router.get('/list', authenticateTLAToken, (req, res) => {
                 sort: { timestamp: -1 }
             }
         })
+        .populate({
+            path: 'bp',
+            options: {
+                sort: { _id: -1 }
+            }
+        })
         .exec()
         .then(tasks => {
             return res.status(200).json({
@@ -66,6 +72,12 @@ router.get('/all', authenticateTLAToken, (req, res) => {
             .populate('editor', 'fullname -_id')
             .populate({
                 path: 'remarks',
+                options: {
+                    sort: { _id: -1 }
+                }
+            })
+            .populate({
+                path: 'bp',
                 options: {
                     sort: { timestamp: -1 }
                 }
@@ -260,7 +272,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
     Job
         .findById(job)
         .exec()
-        .then(j => {          
+        .then(j => {
 
             getCustomerIdFromJob(job)
                 .then(result => {
@@ -281,8 +293,8 @@ router.post('/', authenticateTLAToken, (req, res) => {
                             task.level_price = result.cl.price;
                             task.assigned_date = assigned_date;
 
-                          
-                            if(deadline.length !== 0){
+
+                            if (deadline.length !== 0) {
                                 task.deadline = deadline;
                             }
                             task.input_link = input_link;
@@ -758,7 +770,7 @@ router.delete('/', authenticateTLAToken, (req, res) => {
                                 })
                             }
                             return res.status(200).json({
-                                msg:`The task has been deleted!`
+                                msg: `The task has been deleted!`
                             })
                         })
 
