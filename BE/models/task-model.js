@@ -246,14 +246,12 @@ const taskSchema = new Schema({
         type: Date,
         default: new Date()
     },
-    dc_mark:{
-        //cột này dùng để áp thuộc tính đánh dấu do DC set
-        //mặc định 0: không thưởng, k phạt
-        //-1: phạt
-        //1: thưởng
-        type:Number,
-        default:0
-    }
+    bp:[{
+        // lưu lý do thưởng/phạt
+        //vì cùng 1 task có thể vừa thưởng, vừa phạt nên cần lưu trữ dạng mảng
+        type:Schema.Types.ObjectId,
+        ref:'bonus-penalty'
+    }]
 
 });
 

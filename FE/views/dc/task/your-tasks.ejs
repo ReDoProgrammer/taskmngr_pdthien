@@ -28,8 +28,8 @@
   <table class="table table-striped text-nowrap">
     <thead class="thead-dark">
       <tr>
-        <th scope="col"></th>
         <th scope="col">#</th>
+        <th scope="col"></th>
         <th scope="col"></th>
         <th scope="col">Customer</th>
         <th scope="col">Job</th>
@@ -173,11 +173,10 @@
                   mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
                   break;
 
-                case 3:
+                case 3: case 4: case 5: case 6:
                   if (data.task.dc_mark === 0) {
                     mn = '<li id="bonus-or-penalty-task"><a tabindex="-1" href="#"> <i class="fa fa-cog" aria-hidden="true"></i> Bonus or Penalty</a></li>';
                   }
-
                   break;
 
                 default:
@@ -254,27 +253,39 @@
 
               data.tasks.forEach(t => {
                 let tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '">';
-                  tr+= '<td>'+(idx++)+'</td>';
-                  tr+= '<td>';
-                    if(t.dc_mark === 1){
-                      tr+= '<span class="text-success"><i class="fa fa-trophy" aria-hidden="true"></i></span>'
-                      console.log(1);
-                    }
+                if (typeof t.bp !== 'undefined' && t.bp !== null && t.bp.length > 0) {
+                  if (t.bp[0].is_bonus) {
+                    tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '" style="background-color: #E0F8E0">';
+                  } else {
+                    tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '" style="background-color:#FBEFEF">';
+                  }
+                }
 
-                    if(t.dc_mark === -1){
-                      tr+= '<span class="text-danger"><i class="fa fa-credit-card" aria-hidden="true"></i></span>'
-                      console.log(1);
-                    }
-                    tr+='</td>'
-               
+                tr += '<td>' + (idx++) + '</td>';
+
+                tr += '<td>';
+                if (t.dc_mark === 1) {
+                  tr += '<span class="text-success"><i class="fa fa-trophy" aria-hidden="true"></i></span>';
+                }
+
+                if (t.dc_mark === -1) {
+                  tr += '<span class="text-danger"><i class="fa fa-credit-card" aria-hidden="true"></i></span>';
+                }
+                tr += '</td>';
+
                 tr += '<td>';
                 tr += '<button class="btn btn-sm btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
                 tr += '</td>';
-                tr += '<td>' + (idx++) + '</td>';
+
                 tr += '<td class="font-weight-bold text-success">' + t.job.customer.firstname + ' ' + t.job.customer.lastname + '</td>';
+
                 tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
                 tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
-                tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>'
+                tr += '<td class="text-danger">';
+                if (t.deadline) {
+                  tr += convertISODateToTimeFormat(t.deadline);
+                }
+                tr += '</td>';
 
                 tr += '<td>';
                 if (typeof t.remarks[0] !== 'undefined') {

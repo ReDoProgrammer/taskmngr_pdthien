@@ -12,11 +12,14 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <label class="radio-inline"><input type="radio" name="optradio" checked
-                                        id="rbtBonus">Bonus</label>
+                                        value="bonus">Bonus</label>
                                 <label class="radio-inline"><input type="radio" name="optradio"
-                                        id="rbtPenalty">Penalty</label>
+                                        value="penalty">Penalty</label>
                             </div>
-                            <div class="col-md-7">
+                            <div class="col-md-3">
+                                <select id="slBPList" class="form-control"></select>
+                            </div>
+                            <div class="col-md-4">
                                 <input type="text" placeholder="Remark" id="txtBPRemark" class="form-control">
                             </div>
                             <div class="col-md-2">
@@ -37,11 +40,50 @@
 </div>
 
 <script>
+    var is_bonus = true;
+    $(document).ready(function(){
+        LoadBonusOrPenalty();
+    })
+    $('input[type=radio][name=optradio]').change(function () {
+        is_bonus = $(this).val() === 'bonus' ? true : false;
+        LoadBonusOrPenalty();
+    });
+
+    function LoadBonusOrPenalty() {
+        $.ajax({
+            url: '/dc/bonus-penalty/list',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data:{is_bonus},
+            success:function(data){
+                $('#slBPList').empty();
+                data.bpList.forEach(bp=>{
+                    $('#slBPList').append('<option value="'+bp._id+'">'+bp.name+'</option>');
+                })
+            },
+            error: function (request, status, error) {
+                alert(request.responseJSON.msg)              
+            }
+        })
+    }
+
     $('#btnSubmitBP').click(function () {
-        let dc_mark = $('#rbtBonus').is(':checked') ? 1 : -1;
+       
         let remark = $('#txtBPRemark').val();
+        
+        let bpId = $('#slBPList option:selected').val();
+
         if (remark.trim().length === 0) {
             $('#lblBPMessage').text('(!) Please input remark');
+            $('#lblBPMessage').show().delay(2000).fadeOut();
+            return;
+        }
+
+         
+        if(typeof bpId === 'undefined' || bpId === null){
+            $('#lblBPMessage').text('(!) Please contact your administrator to set bonus or penalty list first');
             $('#lblBPMessage').show().delay(2000).fadeOut();
             return;
         }
@@ -53,7 +95,7 @@
             },
             data: {
                 taskId,
-                dc_mark,
+                bpId:$('#slBPList option:selected').val(),
                 remark
             },
             success: function (data) {

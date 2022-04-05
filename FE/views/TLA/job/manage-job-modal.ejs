@@ -434,12 +434,12 @@
           tr += "<td class='font-weight-bold text-info'>" + t.level.name + "</td>";
           tr += "<td>" + convertISODateToTimeFormat(t.assigned_date) + "</td>";
 
-          tr += "<td>";
+          tr += '<td>';
           if (typeof t.deadline !== 'undefined') {
             tr += convertISODateToTimeFormat(t.deadline);
           }
-          tr += "</td>";
-          
+          tr += '</td>';
+
           tr += '<td>';
           if (typeof t.remarks[0] !== 'undefined') {
             tr += t.remarks[0].content;
