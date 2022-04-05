@@ -23,6 +23,7 @@ router.get('/list', authenticateTLAToken, (req, res) => {
         .populate('level', 'name')
         .populate('qa', 'fullname -_id')
         .populate('editor', 'fullname -_id')
+        .populate('dc', 'fullname -_id')
         .populate('created_by', 'fullname -_id')
         .populate('updated_by', 'fullname -_id')
         .populate({
@@ -258,13 +259,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
     Job
         .findById(job)
         .exec()
-        .then(j => {
-
-            // if (new Date(deadline) > j.delivery_date) {
-            //     return res.status(403).json({
-            //         msg: `Staff's deadline can not be later than job's deadline!`
-            //     })
-            // }
+        .then(j => {          
 
             getCustomerIdFromJob(job)
                 .then(result => {
