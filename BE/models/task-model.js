@@ -75,12 +75,13 @@ const taskSchema = new Schema({
             type: Number,
             default: 0
         },       
-        assigned_by: {
+        tla: {
             type: Schema.Types.ObjectId,
             ref: 'user'
         },
-        assigned_at: {
-            type: Date
+        timestamp:{
+            //thời điểm nhận or được gán
+            type:Date
         },
         submited_at: [{
             type: Date
@@ -92,17 +93,18 @@ const taskSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'user'
         },
+        timestamp:{
+            //thời điểm nhận or được gán
+            type:Date
+        },
         wage: {
             type: Number,
             default: 0
         },      
-        assigned_by: {
+        tla: {
             type: Schema.Types.ObjectId,
             ref: 'user'
-        },
-        assigned_at: {
-            type: Date
-        },
+        },        
         submited: [{
             at: {
                 type: Date

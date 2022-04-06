@@ -11,79 +11,101 @@ const { authenticateEditorToken } = require("../../../middlewares/editor-middlew
 const _MODULE = 'EDITOR';
 
 
-router.post('/change-amount',authenticateEditorToken,(req,res)=>{
-    let {amount,taskId} = req.body;
+router.post('/change-amount', authenticateEditorToken, (req, res) => {
+    let { amount, taskId } = req.body;
     Task
-    .findByIdAndUpdate(taskId,
-        {amount},{new:true},(err,task)=>{
-            if(err){
-                return res.status(500).json({
-                    msg:`Can not change amount of image with error: ${new Error(err.message)}`
-                })
-            }
+        .findByIdAndUpdate(taskId,
+            { amount }, { new: true }, (err, task) => {
+                if (err) {
+                    return res.status(500).json({
+                        msg: `Can not change amount of image with error: ${new Error(err.message)}`
+                    })
+                }
 
-            if(!task){
-                return res.status(404).json({
-                    msg:`Task not found!`
-                })
-            }
+                if (!task) {
+                    return res.status(404).json({
+                        msg: `Task not found!`
+                    })
+                }
 
+                return res.status(200).json({
+                    msg: `Change number of image successfully!`,
+                    task
+                })
+            })
+})
+
+router.get('/statistic', authenticateEditorToken, (req, res) => {
+    Task
+        .find({ editor: req.user._id })
+        .exec()
+        .then(tasks => {
+            var total = tasks.length;
+            var rejected = (tasks.filter(x => x.status <= -2 && x.status >= -4)).length;
+            var canceled = (tasks.filter(x => x.status === -5)).length;
+            var done = (tasks.filter(x => x.status >= 5)).length;
+            var edited = (tasks.filter(x => x.status >= 1 && x.status < 5 && x.edited_time === 1)).length;
+            var fixed = (tasks.filter(x => x.edited_time > 1)).length;
+            var processing = (tasks.filter(x => x.status === 0)).length;
             return res.status(200).json({
-                msg:`Change number of image successfully!`,
-                task
+                msg: `Get tasks statistic successfully!`,
+                total,
+                rejected,
+                canceled,
+                done,
+                edited,
+                fixed,
+                processing
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not get tasks statistic with error: ${new Error(err.message)}`
             })
         })
 })
 
-router.get('/statistic',authenticateEditorToken,(req,res)=>{
-    Task
-    .find({editor:req.user._id})
-    .exec()
-    .then(tasks=>{
-       var total = tasks.length;
-        var rejected = (tasks.filter(x=>x.status <= -2 && x.status >= -4 )).length;
-        var canceled = (tasks.filter(x=>x.status === -5)).length;
-        var done = (tasks.filter(x=>x.status >= 5)).length;
-        var edited = (tasks.filter(x=>x.status >= 1 && x.status<5 && x.edited_time===1)).length;
-        var fixed = (tasks.filter(x=>x.edited_time >1)).length;
-        var processing = (tasks.filter(x=>x.status === 0)).length;
-        return res.status(200).json({
-            msg:`Get tasks statistic successfully!`,
-            total,
-            rejected,
-            canceled,
-            done,
-            edited,
-            fixed,
-            processing
-        })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not get tasks statistic with error: ${new Error(err.message)}`
-        })
-    })
-})
-
 router.get('/', authenticateEditorToken, (req, res) => {
-    let { page, search,status } = req.query;
+    let { page, search, status } = req.query;
     Task
-        .find({ editor: req.user._id })//chỉ load những task đã được TLA gán hoặc editor đã nhận được
+        .find({ 'editor.staff': req.user._id })//chỉ load những task đã được TLA gán hoặc editor đã nhận được
         .populate('level', 'name -_id')
-        .populate({
-            path: 'job',
-            populate: {
-                path: 'customer'
+        .populate([
+            {
+                path: 'basic.job',
+                populate: {
+                    path: 'customer'
+                }
+            },
+            {
+                path: 'basic.level',
+                select: 'name'
+            },
+            {
+                path: 'editor.staff',
+                select: 'fullname'
+            },
+            {
+                path: 'qa.staff',
+                select: 'fullname'
+            },
+            {
+                path: 'dc.staff',
+                select: 'fullname'
+            },
+            {
+                path: 'tla.created.by',
+                select: 'fullname'
+            },
+            {
+                path: 'tla.uploaded.by',
+                select: 'fullname'
+            },
+            {
+                path: 'remarks',
+                options: { sort: { 'timestamp': -1 } }
             }
-        })
-        .populate('qa')
-        .populate({
-            path:'remarks',
-            options: {
-                limit: 1,
-                sort: { timestamp: -1}   
-            }
-        })
+        ])
         .sort({ deadline: -1 })//sắp xếp giảm dần theo deadline
         .sort({ status: 1 })//sắp xếp tăng dần theo trạng thái của task
         .exec()
@@ -129,42 +151,19 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
 })
 
 
-router.put('/submit', authenticateEditorToken, (req, res) => {
+router.put('/submit', authenticateEditorToken,async (req, res) => {
     let { taskId, output_link, amount } = req.body;
 
-    Task
-        .findById(taskId)
-        .exec()
-        .then(task => {
-            if (!task) {
-                return res.status(404).json({
-                    msg: `Task not found!`
-                })
-            }
-
-            Task
-                .findByIdAndUpdate(taskId, {
-                    output_link,
-                    status: 1,
-                    amount,
-                    edited_time: ++(task.edited_time)
-                }, { new: true }, (err, task) => {
-                    if (err) {
-                        return res.status(500).json({
-                            msg: `Can not find and update task by id with error: ${new Error(err.message)}`
-                        })
-                    }
-
-                    return res.status(200).json({
-                        msg: `The task has been submited!`
-                    })
-                })
+    let task = await Task.findById(taskId);
+    if(!task){
+        return res.status(404).json({
+            msg:`Task not found!`
         })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not get task by id with error: ${new Error(err.message)}`
-            })
-        })
+    }
+    // let ed = task.editor.find(x=>x.staff === req.user._id).sort((x,y)=>{
+    //     return x.
+    // });
+    
 
 })
 
@@ -190,7 +189,7 @@ router.put('/get-more', authenticateEditorToken, (req, res) => {
     Task
         .countDocuments({
             editor: req.user._id,
-            status: {$in:[0,-2,-3]}//task chưa submit hoặc bị reject bởi QA/DC
+            status: { $in: [0, -2, -3] }//task chưa submit hoặc bị reject bởi QA/DC
         }, (err, count) => {
             if (err) {
                 return res.status(500).json({
@@ -204,7 +203,7 @@ router.put('/get-more', authenticateEditorToken, (req, res) => {
             }
 
             getJobLevelBasedOnConditons(req.user._id, _MODULE)
-                .then(levels => {                    
+                .then(levels => {
                     Task
                         .findOne({
                             level: { $in: levels },

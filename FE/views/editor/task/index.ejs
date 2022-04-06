@@ -153,16 +153,28 @@
                 let tr = '<tr id="' + t._id + '">';
 
                 tr += '<td>' + (idx++) + '</td>';
-                tr += '<td class="font-weight-bold text-primary">' + t.job.customer.firstname + ' ' + t.job.customer.lastname + '</td>';
-                tr += '<td class="font-weight-bold">' + t.job.name + '</td>';
-                tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
+                tr += '<td class="font-weight-bold text-primary">' + t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname + '</td>';
+                tr += '<td class="font-weight-bold">' + t.basic.job.name + '</td>';
+                tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';
                 tr += '<td class="text-danger">';
-                if (t.deadline) {
-                  tr += convertISODateToTimeFormat(t.deadline);
+                if (t.basic.deadline.end) {
+                  tr += convertISODateToTimeFormat(t.basic.deadline.end);
                 }
                 tr += '</td>';
-                tr += '<td class="text-right">' + t.edited_time + '</td>';
-                tr += '<td class="text-right">' + t.amount + '</td>';
+
+                tr += '<td class="text-right">';
+                if (t.editor[0].submited !== null && t.editor[0].submited.length > 0) {
+                  tr += t.editor[0].submited[0].times;
+                }
+                tr += '</td>';
+
+                tr += '<td class="text-right">';
+                if (t.editor[0].submited !== null && t.editor[0].submited.length > 0) {
+                  tr += t.editor[0].submited[0].amout;
+                }
+                tr += '</td>';
+               
+              
 
 
 
@@ -175,7 +187,7 @@
                     break;
                   case 1:
                     {
-                      if (t.edited_time > 1) {
+                      if (t.editor.submited.times > 1) {
                         tr += '<span class="text-primary">Fixed</span>';
                       } else {
                         tr += '<span class="text-primary">Edited</span>';

@@ -372,8 +372,8 @@ router.post('/', authenticateTLAToken, (req, res) => {
                                                 let ed = {
                                                     staff: editor,
                                                     wage: w.wage,
-                                                    assigned_by: req.user._id,
-                                                    assigned_at: new Date()
+                                                    tla: req.user._id,
+                                                    timestamp: new Date()
                                                 };
 
                                                 task.editor = ed;
@@ -402,8 +402,8 @@ router.post('/', authenticateTLAToken, (req, res) => {
                                                 let q = {
                                                     staff: qa,
                                                     wage: w.wage,
-                                                    assigned_by: req.user._id,
-                                                    assigned_at: new Date()
+                                                    tla: req.user._id,
+                                                    timestamp: new Date()
                                                 };
                                                 task.qa = q;
                                             })
