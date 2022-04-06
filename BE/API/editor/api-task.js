@@ -160,9 +160,11 @@ router.put('/submit', authenticateEditorToken,async (req, res) => {
             msg:`Task not found!`
         })
     }
-    // let ed = task.editor.find(x=>x.staff === req.user._id).sort((x,y)=>{
-    //     return x.
-    // });
+    let ed = task.editor.filter(x=>{
+        return (x.staff === req.user._id);
+    });
+
+    console.log(`111111`,task.editor,ed,req.user._id);
     
 
 })
