@@ -7,15 +7,15 @@
             </div>
             <div class="modal-body panel-body">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-4 col-xs-4">
                         <label for="">
                             Số lượng ảnh:
                         </label>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4 col-xs-4">
                         <input type="number" name="" id="txtNumberOfImage" class="form-control text-right">
                     </div>
-                    <div class="col-md-4 text-right">
+                    <div class="col-md-4 col-xs-4 text-right">
                         <button class="btn btn-success" id="btnSumitChangeNumber"><i class="fa fa-save"></i> Xác
                             nhận</button>
                     </div>
@@ -38,9 +38,8 @@
             data: {
                 taskId
             },
-            success: function (data) {
-                console.log(data);
-                $('#txtNumberOfImage').val(data.task.amount);
+            success: function (data) {                
+                $('#txtNumberOfImage').val(data.task.editor[data.task.editor.length - 1].submited[(data.task.editor[data.task.editor.length - 1].submited.length - 1)].amount);
 
             }, error: function (request, status, error) {
                 alert(request.responseJSON.msg);

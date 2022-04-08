@@ -149,7 +149,6 @@
               $('#tbdTasks').empty();
               let idx = 1;
               data.tasks.forEach(t => {
-                console.log(t);
                 let tr = '<tr id="' + t._id + '">';
 
                 tr += '<td>' + (idx++) + '</td>';
@@ -164,18 +163,15 @@
 
                 tr += '<td class="text-right">';
                 if (t.editor[0].submited !== null && t.editor[0].submited.length > 0) {
-                  tr += t.editor[0].submited[0].times;
+                  tr += t.editor[0].submited.length;
                 }
                 tr += '</td>';
 
                 tr += '<td class="text-right">';
-                if (t.editor[0].submited !== null && t.editor[0].submited.length > 0) {
-                  tr += t.editor[0].submited[0].amout;
+                if (t.editor[0].submited !== null && t.editor[0].submited.length > 0 && t.editor[0].submited[(t.editor[0].submited.length - 1)].amount) {
+                  tr += t.editor[0].submited[(t.editor[0].submited.length - 1)].amount;
                 }
                 tr += '</td>';
-               
-              
-
 
 
                 tr += '<td><i>';
@@ -187,7 +183,7 @@
                     break;
                   case 1:
                     {
-                      if (t.editor.submited.times > 1) {
+                      if (t.editor[0].submited.length > 1) {
                         tr += '<span class="text-primary">Fixed</span>';
                       } else {
                         tr += '<span class="text-primary">Edited</span>';
@@ -220,9 +216,10 @@
                 tr += '</i></td>';
 
                 tr += '<td>';
-                if (typeof t.qa !== 'undefined' && t.qa !== null) {
-                  tr += t.qa.fullname
-                }
+                  if(typeof t.qa !=='undefined' && t.qa.length>0 && typeof t.qa[t.qa.length-1].staff !=='undefined' && t.qa[t.qa.length-1].staff !==null && t.qa[t.qa.length-1].staff.length > 0){
+                    tr+=  t.qa[t.qa.length-1].staff !==null && t.qa[t.qa.length-1].staff.fullname;
+                  }
+                 
                 tr += '</td>';
 
                 tr += '<td>';
