@@ -181,23 +181,42 @@ router.get('/list', authenticateQAToken, (req, res) => {
     if (status == 100) {
         Task
             .find({})
-            .populate({
-                path: 'job',
-                populate: {
-                    path: 'customer'
+            .populate([
+                {
+                    path: 'basic.job',
+                    populate: {
+                        path: 'customer'
+                    }
+                },
+                {
+                    path: 'basic.level',
+                    select: 'name'
+                },
+                {
+                    path: 'editor.staff',
+                    select: 'fullname'
+                },
+                {
+                    path: 'qa.staff',
+                    select: 'fullname'
+                },
+                {
+                    path: 'dc.staff',
+                    select: 'fullname'
+                },
+                {
+                    path: 'tla.created.by',
+                    select: 'fullname'
+                },
+                {
+                    path: 'tla.uploaded.by',
+                    select: 'fullname'
+                },
+                {
+                    path: 'remarks',
+                    options: { sort: { 'timestamp': -1 } }
                 }
-            })
-            .populate('level')
-            .populate('editor')
-            .populate('qa')
-            .populate('dc')
-            .populate({
-                path: 'remarks',
-                options: {
-                    limit: 1,
-                    sort: { timestamp: -1 }
-                }
-            })
+            ])
             .exec()
             .then(tasks => {
                 return res.status(200).json({
