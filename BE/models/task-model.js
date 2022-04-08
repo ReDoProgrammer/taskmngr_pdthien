@@ -33,12 +33,7 @@ const taskSchema = new Schema({
             input: {
                 type: String,
                 default: ''
-            },
-            output: {
-                //link thành phẩm sau khi editor đã hoàn thành task của mình và submit done
-                type: String,
-                default: ''
-            },
+            },           
             upload: {
                 type: String,
                 default: ''
@@ -108,16 +103,16 @@ const taskSchema = new Schema({
         submited: [{
             at: {
                 type: Date
-            },
-            times: {
-                //thuộc tính đánh dấu số lần edit    
-                type: Number,
-                default: 0
-            },
+            },           
             amount: {
                 //số lượng file xuất ra của editor
                 type: Number,
                 default: 0
+            },
+            link: {
+                //link thành phẩm sau khi editor đã hoàn thành task của mình và submit done
+                type: String,
+                default: ''
             }
         }],
        
