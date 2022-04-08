@@ -1,31 +1,21 @@
 <div class="modal" tabindex="-1" role="dialog" id="modalRejectTask">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Reject task</h4>
+            </div>
             <div class="modal-body">
-                <div class="panel panel-danger text-white bg-dark">
-                    <div class="panel-heading font-weight-bold"><i class="fa fa-info-circle" aria-hidden="true"></i>
-                        Reject task
-                    </div>
-                    <div class="panel-body">
-
-                        <div class="row">
-                            <div class="col-md-10 col-sm-10 col-xs-10">
-                                <input type="text" name="reason" id="txtRejectReason" class="form-control"
-                                    placeholder="Reject note">
-                            </div>
-
-                            <div class="col-md-2 col-sm-2 col-xs-2">
-                                <button class="btn btn-sm btn-warning" id="btnSubmitReject">
-                                    <i class="fa fa-close"></i> Submit
-                                </button>
-                            </div>
-                        </div>
+                <div class="row">
+                    <div class="col-md-10 col-sm-10 col-xs-10">
+                        <input type="text" name="reason" id="txtRejectReason" class="form-control"
+                            placeholder="Reject note">
                     </div>
 
-                    <div class="panel-footer">
-                        <div class="form-group text-right">
-                            <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
-                        </div>
+                    <div class="col-md-2 col-sm-2 col-xs-2">
+                        <button class="btn btn-sm btn-warning" id="btnSubmitReject">
+                            <i class="fa fa-close"></i> Submit
+                        </button>
                     </div>
                 </div>
             </div>
@@ -42,16 +32,16 @@
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
-            data:{
+            data: {
                 taskId,
                 remark
             },
-            success:function(data){
+            success: function (data) {
                 alert(data.msg);
                 $('#modalRejectTask').modal('hide');
             },
             error: function (request, status, error) {
-                alert(request.responseJSON.msg)              
+                alert(request.responseJSON.msg)
             }
         })
     })

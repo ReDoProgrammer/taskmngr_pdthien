@@ -135,7 +135,7 @@
                 }
               }
 
-              tr += '<td>' + (idx++) + '</td>';             
+              tr += '<td>' + (idx++) + '</td>';
 
               tr += '<td class="font-weight-bold text-primary">' + t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname + '</td>';
               tr += '<td class="font-weight-bold text-danger">' + t.basic.job.name + '</td>';
@@ -163,7 +163,7 @@
               if (t.editor[0].submited !== null && t.editor[0].submited.length > 0 && t.editor[0].submited[(t.editor[0].submited.length - 1)].amount) {
                 tr += t.editor[0].submited[(t.editor[0].submited.length - 1)].amount;
               }
-              tr+= '</td>'
+              tr += '</td>'
 
 
 
@@ -173,14 +173,14 @@
               }
               tr += '</td>';
 
-               tr += '<td>';
+              tr += '<td>';
               if (typeof t.qa !== 'undefined' && t.qa.length > 0 && typeof t.qa[t.qa.length - 1].staff !== 'undefined' && t.qa[t.qa.length - 1].staff !== null) {
                 tr += t.qa[t.qa.length - 1].staff.fullname;
               }
-              tr += '</td>';            
+              tr += '</td>';
 
               tr += '<td>';
-                if (typeof t.dc !== 'undefined' && t.dc.length > 0 && typeof t.dc[t.dc.length - 1].staff !== 'undefined' && t.dc[t.dc.length - 1].staff !== null) {
+              if (typeof t.dc !== 'undefined' && t.dc.length > 0 && typeof t.dc[t.dc.length - 1].staff !== 'undefined' && t.dc[t.dc.length - 1].staff !== null) {
                 tr += t.dc[t.dc.length - 1].staff.fullname;
               }
               tr += '</td>';
@@ -231,8 +231,8 @@
 
 
               if (
-                ((t.status === 1 && (typeof t.qa === 'undefined' || t.qa.length == 0)) 
-                || t.status === 2) && (typeof t.dc === 'undefined' || t.dc.length === 0)
+                ((t.status === 1 && (typeof t.qa === 'undefined' || t.qa.length == 0))
+                  || t.status === 2) && (typeof t.dc === 'undefined' || t.dc.length === 0)
               ) {
                 tr += '<button class="btn btn-xs btn-success ml-2" name="get-task"><i class="fa fa-plus" aria-hidden="true"></i></button>';
               }

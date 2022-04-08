@@ -59,6 +59,11 @@ const taskSchema = new Schema({
         wage: {
             //Tiền công của DC
             type: Number
+        },
+        unregisted:{
+            //lưu trạng thái task có bị DC hủy đăng ký hay không
+            type:Boolean,
+            default:false
         }
     }],
     qa: [{

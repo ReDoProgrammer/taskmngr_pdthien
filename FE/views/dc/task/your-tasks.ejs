@@ -147,13 +147,13 @@
             },
             success: function (data) {
               customerId = data.customer._id;
-              levelId = data.task.level._id;
+              levelId = data.task.basic.level._id;
 
               $('#funcMenu').empty();
               let mn = '';
               switch (data.task.status) {
                 case 1:
-                  if (typeof data.task.qa === 'undefined' || data.task.qa === null) {
+                  if (typeof data.task.qa === 'undefined' || data.task.qa.length ===0) {
                     mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Submit</a></li>';
                     mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
                     mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
@@ -247,12 +247,12 @@
               let idx = 1;
 
               data.tasks.forEach(t => {
-                let tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '">';
+                let tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '">';
                 if (typeof t.bp !== 'undefined' && t.bp !== null && t.bp.length > 0) {
                   if (t.bp[0].is_bonus) {
-                    tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '" style="background-color: #E0F8E0">';
+                    tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '" style="background-color: #E0F8E0">';
                   } else {
-                    tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '" style="background-color:#FBEFEF">';
+                    tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '" style="background-color:#FBEFEF">';
                   }
                 }
 
@@ -262,13 +262,13 @@
                 tr += '<button class="btn btn-sm btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
                 tr += '</td>';
 
-                tr += '<td class="font-weight-bold text-success">' + t.job.customer.firstname + ' ' + t.job.customer.lastname + '</td>';
+                tr += '<td class="font-weight-bold text-success">' + t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname + '</td>';
 
-                tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
-                tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
+                tr += '<td class="font-weight-bold text-danger">' + t.basic.job.name + '</td>';
+                tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';
                 tr += '<td class="text-danger">';
-                if (t.deadline) {
-                  tr += convertISODateToTimeFormat(t.deadline);
+                if (t.basic.deadline.end) {
+                  tr += convertISODateToTimeFormat(t.basic.deadline.end);
                 }
                 tr += '</td>';
 
@@ -279,24 +279,37 @@
                 tr += '</td>';
 
 
-                tr += '<td class="text-right">' + t.edited_time + '</td>';
-                tr += '<td class="text-right">' + t.amount + '</td>';
-
-
-
-                tr += '<td>';
-                if (typeof t.editor !== 'undefined' && t.editor !== null) {
-                  tr += t.editor.fullname
+                tr += '<td class="text-right">';
+                if (t.editor[0].submited !== null && t.editor[0].submited.length > 0) {
+                  tr += t.editor[0].submited.length;
                 }
                 tr += '</td>';
-                tr += '<td>';
-                if (typeof t.qa !== 'undefined' && t.qa !== null) {
-                  tr += t.qa.fullname
+
+
+                tr += '<td class="text-right">';
+                if (t.editor[0].submited !== null && t.editor[0].submited.length > 0 && t.editor[0].submited[(t.editor[0].submited.length - 1)].amount) {
+                  tr += t.editor[0].submited[(t.editor[0].submited.length - 1)].amount;
                 }
                 tr += '</td>';
+
+
                 tr += '<td>';
-                if (typeof t.dc !== 'undefined' && t.dc !== null) {
-                  tr += t.dc.fullname
+                if (typeof t.editor !== 'undefined' && t.editor.length > 0 && typeof t.editor[t.editor.length - 1].staff !== 'undefined' && t.editor[t.editor.length - 1].staff !== null) {
+                  tr += t.editor[t.editor.length - 1].staff.fullname;
+                }
+                tr += '</td>';
+
+
+                tr += '<td>';
+                if (typeof t.qa !== 'undefined' && t.qa.length > 0 && typeof t.qa[t.qa.length - 1].staff !== 'undefined' && t.qa[t.qa.length - 1].staff !== null) {
+                  tr += t.qa[t.qa.length - 1].staff.fullname;
+                }
+                tr += '</td>';
+
+console.log(t.dc[t.dc.length - 1].unregisted);
+                tr += '<td>';
+                if (typeof t.dc !== 'undefined' && t.dc.length > 0 && typeof t.dc[t.dc.length - 1].staff !== 'undefined' && t.dc[t.dc.length - 1].staff !== null && t.dc[t.dc.length - 1].unregisted === false) {
+                  tr += t.dc[t.dc.length - 1].staff.fullname;
                 }
                 tr += '</td>';
 
@@ -307,7 +320,7 @@
 
                   case 0: tr += '<span class="text-info">Processing</span>'; break;
                   case 1: {
-                    if (t.edited_time > 1) {
+                    if (t.editor[0].submited.length > 1) {
                       tr += '<span class="text-primary">Fixed</span>';
                     } else {
                       tr += '<span class="text-primary">Edited</span>';
@@ -327,8 +340,8 @@
                 tr += '<td class="text-right">';
 
                 if (
-                  ((t.status === 1 && (typeof t.qa === 'undefined' || t.qa === null)) || t.status === 2)
-                  && (typeof t.dc === 'undefined' || t.dc === null)
+                  ((t.status === 1 && (typeof t.qa === 'undefined' || t.qa.length == 0))
+                    || t.status === 2) && (typeof t.dc === 'undefined' || t.dc.length === 0)
                 ) {
                   tr += '<button class="btn btn-sm btn-success ml-2" name="get-task"><i class="fa fa-plus" aria-hidden="true"></i></button>';
                 }
