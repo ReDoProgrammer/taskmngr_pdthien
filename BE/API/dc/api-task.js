@@ -227,7 +227,10 @@ router.get('/personal-tasks', authenticateDCToken, (req, res) => {
                 },
                 {
                     path: 'dc.staff',
-                    select: 'fullname'
+                    select: 'fullname',
+                    match: {
+                        unregisted: false
+                    }
                 },
                 {
                     path: 'tla.created.by',
