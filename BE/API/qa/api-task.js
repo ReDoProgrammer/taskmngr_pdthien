@@ -108,26 +108,30 @@ router.put('/get-task', authenticateQAToken, (req, res) => {
         })
 })
 
-router.put('/submit', authenticateQAToken, (req, res) => {
+router.put('/submit', authenticateQAToken, async (req, res) => {
     let { taskId } = req.body;
 
-    Task
-        .findByIdAndUpdate(taskId, {
-            qa_done: new Date(),
-            status: 2
-        }, { new: true }, (err, task) => {
-            if (err) {
-                return res.status(500).json({
-                    msg: `Can not submit this task with error: ${new Error(err.message)}`
-                })
-            }
+    let task = await Task.findById(taskId);
+    if (!task) {
+        return res.status(404).json({
+            msg: `Task not found!`
+        })
+    }
 
+    task.qa[task.qa.length - 1].submited_at.push(new Date());
+    task.status = 2;
+
+    await task.save()
+        .then(t => {
             return res.status(200).json({
                 msg: `The task has been submited!`,
-                task
-            }
-
-            )
+                t
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not submit this task with error: ${new Error(err.message)}`
+            })
         })
 
 
@@ -135,43 +139,41 @@ router.put('/submit', authenticateQAToken, (req, res) => {
 
 })
 
-router.put('/reject', authenticateQAToken, (req, res) => {
+router.put('/reject', authenticateQAToken, async (req, res) => {
     let { taskId, remark } = req.body;
 
-    getTaskDetail(taskId)
-        .then(async task => {
-            let rm = new Remark({
-                user: req.user._id,
-                content: remark,
-                tid: task._id
-            });
-
-            await rm.save()
-                .then(async r => {
-                    task.remarks.push(r);
-                    task.status = -2;
-                    await task.save()
-                        .then(t => {
-                            return res.status(200).json({
-                                msg: `The task has been rejected!`
-                            })
-                        })
-                        .catch(err => {
-                            return res.status(500).json({
-                                msg: `Can not reject this task with error: ${new Error(err.message)}`
-                            })
-                        })
-
+    let task = await Task.findById(taskId);
+    if (!task) {
+        return res.status(404).json({
+            msg: `Task not found!`
+        })
+    }
+    let rm = new Remark({
+        user: req.user._id,
+        content: remark,
+        tid: task._id
+    });
+    
+    await rm.save()
+        .then(async r => {
+            task.remarks.push(r);
+            task.status = -2;
+            await task.save()
+                .then(t => {
+                    return res.status(200).json({
+                        msg: `The task has been rejected!`
+                    })
                 })
                 .catch(err => {
                     return res.status(500).json({
-                        msg: `Can not insert reject remark with error: ${new Error(err.message)}`
+                        msg: `Can not reject this task with error: ${new Error(err.message)}`
                     })
                 })
+
         })
         .catch(err => {
-            return res.status(err.code).json({
-                msg: err.msg
+            return res.status(500).json({
+                msg: `Can not insert reject remark with error: ${new Error(err.message)}`
             })
         })
 })
@@ -260,9 +262,10 @@ router.get('/list', authenticateQAToken, (req, res) => {
 
 router.get('/detail', authenticateQAToken, (req, res) => {
     let { taskId } = req.query;
+
     getTaskDetail(taskId)
         .then(async t => {
-            await getCustomer(t.job.customer)
+            await getCustomer(t.basic.job.customer)
                 .then(customer => {
                     return res.status(200).json({
                         msg: `Get task info successfully!`,
@@ -287,23 +290,43 @@ router.get('/personal', authenticateQAToken, (req, res) => {
     let { page, search, status } = req.query;
     if (status == 100) {
         Task
-            .find({ qa: req.user._id })
-            .populate({
-                path: 'job',
-                populate: {
-                    path: 'customer'
+            .find({ 'qa.staff': req.user._id })
+            .populate([
+                {
+                    path: 'basic.job',
+                    populate: {
+                        path: 'customer'
+                    }
+                },
+                {
+                    path: 'basic.level',
+                    select: 'name'
+                },
+                {
+                    path: 'editor.staff',
+                    select: 'fullname'
+                },
+                {
+                    path: 'qa.staff',
+                    select: 'fullname'
+                },
+                {
+                    path: 'dc.staff',
+                    select: 'fullname'
+                },
+                {
+                    path: 'tla.created.by',
+                    select: 'fullname'
+                },
+                {
+                    path: 'tla.uploaded.by',
+                    select: 'fullname'
+                },
+                {
+                    path: 'remarks',
+                    options: { sort: { 'timestamp': -1 } }
                 }
-            })
-            .populate('level')
-            .populate('editor')
-            .populate('qa')
-            .populate({
-                path: 'remarks',
-                options: {
-                    limit: 1,
-                    sort: { timestamp: -1 }
-                }
-            })
+            ])
             .exec()
             .then(tasks => {
                 return res.status(200).json({
