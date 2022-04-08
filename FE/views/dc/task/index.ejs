@@ -125,24 +125,24 @@
 
             data.tasks.forEach(t => {
 
-              let tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '">';
+              let tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '">';
 
               if (typeof t.bp !== 'undefined' && t.bp !== null && t.bp.length > 0) {
                 if (t.bp[0].is_bonus) {
-                  tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '" style="background-color: #E0F8E0">';
+                  tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '" style="background-color: #E0F8E0">';
                 } else {
-                  tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '" style="background-color:#FBEFEF">';
+                  tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '" style="background-color:#FBEFEF">';
                 }
               }
 
               tr += '<td>' + (idx++) + '</td>';             
 
-              tr += '<td class="font-weight-bold text-primary">' + t.job.customer.firstname + ' ' + t.job.customer.lastname + '</td>';
-              tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
-              tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
+              tr += '<td class="font-weight-bold text-primary">' + t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname + '</td>';
+              tr += '<td class="font-weight-bold text-danger">' + t.basic.job.name + '</td>';
+              tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';
               tr += '<td class="text-danger">';
-              if (t.deadline) {
-                tr += convertISODateToTimeFormat(t.deadline);
+              if (t.basic.deadline.end) {
+                tr += convertISODateToTimeFormat(t.basic.deadline.end);
               }
               tr += '</td>';
 
@@ -153,27 +153,37 @@
               tr += '</td>';
 
 
-              tr += '<td class="text-right">' + t.edited_time + '</td>';
-              tr += '<td class="text-right">' + t.amount + '</td>';
+              tr += '<td class="text-right">';
+              if (t.editor[0].submited !== null && t.editor[0].submited.length > 0) {
+                tr += t.editor[0].submited.length;
+              }
+              tr += '</td>';
+
+              tr += '<td class="text-right">';
+              if (t.editor[0].submited !== null && t.editor[0].submited.length > 0 && t.editor[0].submited[(t.editor[0].submited.length - 1)].amount) {
+                tr += t.editor[0].submited[(t.editor[0].submited.length - 1)].amount;
+              }
+              tr+= '</td>'
 
 
 
               tr += '<td>';
-              if (typeof t.editor !== 'undefined' && t.editor !== null) {
-                tr += t.editor.fullname
-              }
-              tr += '</td>';
-              tr += '<td>';
-              if (typeof t.qa !== 'undefined' && t.qa !== null) {
-                tr += t.qa.fullname
-              }
-              tr += '</td>';
-              tr += '<td>';
-              if (typeof t.dc !== 'undefined' && t.dc !== null) {
-                tr += t.dc.fullname
+              if (typeof t.editor !== 'undefined' && t.editor.length > 0 && typeof t.editor[t.editor.length - 1].staff !== 'undefined' && t.editor[t.editor.length - 1].staff !== null) {
+                tr += t.editor[t.editor.length - 1].staff.fullname;
               }
               tr += '</td>';
 
+               tr += '<td>';
+              if (typeof t.qa !== 'undefined' && t.qa.length > 0 && typeof t.qa[t.qa.length - 1].staff !== 'undefined' && t.qa[t.qa.length - 1].staff !== null) {
+                tr += t.qa[t.qa.length - 1].staff.fullname;
+              }
+              tr += '</td>';            
+
+              tr += '<td>';
+                if (typeof t.dc !== 'undefined' && t.dc.length > 0 && typeof t.dc[t.dc.length - 1].staff !== 'undefined' && t.dc[t.dc.length - 1].staff !== null) {
+                tr += t.dc[t.dc.length - 1].staff.fullname;
+              }
+              tr += '</td>';
 
 
               tr += '<td><i>';
@@ -185,7 +195,7 @@
                   break;
                 case 1:
                   {
-                    if (t.edited_time > 1) {
+                    if (t.editor[0].submited.length > 1) {
                       tr += '<span class="text-primary">Fixed</span>';
                     } else {
                       tr += '<span class="text-primary">Edited</span>';
@@ -221,8 +231,8 @@
 
 
               if (
-                ((t.status === 1 && (typeof t.qa === 'undefined' || t.qa === null)) || t.status === 2)
-                && (typeof t.dc === 'undefined' || t.dc === null)
+                ((t.status === 1 && (typeof t.qa === 'undefined' || t.qa.length == 0)) 
+                || t.status === 2) && (typeof t.dc === 'undefined' || t.dc.length === 0)
               ) {
                 tr += '<button class="btn btn-xs btn-success ml-2" name="get-task"><i class="fa fa-plus" aria-hidden="true"></i></button>';
               }
