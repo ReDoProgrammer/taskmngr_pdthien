@@ -34,7 +34,7 @@ const taskSchema = new Schema({
                 type: String,
                 default: ''
             },           
-            upload: {
+            output: {
                 type: String,
                 default: ''
             }
@@ -181,7 +181,7 @@ const taskSchema = new Schema({
             }
         },
 
-        uploaded: {
+        uploaded: [{
             at: {
                 type: Date,
                 default: new Date()
@@ -189,8 +189,13 @@ const taskSchema = new Schema({
             by: {
                 type: Schema.Types.ObjectId,
                 ref: 'user'
+            },
+            link:{
+                type:String,
+                default:''
             }
-        },
+            
+        }],
 
     },
 

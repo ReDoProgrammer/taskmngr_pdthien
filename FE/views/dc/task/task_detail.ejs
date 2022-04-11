@@ -114,7 +114,7 @@
                         </div>
                     </div>
                     <div class="panel panel-warning mt-2">
-                        <div class="panel-heading font-weight-bold">Remarks:</div>
+                        <div class="pa  nel-heading font-weight-bold">Remarks:</div>
                         <div class="panel-body" id="remarks"></div>
                     </div>
                     <div class="panel-footer">
@@ -164,16 +164,16 @@
                 $('#divSize').html(data.customer.size.name)
                 $('#lblNoteStyle').text(data.customer.remark);
 
-                $('#lblJobName').text(data.task.job.name);
-                $('#lblLevelName').text(data.task.level.name);
-                $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.assigned_date));
-                if(typeof data.task.deadline !== 'undefined'){
-                    $('#lblDeadline').text(convertISODateToTimeFormat(data.task.deadline));
+                $('#lblJobName').text(data.task.basic.job.name);
+                $('#lblLevelName').text(data.task.basic.level.name);
+                $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.basic.deadline.begin));
+                if(typeof data.task.basic.deadline.end !== 'undefined'){
+                    $('#lblDeadline').text(convertISODateToTimeFormat(data.task.basic.deadline.end));
                 }else{
                     $('#lblDeadline').text('');
                 }
                 
-                $('#lblIntruction').text(data.task.job.intruction);
+                $('#lblIntruction').text(data.task.basic.job.intruction);
 
                 $('#remarks').empty();
                 data.task.remarks.forEach(r => {
@@ -186,16 +186,16 @@
                 })
 
 
-                if (isValidHttpUrl(data.task.input_link)) {
-                    $('#lblInputLink').html('<a href="' + data.task.input_link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                if (isValidHttpUrl(data.task.basic.link.input)) {
+                    $('#lblInputLink').html('<a href="' + data.task.basic.link.input+ '" target="_blank" rel="noopener noreferrer">Link</a>')
                 } else {
-                    $('#lblInputLink').html('<span class="font-weight-bold font-italic">' + data.task.input_link + '</span>');
+                    $('#lblInputLink').html('<span class="font-weight-bold font-italic">' + data.task.basic.link.input + '</span>');
                 }
 
-                if (isValidHttpUrl(data.task.output_link)) {
-                    $('#lblOutputLink').html('<a href="' + data.task.output_link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                if (isValidHttpUrl(data.task.basic.link.output)) {
+                    $('#lblOutputLink').html('<a href="' + data.task.basic.link.output + '" target="_blank" rel="noopener noreferrer">Link</a>')
                 } else {
-                    $('#lblOutputLink').html('<span class="font-weight-bold font-italic">' + data.task.output_link + '</span>');
+                    $('#lblOutputLink').html('<span class="font-weight-bold font-italic">' + data.task.basic.link.output + '</span>');
                 }
 
 
