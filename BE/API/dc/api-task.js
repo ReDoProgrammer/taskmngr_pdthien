@@ -205,8 +205,11 @@ router.get('/personal-tasks', authenticateDCToken, (req, res) => {
     let { page, search, status } = req.query;
     if (status == 100) {
         Task
-            .find({ 'dc.staff': req.user._id })
-            .populate([
+            .find({ 
+                'dc.staff': req.user._id,
+                'dc.unregisted':false
+             })   
+             .populate([
                 {
                     path: 'basic.job',
                     populate: {
@@ -227,10 +230,7 @@ router.get('/personal-tasks', authenticateDCToken, (req, res) => {
                 },
                 {
                     path: 'dc.staff',
-                    select: 'fullname',
-                    match: {
-                        unregisted: false
-                    }
+                    select: 'fullname'
                 },
                 {
                     path: 'tla.created.by',
@@ -244,7 +244,8 @@ router.get('/personal-tasks', authenticateDCToken, (req, res) => {
                     path: 'remarks',
                     options: { sort: { 'timestamp': -1 } }
                 }
-            ])
+            ])           
+              
             .exec()
             .then(tasks => {
                 return res.status(200).json({
@@ -253,6 +254,7 @@ router.get('/personal-tasks', authenticateDCToken, (req, res) => {
                 })
             })
             .catch(err => {
+                console.log(`Can not get tasks list with error: ${new Error(err.message)}`);
                 return res.status(500).json({
                     msg: `Can not get tasks list with error: ${new Error(err.message)}`
                 })
