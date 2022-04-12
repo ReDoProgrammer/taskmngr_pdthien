@@ -64,7 +64,23 @@ const taskSchema = new Schema({
             //lưu trạng thái task có bị DC hủy đăng ký hay không
             type:Boolean,
             default:false
-        }
+        },
+        rejected: [
+            {
+                at: {
+                    type: Date,
+                    default: new Date()
+                },
+                by: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'user'
+                },
+                rm:{
+                    type: Schema.Types.ObjectId,
+                    ref: 'remark'
+                }
+            }
+        ]
     }],
     qa: [{
         staff: {
@@ -90,7 +106,23 @@ const taskSchema = new Schema({
             //lưu trạng thái task có bị DC hủy đăng ký hay không
             type:Boolean,
             default:false
-        }
+        },
+        rejected: [
+            {
+                at: {
+                    type: Date,
+                    default: new Date()
+                },
+                by: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'user'
+                },
+                rm:{
+                    type: Schema.Types.ObjectId,
+                    ref: 'remark'
+                }
+            }
+        ]
     }],
 
     editor: [{
@@ -218,22 +250,7 @@ const taskSchema = new Schema({
         }
     },
 
-    rejected: [
-        {
-            at: {
-                type: Date,
-                default: new Date()
-            },
-            by: {
-                type: Schema.Types.ObjectId,
-                ref: 'user'
-            },
-            rm:{
-                type: Schema.Types.ObjectId,
-                ref: 'remark'
-            }
-        }
-    ],
+    
 
     canceled: {
         reason: {

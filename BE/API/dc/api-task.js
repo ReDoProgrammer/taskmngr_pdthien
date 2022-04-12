@@ -93,8 +93,14 @@ router.put('/unregister', authenticateDCToken, async (req, res) => {
 
     
 
-    let dc = task.dc.filter(x=>x.staff == req.user._id && !x.unregisted && !x.submited_at);
-    dc[0].unregisted = true;
+    let dc = task.dc.filter(x=>x.staff == req.user._id && !x.unregisted);
+    if(dc.length == 0){
+        return res.status(404).json({
+            msg:`DC not found!`
+        })
+    }
+
+    dc[dc.length-1].unregisted = true;
     await task.save()
     .then(_=>{
         return res.status(200).json({
@@ -159,45 +165,57 @@ router.put('/get-task', authenticateDCToken,async (req, res) => {
     
 })
 
-router.put('/reject', authenticateDCToken, (req, res) => {
+router.put('/reject', authenticateDCToken, async (req, res) => {
     let { taskId, remark } = req.body;
 
-    getTaskDetail(taskId)
-        .then(async task => {
-            let rm = new Remark({
-                user: req.user._id,
-                content: remark,
-                tid: task._id
-            });
+    let task = await Task.findById(taskId);
 
-            await rm.save()
-                .then(async r => {
-                    task.remarks.push(r);
-                    task.status = -3;
-                    await task.save()
-                        .then(t => {
-                            return res.status(200).json({
-                                msg: `The task has been rejected!`
-                            })
-                        })
-                        .catch(err => {
-                            return res.status(500).json({
-                                msg: `Can not reject this task with error: ${new Error(err.message)}`
-                            })
-                        })
-
-                })
-                .catch(err => {
-                    return res.status(500).json({
-                        msg: `Can not insert reject remark with error: ${new Error(err.message)}`
-                    })
-                })
+    if(!task){
+        return res.status(404).json({
+            msg:`Task not found!`
         })
-        .catch(err => {
-            return res.status(err.code).json({
-                msg: err.msg
+    }
+
+    if(task.dc.length==0){
+        return res.status(404).json({
+            msg:`DC not found!`
+        })
+    }
+
+    let rm = new Remark({
+        user: req.user._id,
+        content: remark,
+        tid:taskId
+    });
+
+    await rm.save()
+    .then(async _=>{
+        task.remarks.push(rm);
+        task.dc[task.dc.length-1].rejected.push({
+            at:new Date(),
+            by:req.user._id,
+            rm:rm._id
+        });
+        task.status = -3;
+
+        await task.save()
+        .then(_=>{
+            return res.status(200).json({
+                msg:`Task has been rejected!`
             })
         })
+        .catch(err=>{
+            return res.status(500).json({
+                msg:`Can not reject this task with error: ${new Error(err.message)}`
+            })
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not created remark with error: ${new Error(err.message)}`
+        })
+    })
+   
 })
 
 
