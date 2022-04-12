@@ -166,12 +166,9 @@ router.put('/submit', authenticateEditorToken,async (req, res) => {
         return res.status(404).json({
             msg:`Task not found!`
         })
-    }
-    let ed = (task.editor.filter(x=>x.staff == req.user._id)).sort((a,b)=>{
-        return b.timestamp - a.timestamp;
-    });
+    }    
 
-    ed[0].submited.push({
+    task.editor[task.editor.length-1].submited.push({
         at: new Date(),
         amount:amount,
         link: output_link
@@ -185,6 +182,7 @@ router.put('/submit', authenticateEditorToken,async (req, res) => {
         })
     })
     .catch(err=>{
+        console.log(`Can not submit this task with error: ${new Error(err.message)}`);
         return res.status(500).json({
             msg:`Can not submit this task with error: ${new Error(err.message)}`
         })

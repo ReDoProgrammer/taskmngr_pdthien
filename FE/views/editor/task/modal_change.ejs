@@ -38,7 +38,8 @@
             data: {
                 taskId
             },
-            success: function (data) {                
+            success: function (data) {   
+                console.log(data.task);             
                 $('#txtNumberOfImage').val(data.task.editor[data.task.editor.length - 1].submited[(data.task.editor[data.task.editor.length - 1].submited.length - 1)].amount);
 
             }, error: function (request, status, error) {
