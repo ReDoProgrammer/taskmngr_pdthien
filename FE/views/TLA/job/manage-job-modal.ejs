@@ -192,7 +192,7 @@
   //sự kiện click button sửa task trên table
 
   $(document).on("click", "button[name='btnEditTask']", function () {
-    taskId = $(this).closest("tr").attr("id");  
+    taskId = $(this).closest("tr").attr("id");
 
     $.ajax({
       url: '/tla/task/detail',
@@ -205,7 +205,6 @@
       },
       success: function (data) {
 
-console.log(data);
         levelId = data.task.basic.level._id;
 
         $('#divAddOrUpdateTask').slideUp(200);
@@ -215,27 +214,25 @@ console.log(data);
         $('#slJobLevels').attr("disabled", true);
 
         $('#txtAssignDate').val(convertISODateToTimeFormat(data.task.basic.deadline.begin));
-        if(data.task.basic.deadline.end){
+        if (data.task.basic.deadline.end) {
           $('#txtDeadline').val(convertISODateToTimeFormat(data.task.basic.deadline.end));
         }
-       
+
         $('#txtInputLink').val(data.task.basic.link.input);
 
-        $('#txtRemark').val(data.task.remarks[data.task.remarks.length -1].content);
+        $('#txtRemark').val(data.task.remarks[data.task.remarks.length - 1].content);
 
         LoadEditor(data.task.basic.level._id);
         LoadQA(data.task.basic.level._id);
 
-        console.log(data.task.qa);
-
         //xu ly checkbox va dropdown lien quan toi editor va qa
-       
-        $('#ckbAssignEditor').prop('checked',(data.task.editor.length > 0 && data.task.editor[data.task.editor.length -1].tla.length>0)?true:false);
-        $('#ckbAssignQA').prop('checked',(data.task.qa.length > 0 && data.task.qa[data.task.qa.length -1].tla.length>0)?true:false);
-        
-       
 
-        if (data.task.editor.length > 0 && data.task.editor[data.task.editor.length -1].tla.length>0) {
+        $('#ckbAssignEditor').prop('checked', (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla.length > 0) ? true : false);
+        $('#ckbAssignQA').prop('checked', (data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla.length > 0) ? true : false);
+
+
+
+        if (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla.length > 0) {
           $('#colEditor').show();
           $('#slEditor').val(data.task.editor);
           if (data.task.status > 0) {
@@ -249,7 +246,7 @@ console.log(data);
           $('#colEditor').hide();
         }
 
-        if ((data.task.qa.length > 0 && data.task.qa[data.task.qa.length -1].tla.length>0)) {
+        if ((data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla.length > 0)) {
           $('#colQA').show();
           $('#slQA').val(data.task.qa);
           if (data.task.status > 1) {
@@ -306,6 +303,11 @@ console.log(data);
 
 
   $('#btnAddTask').click(function () {
+    $('#txtInputLink').val('');
+    $('#txtRemark').val('');
+    $('#divAddOrUpdateTask').slideUp(500);
+
+    
     $('#divAddOrUpdateTask').slideDown(1000);
     $('#divAssign').slideUp(200);
     $('#divEditTask').slideUp(200);
@@ -320,7 +322,9 @@ console.log(data);
     $('#colQA').hide();
     $('#ckbAssignEditor').prop('checked', false);
     $('#ckbAssignQA').prop('checked', false);
-    $('#txtInputLink').val('');
+
+
+
     LoadEditor($('#slJobLevels option:selected').val());
     LoadQA($('#slJobLevels option:selected').val());
   })
@@ -430,7 +434,7 @@ console.log(data);
         $("#tblTasks").empty();
         console.log(data.tasks);
         data.tasks.forEach(t => {
-          
+
           let tr = '<tr id="' + t._id + '">';
 
           tr += "<td>" + idx++ + "</td>";
@@ -453,7 +457,7 @@ console.log(data);
 
 
           tr += '<td>';
-          if (typeof t.editor !== 'undefined' && t.editor.length >0)
+          if (typeof t.editor !== 'undefined' && t.editor.length > 0)
             tr += t.editor[0].staff.fullname;
           tr += "</td>";
 
