@@ -339,8 +339,7 @@ const getTaskDetail = (taskId) => {
                     path: 'remarks',
                     populate: {
                         path: 'user',
-                        select: 'fullname',
-                        options: { sort: { 'timestamp': -1 } }
+                        select: 'fullname'                       
                     }
                 }
             ])
