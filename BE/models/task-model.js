@@ -85,7 +85,12 @@ const taskSchema = new Schema({
         },
         submited_at: [{
             type: Date
-        }]
+        }],
+        unregisted:{
+            //lưu trạng thái task có bị DC hủy đăng ký hay không
+            type:Boolean,
+            default:false
+        }
     }],
 
     editor: [{

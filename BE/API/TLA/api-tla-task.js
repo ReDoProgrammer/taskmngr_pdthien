@@ -197,7 +197,7 @@ router.get('/list-unuploaded', authenticateTLAToken, (req, res) => {
             status: 3//chỉ lấy những task đã được DC submit: status = 3
         })
         .populate([
-           
+
             {
                 path: 'basic.level',
                 select: 'name'
@@ -209,10 +209,10 @@ router.get('/list-unuploaded', authenticateTLAToken, (req, res) => {
             {
                 path: 'qa.staff',
                 select: 'fullname'
-            }           
-            
+            }
+
         ])
-        
+
         .exec()
         .then(tasks => {
             return res.status(200).json({
@@ -316,7 +316,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
         editor
     } = req.body;
 
-   
+
 
     Job
         .findById(job)
@@ -392,6 +392,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
                                                 };
 
                                                 task.editor = ed;
+                                                task.status = 0;
 
                                             })
                                             .catch(err => {
@@ -436,55 +437,45 @@ router.post('/', authenticateTLAToken, (req, res) => {
 
                             }
 
+                           
 
+                            let rm = new Remark({
+                                user: req.user._id,
+                                content: remark,
+                                tid: task._id
+                            });
 
+                            await rm.save()
+                                .then(async r => {
+                                    task.remarks.push(r);
 
-                            await task.save()
-                                .then(async t => {
-                                    let rm = new Remark({
-                                        user: req.user._id,
-                                        content: remark,
-                                        tid: t._id
-                                    });
-                                    await rm.save()
-                                        .then(async r => {
-                                            task.remarks.push(r);
-                                            await task.save()
-                                                .then(async tk => {
-                                                    j.tasks.push(tk);
-                                                    await j.save()
-                                                        .then(_ => {
-                                                            return res.status(200).json({
-                                                                msg: `Task has been created!`,
-                                                                tk
-                                                            })
-                                                        })
-                                                        .catch(err => {
-                                                            return res.status(500).json({
-                                                                msg: `Can not push this task to parent job with error: ${new Error(err.message)}`
-                                                            })
-                                                        })
-                                                })
-                                                .catch(err => {
-                                                    return res.status(500).json({
-                                                        msg: `Can not add remark into task with error: ${new Error(err.message)}`
-                                                    })
-                                                })
-
-                                        })
-                                        .catch(err => {
-                                            console.log(`Can not insert remark with error: ${new Error(err.message)}`);
-                                            return res.status(500).json({
-                                                msg: `Can not insert remark with error: ${new Error(err.message)}`
+                                    await task.save()
+                                    .then(async t=>{
+                                        j.tasks.push(t);
+                                        await j.save()
+                                        .then(_=>{
+                                            return res.status(201).json({
+                                                msg:`Task has been created successfully!`
                                             })
                                         })
-
+                                        .catch(err=>{
+                                            console.log(`Can not update tasks list into job with error: ${new Error(err.message)}`)
+                                            return res.status(500).json({
+                                                msg:`Can not update tasks list into job with error: ${new Error(err.message)}`
+                                            })
+                                        })
+                                    })
+                                    .catch(err=>{
+                                        console.log(`Can not create task with error: ${new Error(err.message)}`)
+                                        return res.status(500).json({
+                                            msg:`Can not create task with error: ${new Error(err.message)}`
+                                        })
+                                    })
                                 })
                                 .catch(err => {
-                                    console.log(`Can not create task with error: ${new Error(err.message)}`);
+                                    console.log( `Can not create remark with error: ${new Error(err.message)}`)
                                     return res.status(500).json({
-                                        msg: `Can not create task with error: ${new Error(err.message)}`,
-                                        error: new Error(err.message)
+                                        msg: `Can not create remark with error: ${new Error(err.message)}`
                                     })
                                 })
                         })
@@ -519,13 +510,13 @@ router.put('/upload', authenticateTLAToken, async (req, res) => {
         })
     }
 
-    if (task.status == 1 && task.qa.length>0) {
+    if (task.status == 1 && task.qa.length > 0) {
         return res.status(403).json({
             msg: `You can not upload this task ultil Q.A submit it!`
         })
     }
 
-    if (task.status == 2 && task.dc.length>0) {
+    if (task.status == 2 && task.dc.length > 0) {
         return res.status(403).json({
             msg: `You can not upload this task ultil DC submit it!`
         })
@@ -542,12 +533,12 @@ router.put('/upload', authenticateTLAToken, async (req, res) => {
             task.status = 4;
             let up = {
                 at: new Date(),
-                by:req.user._id,
+                by: req.user._id,
                 link: uploaded_link
             };
-            
+
             console.log(task.tla.uploaded)
-            task.tla.uploaded.push(up);          
+            task.tla.uploaded.push(up);
 
             task.remarks.push(r);
 
@@ -626,46 +617,15 @@ router.put('/', authenticateTLAToken, async (req, res) => {
         .then(async _ => {
             task.basic.deadline.end = deadline;
             task.basic.link.input = input_link;
-            
-            
+
+
             //cập nhật Editor
-           
-            if (editor_assigned=='true') {       
-                task.status = 1;        
-                if (task.editor.length == 0) {                 
+
+            if (editor_assigned == 'true') {
+                task.status = 1;
+                if (task.editor.length == 0) {
                     await getModule(_EDITOR)
-                        .then(async m => {                            
-                            await getWage(editor, task.basic.level, m._id)
-                                .then(async w => {
-                                    let ed = {
-                                        staff: editor,
-                                        wage: w.wage,
-                                        tla: req.user._id,
-                                        timestamp: new Date()
-                                    };
-
-                                    task.editor.push(ed);
-
-                                })
-                                .catch(err => {
-                                    console.log(err)
-                                    return res.status(err.code).json({
-                                        msg: err.msg
-                                    })
-                                })
-                        })
-                        .catch(err => {
-                            console.log(err)
-                            return res.status(err.code).json({
-                                msg: err.msg
-                            })
-                        })
-                }else{   
-                                             
-                    if(task.editor[task.editor.length-1].staff !== editor){                        
-                        await getModule(_EDITOR)
                         .then(async m => {
-                            
                             await getWage(editor, task.basic.level, m._id)
                                 .then(async w => {
                                     let ed = {
@@ -691,25 +651,54 @@ router.put('/', authenticateTLAToken, async (req, res) => {
                                 msg: err.msg
                             })
                         })
-                    }else{
-                        console.log(1)
+                } else {
+
+                    if (task.editor[task.editor.length - 1].staff !== editor) {
+                        await getModule(_EDITOR)
+                            .then(async m => {
+
+                                await getWage(editor, task.basic.level, m._id)
+                                    .then(async w => {
+                                        let ed = {
+                                            staff: editor,
+                                            wage: w.wage,
+                                            tla: req.user._id,
+                                            timestamp: new Date()
+                                        };
+
+                                        task.editor.push(ed);
+
+                                    })
+                                    .catch(err => {
+                                        console.log(err)
+                                        return res.status(err.code).json({
+                                            msg: err.msg
+                                        })
+                                    })
+                            })
+                            .catch(err => {
+                                console.log(err)
+                                return res.status(err.code).json({
+                                    msg: err.msg
+                                })
+                            })
                     }
                 }
 
 
 
-               
-            }else{
+
+            } else {
                 //trường hợp không gán editor thì set về mặc định
-                task.editor = [];    
-                task.status = -1;           
+                task.editor = [];
+                task.status = -1;
             }
 
 
 
             //Cập nhật Q.A
 
-            if (qa_assigned=='true') {                
+            if (qa_assigned == 'true') {
                 if (task.qa.length == 0) {
                     await getModule(_QA)
                         .then(async m => {
@@ -739,53 +728,53 @@ router.put('/', authenticateTLAToken, async (req, res) => {
                                 msg: err.msg
                             })
                         })
-                }else{                         
+                } else {
                     //chỉ update khi Q.A truyền vào khác Q.A hiện đang nhận task           
-                    if(task.qa[task.qa.length-1].staff !== qa){
+                    if (task.qa[task.qa.length - 1].staff !== qa) {
                         await getModule(_QA)
-                        .then(async m => {
-                            await getWage(qa, task.basic.level, m._id)
-                                .then(async w => {
-                                    let q = {
-                                        staff: qa,
-                                        wage: w.wage,
-                                        tla: req.user._id,
-                                        timestamp: new Date()
-                                    };
+                            .then(async m => {
+                                await getWage(qa, task.basic.level, m._id)
+                                    .then(async w => {
+                                        let q = {
+                                            staff: qa,
+                                            wage: w.wage,
+                                            tla: req.user._id,
+                                            timestamp: new Date()
+                                        };
 
-                                    task.qa.push(q);
+                                        task.qa.push(q);
 
-                                })
-                                .catch(err => {
-                                    return res.status(err.code).json({
-                                        msg: err.msg
                                     })
-                                })
-                        })
-                        .catch(err => {
-                            return res.status(err.code).json({
-                                msg: err.msg
+                                    .catch(err => {
+                                        return res.status(err.code).json({
+                                            msg: err.msg
+                                        })
+                                    })
                             })
-                        })
+                            .catch(err => {
+                                return res.status(err.code).json({
+                                    msg: err.msg
+                                })
+                            })
                     }
-                }               
-            }else{
+                }
+            } else {
                 //trường hợp không gán Q.A thì set về mặc định
-                task.qa = [];                
-            }           
+                task.qa = [];
+            }
 
             await task
-            .save()
-            .then(_=>{
-                return res.status(200).json({
-                    msg:`This task has been changed!`
+                .save()
+                .then(_ => {
+                    return res.status(200).json({
+                        msg: `This task has been changed!`
+                    })
                 })
-            })
-            .catch(err=>{
-                return res.status(500).json({
-                    msg:`Can not update this task with error: ${new Error(err.message)}`
+                .catch(err => {
+                    return res.status(500).json({
+                        msg: `Can not update this task with error: ${new Error(err.message)}`
+                    })
                 })
-            })
         })
         .catch(err => {
             return res.status(500).json({
@@ -807,9 +796,9 @@ router.delete('/', authenticateTLAToken, (req, res) => {
     Task.findByIdAndDelete(_id)
         .exec()
         .then(async task => {
-            if(!task){
+            if (!task) {
                 return res.status(404).json({
-                    msg:`Task not found!`
+                    msg: `Task not found!`
                 })
             }
 

@@ -263,6 +263,10 @@
     })
   })
 
+  $("#JobMngrModal").on('hide.bs.modal', function(){
+    LoadJobs();
+  });
+
 
 
   $('#txtDuration').keyup(function (e) {
