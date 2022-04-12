@@ -153,7 +153,7 @@
               let mn = '';
               switch (data.task.status) {
                 case 1:
-                  if (typeof data.task.qa === 'undefined' || data.task.qa.length ===0) {
+                  if (typeof data.task.qa === 'undefined' || data.task.qa.length === 0) {
                     mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Submit</a></li>';
                     mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
                     mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
@@ -247,7 +247,7 @@
               let idx = 1;
 
               data.tasks.forEach(t => {
-                
+
                 let tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '">';
                 if (typeof t.bp !== 'undefined' && t.bp !== null && t.bp.length > 0) {
                   if (t.bp[0].is_bonus) {
@@ -281,34 +281,34 @@
 
 
                 tr += '<td class="text-right">';
-                if (t.editor[0].submited !== null && t.editor[0].submited.length > 0) {
-                  tr += t.editor[0].submited.length;
+                if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                  tr += t.editor[t.editor.length - 1].submited.length;
                 }
                 tr += '</td>';
 
 
                 tr += '<td class="text-right">';
-                if (t.editor[0].submited !== null && t.editor[0].submited.length > 0 && t.editor[0].submited[(t.editor[0].submited.length - 1)].amount) {
-                  tr += t.editor[0].submited[(t.editor[0].submited.length - 1)].amount;
+                if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                  tr += t.editor[t.editor.length - 1].submited[(t.editor[t.editor.length - 1].submited.length - 1)].amount;
                 }
                 tr += '</td>';
 
 
                 tr += '<td>';
-                if (typeof t.editor !== 'undefined' && t.editor.length > 0 && typeof t.editor[t.editor.length - 1].staff !== 'undefined' && t.editor[t.editor.length - 1].staff !== null) {
+                if (t.editor.length > 0) {
                   tr += t.editor[t.editor.length - 1].staff.fullname;
                 }
                 tr += '</td>';
 
 
                 tr += '<td>';
-                if (typeof t.qa !== 'undefined' && t.qa.length > 0 && typeof t.qa[t.qa.length - 1].staff !== 'undefined' && t.qa[t.qa.length - 1].staff !== null) {
+                if (t.qa.length > 0) {
                   tr += t.qa[t.qa.length - 1].staff.fullname;
                 }
                 tr += '</td>';
 
                 tr += '<td>';
-                if (typeof t.dc !== 'undefined' && t.dc.length > 0 && typeof t.dc[t.dc.length - 1].staff !== 'undefined' && t.dc[t.dc.length - 1].staff !== null && t.dc[t.dc.length - 1].unregisted === false) {
+                if (t.dc.length > 0) {
                   tr += t.dc[t.dc.length - 1].staff.fullname;
                 }
                 tr += '</td>';
@@ -320,7 +320,7 @@
 
                   case 0: tr += '<span class="text-info">Processing</span>'; break;
                   case 1: {
-                    if (t.editor[0].submited.length > 1) {
+                    if (t.editor[t.editor.length - 1].submited.length > 1) {
                       tr += '<span class="text-primary">Fixed</span>';
                     } else {
                       tr += '<span class="text-primary">Edited</span>';
