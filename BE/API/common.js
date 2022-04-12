@@ -104,54 +104,6 @@ const checkAccount = (username, password) => {
 
 
 
-
-
-//hàm dùng để gán hoặc nhận task
-const assignOrTakeTask = (moduleName, taskId, jobLevelId, staffId, is_assigned) => {
-    return new Promise((resolve, reject) => {
-        getModule(moduleName)
-            .then(md => {
-                getWage(staffId, jobLevelId, md._id)
-                    .then(w => {
-                        Task
-                            .findByIdAndUpdate(taskId, {
-                                editor: staffId,
-                                editor_wage: w.wage,
-                                editor_assigned: is_assigned,
-                                status: 0,
-
-                            },
-                                { new: true }, (err, task) => {
-                                    if (err) {
-                                        return reject({
-                                            code: 500,
-                                            msg: `Can not assign or take task with error: ${new Error(err.message)}`
-                                        })
-                                    }
-
-                                    if (!task) {
-                                        return reject({
-                                            code: 404,
-                                            msg: `Task not found so can not assign or take task!`
-                                        })
-                                    }
-                                    return resolve(task);
-                                })
-
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        return reject(err);
-                    })
-            })
-            .catch(err => {
-                return reject(err)
-            })
-    })
-}
-
-
-
 //hàm lấy quyền truy cập module
 
 const getRole = (moduleId, userId) => {
@@ -392,7 +344,6 @@ const setJobStatus = (jobId, status, staff) => {
 
 module.exports = {
     generateAccessToken,
-    assignOrTakeTask,
     getRole,
     getModule,
     getWage,

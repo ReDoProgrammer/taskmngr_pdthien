@@ -215,7 +215,7 @@ router.put('/get-more', authenticateEditorToken, (req, res) => {
 
     Task
         .countDocuments({
-            editor: req.user._id,
+            'editor.staff': req.user._id,
             status: { $in: [0, -2, -3] }//task chưa submit hoặc bị reject bởi QA/DC
         }, (err, count) => {
             if (err) {

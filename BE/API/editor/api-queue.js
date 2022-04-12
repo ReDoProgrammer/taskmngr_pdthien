@@ -5,7 +5,7 @@ const { authenticateEditorToken } = require("../../../middlewares/editor-middlew
 router.post('/',authenticateEditorToken,(req,res)=>{
 
     Queue
-    .countDocuments({staff:req.user._id},(err,count)=>{
+    .countDocuments({staff:req.user._id},async (err,count)=>{
         if(err){
             return res.status(500).json({
                 msg:`Can not check queue with error: ${new Error(err.message)}`
@@ -21,8 +21,10 @@ router.post('/',authenticateEditorToken,(req,res)=>{
         let queue = new Queue({
             staff:req.user._id
         });
+
+        console.log(queue)
     
-        queue
+        await queue
         .save()
         .then(_=>{
             return res.status(201).json({
