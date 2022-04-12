@@ -183,8 +183,7 @@ const taskSchema = new Schema({
 
         uploaded: [{
             at: {
-                type: Date,
-                default: new Date()
+                type: Date                
             },
             by: {
                 type: Schema.Types.ObjectId,

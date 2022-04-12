@@ -193,14 +193,28 @@ router.get('/list-unuploaded', authenticateTLAToken, (req, res) => {
     let { jobId } = req.query;
     Task
         .find({
-            job: jobId,
+            'basic.job': jobId,
             status: 3//chỉ lấy những task đã được DC submit: status = 3
         })
-        .populate('level')
-        .populate('editor')
+        .populate([
+           
+            {
+                path: 'basic.level',
+                select: 'name'
+            },
+            {
+                path: 'editor.staff',
+                select: 'fullname'
+            },
+            {
+                path: 'qa.staff',
+                select: 'fullname'
+            }           
+            
+        ])
+        
         .exec()
         .then(tasks => {
-
             return res.status(200).json({
                 msg: `Load unuploaded tasks successfully!`,
                 tasks
@@ -505,13 +519,13 @@ router.put('/upload', authenticateTLAToken, async (req, res) => {
         })
     }
 
-    if (task.status == 1 && typeof task.qa !== 'undefined' && task.qa !== null) {
+    if (task.status == 1 && task.qa.length>0) {
         return res.status(403).json({
             msg: `You can not upload this task ultil Q.A submit it!`
         })
     }
 
-    if (task.status == 2 && typeof task.dc !== 'undefined' && task.dc !== null) {
+    if (task.status == 2 && task.dc.length>0) {
         return res.status(403).json({
             msg: `You can not upload this task ultil DC submit it!`
         })
@@ -526,21 +540,28 @@ router.put('/upload', authenticateTLAToken, async (req, res) => {
     await rmk.save()
         .then(async r => {
             task.status = 4;
-            task.uploaded_link = uploaded_link;
-            task.uploaded_at = new Date();
-            task.uploaded_by = req.user._id;
+            let up = {
+                at: new Date(),
+                by:req.user._id,
+                link: uploaded_link
+            };
+            
+            console.log(task.tla.uploaded)
+            task.tla.uploaded.push(up);          
+
             task.remarks.push(r);
-            await task.save()
-                .then(_ => {
-                    return res.status(200).json({
-                        msg: `The task has been uploaded!`
-                    })
-                })
-                .catch(err => {
-                    return res.status(500).json({
-                        msg: `Can not upload this task with error: ${new Error(err.message)}`
-                    })
-                })
+
+            // await task.save()
+            //     .then(_ => {
+            //         return res.status(200).json({
+            //             msg: `The task has been uploaded!`
+            //         })
+            //     })
+            //     .catch(err => {
+            //         return res.status(500).json({
+            //             msg: `Can not upload this task with error: ${new Error(err.message)}`
+            //         })
+            //     })
         })
         .catch(err => {
             return res.status(500).json({

@@ -146,10 +146,10 @@
       },
       success: function (data) {
         $('#slTasks').empty();
-        data.tasks.forEach(t => {
-          let opt = '<option value = "' + t._id + '" data-link="' + t.output_link + '">';
-            opt+= t.level.name;
-            opt+=' - ['+t.editor.fullname+']';           
+        data.tasks.forEach(t => { 
+          let opt = '<option value = "' + t._id + '" data-link="' + t.basic.link.output + '">';
+            opt+= t.basic.level.name;
+            opt+=' - ['+t.editor[t.editor.length-1].staff.fullname+']';           
             opt+= '</option>';
           $('#slTasks').append(opt);
         })
