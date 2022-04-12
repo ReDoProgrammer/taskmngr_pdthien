@@ -880,6 +880,12 @@ router.delete('/', authenticateTLAToken, (req, res) => {
     Task.findByIdAndDelete(_id)
         .exec()
         .then(async task => {
+            if(!task){
+                return res.status(404).json({
+                    msg:`Task not found!`
+                })
+            }
+
             await Remark
                 .deleteMany({ tid: _id }, async err => {
                     if (err) {
@@ -891,7 +897,7 @@ router.delete('/', authenticateTLAToken, (req, res) => {
 
 
 
-                    await Job.findByIdAndUpdate(task.job,
+                    await Job.findByIdAndUpdate(task.basic.job,
                         {
                             $pull: { tasks: _id }
                         }, { new: true }, (err, job) => {
