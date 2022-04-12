@@ -254,7 +254,7 @@
 
 
                             tr += '<td>';
-                            if (typeof t.editor !== 'undefined' && t.editor.length > 0 && typeof t.editor[t.editor.length - 1].staff !== 'undefined' && t.editor[t.editor.length - 1].staff !== null) {
+                            if (t.editor.length>0) {
                                 tr += t.editor[t.editor.length - 1].staff.fullname;
                             }
                             tr += '</td>';

@@ -5,30 +5,33 @@ const { authenticateQAToken } = require("../../../middlewares/qa-middleware");
 const { getWage, getModule, getCustomer, getTaskDetail } = require('../common');
 const _MODULE = 'QA';
 
-router.put('/unregister', authenticateQAToken, (req, res) => {
+router.put('/unregister', authenticateQAToken, async (req, res) => {
     let { taskId } = req.body;
-    Task
-        .findByIdAndUpdate(taskId, {
-            qa: null,
-            qa_assigned_date: new Date()//danh dau thoi gian Q.A huy nhan task
-        }, { new: true }, (err, task) => {
-            if (err) {
-                return res.status(500).json({
-                    msg: `Can not unregister task with error: ${new Error(err.message)}`
-                })
-            }
+   let task = await Task.findById(taskId);
+   if(!task){
+       return res.status(404).json({
+           msg:`Task not found!`
+       })
+   }
 
-            if (!task) {
-                return res.status(404).json({
-                    msg: `Can not unregister this task because it\'s not found`
-                })
-            }
-
-            return res.status(200).json({
-                msg: `The task have been unregisted successfully!`,
-                task
-            })
-        })
+   let q = task.qa.filter(x=>x.staff == req.user._id && !x.unregisted);
+   if(q.length == 0){
+       return res.status(404).json({
+           msg:`Q.A not found!`
+       })
+   }
+   q[q.length-1].unregisted = true;
+   await task.save()
+   .then(_=>{
+       return res.status(200).json({
+           msg:`You have unregisted this task successfully!`
+       })
+   })
+   .catch(err=>{
+       return res.status(500).json({
+           msg:`Can not unregister this task with error: ${new Error(err.message)}`
+       })
+   })
 
 })
 
@@ -294,7 +297,10 @@ router.get('/personal', authenticateQAToken, (req, res) => {
     let { page, search, status } = req.query;
     if (status == 100) {
         Task
-            .find({ 'qa.staff': req.user._id })
+            .find({ 
+                'qa.staff': req.user._id,
+                'qa.unregisted':false 
+            })
             .populate([
                 {
                     path: 'basic.job',
