@@ -150,46 +150,52 @@ router.put('/reject', authenticateQAToken, async (req, res) => {
     let { taskId, remark } = req.body;
 
     let task = await Task.findById(taskId);
-    if (!task) {
+
+    if(!task){
         return res.status(404).json({
-            msg: `Task not found!`
+            msg:`Task not found!`
         })
     }
+
+    if(task.qa.length==0){
+        return res.status(404).json({
+            msg:`Q.A not found!`
+        })
+    }
+
     let rm = new Remark({
         user: req.user._id,
         content: remark,
-        tid: task._id
+        tid:taskId
     });
 
-  
-
     await rm.save()
-        .then(async r => {
-            task.remarks.push(r);
-            task.status = -2;
-            task.rejected.push({
-                at: new Date(),
-                by:req.user._id,
-                rm:rm._id
-            });
-            await task.save()
-                .then(t => {
-                    return res.status(200).json({
-                        msg: `The task has been rejected!`
-                    })
-                })
-                .catch(err => {
-                    return res.status(500).json({
-                        msg: `Can not reject this task with error: ${new Error(err.message)}`
-                    })
-                })
+    .then(async _=>{
+        task.remarks.push(rm);
+        task.qa[task.qa.length-1].rejected.push({
+            at:new Date(),
+            by:req.user._id,
+            rm:rm._id
+        });
+        task.status = -2;
 
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not insert reject remark with error: ${new Error(err.message)}`
+        await task.save()
+        .then(_=>{
+            return res.status(200).json({
+                msg:`The task has been rejected!`
             })
         })
+        .catch(err=>{
+            return res.status(500).json({
+                msg:`Can not reject this task with error: ${new Error(err.message)}`
+            })
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not created remark with error: ${new Error(err.message)}`
+        })
+    })
 })
 
 router.get('/list', authenticateQAToken, (req, res) => {
