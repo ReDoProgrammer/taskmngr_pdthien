@@ -234,8 +234,8 @@
 
         if (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla.length > 0) {
           $('#colEditor').show();
-          $('#slEditor').val(data.task.editor);
-          if (data.task.status > 0) {
+          $('#slEditor').val(data.task.editor[data.task.editor.length-1].staff);
+          if (data.task.status > 1) {
             $('#ckbAssignEditor').attr("disabled", true);
             $('#slEditor').attr("disabled", true);
           } else {
@@ -248,7 +248,7 @@
 
         if ((data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla.length > 0)) {
           $('#colQA').show();
-          $('#slQA').val(data.task.qa);
+          $('#slQA').val(data.task.qa[data.task.qa.length -1].staff);
           if (data.task.status > 1) {
             $('#ckbAssignQA').attr("disabled", true);
             $('#slQA').attr("disabled", true);
@@ -307,7 +307,7 @@
     $('#txtRemark').val('');
     $('#divAddOrUpdateTask').slideUp(500);
 
-    
+
     $('#divAddOrUpdateTask').slideDown(1000);
     $('#divAssign').slideUp(200);
     $('#divEditTask').slideUp(200);

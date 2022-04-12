@@ -703,9 +703,9 @@ router.put('/', authenticateTLAToken, async (req, res) => {
             
             //cập nhật Editor
            
-            if (editor_assigned=='true') {               
-                if (task.editor.length == 0) {
-                    console.log(0)
+            if (editor_assigned=='true') {       
+                task.status = 1;        
+                if (task.editor.length == 0) {                 
                     await getModule(_EDITOR)
                         .then(async m => {                            
                             await getWage(editor, task.basic.level, m._id)
@@ -774,7 +774,8 @@ router.put('/', authenticateTLAToken, async (req, res) => {
                
             }else{
                 //trường hợp không gán editor thì set về mặc định
-                task.editor = [];               
+                task.editor = [];    
+                task.status = -1;           
             }
 
 
