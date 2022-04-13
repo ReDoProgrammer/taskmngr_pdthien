@@ -9,22 +9,45 @@ const { getCustomer, getTaskDetail, getModule, getWage } = require('../common');
 router.get('/list', authenticateSaleToken, (req, res) => {
     let { jobId } = req.query;
     Task
-        .find({ job: jobId })
-        .populate('level', 'name')
-        .populate('qa', 'fullname -_id')
-        
-        .populate('editor', 'fullname -_id')
-        .populate('dc', 'fullname -_id')
-        .populate('created_by', 'fullname -_id')
-        .populate('uploaded_by', 'fullname -_id')
-        .populate({
-            path:'remarks',
-            options: {               
-                sort: { timestamp: -1}   
+        .find({ 'basic.job': jobId })
+        .populate([
+            {
+                path: 'basic.job',
+                populate: {
+                    path: 'customer'
+                }
+            },
+            {
+                path: 'basic.level',
+                select: 'name'
+            },
+            {
+                path: 'editor.staff',
+                select: 'fullname'
+            },
+            {
+                path: 'qa.staff',
+                select: 'fullname'
+            },
+            {
+                path: 'dc.staff',
+                select: 'fullname'
+            },
+            {
+                path: 'tla.created.by',
+                select: 'fullname'
+            },
+            {
+                path: 'tla.uploaded.by',
+                select: 'fullname'
+            },
+            {
+                path: 'remarks',
+                options: { sort: { 'timestamp': -1 } }
             }
-        })
+        ])
         .exec()
-        .then(tasks => {           
+        .then(tasks => {
             return res.status(200).json({
                 tasks,
                 msg: 'Load tasks by job id successfully!'
@@ -41,9 +64,9 @@ router.get('/list', authenticateSaleToken, (req, res) => {
 
 
 router.get('/all', authenticateSaleToken, (req, res) => {
-    let { page,search,status } = req.query;
+    let { page, search, status } = req.query;
     Task
-        .find({ })
+        .find({})
         .populate({
             path: 'job',
             populate: {
@@ -56,15 +79,15 @@ router.get('/all', authenticateSaleToken, (req, res) => {
         .populate('dc', 'fullname -_id')
         .populate('created_by', 'fullname -_id')
         .populate('updated_by', 'fullname -_id')
-        .populate('uploaded_by', 'fullname -_id')       
+        .populate('uploaded_by', 'fullname -_id')
         .populate({
-            path:'remarks',
-            options: {               
-                sort: { timestamp: -1}   
+            path: 'remarks',
+            options: {
+                sort: { timestamp: -1 }
             }
         })
         .exec()
-        .then(tasks => {  
+        .then(tasks => {
             return res.status(200).json({
                 tasks,
                 msg: 'Load taskslist successfully!'
@@ -79,7 +102,7 @@ router.get('/all', authenticateSaleToken, (req, res) => {
         })
 })
 
-router.get('/detail',authenticateSaleToken,(req,res)=>{
+router.get('/detail', authenticateSaleToken, (req, res) => {
     let { taskId } = req.query;
     getTaskDetail(taskId)
         .then(async task => {
@@ -104,42 +127,42 @@ router.get('/detail',authenticateSaleToken,(req,res)=>{
         })
 })
 
-router.put('/submit',authenticateSaleToken,(req,res)=>{
-    let {taskId} = req.body;
+router.put('/submit', authenticateSaleToken, (req, res) => {
+    let { taskId } = req.body;
 
     Task
-    .findByIdAndUpdate(taskId,{
-        done_submited_by: req.user._id,
-        done_submited_at: new Date(),
-        status:5
-    },{new:true},(err,task)=>{
-        if(err){
-            return res.status(500).json({
-                msg:`Can not submit done for this task with error: ${new Error(err.message)}`
-            })
-        }
+        .findByIdAndUpdate(taskId, {
+            done_submited_by: req.user._id,
+            done_submited_at: new Date(),
+            status: 5
+        }, { new: true }, (err, task) => {
+            if (err) {
+                return res.status(500).json({
+                    msg: `Can not submit done for this task with error: ${new Error(err.message)}`
+                })
+            }
 
-        if(!task){
-            return res.status(404).json({
-                msg:`Task not found!`
-            })
-        }
+            if (!task) {
+                return res.status(404).json({
+                    msg: `Task not found!`
+                })
+            }
 
-        return res.status(200).json({
-            msg:`The task has been submited done!`,
-            task
+            return res.status(200).json({
+                msg: `The task has been submited done!`,
+                task
+            })
         })
-    })
 })
 
 
-router.put('/reject',authenticateSaleToken,async (req,res)=>{
-    let {taskId,remark} = req.body;
+router.put('/reject', authenticateSaleToken, async (req, res) => {
+    let { taskId, remark } = req.body;
 
-    let  task = await Task.findById(taskId);
-    if(!task){
+    let task = await Task.findById(taskId);
+    if (!task) {
         return res.status(404).json({
-            msg:`Task not found!`
+            msg: `Task not found!`
         })
     }
 
@@ -149,30 +172,30 @@ router.put('/reject',authenticateSaleToken,async (req,res)=>{
         content: remark
     });
     await rmk.save()
-    .then(async r=>{
-        task.remarks.push(rmk);
-        task.rejected_by = req.user._id;
-        task.rejected_at = new Date();
-        task.status = -4;
-        task.updated_by = req.user._id;
-        task.updated_at = new Date();
-        
-        await task.save()
-        .then(_=>{
-            return res.status(200).json({
-                msg:`The task has been rejected!`
-            })
+        .then(async r => {
+            task.remarks.push(rmk);
+            task.rejected_by = req.user._id;
+            task.rejected_at = new Date();
+            task.status = -4;
+            task.updated_by = req.user._id;
+            task.updated_at = new Date();
+
+            await task.save()
+                .then(_ => {
+                    return res.status(200).json({
+                        msg: `The task has been rejected!`
+                    })
+                })
+                .catch(err => {
+                    return res.status(500).json({
+                        msg: `Can not reject this task with error: ${new Error(err.message)}`
+                    })
+                })
         })
-        .catch(err=>{
+        .catch(err => {
             return res.status(500).json({
-                msg:`Can not reject this task with error: ${new Error(err.message)}`
+                msg: `Can not insert reject remark with error: ${new Error(err.message)}`
             })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not insert reject remark with error: ${new Error(err.message)}`
-        })
-    })
 })
 module.exports = router;

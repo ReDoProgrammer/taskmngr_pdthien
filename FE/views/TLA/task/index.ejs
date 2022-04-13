@@ -355,7 +355,7 @@
                                             }
                                             tr += '</td>';
                                             tr += '<td>';
-                                            if (t.qa.length > 0) {
+                                            if (t.qa.length > 0 && !t.qa[t.qa.length-1].unregisted) {
                                                 tr += t.qa[t.qa.length - 1].staff.fullname
                                             }
                                             tr += '</td>';

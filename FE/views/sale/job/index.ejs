@@ -89,7 +89,7 @@
             $('#funcMenu').empty();
             let mn = '';
             mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Q.A ok</a></li>';
-           
+
             $('#funcMenu').append(mn);
           }
         })
@@ -179,7 +179,7 @@
           $nextRow.toggle($btn.hasClass('fa-minus'));
         } else {
           var newRow = '<tr class="expand-child" id="collapse' + $btn.data('id') + '">' +
-            '<td colspan="8">' +
+            '<td colspan="9">' +
             '<table class="table table-condensed table-bordered table-striped" width=100% >' +
             '<thead>' +
             '<tr>' +
@@ -193,6 +193,7 @@
             '<th>Uploaded at</th>' +
             '<th>I-Link</th>' +
             '<th>O-Link</th>' +
+            '<th>U-Link</th>' +
             '<th>Status</th>' +
             '</tr>' +
             '</thead>' +
@@ -213,57 +214,74 @@
               data.tasks.forEach(t => {
                 newRow += '<tr>';
                 newRow += '<td class="text-right">' + (idx++) + '</td>';
-                newRow += '<td class="font-weight-bold text-primary">' + t.level.name + '</td>';
+                newRow += '<td class="font-weight-bold text-primary">' + t.basic.level.name + '</td>';
                 newRow += '<td>';
-                if (typeof t.editor !== 'undefined' && t.editor !== null) {
-                  newRow += t.editor.fullname;
+                if (t.editor.length > 0 && !t.editor[t.editor.length - 1].unregisted) {
+                  newRow += t.editor[t.editor.length - 1].staff.fullname;
                 }
                 newRow += '</td>';
 
                 newRow += '<td class="text-center">';
-                if (typeof t.editor !== 'undefined' && t.editor !== null) {
-                  newRow += t.amount;
+                if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                  newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount
                 }
                 newRow += '</td>';
 
                 newRow += '<td>';
-                if (typeof t.qa !== 'undefined' && t.qa !== null) {
-                  newRow += t.qa.fullname;
+                if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
+                  newRow += t.qa[t.qa.length - 1].staff.fullname
                 }
                 newRow += '</td>';
 
                 newRow += '<td>';
-                if (typeof t.dc !== 'undefined' && t.dc !== null) {
-                  newRow += t.dc.fullname;
+                if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
+                  newRow += t.dc[t.dc.length - 1].staff.fullname
                 }
                 newRow += '</td>';
 
                 newRow += '<td>';
-                if (typeof t.uploaded_by !== 'undefined' && t.uploaded_by !== null) {
-                  newRow += t.uploaded_by.fullname;
+                if (t.tla.uploaded.length > 0) {
+                  newRow += t.tla.uploaded[t.tla.uploaded.length - 1].by.fullname;
                 }
                 newRow += '</td>';
 
                 newRow += '<td>';
-                if (typeof t.uploaded_by !== 'undefined' && t.uploaded_by !== null) {
-                  newRow += convertISODateToTimeFormat(t.uploaded_at);
+                if (t.tla.uploaded.length > 0) {
+                  newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
                 }
                 newRow += '</td>';
 
                 newRow += '<td  class="text-center">';
-                if (isValidHttpUrl(t.input_link)) {
-                  newRow += '<a href="' + t.input_link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                if (isValidHttpUrl(t.basic.link.input)) {
+                  newRow += '<a href="' + t.basic.link.input + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
                 } else {
-                  newRow += t.input_link;
+                  newRow += t.basic.link.input;
                 }
                 newRow += '</td>';
 
-                newRow += '<td  class="text-center">';
-                if (isValidHttpUrl(t.uploaded_link)) {
-                  newRow += '<a href="' + t.uploaded_link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
-                } else {
-                  newRow += t.uploaded_link
+                newRow += '<td class="text-center">';
+                if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                  if (isValidHttpUrl(t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link)) {
+                    newRow += '<a href="' + t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                  } else {
+                    newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link;
+                  }
                 }
+
+                newRow += '</td>';
+
+
+
+                newRow += '<td  class="text-center">';
+
+                if (t.tla.uploaded.length > 0) {
+                  if (isValidHttpUrl(t.tla.uploaded[t.tla.uploaded.length - 1].link)) {
+                    newRow += '<a href="' + t.tla.uploaded[t.tla.uploaded.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                  } else {
+                    newRow += t.tla.uploaded[t.tla.uploaded.length - 1].link
+                  }
+                }
+
                 newRow += '</td>';
 
 
@@ -345,7 +363,12 @@
             data.jobs.forEach(j => {
               let tr = '<tr id="' + j._id + '" data-customer="' + j.customer._id + '">';
               tr += '<td>';
-              tr += '<button class="btn btn-xs parents js-view-parents fa fa-plus" name="js-view-parents"></button>';
+              if (j.tasks.length > 0) {
+                tr += '<button class="btn btn-xs parents js-view-parents " name="js-view-parents">(';
+                tr += j.tasks.length + ') <i class="fa fa-plus"></i>'
+                tr += '</button>';
+              }
+
               tr += '</td>';
               tr += '<td>' + (idx++) + '</td>';
               tr += '<td class="font-weight-bold text-primary">' + j.customer.firstname + ' ' + j.customer.lastname + '</td>';
