@@ -73,7 +73,7 @@
                         $nextRow.toggle($btn.hasClass('fa-minus'));
                     } else {
                         var newRow = '<tr class="expand-child" id="collapse' + $btn.data('id') + '">' +
-                            '<td colspan="8">' +
+                            '<td colspan="9">' +
                             '<table class="table table-condensed table-bordered table-striped" width=100% >' +
                             '<thead>' +
                             '<tr>' +
@@ -86,6 +86,7 @@
                             '<th>Uploaded by</th>' +
                             '<th>Uploaded at</th>' +
                             '<th>I-Link</th>' +
+                            '<th>O-Link</th>' +
                             '<th>U-Link</th>' +
                             '<th>Status</th>' +
                             '</tr>' +
@@ -109,39 +110,40 @@
                                     newRow += '<td class="text-right">' + (idx++) + '</td>';
                                     newRow += '<td class="font-weight-bold text-primary">' + t.basic.level.name + '</td>';
                                     newRow += '<td>';
-                                    if (typeof t.editor !== 'undefined' && t.editor.length > 0) {
-                                        newRow += t.editor[0].staff.fullname;
+                                    if (t.editor.length > 0) {
+                                        newRow += t.editor[t.editor.length - 1].staff.fullname;
                                     }
                                     newRow += '</td>';
 
                                     newRow += '<td class="text-center">';
-                                    console.log(t.editor);
-                                    if (typeof t.editor !== 'undefined' && t.editor.length > 0 && typeof t.editor[0].submited !== 'undefined' && t.editor[0].submited.length > 0) {
-                                        newRow += t.editor[0].submited.amount;
+                                    if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                                        newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount;
                                     }
                                     newRow += '</td>';
 
                                     newRow += '<td>';
-                                    if (typeof t.qa !== 'undefined' && t.qa.length > 0) {
-                                        newRow += t.qa[0].staff.fullname;
+                                    if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
+                                        newRow += t.qa[t.qa.length - 1].staff.fullname;
                                     }
                                     newRow += '</td>';
 
                                     newRow += '<td>';
-                                    if (typeof t.dc !== 'undefined' && t.dc.length > 0) {
-                                        newRow += t.dc[0].staff.fullname;
+                                    if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
+                                        newRow += t.dc[t.dc.length - 1].staff.fullname;
+                                    }
+                                    newRow += '</td>';
+
+
+
+                                    newRow += '<td>';
+                                    if (t.tla.uploaded.length > 0) {
+                                        newRow += t.tla.uploaded[t.tla.uploaded.length - 1].by.fullname;
                                     }
                                     newRow += '</td>';
 
                                     newRow += '<td>';
-                                    if (typeof t.tla.uploaded.by !== 'undefined' && t.tla.uploaded.by !== null) {
-                                        newRow += t.tla.uploaded.by.fullname;
-                                    }
-                                    newRow += '</td>';
-
-                                    newRow += '<td>';
-                                    if (typeof t.tla.uploaded.at !== 'undefined' && t.tla.uploaded.at !== null) {
-                                        newRow += convertISODateToTimeFormat(t.tla.uploaded.at);
+                                    if (t.tla.uploaded.length > 0) {
+                                        newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
                                     }
                                     newRow += '</td>';
 
@@ -153,13 +155,31 @@
                                     }
                                     newRow += '</td>';
 
-                                    newRow += '<td  class="text-center">';
-                                    if (isValidHttpUrl(t.basic.link.upload)) {
-                                        newRow += '<a href="' + t.basic.link.upload + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
-                                    } else {
-                                        newRow += t.basic.link.upload
+                                    newRow += '<td class="text-center">';
+                                    if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                                        if (isValidHttpUrl(t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link)) {
+                                            newRow += '<a href="' + t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                                        } else {
+                                            newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link;
+                                        }
                                     }
+
                                     newRow += '</td>';
+
+
+
+                                    newRow += '<td  class="text-center">';
+
+                                    if (t.tla.uploaded.length > 0) {
+                                        if (isValidHttpUrl(t.tla.uploaded[t.tla.uploaded.length - 1].link)) {
+                                            newRow += '<a href="' + t.tla.uploaded[t.tla.uploaded.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                                        } else {
+                                            newRow += t.tla.uploaded[t.tla.uploaded.length - 1].link
+                                        }
+                                    }
+
+                                    newRow += '</td>';
+
 
 
                                     newRow += '<td><i>';
@@ -255,10 +275,10 @@
                             $('#tblData').empty();
                             data.jobs.forEach(job => {
                                 let tr = '<tr id = "' + job._id + '" data-customer="' + job.customer._id + '"  >';
-                               
-                                    tr += '<td>';
+
+                                tr += '<td>';
                                 if (job.tasks.length > 0) {
-                                    tr += '<button class="btn btn-xs btn-info parents js-view-parents" name="js-view-parents"> ('+job.tasks.length+') <i class="fa fa-plus"></i></button>';
+                                    tr += '<button class="btn btn-xs btn-info parents js-view-parents" name="js-view-parents"> (' + job.tasks.length + ') <i class="fa fa-plus"></i></button>';
                                 }
                                 tr += '</td>';
 
@@ -274,7 +294,7 @@
 
                                 tr += '</td>';
 
-                               
+
                                 tr += '<td class="text-info font-weight-bold">' + job.customer.firstname + ' ' + job.customer.lastname + '</td>';
                                 tr += '<td class="text-warning">' + job.name + '</td>';
                                 tr += '<td class="font-weight-bold text-danger">';

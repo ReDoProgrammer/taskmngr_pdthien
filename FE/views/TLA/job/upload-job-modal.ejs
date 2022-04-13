@@ -124,6 +124,9 @@
   })
 
 
+  $("#uploadJobModal").on('hide.bs.modal', function(){
+    LoadJobs();
+  });
 
   $("#uploadJobModal").on('shown.bs.modal', function (e) {
     LoadUnuploadedTask();
@@ -147,7 +150,7 @@
       success: function (data) {
         $('#slTasks').empty();
         data.tasks.forEach(t => { 
-          let opt = '<option value = "' + t._id + '" data-link="' + t.basic.link.output + '">';
+          let opt = '<option value = "' + t._id + '" data-link="' + t.editor[t.editor.length-1].submited[t.editor[t.editor.length-1].submited.length-1].link + '">';
             opt+= t.basic.level.name;
             opt+=' - ['+t.editor[t.editor.length-1].staff.fullname+']';           
             opt+= '</option>';
@@ -179,13 +182,14 @@
         $('#tbdyUploadedTasks').empty();
         let idx = 1;
         data.tasks.forEach(t=>{
+          console.log(t.remarks);
           let tr = '<tr>';
             tr+= '<td>'+(idx++)+'</td>';
-            tr+= '<td class="font-weight-bold text-primary">'+t.level.name+'</td>';
-            tr+= '<td>'+t.remarks[0].content+'</td>';
-            tr+= '<td><a href="'+t.uploaded_link+'" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a></td>';
-            tr+= '<td>'+t.uploaded_by.fullname+'</td>';
-            tr += "<td>" + convertISODateToTimeFormat(t.uploaded_at) + "</td>";
+            tr+= '<td class="font-weight-bold text-primary">'+t.basic.level.name+'</td>';
+            tr+= '<td>'+t.remarks[t.remarks.length-1].content+'</td>';
+            tr+= '<td><a href="'+t.tla.uploaded[t.tla.uploaded.length-1].link+'" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a></td>';
+            tr+= '<td>'+t.tla.uploaded[t.tla.uploaded.length-1].by.fullname+'</td>';
+            tr += "<td>" + convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length-1].at) + "</td>";
             tr+= '</tr>';
             $('#tbdyUploadedTasks').append(tr);
         })

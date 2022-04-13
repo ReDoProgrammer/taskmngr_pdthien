@@ -199,8 +199,7 @@ const taskSchema = new Schema({
         },
         updated: {
             at: {
-                type: Date,
-                default: new Date()
+                type: Date               
             },
             by: {
                 type: Schema.Types.ObjectId,
@@ -209,8 +208,7 @@ const taskSchema = new Schema({
         },
         submited: {
             at: {
-                type: Date,
-                default: new Date()
+                type: Date               
             },
             by: {
                 type: Schema.Types.ObjectId,

@@ -164,17 +164,25 @@ router.get('/list-uploaded', authenticateTLAToken, (req, res) => {
 
     Task
         .find({
-            job: jobId,
+            'basic.job': jobId,
             status: { $gt: 3 }// lấy các task có trạng thái đã được upload trở lên
         })
-        .populate('uploaded_by', 'fullname')
-        .populate('level', 'name')
-        .populate({
-            path: 'remarks',
-            options: {
-                sort: { timestamp: -1 }
+        .populate([
+
+            {
+                path: 'basic.level',
+                select: 'name'
+            },
+            {
+                path: 'tla.uploaded.by',
+                select: 'fullname'
+            },
+            {
+                path: 'remarks',
+                select: 'content'
             }
-        })
+
+        ])
         .exec()
         .then(tasks => {
             return res.status(200).json({
@@ -437,7 +445,7 @@ router.post('/', authenticateTLAToken, (req, res) => {
 
                             }
 
-                           
+
 
                             let rm = new Remark({
                                 user: req.user._id,
@@ -450,30 +458,30 @@ router.post('/', authenticateTLAToken, (req, res) => {
                                     task.remarks.push(r);
 
                                     await task.save()
-                                    .then(async t=>{
-                                        j.tasks.push(t);
-                                        await j.save()
-                                        .then(_=>{
-                                            return res.status(201).json({
-                                                msg:`Task has been created successfully!`
-                                            })
+                                        .then(async t => {
+                                            j.tasks.push(t);
+                                            await j.save()
+                                                .then(_ => {
+                                                    return res.status(201).json({
+                                                        msg: `Task has been created successfully!`
+                                                    })
+                                                })
+                                                .catch(err => {
+                                                    console.log(`Can not update tasks list into job with error: ${new Error(err.message)}`)
+                                                    return res.status(500).json({
+                                                        msg: `Can not update tasks list into job with error: ${new Error(err.message)}`
+                                                    })
+                                                })
                                         })
-                                        .catch(err=>{
-                                            console.log(`Can not update tasks list into job with error: ${new Error(err.message)}`)
+                                        .catch(err => {
+                                            console.log(`Can not create task with error: ${new Error(err.message)}`)
                                             return res.status(500).json({
-                                                msg:`Can not update tasks list into job with error: ${new Error(err.message)}`
+                                                msg: `Can not create task with error: ${new Error(err.message)}`
                                             })
                                         })
-                                    })
-                                    .catch(err=>{
-                                        console.log(`Can not create task with error: ${new Error(err.message)}`)
-                                        return res.status(500).json({
-                                            msg:`Can not create task with error: ${new Error(err.message)}`
-                                        })
-                                    })
                                 })
                                 .catch(err => {
-                                    console.log( `Can not create remark with error: ${new Error(err.message)}`)
+                                    console.log(`Can not create remark with error: ${new Error(err.message)}`)
                                     return res.status(500).json({
                                         msg: `Can not create remark with error: ${new Error(err.message)}`
                                     })
@@ -537,22 +545,20 @@ router.put('/upload', authenticateTLAToken, async (req, res) => {
                 link: uploaded_link
             };
 
-            console.log(task.tla.uploaded)
             task.tla.uploaded.push(up);
-
             task.remarks.push(r);
 
-            // await task.save()
-            //     .then(_ => {
-            //         return res.status(200).json({
-            //             msg: `The task has been uploaded!`
-            //         })
-            //     })
-            //     .catch(err => {
-            //         return res.status(500).json({
-            //             msg: `Can not upload this task with error: ${new Error(err.message)}`
-            //         })
-            //     })
+            await task.save()
+                .then(_ => {
+                    return res.status(200).json({
+                        msg: `The task has been uploaded!`
+                    })
+                })
+                .catch(err => {
+                    return res.status(500).json({
+                        msg: `Can not upload this task with error: ${new Error(err.message)}`
+                    })
+                })
         })
         .catch(err => {
             return res.status(500).json({
