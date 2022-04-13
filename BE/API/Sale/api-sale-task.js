@@ -67,25 +67,42 @@ router.get('/all', authenticateSaleToken, (req, res) => {
     let { page, search, status } = req.query;
     Task
         .find({})
-        .populate({
-            path: 'job',
-            populate: {
-                path: 'customer'
+        .populate([
+            {
+                path: 'basic.job',
+                populate: {
+                    path: 'customer'
+                }
+            },
+            {
+                path: 'basic.level',
+                select: 'name'
+            },
+            {
+                path: 'editor.staff',
+                select: 'fullname'
+            },
+            {
+                path: 'qa.staff',
+                select: 'fullname'
+            },
+            {
+                path: 'dc.staff',
+                select: 'fullname'
+            },
+            {
+                path: 'tla.created.by',
+                select: 'fullname'
+            },
+            {
+                path: 'tla.uploaded.by',
+                select: 'fullname'
+            },
+            {
+                path: 'remarks',
+                options: { sort: { 'timestamp': -1 } }
             }
-        })
-        .populate('level', 'name')
-        .populate('qa', 'fullname -_id')
-        .populate('editor', 'fullname -_id')
-        .populate('dc', 'fullname -_id')
-        .populate('created_by', 'fullname -_id')
-        .populate('updated_by', 'fullname -_id')
-        .populate('uploaded_by', 'fullname -_id')
-        .populate({
-            path: 'remarks',
-            options: {
-                sort: { timestamp: -1 }
-            }
-        })
+        ])
         .exec()
         .then(tasks => {
             return res.status(200).json({

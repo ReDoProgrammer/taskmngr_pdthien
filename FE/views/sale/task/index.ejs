@@ -208,7 +208,7 @@
 
 
                         data.tasks.forEach(t => {
-                            let tr = '<tr id="' + t._id + '" data-job="' + t.level._id + '">';
+                            let tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '">';
 
                             tr += '<td>';
                             tr += '<button class="btn btn-xs btn-warning ml-2" name="btn-job-functions">';
@@ -218,13 +218,13 @@
 
                             tr += '<td>' + (idx++) + '</td>';
 
-                            tr += '<td class="font-weight-bold text-primary">' + t.job.customer.firstname + ' ' + t.job.customer.lastname + '</td>';
-                            tr += '<td class="font-weight-bold text-danger">' + t.job.name + '</td>';
-                            tr += '<td class="font-weight-bold">' + t.level.name + '</td>';
+                            tr += '<td class="font-weight-bold text-primary">' + t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname + '</td>';
+                            tr += '<td class="font-weight-bold text-danger">' + t.basic.job.name + '</td>';
+                            tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';
 
                             tr += '<td>';
-                            if (typeof t.deadline !== 'undefined') {
-                                tr += convertISODateToTimeFormat(t.deadline);
+                            if (typeof t.basic.deadline.end !== 'undefined') {
+                                tr += convertISODateToTimeFormat(t.basic.deadline.end);
                             }
                             tr += '</td>';
 
@@ -236,26 +236,17 @@
                             }
                             tr += '</td>';
 
-
-                            tr += '<td class="text-right">' + t.amount + '</td>';
-                            tr += '<td class="text-right">' + t.edited_time + '</td>';
-
-
-                            tr += '<td>';
-                            if (typeof t.editor !== 'undefined' && t.editor !== null) {
-                                tr += t.editor.fullname
+                            tr += '<td class="text-right">';
+                            if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                                tr += t.editor[0].submited.length;
                             }
                             tr += '</td>';
 
-                            tr += '<td>';
-                            if (typeof t.qa !== 'undefined' && t.qa !== null) {
-                                tr += t.qa.fullname
-                            }
-                            tr += '</td>';
 
-                            tr += '<td>';
-                            if (typeof t.dc !== 'undefined' && t.dc !== null) {
-                                tr += t.dc.fullname
+
+                            tr += '<td class="text-right">';
+                            if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                                tr += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount
                             }
                             tr += '</td>';
 
@@ -263,18 +254,46 @@
 
 
                             tr += '<td>';
-                            if (typeof t.uploaded_by !== 'undefined' && t.uploaded_by !== null) {
-                                tr += t.uploaded_by.fullname
+                            if (t.editor.length > 0 && !t.editor[t.editor.length - 1].unregisted) {
+                                tr += t.editor[t.editor.length - 1].staff.fullname
+                            }
+                            tr += '</td>';
+
+
+
+                            tr += '<td>';
+                            if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
+                                tr += t.qa[t.qa.length - 1].staff.fullname
+                            }
+                            tr += '</td>';
+
+
+                            tr += '<td>';
+                            if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
+                                tr += t.dc[t.dc.length - 1].staff.fullname
+                            }
+                            tr += '</td>';
+
+
+
+
+                            tr += '<td>';
+                            if (t.tla.uploaded.length > 0) {
+                                tr += t.tla.uploaded[t.tla.uploaded.length - 1].by.fullname
                             }
                             tr += '</td>';
 
                             tr += '<td>';
-                            if (typeof t.uploaded_by !== 'undefined' && t.uploaded_by !== null) {
-                                tr += convertISODateToTimeFormat(t.uploaded_at);
+                            if (t.tla.uploaded.length > 0) {
+                                tr += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
                             }
                             tr += '</td>';
 
-                            tr += '<td><a href="' + t.uploaded_link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a></td>'
+                            tr += '<td>';
+                            if (t.tla.uploaded.length > 0) {
+                                tr += '<a href="' + t.tla.uploaded[t.tla.uploaded.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                            }
+                            tr += '</td>'
 
 
                             tr += '<td><i>';
@@ -286,7 +305,7 @@
                                     break;
                                 case 1:
                                     {
-                                        if (t.edited_time > 1) {
+                                        if (t.editor[t.editor.length-1].submited.length > 1) {
                                             tr += '<span class="text-primary">Fixed</span>';
                                         } else {
                                             tr += '<span class="text-primary">Edited</span>';
