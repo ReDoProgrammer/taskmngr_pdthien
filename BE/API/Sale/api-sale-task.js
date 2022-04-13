@@ -123,7 +123,7 @@ router.get('/detail', authenticateSaleToken, (req, res) => {
     let { taskId } = req.query;
     getTaskDetail(taskId)
         .then(async task => {
-            await getCustomer(task.job.customer)
+            await getCustomer(task.basic.job.customer)
                 .then(customer => {
                     return res.status(200).json({
                         msg: `Get task info successfully!`,

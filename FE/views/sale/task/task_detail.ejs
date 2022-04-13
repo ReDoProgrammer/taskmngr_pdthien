@@ -166,14 +166,15 @@
                 $('#divSize').html(data.customer.size.name);
 
 
-                $('#lblJobName').text(data.task.job.name);
-                $('#lblLevelName').text(data.task.level.name);
-                $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.assigned_date));
-                $('#lblDeadline').text(convertISODateToTimeFormat(data.task.deadline));
+                $('#lblJobName').text(data.task.basic.job.name);
+                $('#lblLevelName').text(data.task.basic.level.name);
+                $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.basic.deadline.begin));
+                if(data.task.basic.deadline.end){
+                    $('#lblDeadline').text(convertISODateToTimeFormat(data.task.basic.deadline.end));
+                }
+              
                 $('#lblStyleNote').text(data.customer.remark);
-                $('#lblIntruction').text(data.task.job.intruction);
-                $('#lblRemark').text(data.task.remark);
-
+                $('#lblIntruction').text(data.task.basic.job.intruction);              
 
                 $('#remarks').empty();
                 data.task.remarks.forEach(r => {
@@ -187,16 +188,17 @@
 
 
 
-                if (isValidHttpUrl(data.task.input_link)) {
-                    $('#lblInputLink').html('<a href="' + data.task.input_link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                if (isValidHttpUrl(data.task.basic.link.input)) {
+                    $('#lblInputLink').html('<a href="' + data.task.basic.link.input + '" target="_blank" rel="noopener noreferrer">Link</a>')
                 } else {
-                    $('#lblInputLink').html('<span class="font-weight-bold font-italic">' + data.task.input_link + '</span>');
+                    $('#lblInputLink').html('<span class="font-weight-bold font-italic">' +data.task.basic.link.input + '</span>');
                 }
 
-                if (isValidHttpUrl(data.task.output_link)) {
-                    $('#lblOutputLink').html('<a href="' + data.task.output_link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                if(data.task.editor.length>0 && data.task.editor[data.task.editor.length-1].submited.length>0)
+                if (isValidHttpUrl(data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link)) {
+                    $('#lblOutputLink').html('<a href="' + data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
                 } else {
-                    $('#lblOutputLink').html('<span class="font-weight-bold font-italic">' + data.task.output_link + '</span>');
+                    $('#lblOutputLink').html('<span class="font-weight-bold font-italic">' +data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link + '</span>');
                 }
 
 
