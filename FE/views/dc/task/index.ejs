@@ -180,7 +180,7 @@
               tr += '</td>';
 
               tr += '<td>';
-              if (t.dc.length > 0) {
+              if (t.dc.length > 0 && !t.dc[t.dc.length-1].unregisted) {
                 tr += t.dc[t.dc.length - 1].staff.fullname;
               }
               tr += '</td>';
