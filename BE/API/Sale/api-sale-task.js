@@ -144,32 +144,32 @@ router.get('/detail', authenticateSaleToken, (req, res) => {
         })
 })
 
-router.put('/submit', authenticateSaleToken, (req, res) => {
+router.put('/submit', authenticateSaleToken, async (req, res) => {
     let { taskId } = req.body;
-
-    Task
-        .findByIdAndUpdate(taskId, {
-            done_submited_by: req.user._id,
-            done_submited_at: new Date(),
-            status: 5
-        }, { new: true }, (err, task) => {
-            if (err) {
-                return res.status(500).json({
-                    msg: `Can not submit done for this task with error: ${new Error(err.message)}`
-                })
-            }
-
-            if (!task) {
-                return res.status(404).json({
-                    msg: `Task not found!`
-                })
-            }
-
-            return res.status(200).json({
-                msg: `The task has been submited done!`,
-                task
-            })
+    let task = await Task.findById(taskId);
+    if(!task){
+        return res.status(404).json({
+            msg:`Task not found!`
         })
+    }
+    task.status = 5;
+    task.done.push({
+        at: new Date(),
+        by:req.user._id
+    })
+
+    await task.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`Task has been submited!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not submit this task with error: ${new Error(err.message)}`
+        })
+    })
+   
 })
 
 

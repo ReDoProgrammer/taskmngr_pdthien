@@ -233,6 +233,20 @@ const taskSchema = new Schema({
 
     },
 
+    //thông tin liên quan tới Sale submit
+    done: [
+        {
+            at: {
+                type: Date
+            },
+            by: {
+                type: Schema.Types.ObjectId,
+                ref: 'user'
+            }       
+        }
+    ],
+
+
     //thông tin liên quan tới kế toán
     finished: {
         at: {
