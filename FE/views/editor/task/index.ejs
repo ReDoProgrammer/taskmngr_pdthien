@@ -40,8 +40,9 @@
         <th scope="col">Deadline</th>
         <th scope="col" class="text-right">E-T</th>
         <th scope="col" class="text-right">I-N</th>
-        <th scope="col">Status</th>
         <th scope="col">Q.A</th>
+        <th scope="col">DC</th>
+        <th scope="col">Status</th>       
         <th scope="col">Remark</th>
         <th scope="col"></th>
       </tr>
@@ -173,6 +174,17 @@
                 }
                 tr += '</td>';
 
+                tr += '<td>';
+                  if(t.qa.length>0 && !t.qa[t.qa.length-1].unregisted){
+                    tr+=  t.qa[t.qa.length-1].staff.fullname;
+                  }                 
+                tr += '</td>';
+
+                tr += '<td>';
+                  if(t.dc.length>0 && !t.dc[t.dc.length-1].unregisted){
+                    tr+=  t.dc[t.dc.length-1].staff.fullname;
+                  }                 
+                tr += '</td>';
 
                 tr += '<td><i>';
 
@@ -215,12 +227,7 @@
                 }
                 tr += '</i></td>';
 
-                tr += '<td>';
-                  if(typeof t.qa !=='undefined' && t.qa.length>0 && typeof t.qa[t.qa.length-1].staff !=='undefined' && t.qa[t.qa.length-1].staff !==null && t.qa[t.qa.length-1].staff.length > 0){
-                    tr+=  t.qa[t.qa.length-1].staff !==null && t.qa[t.qa.length-1].staff.fullname;
-                  }
-                 
-                tr += '</td>';
+            
 
                 tr += '<td>';
                 if (typeof t.remarks[0] != 'undefined') {
