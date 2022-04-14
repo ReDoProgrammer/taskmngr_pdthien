@@ -115,6 +115,61 @@ router.get('/list',authenticateAccountantToken,(req,res)=>{
     })
 })
 
+router.get('/list-payment',authenticateAccountantToken,(req,res)=>{
+    let {page,search} = req.query;
+    Task
+    .find({status:5})
+    .populate([
+        {
+            path: 'basic.job',
+            populate: {
+                path: 'customer'
+            }
+        },
+        {
+            path: 'basic.level',
+            select: 'name'
+        },
+        {
+            path: 'editor.staff',
+            select: 'fullname'
+        },
+        {
+            path: 'qa.staff',
+            select: 'fullname'
+        },
+        {
+            path: 'dc.staff',
+            select: 'fullname'
+        },
+        {
+            path: 'tla.created.by',
+            select: 'fullname'
+        },
+        {
+            path: 'tla.uploaded.by',
+            select: 'fullname'
+        },
+        {
+            path: 'remarks',
+            options: { sort: { 'timestamp': -1 } }
+        }
+    ])
+    .exec()
+    .then(tasks => {
+        return res.status(200).json({
+            tasks,
+            msg: 'Load paid tasks list successfully!'
+        })
+    })
+    .catch(err => {
+        console.log(`Can not load paid tasks list: ${jobId}`);
+        return res.status(500).json({
+            msg: `Can not load paid tasks list: ${jobId}`,
+            error: new Error(err.message)
+        })
+    })
+})
 
 router.get('/detail', authenticateAccountantToken, (req, res) => {
     let { taskId } = req.query;
