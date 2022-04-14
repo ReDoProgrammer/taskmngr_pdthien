@@ -10,7 +10,7 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-md-6 col-sm-12 col-xs-12">
+                            <div class="col-md-4 col-sm-12 col-xs-12">
                                 <div class="form-group">
                                     <label for="">Job level</label>
                                     <select name="" id="slJobLevels" class="form-control"></select>
@@ -24,6 +24,12 @@
                                     <input type="text" class="inputDate form-control" id="txtAssignDate">
                                 </div>
                             </div>
+                            <div class="col-md-2 col-sm-2 col-xs-2">
+                                <div class="form-group">
+                                  <label for="">Hours:</label>
+                                  <input type="text" class="form-control text-right" id="txtDuration" value="0">
+                                </div>
+                              </div>
 
                             <div class="col-md-3 col-sm-6 col-xs-6">
                                 <div class=" form-group">
@@ -199,7 +205,7 @@
 
     function LoadTask() {
         $.ajax({
-            url: '/tla/task/detail-to-edit',
+            url: '/tla/task/detail',
             type: 'get',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -208,27 +214,33 @@
                 taskId
             },
             success: function (data) {
-                levelId = data.task.level._id;               
+                levelId = data.task.basic.level._id;               
                 LoadEditors();
                 LoadQAs();
-                $('#name_case').text(data.task.job.name);
+
+                console.log(data.task);
+                $('#name_case').text(data.task.basic.job.name);
                 $('#customer').text(data.customer.firstname+' '+data.customer.lastname);
 
-                $('#slJobLevels').val(data.task.level._id);
+                $('#slJobLevels').val(data.task.basic.level._id);
                 $('#slJobLevels').attr("disabled", true);
-                $('#txtAssignDate').val(convertISODateToTimeFormat(data.task.assigned_date));
+                $('#txtAssignDate').val(convertISODateToTimeFormat(data.task.basic.deadline.begin));
                 $('#txtAssignDate').prop('readonly', true);
-                $('#txtDeadline').val(convertISODateToTimeFormat(data.task.deadline));
-                $('#txtInputLink').val(data.task.input_link);
+                if(data.task.basic.deadline.end){
+                    $('#txtDeadline').val(convertISODateToTimeFormat(data.task.basic.deadline.end));
+                }
+               
+                $('#txtInputLink').val(data.task.basic.link.input);
                 $('#txtRemark').val(data.task.remarks[0].content);
 
                 //xu ly checkbox va dropdown lien quan toi editor va qa
-                $('#ckbAssignEditor').prop('checked', data.task.editor_assigned);
-                $('#ckbAssignQA').prop('checked', data.task.qa_assigned);
+               
+                $('#ckbAssignEditor').prop('checked', data.task.editor.length>0?true:false);
+                $('#ckbAssignQA').prop('checked', data.task.qa.length>0?true:false);
 
-                if (data.task.editor_assigned) {
+                if (data.task.editor.length>0) {
                     $('#colEditor').show();
-                    $('#slEditor').val(data.task.editor);
+                    $('#slEditor').val(data.task.editor[data.task.editor.length-1].staff._id);
                     if (data.task.status > 0) {
                         $('#ckbAssignEditor').attr("disabled", true);
                         $('#slEditor').attr("disabled", true);
@@ -240,9 +252,9 @@
                     $('#colEditor').hide();
                 }
 
-                if (data.task.qa_assigned) {
+                if (data.task.qa.length>0) {
                     $('#colQA').show();
-                    $('#slQA').val(data.task.qa);
+                    $('#slQA').val(data.task.qa[data.task.qa.length-1].staff._id);
                     if (data.task.status > 1) {
                         $('#ckbAssignQA').attr("disabled", true);
                         $('#slQA').attr("disabled", true);
@@ -369,6 +381,17 @@
         })
     }
 
+    $('#txtDuration').keyup(function (e) {
+        console.log(111111111111);
+    if (/\D/g.test(this.value)) {
+      // Filter non-digits from input value.
+      this.value = this.value.replace(/\D/g, '');
+    }
+    let duration = parseInt($('#txtDuration').val());
+    let assigned_date = strToDate($('#txtAssignDate').val());
+    let deadline = assigned_date.addHours(duration);
+    $('#txtDeadline').val(convertISODateToTimeFormat(deadline));
+  });
 
 
     $('.inputDate').inputmask("datetime", {

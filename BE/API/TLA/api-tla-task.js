@@ -628,7 +628,7 @@ router.put('/', authenticateTLAToken, async (req, res) => {
             //cập nhật Editor
 
             if (editor_assigned == 'true') {
-                task.status = 1;
+                task.status = 0;
                 if (task.editor.length == 0) {
                     await getModule(_EDITOR)
                         .then(async m => {
@@ -707,8 +707,7 @@ router.put('/', authenticateTLAToken, async (req, res) => {
             if (qa_assigned == 'true') {
                 if (task.qa.length == 0) {
                     await getModule(_QA)
-                        .then(async m => {
-                            console.log(m)
+                        .then(async m => {                            
                             await getWage(qa, task.basic.level, m._id)
                                 .then(async w => {
                                     let q = {
@@ -787,12 +786,6 @@ router.put('/', authenticateTLAToken, async (req, res) => {
                 msg: `Can not update remark with error: ${new Error(err.message)}`
             })
         })
-
-
-
-
-
-
 })
 
 
