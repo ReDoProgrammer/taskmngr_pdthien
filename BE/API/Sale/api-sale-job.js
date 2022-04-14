@@ -50,7 +50,7 @@ router.get("/list", authenticateSaleToken, (req, res) => {
 
     })
     .populate('cb')
-    .populate({path:'links',populate:({path:'created_by',select:'fullname'})})  
+    .populate('tasks')  
     .exec()
     .then((jobs) => {
       let result = jobs.slice(process.env.PAGE_SIZE * (page - 1), process.env.PAGE_SIZE);
@@ -73,7 +73,7 @@ router.delete('/',authenticateSaleToken,(req,res)=>{
   let {jobId} = req.body;
   Task
   .countDocuments({
-    job:jobId,
+    'basic.job':jobId,
     status: {   
       $nin:[0,-1,-2,-3,-4,-5]//và không bị cancel,reject
     }
@@ -208,7 +208,7 @@ module.exports = router;
 const DeleteTasksBasedJob = (jobId)=>{
   return new Promise((resolve,reject)=>{
     Task
-    .deleteMany({job:jobId},err=>{
+    .deleteMany({'basic.job':jobId},err=>{
       if(err){
         return reject({
           code:500,
