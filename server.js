@@ -34,6 +34,8 @@ app.use('/accountant',accountantHomeController);
 const accountantJobController = require('./BE/controllers/accountant/job-controller');
 app.use('/accountant/job',accountantJobController);
 
+const accountantPayment = require('./BE/controllers/accountant/payment-controller');
+app.use('/accountant/payment',accountantPayment);
 const accountantTaskController = require('./BE/controllers/accountant/task-controller');
 app.use('/accountant/task',accountantTaskController);
 
@@ -71,6 +73,8 @@ app.use('/accountant/job-level',accountantJobLevelAPI);
 
 const accountantNationalStyleAPI = require('./BE/API/accountant/api-national-style');
 app.use('/accountant/national-style',accountantNationalStyleAPI);
+
+
 
 const accountantSizeAPI = require('./BE/API/accountant/api-size');
 app.use('/accountant/size',accountantSizeAPI);
