@@ -1,0 +1,232 @@
+<div class="modal" tabindex="-1" role="dialog" id="modalTaskDetail">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="panel panel-primary text-white bg-dark">
+                    <div class="panel-heading"> <button class="btn btn-xs btn-primary" id="btn-task-info">Show job info
+                            <i class="fa fa-arrow-down" aria-hidden="true"></i></button> </div>
+                    <div class="panel-body" id="job-info">
+
+                        <div class="row">
+                            <div class="col-md-2 col-sm-4 col-xs-4">Job name:</div>
+                            <div class="col-md-4 col-sm-8 col-xs-8">
+                                <label id="lblJobName" class="text-info font-weight-bold"></label>
+                            </div>
+
+                            <div class="col-md-2 col-sm-4 col-xs-4">Job level:</div>
+                            <div class="col-md-4 col-sm-8 col-xs-8">
+                                <label id="lblLevelName" class="text-info font-weight-bold"></label>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row mt-2">
+                            <div class="col-md-2 co-sm-4 col-xs-4">Assigne date:</div>
+                            <div class="col-md-4 col-sm-8 col-xs-8">
+                                <label id="lblAssignDate"></label>
+                            </div>
+                            <div class="col-md-2 co-sm-4 col-xs-4">Deadline:</div>
+                            <div class="col-md-4 col-sm-8 col-xs-8">
+                                <label id="lblDeadline" class="text-danger"></label>
+                            </div>
+                        </div>
+
+
+
+
+                        <hr />
+
+
+                        <div class="row">
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                Intruction:
+                            </div>
+
+                            <div class="col-md-10 col-sm-10 col-xs-8">
+                                <label id="lblIntruction"></label>
+                            </div>
+                        </div>
+
+
+                        <hr />
+                        <div class="row mt-2">
+                            <div class="col-md-2 col-sm-2 col-xs-4">Source:</div>
+                            <div class="col-md-10 col-sm-10 col-xs-8" id="lblInputLink"></div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-2 col-sm-2 col-xs-4">Output:</div>
+                            <div class="col-md-10 col-sm-10 col-xs-8" id="lblOutputLink"></div>
+                        </div>
+
+
+
+                        <div class="panel panel-info mt-2">
+                            <div class="panel-heading">Job style info</div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-2 col-sm-3 col-xs-4">National style:</div>
+                                    <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold" id="divNationalStyle">
+                                    </div>
+                                    <div class="col-md-2 col-sm-3 col-xs-4">Color:</div>
+                                    <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold" id="divColor"></div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-2 col-sm-3 col-xs-4">Size:</div>
+                                    <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold" id="divSize"></div>
+
+                                    <div class="col-md-2 col-sm-3 col-xs-4">Output:</div>
+                                    <div class="col-md-4 col-sm-3 col-xs-8 font-weight-bold" id="divOutput"></div>
+                                </div>
+
+
+
+                                <hr />
+                                <div class="row">
+                                    <div class="col-md-1 col-sm-1 col-xs-2 mt-1">Align: </div>
+                                    <div id="divAlign" class="font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1"></div>
+
+                                    <div class="col-md-1 col-sm-1 col-xs-2 mt-1">Sky:</div>
+                                    <div id="divSky" class=" font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1"></div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-1 col-sm-1 col-xs-2 mt-1">Fire:</div>
+                                    <div id="divFire" class="font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1"></div>
+
+                                    <div class="col-md-1 col-sm-1 col-xs-2 mt-1">TV:</div>
+                                    <div id="divTV" class=" font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1"></div>
+                                </div>
+
+                                <hr />
+                                <div class="row mt-2">
+                                    <div class="col-md-2 col-sm-2 col-xs-4">
+                                        Style note:
+                                    </div>
+                                    <div class="col-md-10 col-sm-10 col-xs-8">
+                                        <label id="lblNoteStyle" class="text-danger font-weight-bold"></label>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-warning mt-2">
+                        <div class="pa  nel-heading font-weight-bold">Remarks:</div>
+                        <div class="panel-body" id="remarks"></div>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="form-group text-right">
+                            <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/js/common.js"></script>
+
+<script>
+    $('#btn-task-info').click(function () {
+        if ($('#job-info').is(":hidden")) {
+            $('#job-info').slideDown(1000);
+            $('#btn-task-info').html('Hide job info <i class="fa fa-arrow-up" aria-hidden="true"></i>')
+        } else {
+            $('#btn-task-info').html('Show job info <i class="fa fa-arrow-down" aria-hidden="true"></i>');
+            $('#job-info').slideUp(1000);
+        }
+    })
+
+    $("#modalTaskDetail").on('shown.bs.modal', function (e) {
+        $('#job-info').hide();
+        $.ajax({
+            url: '/accountant/task/detail',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                taskId
+            },
+            success: function (data) {
+
+                $('#divNationalStyle').html(data.customer.nation.name)
+                $('#divColor').html(data.customer.color.name)
+                $('#divOutput').html(data.customer.output.name)
+
+                $('#divSize').html(data.customer.size.name)
+                $('#lblNoteStyle').text(data.customer.remark);
+
+                $('#lblJobName').text(data.task.basic.job.name);
+                $('#lblLevelName').text(data.task.basic.level.name);
+                $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.basic.deadline.begin));
+                if(typeof data.task.basic.deadline.end !== 'undefined'){
+                    $('#lblDeadline').text(convertISODateToTimeFormat(data.task.basic.deadline.end));
+                }else{
+                    $('#lblDeadline').text('');
+                }
+                
+                $('#lblIntruction').text(data.task.basic.job.intruction);
+
+                $('#remarks').empty();
+                data.task.remarks.forEach(r => {
+                    let item = '<div class="row mt-2">';
+                    item += '<div class="col-md-4 col-sm-4 col-xs-12"><span class="font-weight-bold text-primary">' + r.user.fullname + '</span>(' + convertISODateToTimeFormat(r.timestamp) + '):</div>';
+                    item += '<div class="col-md-8 col-sm-8 col-xs-12 text-danger font-italic">' + r.content + '</div>';
+                    item += '</div>';
+
+                    $('#remarks').append(item);
+                })
+
+
+                if (isValidHttpUrl(data.task.basic.link.input)) {
+                    $('#lblInputLink').html('<a href="' + data.task.basic.link.input+ '" target="_blank" rel="noopener noreferrer">Link</a>')
+                } else {
+                    $('#lblInputLink').html('<span class="font-weight-bold font-italic">' + data.task.basic.link.input + '</span>');
+                }
+
+                if (isValidHttpUrl(data.task.basic.link.output)) {
+                    $('#lblOutputLink').html('<a href="' + data.task.basic.link.output + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                } else {
+                    $('#lblOutputLink').html('<span class="font-weight-bold font-italic">' + data.task.basic.link.output + '</span>');
+                }
+
+
+                if (data.customer.is_align) {
+                    $('#divAlign').html('<i class="fa fa-check-square-o"></i>  <span class="text-warning">' + data.customer.align_note + '</span>');
+                } else {
+                    $('#divAlign').html('<i class="fa fa-square-o"></i>');
+                }
+
+
+                if (data.customer.has_sky) {
+                    $('#divSky').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.sky_note + '</span>');
+                } else {
+                    $('#divSky').html('<i class="fa fa-square-o"></i>');
+                }
+
+
+                if (data.customer.has_TV) {
+                    $('#divTV').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.TV_note + '</span>');
+                } else {
+                    $('#divTV').html('<i class="fa fa-square-o"></i>');
+                }
+
+
+                if (data.customer.has_fire) {
+                    $('#divFire').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.fire_note + '</span>');
+                } else {
+                    $('#divFire').html('<i class="fa fa-square-o"></i>');
+                }
+            }, error: function (request, status, error) {
+                alert(request.responseJSON.msg)              
+            }
+        })
+    });
+</script>

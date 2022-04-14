@@ -113,32 +113,32 @@
               newRow += '<td class="text-right">' + (idx++) + '</td>';
               newRow += '<td class="font-weight-bold text-primary">' + t.basic.level.name + '</td>';
               newRow += '<td>';
-              if (t.editor.length>0) {
-                newRow += t.editor[t.editor.length-1].staff.fullname;
+              if (t.editor.length > 0) {
+                newRow += t.editor[t.editor.length - 1].staff.fullname;
               }
               newRow += '</td>';
 
               newRow += '<td>';
-              if (t.qa.length>0 && !t.qa[t.qa.length-1].unregisted) {
-                newRow +=t.qa[t.qa.length-1].staff.fullname;
+              if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
+                newRow += t.qa[t.qa.length - 1].staff.fullname;
               }
               newRow += '</td>';
 
               newRow += '<td>';
-              if (t.dc.length>0 && !t.dc[t.dc.length-1].unregisted) {
-                newRow += t.dc[t.dc.length-1].staff.fullname;
+              if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
+                newRow += t.dc[t.dc.length - 1].staff.fullname;
               }
               newRow += '</td>';
 
               newRow += '<td>';
-              if (t.tla.uploaded.length>0) {
-                newRow += t.tla.uploaded[t.tla.uploaded.length-1].by.fullname;
+              if (t.tla.uploaded.length > 0) {
+                newRow += t.tla.uploaded[t.tla.uploaded.length - 1].by.fullname;
               }
               newRow += '</td>';
 
               newRow += '<td>';
-                if (t.tla.uploaded.length>0) {
-                newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length-1].at);
+              if (t.tla.uploaded.length > 0) {
+                newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
               }
               newRow += '</td>';
 
@@ -152,7 +152,7 @@
                   break;
                 case 1:
                   {
-                    if (t.editor[t.editor.length-1].submited.length>0) {
+                    if (t.editor[t.editor.length - 1].submited.length > 0) {
                       newRow += '<span class="text-primary">Fixed</span>';
                     } else {
                       newRow += '<span class="text-primary">Edited</span>';
@@ -315,7 +315,6 @@
           let idx = 1;
           data.jobs.forEach(j => {
             let tr = '<tr id="' + j._id + '">';
-            // tr += '<td>  <input type="checkbox" name="ckb_ticked"></td>';
             tr += '<td>' + (idx++) + '</td>';
             tr += '<td class="font-weight-bold text-primary">' + j.customer.firstname + ' ' + j.customer.lastname + '</td>';
             tr += '<td class="font-weight-bold text-warning">' + j.name + '</td>';
@@ -324,17 +323,7 @@
 
             tr += '<td>';
 
-            /*            
-           0: Processing
-           1:Upload   
-           2:Done
-           3: finish
 
-           -1: initial
-           -2:'Rejected
-           
-           - 3: Canceled           
-       */
 
             switch (j.status) {
               case -1: tr += '<i class="text-info">Initial</i>'; break;
@@ -349,8 +338,13 @@
             tr += '</td>';
 
 
-            tr += '<td>';
-            tr += '<button class="btn btn-xs parents js-view-parents fa fa-plus" name="js-view-parents"></button>';
+            tr += '<td class="text-right">';
+            if (j.tasks.length > 0) {
+              tr += '<button class="btn btn-xs parents js-view-parents" name="js-view-parents">(';
+              tr += j.tasks.length+')<i class="fa fa-plus"></i>';
+              tr += '</button>';
+            }
+
             tr += '</td>';
             tr += '</tr> ';
             $('#tblJobs').append(tr);
