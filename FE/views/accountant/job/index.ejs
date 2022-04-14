@@ -111,34 +111,34 @@
             data.tasks.forEach(t => {
               newRow += '<tr>';
               newRow += '<td class="text-right">' + (idx++) + '</td>';
-              newRow += '<td class="font-weight-bold text-primary">' + t.level.name + '</td>';
+              newRow += '<td class="font-weight-bold text-primary">' + t.basic.level.name + '</td>';
               newRow += '<td>';
-              if (typeof t.editor !== 'undefined' && t.editor !== null) {
-                newRow += t.editor.fullname;
+              if (t.editor.length>0) {
+                newRow += t.editor[t.editor.length-1].staff.fullname;
               }
               newRow += '</td>';
 
               newRow += '<td>';
-              if (typeof t.qa !== 'undefined' && t.qa !== null) {
-                newRow += t.qa.fullname;
+              if (t.qa.length>0 && !t.qa[t.qa.length-1].unregisted) {
+                newRow +=t.qa[t.qa.length-1].staff.fullname;
               }
               newRow += '</td>';
 
               newRow += '<td>';
-              if (typeof t.dc !== 'undefined' && t.dc !== null) {
-                newRow += t.dc.fullname;
+              if (t.dc.length>0 && !t.dc[t.dc.length-1].unregisted) {
+                newRow += t.dc[t.dc.length-1].staff.fullname;
               }
               newRow += '</td>';
 
               newRow += '<td>';
-              if (typeof t.uploaded_by !== 'undefined' && t.uploaded_by !== null) {
-                newRow += t.uploaded_by.fullname;
+              if (t.tla.uploaded.length>0) {
+                newRow += t.tla.uploaded[t.tla.uploaded.length-1].by.fullname;
               }
               newRow += '</td>';
 
               newRow += '<td>';
-              if (typeof t.uploaded_by !== 'undefined' && t.uploaded_by !== null) {
-                newRow += convertISODateToTimeFormat(t.uploaded_at);
+                if (t.tla.uploaded.length>0) {
+                newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length-1].at);
               }
               newRow += '</td>';
 
@@ -152,7 +152,7 @@
                   break;
                 case 1:
                   {
-                    if (t.edited_time > 1) {
+                    if (t.editor[t.editor.length-1].submited.length>0) {
                       newRow += '<span class="text-primary">Fixed</span>';
                     } else {
                       newRow += '<span class="text-primary">Edited</span>';

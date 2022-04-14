@@ -7,8 +7,7 @@ router.get('/list',authenticateAccountantToken,(req,res)=>{
     .find({})
     .populate('customer','firstname lastname')
     .populate('cb','name')   
-    .then(jobs=>{
-        console.log(jobs);
+    .then(jobs=>{      
         return res.status(200).json({
             msg:`Load jobs list successfully!`,
             jobs
