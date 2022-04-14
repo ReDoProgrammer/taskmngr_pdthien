@@ -36,7 +36,7 @@
         <th scope="col">Customer</th>
         <th scope="col">Phone</th>
         <th scope="col">Email</th>
-        <th scope="col">Status</th>
+        <th scope="col" class="text-center">Status</th>
         <th></th>
       </tr>
     </thead>
@@ -50,6 +50,8 @@
 
   </ul>
 </nav>
+
+<label class="font-weight-bold text-success" id="lblSuccessMsg"></label>
 
 
 
@@ -80,6 +82,23 @@
           $("#modalStyle").modal();
         });
 
+        $(document).on("click", "input[name='ckbActive']", function () {
+          customerId = $(this).closest("tr").attr("id");
+          
+          $.ajax({
+            url:'/accountant/customer/change-state',
+            type:'put',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+              },
+              data:{customerId},
+              success:function(data){
+                LoadCustomers();
+                $('#lblSuccessMsg').text(data.msg);
+                $('#lblSuccessMsg').show().delay(2000).fadeOut();
+              }
+          })
+        })
 
         $(document).on("click", "button[name='delete']", function () {
           customerId = $(this).closest("tr").attr("id");
@@ -255,11 +274,11 @@
                 tr += "<td>" + customer.phone + "</td>";
                 tr += "<td>" + customer.email + "</td>";
 
-                tr += '<td>';
+                tr += '<td class="text-center">';
                 if (customer.status) {
-                  tr += '<span class="text-success"><i class="fa fa-check-square-o" aria-hidden="true"></i> Active</span>';
+                  tr += ' <input type="checkbox" name="ckbActive" checked>';
                 } else {
-                  tr += '<span class="text-danger"><i class="fa fa-ban" aria-hidden="true"></i> Unactive</span>';
+                  tr += ' <input type="checkbox" name="ckbActive">';
                 }
                 tr += '</td>';
 
@@ -285,3 +304,5 @@
           });
         }
       </script>
+
+     

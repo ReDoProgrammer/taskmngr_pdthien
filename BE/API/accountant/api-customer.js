@@ -332,6 +332,24 @@ router.put("/", authenticateAccountantToken, (req, res) => {
 
 });
 
+router.put('/change-state',authenticateAccountantToken,async (req,res)=>{
+  let {customerId} = req.body;
+  let customer = await Customer.findById(customerId);  
+
+  customer.status = !customer.status; 
+  await customer.save()
+  .then(_=>{
+    return res.status(200).json({
+      msg:`Change customer state successfully!`
+    })
+  })
+  .catch(err=>{
+    return res.status(500).json({
+      msg:`Can not change customer state with erro: ${new Error(err.message)}`
+    })
+  })
+})
+
 
 module.exports = router;
 
