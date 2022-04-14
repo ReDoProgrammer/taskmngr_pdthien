@@ -707,7 +707,7 @@ router.put('/', authenticateTLAToken, async (req, res) => {
             if (qa_assigned == 'true') {
                 if (task.qa.length == 0) {
                     await getModule(_QA)
-                        .then(async m => {                            
+                        .then(async m => {
                             await getWage(qa, task.basic.level, m._id)
                                 .then(async w => {
                                     let q = {
@@ -800,39 +800,59 @@ router.delete('/', authenticateTLAToken, (req, res) => {
                     msg: `Task not found!`
                 })
             }
-
-            await Remark
-                .deleteMany({ tid: _id }, async err => {
-                    if (err) {
-                        console.log(`Can not delete remarks belong to this task with error: ${new Error(err.message)}`);
+            await Job
+                .findByIdAndUpdate(task.basic.job._id, {
+                    $pull: { tasks: _id }
+                }, async (err, job) => {
+                    if(err){
+                        console.log(`Can not pull this task from parent job with error: ${new Error(err.message)}`)
                         return res.status(500).json({
-                            msg: `Can not delete remarks belong to this task with error: ${new Error(err.message)}`
+                            msg:`Can not pull this task from parent job with error: ${new Error(err.message)}`
+                        })
+                    }
+                    if (!job) {
+                        return res.status(404).json({
+                            msg: `Parent job not found!`
                         })
                     }
 
-
-
-                    await Job.findByIdAndUpdate(task.basic.job,
-                        {
-                            $pull: { tasks: _id }
-                        }, { new: true }, (err, job) => {
+                    await Remark
+                        .deleteMany({ tid: _id }, async err => {
                             if (err) {
+                                console.log(`Can not delete remarks belong to this task with error: ${new Error(err.message)}`);
                                 return res.status(500).json({
-                                    msg: `Can not pull this task from parent job with error: ${new Error(err.message)}`
+                                    msg: `Can not delete remarks belong to this task with error: ${new Error(err.message)}`
                                 })
                             }
-                            if (!job) {
-                                console.log(`Can not find parent job of this task!`);
-                                return res.status(404).json({
-                                    msg: `Can not find parent job of this task!`
+
+
+
+                            await Job.findByIdAndUpdate(task.basic.job,
+                                {
+                                    $pull: { tasks: _id }
+                                }, { new: true }, (err, job) => {
+                                    if (err) {
+                                        return res.status(500).json({
+                                            msg: `Can not pull this task from parent job with error: ${new Error(err.message)}`
+                                        })
+                                    }
+                                    if (!job) {
+                                        console.log(`Can not find parent job of this task!`);
+                                        return res.status(404).json({
+                                            msg: `Can not find parent job of this task!`
+                                        })
+                                    }
+                                    return res.status(200).json({
+                                        msg: `The task has been deleted!`
+                                    })
                                 })
-                            }
-                            return res.status(200).json({
-                                msg: `The task has been deleted!`
-                            })
+
                         })
 
+
                 })
+
+
 
 
         })
