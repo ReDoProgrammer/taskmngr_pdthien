@@ -14,30 +14,30 @@ const _MODULE = 'EDITOR';
 router.post('/change-amount', authenticateEditorToken, async (req, res) => {
     let { amount, taskId } = req.body;
     let task = await Task.findById(taskId);
-    if(!task){
+    if (!task) {
         return res.status(404).json({
-            msg:`Task not found!`
+            msg: `Task not found!`
         })
     }
 
-    if(task.status !== 1){
+    if (task.status !== 1) {
         return res.status(403).json({
-            msg:`Can not change amount of image when task status different from 1`
+            msg: `Can not change amount of image when task status different from 1`
         })
     }
 
-    let editor = task.editor.filter(x=>x.staff == req.user._id);
-    editor[(editor.length - 1)].submited[editor[(editor.length - 1)].submited.length -1].amount = amount;
+    let editor = task.editor.filter(x => x.staff == req.user._id);
+    editor[(editor.length - 1)].submited[editor[(editor.length - 1)].submited.length - 1].amount = amount;
     await task.save()
-    .then(t=>{
-        return res.status(200).json({
-            msg:`Task has been changed amount successfully!`
+        .then(t => {
+            return res.status(200).json({
+                msg: `Task has been changed amount successfully!`
+            })
         })
-    })
-    .catch(err=>{
-        msg:`Can not change image amount with error: ${new Error(err.message)}`
-    })
-    
+        .catch(err => {
+            msg: `Can not change image amount with error: ${new Error(err.message)}`
+        })
+
 
 })
 
@@ -88,7 +88,7 @@ router.get('/', authenticateEditorToken, (req, res) => {
             },
             {
                 path: 'editor.staff',
-                select:'fullname'                     
+                select: 'fullname'
             },
             {
                 path: 'qa.staff',
@@ -158,37 +158,37 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
 })
 
 
-router.put('/submit', authenticateEditorToken,async (req, res) => {
+router.put('/submit', authenticateEditorToken, async (req, res) => {
     let { taskId, output_link, amount } = req.body;
 
     let task = await Task.findById(taskId);
-    if(!task){
+    if (!task) {
         return res.status(404).json({
-            msg:`Task not found!`
+            msg: `Task not found!`
         })
-    }    
+    }
 
-    task.editor[task.editor.length-1].submited.push({
+    task.editor[task.editor.length - 1].submited.push({
         at: new Date(),
-        amount:amount,
+        amount: amount,
         link: output_link
     });
     task.status = 1;
     await task.save()
-    .then(t=>{
-        return res.status(200).json({
-            msg:`The task has been submited!`,
-            t
+        .then(t => {
+            return res.status(200).json({
+                msg: `The task has been submited!`,
+                t
+            })
         })
-    })
-    .catch(err=>{
-        console.log(`Can not submit this task with error: ${new Error(err.message)}`);
-        return res.status(500).json({
-            msg:`Can not submit this task with error: ${new Error(err.message)}`
+        .catch(err => {
+            console.log(`Can not submit this task with error: ${new Error(err.message)}`);
+            return res.status(500).json({
+                msg: `Can not submit this task with error: ${new Error(err.message)}`
+            })
         })
-    })
 
-    
+
 
 })
 
@@ -197,78 +197,37 @@ router.put('/submit', authenticateEditorToken,async (req, res) => {
 
 
 
-router.put('/get-more', authenticateEditorToken, (req, res) => {
+router.put('/get-more', authenticateEditorToken, async (req, res) => {
     //----------TÁC VỤ NHẬN task MỚI ---------------//
     /*
-        TH1: editor đang không xử lý bất kì 1 job nào hoặc các job editor xử lý đã đc giao hết cho khách -> nhận thêm đc 1 level (task) của job mới
-        TH2: editor đã xử lý xong(đã submit done) và Q.A chưa submit done, editor có quyền nhận thêm 1 level(task) của job mới. 
-        Tuy nhiên khi editor submit done task mới này thì sẽ không được nhận thêm bất cứ 1 task(level) của job mới nào nữa cho tới khi Q.A submit done
-
-        Editor chỉ được phép nhận các task có job level phù hợp với trình độ của mình (staff group)
-
-        Khi thỏa các điều kiện trên thì sẽ nhận được task của job có deadline gần nhất với thời điểm hiện tạichốt
+       Đăng ký nhận task miễn phù hợp và những task đó không vượt quá 2 job
     
     */
+    await Task
+        .aggregate([
+            {
+                $match: { "status": 0 }         
+             
+            },
+            {
+                'editor.staff':req.user._id
+            },
 
+            {
+                $group: {
+                    "_id": "$basic.job"
+                }
+            },
 
-    Task
-        .countDocuments({
-            'editor.staff': req.user._id,
-            status: { $in: [0, -2, -3] }//task chưa submit hoặc bị reject bởi QA/DC
-        }, (err, count) => {
-            if (err) {
-                return res.status(500).json({
-                    msg: `Can not check tasks have been editing with error: ${new Error(err.message)}`
-                })
-            }
-            if (count > 0) {
-                return res.status(403).json({
-                    msg: `You can not get more task ultil your editing tasks have been submited!`
-                })
-            }
-
-            getJobLevelBasedOnConditons(req.user._id, _MODULE)
-                .then(levels => {
-                    Task
-                        .findOne({
-                            level: { $in: levels },
-                            status: -1
-                        })
-                        .sort({ deadline: 1 })
-                        .exec()
-                        .then(t => {
-                            if (!t) {
-                                return res.status(404).json({
-                                    msg: `No available task to take!`
-                                })
-                            }
-                            assignOrTakeTask(_MODULE, t._id, t.level, req.user._id, false)
-                                .then(t => {
-                                    return res.status(200).json({
-                                        msg: `You have take task successfully!`,
-                                        t
-                                    })
-                                })
-                                .catch(err => {
-                                    return res.status(err.code).json({
-                                        msg: err.msg
-                                    })
-                                })
-                        })
-                        .catch(err => {
-                            return res.status(500).json({
-                                msg: `Can find initial task with error: ${new Error(err.message)}`
-                            })
-                        })
-                })
-                .catch(err => {
-                    return res.status(err.code).json({
-                        msg: err.msg
-                    })
-                })
-
-
+        ])
+        .then(t => {
+            console.log(t)
         })
+        .catch(err => {
+            console.log(err)
+        })
+
+
 
 })
 
