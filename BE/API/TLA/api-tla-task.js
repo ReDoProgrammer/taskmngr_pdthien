@@ -624,6 +624,10 @@ router.put('/', authenticateTLAToken, async (req, res) => {
             task.basic.deadline.end = deadline;
             task.basic.link.input = input_link;
 
+            task.tla.updated.push({
+                at: new Date(),
+                by:req.user._id               
+            })
 
             //cập nhật Editor
 
