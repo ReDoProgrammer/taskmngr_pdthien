@@ -197,25 +197,19 @@ const taskSchema = new Schema({
                 ref: 'user'
             }
         },
-        updated: {
+        updated: [{
             at: {
                 type: Date               
             },
             by: {
                 type: Schema.Types.ObjectId,
                 ref: 'user'
-            }
-        },
-        submited: {
-            at: {
-                type: Date               
             },
-            by: {
+            rm:{
                 type: Schema.Types.ObjectId,
-                ref: 'user'
+                ref: 'remark'
             }
-        },
-
+        }],
         uploaded: [{
             at: {
                 type: Date                
@@ -229,7 +223,7 @@ const taskSchema = new Schema({
                 default:''
             }
             
-        }],
+        }]      
 
     },
 

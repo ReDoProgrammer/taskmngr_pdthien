@@ -5,8 +5,7 @@
 
 
                 <div class="panel panel-primary text-white bg-dark">
-                    <div class="panel-heading"> <button class="btn btn-xs btn-primary" id="btn-job-info">Show job info
-                            <i class="fa fa-arrow-down" aria-hidden="true"></i></button> </div>
+                    <div class="panel-heading"> <i class="fa fa-info-circle" aria-hidden="true"></i> Job info </div>
                     <div class="panel-body" id="job-info">
 
                         <div class="row">
@@ -115,38 +114,6 @@
 
                     </div>
                 </div>
-
-
-                <div class="panel panel-warning">
-                    <div class="panel-heading">Tasks list</div>
-                    <div class="panel-body">
-                        <div class="table-responsive  table-responsive-sm table-responsive-xs mt-2">
-                            <table class="table mt-1 table-striped bg-white text-dark nowrap text-nowrap">
-                                <thead class="thead-dark">
-                                    <tr>
-
-                                        <th scope="col">#</th>
-                                        <th scope="col">Level</th>
-                                        <th scope="col">Assign date</th>
-                                        <th scope="col">Deadline</th>
-                                        <th scope="col">Remark</th>
-                                        <th scope="col">Editor</th>
-                                        <th scope="col">Q.A</th>
-                                        <th scope="col">E-T</th>
-                                        <th scope="col">I-N</th>
-                                        <th scope="col">ILink</th>
-                                        <th scope="col">OLink</th>
-                                        <th scope="col">Status</th>
-                                        <th scope="col">Created by</th>
-                                        <th scope="col">Updated by</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tblTasksList"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -162,22 +129,11 @@
 
 <script src="/js/common.js"></script>
 <script>
-    $("#JobDetailModal").on('shown.bs.modal', function (e) {
-        LoadTasksList();
+    $("#JobDetailModal").on('shown.bs.modal', function (e) {      
         LoadCustomer();
-        LoadJobDetail();
-        $('#job-info').hide();
+        LoadJobDetail();        
     })
 
-    $('#btn-job-info').click(function () {
-        if ($('#job-info').is(":hidden")) {
-            $('#job-info').slideDown(1000);
-            $('#btn-job-info').html('Hide job info <i class="fa fa-arrow-up" aria-hidden="true"></i>')
-        } else {
-            $('#btn-job-info').html('Show job info <i class="fa fa-arrow-down" aria-hidden="true"></i>');
-            $('#job-info').slideUp(1000);
-        }
-    })
 
     function LoadJobDetail() {
         $.ajax({
@@ -187,7 +143,7 @@
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
             data: {
-                id:jobId
+                id: jobId
             },
             success: function (data) {
 
@@ -197,7 +153,7 @@
                 $('#lblReceivedDate').text(convertISODateToTimeFormat(data.job.received_date));
                 $('#lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.delivery_date));
                 $('#lblIntruction').text(data.job.intruction);
-                $('#lblInputLink').html('<a href="'+data.job.input_link+'" target="_blank" rel="noopener noreferrer">Link</a>')
+                $('#lblInputLink').html('<a href="' + data.job.input_link + '" target="_blank" rel="noopener noreferrer">Link</a>')
 
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -258,126 +214,6 @@
 
     }
 
-    function LoadTasksList() {
-        $('#tblTasksList').empty();
-        $.ajax({
-            url: '/accountant/task/list-by-job',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-                jobId
-            },
-            success: function (data) {
-                let idx = 1;
-                data.tasks.forEach(t => {
-                    let tr = '<tr>';
-
-                    tr += '<td>' + (idx++) + '</td>';
-                    tr += '<td class="text-warning font-weight-bold">' + t.level.name + '</td>';
-                    tr += '<td>' + convertISODateToTimeFormat(t.assigned_date) + '</td>';
-                    tr += '<td>' + convertISODateToTimeFormat(t.deadline) + '</td>';
-
-                    tr += '<td>';
-                    if (typeof t.remarks[0] !== 'undefined') {
-                        tr += t.remarks[0].content;
-                    }
-                    tr += '</td>';
-
-                    tr += '<td>';
-                    if (t.editor) {
-                        tr += t.editor.fullname
-                    }
-                    tr += '</td>';
-                    tr += '<td>';
-                    if (t.qa) {
-                        tr += t.qa.fullname
-                    }
-                    tr += '</td>';
-
-                    tr += '<td class="text-right">' + t.edited_time + '</td>';
 
 
-                    tr += '<td class="text-right">';
-                    if (t.editor) {
-                        tr += t.amount
-                    }
-                    tr += '</td>';
-
-                    tr += '<td>';
-                    if (isValidHttpUrl(t.input_link)) {
-                        tr += '<a href="' + t.input_link + '" target="_blank" rel="noopener noreferrer">Link</a>'
-                    } else {
-                        tr += t.input_link;
-                    }
-                    tr += '</td>';
-
-                    tr += '<td>';
-                    if (typeof t.links !== 'undefined') {
-                        if (t.links.length == 1) {
-                            tr += '<a href="' + t.linksp[0].url + '" target="_blank" rel="noopener noreferrer">Link</a>'
-                        } else {
-                            tr += '<button class="btn btn-xs btn-info" name="btn-links-list"><i class="fa fa-link" aria-hidden="true"></i></button>';
-                        }
-                    }
-                    tr += '</td>';
-
-
-
-
-                    tr += '<td><i>';
-
-                    switch (t.status) {
-                        case -1: tr += '<span class="text-info">Initial</span>';
-                            break;
-                        case 0: tr += '<span class="text-info">Processing</span>';
-                            break;
-                        case 1:
-                            {
-                                if (t.edited_time > 1) {
-                                    tr += '<span class="text-primary">Fixed</span>';
-                                } else {
-                                    tr += '<span class="text-primary">Edited</span>';
-                                }
-                                break;
-                            }
-                        case 2:
-                            tr += '<span class="text-success">Q.A ok!</span>';
-                            break;
-                        case 3:
-                            tr += '<span class="text-success">DC ok!</span>'
-                            break;
-                        case -2:
-                            tr += '<span class="text-danger">Q.A rejected</span>';
-                            break;
-                        case -3:
-                            tr += '<span class="text-danger">DC rejected</span>';
-                            break;
-
-                    }
-                    tr += '</i></td>';
-
-                    tr += '<td>';
-                    tr += t.created_by.fullname;
-                    tr += '</td>';
-
-                    tr += '<td>';
-                    if (typeof t.updated_by !== 'undefined') {
-                        tr += t.updated_by.fullname;
-                    }
-                    tr += '</td>';
-
-
-
-                    tr += '</tr>';
-                    $('#tblTasksList').append(tr);
-                })
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                alert(jqXHR.responseJSON.msg);
-            }
-        })
-    }
 </script>
-
