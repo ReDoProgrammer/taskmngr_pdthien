@@ -6,6 +6,8 @@ const { assignOrTakeTask,
     getCustomer,
     getTaskDetail } = require('../common');
 
+var ObjectId = require('mongodb').ObjectId;
+
 const { authenticateEditorToken } = require("../../../middlewares/editor-middleware");
 
 const _MODULE = 'EDITOR';
@@ -206,19 +208,12 @@ router.put('/get-more', authenticateEditorToken, async (req, res) => {
     await Task
         .aggregate([
             {
-                $match: { "status": 0 }         
-             
-            },
-            {
-                'editor.staff':req.user._id
-            },
-
-            {
-                $group: {
-                    "_id": "$basic.job"
+                $match: {
+                    'editor.staff': ObjectId(req.user._id),
+                    status: 0
                 }
             },
-
+            { $group: { _id: '$basic.job' } }
         ])
         .then(t => {
             console.log(t)
