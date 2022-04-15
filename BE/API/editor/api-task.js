@@ -205,21 +205,25 @@ router.put('/get-more', authenticateEditorToken, async (req, res) => {
        Đăng ký nhận task miễn phù hợp và những task đó không vượt quá 2 job
     
     */
-    await Task
-        .aggregate([
-            {
-                $match: {
-                    'editor.staff': ObjectId(req.user._id),
-                    status: 0
-                }
-            },
-            { $group: { _id: '$basic.job' } }
-        ])
-        .then(t => {
-            console.log(t)
+    ProcessingJobs(req.user._id)
+        .then(jobs => {
+           Task
+           .find({
+               'basic.job':{$in:jobs}
+           })
+           .then(tasks=>{
+               console.log(tasks)
+           })
+           .catch(err=>{
+               return res.status(500).json({
+                   msg:`Can not get tasks in jobs list with error: ${new Error(err.message)}`
+               })
+           })
         })
         .catch(err => {
-            console.log(err)
+            return res.status(err.code).json({
+                msg: err.msg
+            })
         })
 
 
@@ -229,6 +233,30 @@ router.put('/get-more', authenticateEditorToken, async (req, res) => {
 
 
 module.exports = router;
+
+const ProcessingJobs = (staffId) => {
+    return new Promise((resolve, reject) => {
+        Task
+            .aggregate([
+                {
+                    $match: {
+                        'editor.staff': ObjectId(staffId),
+                        status: 0
+                    }
+                },
+                { $group: { _id: '$basic.job' } }
+            ])
+            .then(jobs => {
+                return resolve(jobs)
+            })
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not get jobs list wich you are processing with error: ${new Error(err.message)}`
+                })
+            })
+    })
+}
 
 
 
