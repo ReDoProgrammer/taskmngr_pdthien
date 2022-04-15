@@ -1,8 +1,9 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
 const Customer = require('../../models/customer-model');
-const { assignOrTakeTask,
-    getJobLevelBasedOnConditons,
+const StaffJobLevel = require('../../models/staff-job-level-model');
+const { 
+    getUser,
     getCustomer,
     getTaskDetail } = require('../common');
 
@@ -205,22 +206,45 @@ router.put('/get-more', authenticateEditorToken, async (req, res) => {
        Đăng ký nhận task miễn phù hợp và những task đó không vượt quá 2 job
     
     */
-    ProcessingJobs(req.user._id)
-        .then(jobs => {
-           Task
-           .find({
-               'basic.job':{$in:jobs}
-           })
-           .then(tasks=>{
-               console.log(tasks)
-           })
-           .catch(err=>{
-               return res.status(500).json({
-                   msg:`Can not get tasks in jobs list with error: ${new Error(err.message)}`
-               })
-           })
+    GetProcessingJobs(req.user._id)//lấy những job mà editor này đang xử lý, chưa submit
+        .then(jobIds => {
+            if (jobIds.length > 0) {
+                getUser(req.user._id)           
+                .then(u=>{                  
+                    GetJobLevelsByStaffLevel(u.user_level._id)
+                    .then(levels=>{
+                        let jobLv = levels.map(x=>{
+                            return x.job_lv
+                        });
+                        GetInititalTasks(jobIds,jobLv)
+                        .then(tasks=>{
+                            if(tasks.length>0){
+                                let task = tasks[0];
+                            }
+                        })
+                        .catch(err=>{
+                            return res.status(err.code).json({
+                                msg:err.msg
+                            })
+                        })
+                    })
+                    .catch(err=>{
+                        console.log(err)
+                        return res.status(err.code).json({
+                            msg:err.msg
+                        })
+                    })
+                })
+                .catch(err=>{
+                  return res.status(err.code).json({
+                      msg:err.msg
+                  })
+                })
+            }
+
         })
         .catch(err => {
+            console.log(err)
             return res.status(err.code).json({
                 msg: err.msg
             })
@@ -234,7 +258,51 @@ router.put('/get-more', authenticateEditorToken, async (req, res) => {
 
 module.exports = router;
 
-const ProcessingJobs = (staffId) => {
+//lấy những job level mà trình độ nhân viên có thể đảm nhận
+const GetJobLevelsByStaffLevel = (staffLevel)=>{
+    return new Promise((resolve,reject)=>{
+        StaffJobLevel
+        .find({staff_lv:staffLevel})
+        .then(levels=>{
+            return resolve(levels)
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not get job levels by staff level with error: ${new Error(err.message)}`
+            })
+        })
+    })
+}
+
+
+//lấy những task chưa có editor nào xử lý
+const GetInititalTasks = (jobIds,jobLevelIds)=>{
+    return new Promise((resolve,reject)=>{
+        Task
+                //lấy những task chưa có editor nào nhận
+                    .find({
+                        'basic.job': { $in: jobIds },
+                        'basic.level':{$in:jobLevelIds},
+                        editor:{$size:0},
+                        status:-1
+                    })
+                    .sort({'basic.deadline.end':1})// sắp xếp tăng dần theo deadline
+                    .then(tasks => {
+                        return resolve(tasks)
+                    })
+                    .catch(err => {
+                       return reject({
+                           code:500,
+                           msg:`Can not get initial task in jobs list with error: ${new Error(err.message)}`
+                       })
+                    })
+    })
+}
+
+
+//lấy những job mà editor đăng nhập đang xử lý
+const GetProcessingJobs = (staffId) => {
     return new Promise((resolve, reject) => {
         Task
             .aggregate([

@@ -203,6 +203,26 @@ const getUser = (staffId) => {
     return new Promise((resolve, reject) => {
         User
             .findById(staffId)
+            .populate([
+                {
+                    path: 'user_level',
+                    populate: {
+                        path: 'staff_level'
+                    }
+                },
+                {
+                    path: 'user_group',
+                    populate: {
+                        path: 'user_group'
+                    }
+                },
+                {
+                    path: 'bank',
+                    populate: {
+                        path: 'bank'
+                    }
+                }
+            ])
             .exec()
             .then(u => {
                 if (!u) {
@@ -351,5 +371,6 @@ module.exports = {
     getJobLevelBasedOnConditons,
     getCustomer,
     getTaskDetail,
-    setJobStatus
+    setJobStatus,
+    getUser
 }
