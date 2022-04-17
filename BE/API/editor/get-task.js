@@ -8,7 +8,7 @@ const {
     getCustomer,
     getModule,
     getWage,
-    getTaskDetail } = require('../common');
+    GetJobLevelsByStaffLevel } = require('../common');
 
 const getTask = (staffId) => {
     return new Promise((resolve, reject) => {
@@ -199,24 +199,6 @@ const NoJOB = (jobLevelIds) => {
                 return reject({
                     code: 500,
                     msg: `Can not get more task with error: ${new Error(err.message)}`
-                })
-            })
-    })
-}
-
-
-//lấy những job level mà trình độ nhân viên có thể đảm nhận
-const GetJobLevelsByStaffLevel = (staffLevel) => {
-    return new Promise((resolve, reject) => {
-        StaffJobLevel
-            .find({ staff_lv: staffLevel })
-            .then(levels => {
-                return resolve(levels)
-            })
-            .catch(err => {
-                return reject({
-                    code: 500,
-                    msg: `Can not get job levels by staff level with error: ${new Error(err.message)}`
                 })
             })
     })
