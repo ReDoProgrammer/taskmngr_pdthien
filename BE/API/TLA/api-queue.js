@@ -32,16 +32,17 @@ router.post('/', authenticateTLAToken, async (req, res) => {
         .then(async queues => {
             queues.forEach(q => {
                 GetJobLevelsByStaffLevel(q.staff.user_level)
-                    .then(async levels => {
-                        let lv = levels.map(x => x.job_lv);
-                        let check = await lv.filter(x => x == task.basic.level);
-                        console.log(lv,task.basic.level,check)
+                    .then(levels => {
+                        let lv = levels.map(x => {return x.job_lv});
+
+                        let t = lv.filter(x=>x == task.basic.level)
+                        console.log(t)
                     })
                     .catch(err => {
                         return res.status(err.code).json({
                             msg: err.msg
                         })
-                    })
+                    })                   
             })
         })
         .catch(err => {
