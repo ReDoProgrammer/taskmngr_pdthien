@@ -5,6 +5,8 @@ const StaffJobLevel = require('../../models/staff-job-level-model');
 const { 
     getUser,
     getCustomer,
+    getModule,
+    getWage,
     getTaskDetail } = require('../common');
 
 var ObjectId = require('mongodb').ObjectId;
@@ -208,18 +210,54 @@ router.put('/get-more', authenticateEditorToken, async (req, res) => {
     */
     GetProcessingJobs(req.user._id)//lấy những job mà editor này đang xử lý, chưa submit
         .then(jobIds => {
-            if (jobIds.length > 0) {
+           
+            if (jobIds.length > 0) {               
                 getUser(req.user._id)           
-                .then(u=>{                  
+                .then(u=>{     
+                             
                     GetJobLevelsByStaffLevel(u.user_level._id)
-                    .then(levels=>{
+                    .then(levels=>{                       
                         let jobLv = levels.map(x=>{
                             return x.job_lv
                         });
-                        GetInititalTasks(jobIds,jobLv)
-                        .then(tasks=>{
-                            if(tasks.length>0){
-                                let task = tasks[0];
+                        GetInititalTask(jobIds,jobLv)
+                        .then(task=>{    
+                    
+                            if(task){//nếu có task chưa có editor xử lý, phù hợp với trình độ của nhân viên
+                               task.status = 0;
+                               getModule(_MODULE)
+                               .then(m=>{
+                                getWage(req.user._id,task.basic.level,m._id)
+                                .then(async w=>{
+                                    task.editor.push({
+                                        staff:req.user._id,
+                                        timestamp:new Date(),
+                                        wage:w.wage
+                                    });
+                                    await task.save()
+                                    .then(_=>{
+                                        return res.status(200).json({
+                                            msg:`You have registed new task successfully!`
+                                        })
+                                    })
+                                    .catch(err=>{
+                                        return res.status(500).json({
+                                            msg:`Can not get more task with error: ${new Error(err.message)}`
+                                        })
+                                    })
+                                })
+                                .catch(err=>{
+                                    return res.status(err.code).json({
+                                        msg:err.msg
+                                    })
+                                })
+                               })
+                               .catch(err=>{
+                                   return res.status(err.code).json({
+                                       msg:err.msg
+                                   })
+                               })
+                               
                             }
                         })
                         .catch(err=>{
@@ -240,6 +278,8 @@ router.put('/get-more', authenticateEditorToken, async (req, res) => {
                       msg:err.msg
                   })
                 })
+            }else{
+                console.log(`You have been processing any job`)
             }
 
         })
@@ -277,19 +317,20 @@ const GetJobLevelsByStaffLevel = (staffLevel)=>{
 
 
 //lấy những task chưa có editor nào xử lý
-const GetInititalTasks = (jobIds,jobLevelIds)=>{
+const GetInititalTask = (jobIds,jobLevelIds)=>{
+  
     return new Promise((resolve,reject)=>{
         Task
                 //lấy những task chưa có editor nào nhận
-                    .find({
+                    .findOne({
                         'basic.job': { $in: jobIds },
                         'basic.level':{$in:jobLevelIds},
                         editor:{$size:0},
                         status:-1
                     })
                     .sort({'basic.deadline.end':1})// sắp xếp tăng dần theo deadline
-                    .then(tasks => {
-                        return resolve(tasks)
+                    .then(task => {                      
+                        return resolve(task)
                     })
                     .catch(err => {
                        return reject({
@@ -303,6 +344,7 @@ const GetInititalTasks = (jobIds,jobLevelIds)=>{
 
 //lấy những job mà editor đăng nhập đang xử lý
 const GetProcessingJobs = (staffId) => {
+  
     return new Promise((resolve, reject) => {
         Task
             .aggregate([
