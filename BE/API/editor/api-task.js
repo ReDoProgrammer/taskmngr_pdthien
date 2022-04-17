@@ -14,7 +14,7 @@ const { authenticateEditorToken } = require("../../../middlewares/editor-middlew
 const _MODULE = 'EDITOR';
 
 
-router.post('/change-amount', authenticateEditorToken, async (req, res) => {
+router.put('/change-amount', authenticateEditorToken, async (req, res) => {
     let { amount, taskId } = req.body;
     let task = await Task.findById(taskId);
     if (!task) {

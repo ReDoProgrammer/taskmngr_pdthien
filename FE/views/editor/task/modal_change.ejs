@@ -57,7 +57,7 @@
 
         $.ajax({
             url: '/editor/task/change-amount',
-            type: 'post',
+            type: 'put',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
