@@ -60,15 +60,15 @@ router.get('/list-by-level', authenticateTLAToken, (req, res) => {
     let { levelId } = req.query;
 
     StaffJobLevel
-        .findOne({ job_lv: levelId })
+        .find({ job_lv: levelId })
         .then(async sjl => {
+            let lv = sjl.map(x=> x.staff_lv)
+
             await Queue
                 .find({})
-                .populate('staff',{
-                    // match:{user_level:{$in:lv}}
-                })
+                .populate('staff', null, { user_level: {$in: lv} } )//lọc những nhân viên có trình độ phù hợp từ hàng chờ
+                .sort({timestamp:1})//sắp xếp tăng dần theo thời gian đăng ký hàng chờ
                 .then(qs => {
-                    console.log('staff:', qs)
                     return res.status(200).json({
                         msg: `Get queue editors successfully!`,
                         qs
