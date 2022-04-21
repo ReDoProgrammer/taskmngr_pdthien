@@ -14,8 +14,7 @@ const Schema = mongoose.Schema;
 const staffLevelAndJobLevel = new Schema({
     staff_lv:{
         type: Schema.Types.ObjectId,
-        ref: 'staff_level'
-       
+        ref: 'staff_level'       
     },
     job_lv:{
         type: Schema.Types.ObjectId,

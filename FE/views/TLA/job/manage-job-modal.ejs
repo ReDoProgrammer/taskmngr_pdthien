@@ -234,7 +234,7 @@
 
         if (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla.length > 0) {
           $('#colEditor').show();
-          $('#slEditor').val(data.task.editor[data.task.editor.length-1].staff);
+          $('#slEditor').val(data.task.editor[data.task.editor.length - 1].staff);
           if (data.task.status > 1) {
             $('#ckbAssignEditor').attr("disabled", true);
             $('#slEditor').attr("disabled", true);
@@ -248,7 +248,7 @@
 
         if ((data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla.length > 0)) {
           $('#colQA').show();
-          $('#slQA').val(data.task.qa[data.task.qa.length -1].staff);
+          $('#slQA').val(data.task.qa[data.task.qa.length - 1].staff);
           if (data.task.status > 1) {
             $('#ckbAssignQA').attr("disabled", true);
             $('#slQA').attr("disabled", true);
@@ -263,7 +263,7 @@
     })
   })
 
-  $("#JobMngrModal").on('hide.bs.modal', function(){
+  $("#JobMngrModal").on('hide.bs.modal', function () {
     LoadJobs();
   });
 
@@ -436,7 +436,6 @@
       success: function (data) {
         let idx = 1;
         $("#tblTasks").empty();
-        console.log(data.tasks);
         data.tasks.forEach(t => {
 
           let tr = '<tr id="' + t._id + '">';
@@ -682,6 +681,7 @@
     let levelId = $("#slJobLevels option:selected").val();
     LoadEditor(levelId);
     LoadQA(levelId);
+    LoadQueue(levelId);
   });
 
   function LoadJobLevels() {
@@ -702,6 +702,8 @@
           let opt = '<option value="' + j._id + '" class="font-weight-bold text-danger">' + j.name + '</option>';
           $('#slJobLevels').append(opt);
         })
+
+        LoadQueue( $('#slJobLevels option:selected').val());
       },
       error: function (jqXHR, textStatus, errorThrown) {
         $('#msgError').text(jqXHR.responseJSON.msg);
@@ -766,6 +768,20 @@
   }
 
 
+
+  function LoadQueue(levelId) {
+    $.ajax({
+      url: '/tla/queue/list-by-level',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: { levelId },
+      success: function (data) {
+        console.log(data)
+      }
+    })
+  }
 
   $('.inputDate').inputmask("datetime", {
     mask: "1/2/y h:s",
