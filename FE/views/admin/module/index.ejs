@@ -23,9 +23,11 @@
 <script>
 
     var moduleId = '';
+    var moduleName = '';
 
     $(document).on("click", "button[name='staff']", function () {
         moduleId = $(this).closest("tr").attr("id");
+        moduleName = $(this).closest("tr").data("name");
         $('#modalStaff').modal();
     })
 

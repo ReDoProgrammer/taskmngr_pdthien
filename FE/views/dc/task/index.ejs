@@ -161,7 +161,7 @@
 
               tr += '<td class="text-right">';
               if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                tr += t.editor[0].submited[(t.editor[0].submited.length - 1)].amount;
+                tr += t.editor[t.editor.length-1].submited[t.editor[t.editor.length-1].submited.length-1].amount;
               }
               tr += '</td>'
 

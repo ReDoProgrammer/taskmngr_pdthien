@@ -126,6 +126,7 @@
     })
 
     function LoadUserModuleRoles() {
+      
         $.ajax({
             url: '/admin/user-module',
             type: 'get',
@@ -144,6 +145,9 @@
                     tr += '<td>' + um.user.username + '</td>';
                     tr += '<td>' + um.user.fullname + '</td>';
                     tr += '<td>' + um.user.phone + '</td>';
+                   if(moduleName === 'EDITOR'){
+
+                   }
                     tr += '<td><button class="btn btn-xs btn-danger" name="deleteRole"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
                     tr += '</tr>';
                     $('#tblUserModuleRoles').append(tr);
@@ -172,3 +176,4 @@
         })
     }
 </script>
+

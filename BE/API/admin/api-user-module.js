@@ -53,6 +53,11 @@ router.post('/', authenticateAdminToken, (req, res) => {
         })
 })
 
+router.put('/',authenticateAdminToken,(req,res)=>{
+    let {staffId} = req.body;
+    console.log(staffId)
+})
+
 router.delete('/',authenticateAdminToken,(req,res)=>{
     let {_id} = req.body;
     UserModule
