@@ -58,6 +58,7 @@ const UserSchema = new Schema({
     type: Boolean,
     default: true
   }
+
 });
 
 UserSchema.pre("save", function (next) {

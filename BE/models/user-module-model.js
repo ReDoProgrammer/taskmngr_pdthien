@@ -16,7 +16,12 @@ const userModuleSchema = new Schema({
         type:Schema.Types.ObjectId,
         required:true,
         ref:'module'
-    }    
+    },
+    reg_task:{
+        //thuộc tính đánh dấu khả năng có thể nhận thêm task của editor
+        type:Boolean,
+        default:false
+      }    
 });
 
 userModuleSchema.index({ user: 1, module: 1 }, { unique: true });
