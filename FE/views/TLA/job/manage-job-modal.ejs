@@ -282,31 +282,7 @@
     $('#txtDeadline').val(convertISODateToTimeFormat(deadline));
   });
 
-  $(document).on("click", "button[name='btnAssignStaffAuto']", function () {
-
-    if (confirm('Are you sure want to set editor automatically?')) {
-      $.ajax({
-        url: '/tla/queue',
-        type: 'post',
-        headers: {
-          authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-        data: {
-          taskId: $(this).closest("tr").attr('id')
-        },
-        success: function (data) {
-          alert(data.msg);
-          LoadTasks();
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          alert(jqXHR.responseJSON.msg);
-        }
-      })
-    }
-
-  })
-
-
+ 
 
   $('#btnAddTask').click(function () {
     $('#txtInputLink').val('');
@@ -507,11 +483,7 @@
 
 
 
-          tr += '<td class="text-right">';
-
-          if (t.status == -1) {
-            tr += '<button class="ml-2 btn btn-xs btn-primary" name="btnAssignStaffAuto"><i class="fa fa-refresh" aria-hidden="true"></i> ASE</button>';
-          }
+          tr += '<td class="text-right">';         
 
           if (t.status < 1) {
             tr += '<button class="ml-1 btn btn-xs btn-danger" name="btnDelTask"><i class="fa fa-trash text-white" aria-hidden="true"></i></button>';

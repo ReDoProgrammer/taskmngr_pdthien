@@ -85,9 +85,7 @@
             }, error: function (request, status, error) {
 
               if (request.status === 404) {
-                if (confirm(request.responseJSON.msg + ' Do you want to regist to take more task when a new job is created?')) {
-                  RegistQueue();
-                }
+               alert(request.responseJSON.msg);
               } else {
                 alert(request.responseJSON.msg)
               }
@@ -96,22 +94,6 @@
           })
         })
 
-
-
-        function RegistQueue() {
-          $.ajax({
-            url: '/editor/queue',
-            type: 'post',
-            headers: {
-              authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            success: function (data) {
-              alert(data.msg);
-            }, error: function (request, status, error) {
-              alert(request.responseJSON.msg)
-            }
-          })
-        }
 
 
         $(document).on("click", "button[name='btnSubmitTask']", function () {
