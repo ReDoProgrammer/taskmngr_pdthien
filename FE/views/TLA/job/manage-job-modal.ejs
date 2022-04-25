@@ -131,15 +131,8 @@
 
             <div class="row mt-2">
               <div class="form-group mt-2 col-md-6 col-sm-6 col-xs-12">
-                <div id="colEditor">
-                  <div class="input-group">
-                    <select name="" id="slEditor" class="form-control selectpicker" data-live-search="true"></select>
-                    <div class="input-group-btn">
-                      <button class="btn" id="btnQueueList">                       
-                        <i class="fa fa-users text-warning" aria-hidden="true"></i>
-                      </button>
-                    </div>
-                  </div>
+                <div id="colEditor">                  
+                    <select name="" id="slEditor" class="form-control selectpicker" data-live-search="true"></select> 
                 </div>
               </div>
 
@@ -236,12 +229,12 @@
 
         //xu ly checkbox va dropdown lien quan toi editor va qa
 
-        $('#ckbAssignEditor').prop('checked', (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla.length > 0) ? true : false);
-        $('#ckbAssignQA').prop('checked', (data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla.length > 0) ? true : false);
+        $('#ckbAssignEditor').prop('checked', (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla!=='undefined') ? true : false);
+        $('#ckbAssignQA').prop('checked', (data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla !== 'undefined') ? true : false);
 
 
 
-        if (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla.length > 0) {
+        if (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla!=='undefined') {
           $('#colEditor').show();
           $('#slEditor').val(data.task.editor[data.task.editor.length - 1].staff);
           if (data.task.status > 1) {
@@ -255,7 +248,7 @@
           $('#colEditor').hide();
         }
 
-        if ((data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla.length > 0)) {
+        if ((data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla !=='undefined')) {
           $('#colQA').show();
           $('#slQA').val(data.task.qa[data.task.qa.length - 1].staff);
           if (data.task.status > 1) {
