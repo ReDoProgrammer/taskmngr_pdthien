@@ -145,6 +145,8 @@
         $("#modalUserType").modal();
         $("#txtName").val(data.ut.name);
         $("#txtDescription").val(data.ut.description);
+        $('#ckbRegistedable').prop('checked', data.ut.registedable);
+
 
         let idx = 1;
         data.ut.wages.forEach((w) => {

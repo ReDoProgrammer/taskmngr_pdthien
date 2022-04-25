@@ -8,17 +8,21 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="form-row">
+        <div class="row">
           <div class="form-group col-md-4">
             <label for="">Name</label>
             <input type="text" name="txtName" id="txtName" class="form-control" placeholder="User type name" />
           </div>
-          <div class="form-group col-md-8">
+          <div class="form-group col-md-6">
             <label for="">Description</label>
             <input type="text" name="txtDescription" id="txtDescription" class="form-control"
               placeholder="Description" />
           </div>
-        </div>        
+          <div class="form-group col-md-2 text-center">
+            <label for="">Get task</label><br/>
+            <input type="checkbox" class="mt-2" id="ckbRegistedable">
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -37,7 +41,7 @@
   var idx = 1;
   var wageId = "";
   $(document).ready(function () {
-    
+
     LoadLevel();
   });
 
@@ -51,7 +55,7 @@
   $("#btnSubmit").click(function () {
     let name = $("#txtName").val().trim();
     let description = $("#txtDescription").val().trim();
-  
+
 
     if (ugId.length > 0) {//case update user type
       $.ajax({
@@ -63,7 +67,8 @@
         data: {
           id: ugId,
           name,
-          description         
+          description,
+          registedable:$('#ckbRegistedable').is(":checked")
         },
         success: function (data, textStatus, xhr) {
           alert(data.msg);
@@ -83,11 +88,12 @@
         },
         data: {
           name,
-          description          
+          description,
+          registedable:$('#ckbRegistedable').is(":checked")
         },
         success: function (data, textStatus, xhr) {
           alert(data.msg);
-              $("#modalUserType").modal("hide");
+          $("#modalUserType").modal("hide");
           ugId = "";
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -97,7 +103,7 @@
     }
   });
 
-  
+
 
   function LoadLevel() {
     $.ajax({
@@ -116,18 +122,6 @@
     });
   }
 
-  //ràng buộc nhập dữ liệu, chỉ cho nhập kiểu số thực
-  // $("#txtWage").on("keypress keyup blur", function (event) {
-  //   //this.value = this.value.replace(/[^0-9\.]/g,'');
-  //   $(this).val(
-  //     $(this)
-  //       .val()
-  //       .replace(/[^0-9]/g, "")
-  //   );
-  //   if (event.which != 46 && (event.which < 48 || event.which > 57)) {
-  //     event.preventDefault();
-  //   }
-  // });
 
   $().ready(function () {
     $("input[id*='txtWage']").keydown(function (event) {
