@@ -131,8 +131,7 @@ app.use('/editor/task',editorTaskController);
 const editorHomeController = require("./BE/controllers/editor/home-controller");
 app.use("/editor", editorHomeController);
 
-const editorQueueAPI = require('./BE/API/editor/api-queue');
-app.use('/editor/queue',editorQueueAPI);
+
 
 
 const editorTaskAPI = require('./BE/API/editor/api-task');
@@ -292,8 +291,7 @@ app.use('/tla/job-level',apiTLAJobLevel);
 const apiTLALevel = require('./BE/API/TLA/api-tla-level');
 app.use('/tla/level',apiTLALevel);
 
-const apiTLAQueue = require('./BE/API/TLA/api-queue');
-app.use('/tla/queue',apiTLAQueue);
+
 
 const apiTLATask = require('./BE/API/TLA/api-tla-task');
 app.use('/tla/task',apiTLATask);
