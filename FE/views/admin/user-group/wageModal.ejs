@@ -163,6 +163,9 @@
                 $('#lblError').text('');
                 $('#lblError').hide();
                 $('#txtWage').text('0');
+
+                moduleId = $('#slModule option:selected').val();
+                        LoadWages();
             })
 
 
@@ -259,6 +262,7 @@
 
 
             function LoadWages() {
+
                 $.ajax({
                     url: '/admin/user-group-wage',
                     type: 'get',
@@ -325,7 +329,7 @@
                         data.jl.forEach(l => {
                             let opt = '<option value="' + l._id + '">' + l.name + '</option>';
                             $('#slJobLevel').append(opt);
-                        })
+                        })                       
                         LoadStaffLevels($('#slJobLevel option:selected').val());
                     }
                 })
@@ -365,7 +369,7 @@
                             let opt = '<option value="' + s._id + '">' + s.name + '</option>';
                             $('#slModule').append(opt);
                         })
-                        LoadWages();
+                       
                     }
                 })
             }

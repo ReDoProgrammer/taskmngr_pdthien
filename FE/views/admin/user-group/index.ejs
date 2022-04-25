@@ -22,158 +22,158 @@
     <%-include('wageModal')%>
 
 
-<script>
-  var ugId = "";
+      <script>
+        var ugId = "";
 
-  $("#tblData").on("click", "button[name='wage']", function () {
-    ugId = $(this).closest("tr").attr("id");
-    $('#modalWage').modal();
-  });
-
-  function LoadData() {
-    $("#tblData").empty();
-    $.ajax({
-      url: "/admin/user-group/list",
-      type: "get",
-      headers: {
-        authorization: "Bearer " + localStorage.getItem('accessToken'),
-      },    
-      success: function (data, textStatus, xhr) {
-        let idx = 1;
-        data.uts.forEach((ut) => {
-          let tr = "<tr id=" + ut._id + " data-name = " + ut.name + ">";
-          tr += '<th scope="row">' + idx++ + "</th>";
-          tr += "<td class='font-weight-bold text-info'>" + ut.name + "</td>";
-          tr += "<td>" + ut.description + "</td>";
-          tr +=
-            '<td class="text-right"><button class="btn btn-xs btn-info" name="wage"><i class="fa fa-bars" aria-hidden="true"></i></button>';
-            
-          tr += '<button class="btn btn-xs btn-warning ml-2" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
-          tr +=
-            '<button class="btn btn-xs btn-danger ml-1" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
-
-         
-          tr += "</tr>";
-          $("#tblData").append(tr);
+        $("#tblData").on("click", "button[name='wage']", function () {
+          ugId = $(this).closest("tr").attr("id");
+          $('#modalWage').modal();
         });
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        alert(jqXHR.responseJSON.msg);
-      },
-    });
-  }
 
-  $(document).ready(function () {
-    $("#btnAddNew").click(function () {
-      ugId = "";
-      $("#modalUserType").modal();
-    });
-    LoadData();
-  });
-
-
-
-  //sự kiện load lại hàm ds level khi modal đc đóng lại
-  $(document).on("hidden.bs.modal", "#modalUserType", function () {
-    LoadData();
-    ugId = "";
-  });
-
-  $("#tblData").on("click", "button[name='delete']", function () {
-    var r = confirm(
-      "Are you sure want to delete " +
-      $(this).closest("tr").data("name") +
-      "?"
-    );
-    if (r == true) {
-      let ugId = $(this).closest("tr").attr("id");
-      $.ajax({
-        url: "/admin/user-group",
-        type: "delete",
-        headers: {
-          authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-        data: {
-          id: ugId
-        },
-        success: function (data, textStatus, xhr) {
-          //xóa các thông tin tiền công liên quan tới nhóm nhân viên vừa xóa
+        function LoadData() {
+          $("#tblData").empty();
           $.ajax({
-            url: '/admin/user-group-wage/delete-many',
-            type: 'delete',
+            url: "/admin/user-group/list",
+            type: "get",
             headers: {
-              authorization: "Bearer " + localStorage.getItem("accessToken"),
+              authorization: "Bearer " + localStorage.getItem('accessToken'),
             },
-            data: {
-              ugId
-            }
-            , success: function (data) {
-              alert(data.msg);
-              LoadData();
+            success: function (data, textStatus, xhr) {
+              let idx = 1;
+              data.uts.forEach((ut) => {
+                let tr = "<tr id=" + ut._id + " data-name = " + ut.name + ">";
+                tr += '<th scope="row">' + idx++ + "</th>";
+                tr += "<td class='font-weight-bold text-info'>" + ut.name + "</td>";
+                tr += "<td>" + ut.description + "</td>";
+                tr +=
+                  '<td class="text-right"><button class="btn btn-xs btn-info" name="wage"><i class="fa fa-bars" aria-hidden="true"></i></button>';
+
+                tr += '<button class="btn btn-xs btn-warning ml-2" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+                tr +=
+                  '<button class="btn btn-xs btn-danger ml-1" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
+
+
+                tr += "</tr>";
+                $("#tblData").append(tr);
+              });
             },
             error: function (jqXHR, textStatus, errorThrown) {
               alert(jqXHR.responseJSON.msg);
             },
-          })
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          alert(jqXHR.responseJSON.msg);
-        },
-      });
-    }
-  });
+          });
+        }
 
-
-  $("#tblData").on("click", "button[name='detail']", function () {
-    ugId = $(this).closest("tr").attr("id");
-    $("#modalUserGroupDetail").modal();
-  })
-
-  $("#tblData").on("click", "button[name='update']", function () {
-    ugId = $(this).closest("tr").attr("id");
-
-    $.ajax({
-      url: "/admin/user-group/detail",
-      type: "get",
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        id: ugId,
-      },
-      success: function (data, textStatus, xhr) {
-        $("#modalUserType").modal();
-        $("#txtName").val(data.ut.name);
-        $("#txtDescription").val(data.ut.description);
-        $('#ckbRegistedable').prop('checked', data.ut.registedable);
-
-
-        let idx = 1;
-        data.ut.wages.forEach((w) => {
-          let tr =
-            '<tr id="' +
-            w._id +
-            '" class="row" data-level="' +
-            w.level._id +
-            '" data-skill="' +
-            w.skill._id +
-            '">';
-          tr += '<td class="col-md-1">' + idx++ + "</td>";
-          tr += '<td class="col-md-4">' + w.skill.name + "</td>";
-          tr += '<td class="col-md-3">' + w.level.name + "</td>";
-          tr += '<td class="col-md-2">' + w.wage + "</td>";
-          tr +=
-            '<td class="col-md-2"><button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
-          tr +=
-            '<button class="btn btn-sm btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
-          tr += "</tr>";
-          $("#tblWages").append(tr);
+        $(document).ready(function () {
+          LoadData();
         });
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        alert(jqXHR.responseJSON.msg);
-      },
-    });
-  });
-</script>
 
+        $("#btnAddNew").click(function () {
+          ugId = "";
+          $("#modalUserType").modal();
+        });
+
+
+
+        //sự kiện load lại hàm ds level khi modal đc đóng lại
+        $(document).on("hidden.bs.modal", "#modalUserType", function () {
+          LoadData();
+        });
+
+        $("#tblData").on("click", "button[name='delete']", function () {
+          var r = confirm(
+            "Are you sure want to delete " +
+            $(this).closest("tr").data("name") +
+            "?"
+          );
+          if (r == true) {
+            let ugId = $(this).closest("tr").attr("id");
+            $.ajax({
+              url: "/admin/user-group",
+              type: "delete",
+              headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+              },
+              data: {
+                id: ugId
+              },
+              success: function (data, textStatus, xhr) {
+                //xóa các thông tin tiền công liên quan tới nhóm nhân viên vừa xóa
+                $.ajax({
+                  url: '/admin/user-group-wage/delete-many',
+                  type: 'delete',
+                  headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                  },
+                  data: {
+                    ugId
+                  }
+                  , success: function (data) {
+                    alert(data.msg);
+                    LoadData();
+                  },
+                  error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseJSON.msg);
+                  },
+                })
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+              },
+            });
+          }
+        });
+
+
+        $("#tblData").on("click", "button[name='detail']", function () {
+          ugId = $(this).closest("tr").attr("id");
+          $("#modalUserGroupDetail").modal();
+        })
+
+        $("#tblData").on("click", "button[name='update']", function () {
+          ugId = $(this).closest("tr").attr("id");
+
+          $.ajax({
+            url: "/admin/user-group/detail",
+            type: "get",
+            headers: {
+              authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+              id: ugId,
+            },
+            success: function (data, textStatus, xhr) {
+              $("#modalUserType").modal();
+              $("#txtName").val(data.ut.name);
+              $("#txtDescription").val(data.ut.description);
+              $('#ckbRegistedable').prop('checked', data.ut.registedable);
+
+
+              let idx = 1;
+              data.ut.wages.forEach((w) => {
+                let tr =
+                  '<tr id="' +
+                  w._id +
+                  '" class="row" data-level="' +
+                  w.level._id +
+                  '" data-skill="' +
+                  w.skill._id +
+                  '">';
+                tr += '<td class="col-md-1">' + idx++ + "</td>";
+                tr += '<td class="col-md-4">' + w.skill.name + "</td>";
+                tr += '<td class="col-md-3">' + w.level.name + "</td>";
+                tr += '<td class="col-md-2">' + w.wage + "</td>";
+                tr +=
+                  '<td class="col-md-2"><button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+                tr +=
+                  '<button class="btn btn-sm btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
+                tr += "</tr>";
+                $("#tblWages").append(tr);
+              });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              alert(jqXHR.responseJSON.msg);
+            },
+          });
+        });
+
+      </script>
