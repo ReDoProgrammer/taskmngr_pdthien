@@ -1,14 +1,11 @@
 <div class="modal" tabindex="-1" role="dialog" id="modalSubmitTask">
     <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
+        <div class="modal-content">           
             <div class="modal-body">
-                <div class="panel panel-primary text-white bg-dark">
-                    <div class="panel-heading"><i class="fa fa-check" aria-hidden="true"></i> Submit task done
-                    </div>
+                <div class="panel panel-primary text-white bg-dark">                   
                     <div class="panel-body">
-
                         <div class="form-row">
-                            <div class="form-group col-md-8 col-sm-7 col-xs-6">
+                            <div class="form-group col-md-7 col-sm-6 col-xs-5">
                                 <label for="">Task output link <span class="text-danger">(!)</span>:</label>
                                 <input type="text" name="" id="txtLink" class="form-control">
                             </div>
@@ -18,9 +15,13 @@
                                     value="1"
                                     onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')">
                             </div>
-                            <div class="form-group col-md-2 col-sm-3 col-xs-4">
-                                <button class="btn btn-success" id="btnSubmitTaskDone" style="margin-top: 25px;">
+                            <div class="form-group input-group col-md-3 col-sm-4 col-xs-5">
+                                <button class="btn btn-primary" id="btnSubmitTaskDone" style="margin-top: 25px;">
+                                    <i class="fa fa-paper-plane" aria-hidden="true"></i>
                                     Submit done
+                                </button>
+                                <button type="button" class="close btn-xs" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
                         </div>
@@ -30,11 +31,6 @@
                             </div>
                         </div>
 
-                    </div>
-                    <div class="panel-footer">
-                        <div class="form-group text-right">
-                            <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -59,11 +55,15 @@
             },
             success: function (data) {
                 $('#txtLink').val('');
-                $('#txtAmount').val(data.task.amount);
 
+                //trường hợp submit sau khi bị reject thì cho hiện lại số lượng ảnh đã submit trước đó
+                if(data.task.editor.length > 0 && data.task.editor[data.task.editor.length-1].submited.length>0 ){
+                    $('#txtAmount').val(data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].amount);
+                }else{
+                    $('#txtAmount').val('');
+                }  
             }, error: function (request, status, error) {
-                alert(request.responseJSON.msg)
-                window.location.href = '/editor/default';
+                alert(request.responseJSON.msg)               
             }
         })
     });
