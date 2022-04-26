@@ -15,20 +15,78 @@
     </div>
 </div>
 
-<div class="tableFixHead table-responsive mt-2">
-    <table class="table mt-1 table-striped bg-white text-dark text-nowrap">
-        <thead class="thead-dark">
-            <tr>
-                <th scope="col"></th>
-                <th scope="col">#</th>
-                <th scope="col">Staff</th>
-                <th scope="col">Status</th>
-            </tr>
-        </thead>
-        <tbody id="tblData">
-        </tbody>
-    </table>
+<div class="row mt-2">
+    <div class="col-md-4">
+        <div class="panel panel-success">
+            <div class="panel-heading">Staffs</div>
+            <div class="panel-body">
+                <div class="tableFixHead table-responsive mt-2">
+                    <table class="table mt-1 table-striped bg-white text-dark text-nowrap">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Username</th>
+                                <th scope="col">Fullname</th>
+
+                            </tr>
+                        </thead>
+                        <tbody id="tblData">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-1 align-middle">
+        <button class="btn btn-success" style="height: 100% !important;">
+            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+        </button>
+    </div>
+    <div class="col-md-3">
+        <div class="panel panel-primary">
+            <div class="panel-heading">Check in</div>
+            <div class="panel-body">
+                <div class="tableFixHead table-responsive mt-2">
+                    <table class="table mt-1 table-striped bg-white text-dark text-nowrap">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Username</th>
+                                <th scope="col">Fullname</th>
+
+                            </tr>
+                        </thead>
+                        <tbody id="tblData">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-1">
+
+    </div>
+    <div class="col-md-3">
+        <div class="panel panel-danger">
+            <div class="panel-heading">Check out</div>
+            <div class="panel-body">
+                <div class="tableFixHead table-responsive mt-2">
+                    <table class="table mt-1 table-striped bg-white text-dark text-nowrap">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Username</th>
+                                <th scope="col">Fullname</th>
+
+                            </tr>
+                        </thead>
+                        <tbody id="tblData">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
 
 <script>
     $(document).ready(function () {
@@ -43,8 +101,8 @@
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
             success: function (data) {
-                data.modules.forEach(m=>{
-                    $('#slModules').append('<option value="'+m._id+'">'+m.name+'</option>');
+                data.modules.forEach(m => {
+                    $('#slModules').append('<option value="' + m._id + '">' + m.name + '</option>');
                 })
 
                 LoadStaffs($('#slModules option:selected').val());
@@ -53,19 +111,19 @@
         })
     }
 
-    $('#slModules').on("change",function(){
+    $('#slModules').on("change", function () {
         LoadStaffs($('#slModules option:selected').val());
     })
 
-    function LoadStaffs(moduleId){
+    function LoadStaffs(moduleId) {
         $.ajax({
-            url:'/tla/checkin/list-staffs-by-module',
-            type:'get',
+            url: '/tla/checkin/list-staffs-by-module',
+            type: 'get',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
-            data:{moduleId},
-            success:function(data){
+            data: { moduleId },
+            success: function (data) {
                 $('#tblData').empty();
             }
         })
