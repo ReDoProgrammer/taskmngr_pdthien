@@ -256,6 +256,9 @@ app.use('/sale/task',apiSaleTask);
 const TLAAuth = require('./BE/controllers/TLA/authentication-controller');
 app.use('/tla',TLAAuth);
 
+const TLACheckInController = require('./BE/controllers/TLA/checkin-controller');
+app.use('/tla/checkin',TLACheckInController);
+
 const TLAHomeController = require('./BE/controllers/TLA/home-controller');
 app.use('/tla',TLAHomeController);
 
