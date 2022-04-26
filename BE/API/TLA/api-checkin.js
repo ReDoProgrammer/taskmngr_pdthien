@@ -23,7 +23,16 @@ router.get('/list-staffs-by-module',authenticateTLAToken,(req,res)=>{
             CheckIn
             .find({})
             .then(staffs=>{
-                let checkOut = users.filter(x=>!staffs.includes(x._id));
+                let out = staffs.map(x=>{
+                    if(x.check.length ==0){
+                        return x.staff;
+                    }else{
+                        if(x.check[x.check.length-1].out!==null){
+                            return x.staff;
+                        }
+                    }
+                })
+                let checkOut = users.filter(x=>out.includes(x._id));
                 console.log(checkOut)
             })
             .catch(err=>{
