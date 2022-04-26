@@ -15,33 +15,35 @@ router.post('/',authenticateTLAToken,(req,res)=>{
 
 router.get('/list-staffs-by-module',authenticateTLAToken,(req,res)=>{
     let {moduleId} = req.query;
-   UserModule
-   .find({module:moduleId})
-   .then(um=>{
-       let users = um   .map(x=>{
-           return x.user;
-       })
-       User
-       .find({_id:{$in:users}})
-       .then(employees=>{
-           return res.status(200).json({
-               msg:`Get users based on module successfully!`,
-               employees
-           })
-       })
-       .catch(err=>{
-           console.log(`Can not get users based on module with error: ${new Error(err.message)}`)
-           return res.status(500).json({
-               msg:`Can not get users based on module with error: ${new Error(err.message)}`
-           })
-       })
-   })
-   .catch(err=>{
-       console.log(`Can not find usermodule by module id with error: ${new Error(err.message)}`)
-       return res.status(500).json({
-           msg:`Can not find usermodule by module id with error: ${new Error(err.message)}`
-       })
-   })
+
+    GetUsersByModule(moduleId)
+    .then(userIds=>{
+        GetUsersInRange(userIds)
+        .then(users=>{
+            CheckIn
+            .find({})
+            .then(staffs=>{
+                let checkOut = users.filter(x=>!staffs.includes(x._id));
+                console.log(checkOut)
+            })
+            .catch(err=>{
+                console.log(`Can not get checkin staffs with error: ${new Error(err.message)}`);
+                return res.status(500).json({
+                    msg:`Can not get checkin staffs with error: ${new Error(err.message)}`
+                })
+            })
+        })
+        .catch(err=>{
+            return res.status(err.code).json({
+                msg:err.msg
+            })
+        })
+    })
+    .catch(err=>{
+        return res.status(err.code).json({
+            msg:err.msg
+        })
+    })
 })
 
 router.get('/list-modules',authenticateTLAToken,(req,res)=>{
@@ -62,3 +64,40 @@ router.get('/list-modules',authenticateTLAToken,(req,res)=>{
 
 
 module.exports = router;
+
+const GetUsersByModule = (moduleId)=>{
+    return new Promise((resolve,reject)=>{
+        UserModule
+        .find({module:moduleId})
+        .then(um=>{
+            let users = um   .map(x=>{
+                return x.user;
+            });
+            return resolve(users);
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not get users by module id with error: ${new Error(err.message)}`
+            })
+        })
+    })
+}
+
+const GetUsersInRange = (userIds)=>{
+    return new Promise((resolve,reject)=>{
+        User
+       .find({_id:{$in:userIds}})
+       .select('fullname username')
+       .then(users=>{
+          return resolve(users);
+       })
+       .catch(err=>{
+           console.log(`Can not get users based on module with error: ${new Error(err.message)}`)
+            return reject({
+                code:500,
+                msg:`Can not get users based on module with error: ${new Error(err.message)}`
+            })
+       })
+    })
+}
