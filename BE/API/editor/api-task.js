@@ -3,6 +3,7 @@ const Task = require("../../models/task-model");
 
 const {
     getCustomer,
+    getUser,
     getTaskDetail } = require('../common');
 
 
@@ -206,34 +207,42 @@ router.put('/get-more', authenticateEditorToken, async (req, res) => {
        Đăng ký nhận task miễn phù hợp và những task đó không vượt quá 2 job
     
     */
+
+       getUser(req.user._id)
+       .then(u=>{
+        console.log(u)
+       })
+       .catch(err=>{
+           console.log(err)
+       })
    
-    getTask(req.user._id)
-    .then(async rs=>{
-       let task = rs.task;
-        task.status = 0;
-        task.editor.push({
-            staff: req.user._id,
-            timestamp: new Date(),
-            wage:rs.wage.wage
-        })
-        await task.save()
-        .then(_=>{
-            return res.status(200).json({
-                msg:`You have gotten more task successfully!`
-            })
-        })
-        .catch(err=>{
-            return res.status(500).json({
-                msg:`Get more task failed with error: ${new Error(err.message)}`
-            })
-        })
-    })
-    .catch(err=>{
-        console.log(err)
-        return res.status(err.code).json({
-            msg:err.msg
-        })
-    })
+    // getTask(req.user._id)
+    // .then(async rs=>{
+    //    let task = rs.task;
+    //     task.status = 0;
+    //     task.editor.push({
+    //         staff: req.user._id,
+    //         timestamp: new Date(),
+    //         wage:rs.wage.wage
+    //     })
+    //     await task.save()
+    //     .then(_=>{
+    //         return res.status(200).json({
+    //             msg:`You have gotten more task successfully!`
+    //         })
+    //     })
+    //     .catch(err=>{
+    //         return res.status(500).json({
+    //             msg:`Get more task failed with error: ${new Error(err.message)}`
+    //         })
+    //     })
+    // })
+    // .catch(err=>{
+    //     console.log(err)
+    //     return res.status(err.code).json({
+    //         msg:err.msg
+    //     })
+    // })
 
 
 })

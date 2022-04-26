@@ -13,15 +13,11 @@
             <label for="">Name</label>
             <input type="text" name="txtName" id="txtName" class="form-control" placeholder="User type name" />
           </div>
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-8">
             <label for="">Description</label>
             <input type="text" name="txtDescription" id="txtDescription" class="form-control"
               placeholder="Description" />
-          </div>
-          <div class="form-group col-md-2 text-center">
-            <label for="">Get task</label><br/>
-            <input type="checkbox" class="mt-2" id="ckbRegistedable">
-          </div>
+          </div>         
         </div>
       </div>
       <div class="modal-footer">
@@ -67,8 +63,7 @@
         data: {
           id: ugId,
           name,
-          description,
-          registedable:$('#ckbRegistedable').is(":checked")
+          description         
         },
         success: function (data, textStatus, xhr) {
           alert(data.msg);
@@ -88,8 +83,7 @@
         },
         data: {
           name,
-          description,
-          registedable:$('#ckbRegistedable').is(":checked")
+          description        
         },
         success: function (data, textStatus, xhr) {
           alert(data.msg);

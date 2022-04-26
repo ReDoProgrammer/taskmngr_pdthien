@@ -76,7 +76,7 @@ router.get('/detail', authenticateAdminToken, (req, res) => {
 
 
 router.post('/', authenticateAdminToken, (req, res) => {
-    let { name,registedable, description } = req.body;
+    let { name, description } = req.body;
 
 
     //validation user type name
@@ -91,8 +91,7 @@ router.post('/', authenticateAdminToken, (req, res) => {
 
     let ut = new UserGroup({
         name,
-        description,
-        registedable
+        description       
     });
     ut.save()
         .then(ug => {

@@ -11,12 +11,7 @@ const UserGroupSchema = new Schema({
     description: {
         type: String,
         default: ''
-    },
-    registedable: {
-        //thuộc tính đánh dấu khả năng có thể nhận thêm task của editor
-        type: Boolean,
-        default: false
-    },
+    },   
     wages: [{
         type: Schema.Types.ObjectId,
         ref: 'wage'
