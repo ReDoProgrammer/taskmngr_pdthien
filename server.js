@@ -282,6 +282,10 @@ app.use('/tla/bonus-penalty-line',apiTLABonusPenaltyLine);
 const apiTLAComboLine = require('./BE/API/TLA/api-tla-combo-line');
 app.use('/tla/combo-line',apiTLAComboLine);
 
+
+const apiTLACheckIn = require('./BE/API/TLA/api-checkin');
+app.use('/tla/checkin',apiTLACheckIn);
+
 const apiTLACustomer = require('./BE/API/TLA/api-tla-customer');
 app.use('/tla/customer',apiTLACustomer);
 

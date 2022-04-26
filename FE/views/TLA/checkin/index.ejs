@@ -1,0 +1,73 @@
+<div class="row mt-2">
+    <div class="col-md-offset-6 col-md-2 col-sm-offset-5 col-sm-3 col-xs-6">
+        <select name="" id="slModules" class="form-control"></select>
+    </div>
+
+    <div class="col-md-4 col-sm-4 col-xs-6 text-right">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Seach job..." id="txtSearch" />
+            <div class="input-group-btn">
+                <button class="btn btn-info" type="submit" id="btnSearch">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tableFixHead table-responsive mt-2">
+    <table class="table mt-1 table-striped bg-white text-dark text-nowrap">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">#</th>
+                <th scope="col">Staff</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody id="tblData">
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function () {
+        LoadModules();
+    })
+
+    function LoadModules() {
+        $.ajax({
+            url: '/tla/checkin/list-modules',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            success: function (data) {
+                data.modules.forEach(m=>{
+                    $('#slModules').append('<option value="'+m._id+'">'+m.name+'</option>');
+                })
+
+                LoadStaffs($('#slModules option:selected').val());
+            }
+
+        })
+    }
+
+    $('#slModules').on("change",function(){
+        LoadStaffs($('#slModules option:selected').val());
+    })
+
+    function LoadStaffs(moduleId){
+        $.ajax({
+            url:'/tla/checkin/list-staffs-by-module',
+            type:'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data:{moduleId},
+            success:function(data){
+                $('#tblData').empty();
+            }
+        })
+    }
+</script>
