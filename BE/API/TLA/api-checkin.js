@@ -38,9 +38,16 @@ router.put('/in', authenticateTLAToken, (req, res) => {
                 ]
             });
             await s.save();
+        }else{
+            user.check.push({
+                in:new Date()
+            });
+            await user.save();            
         }
     })
-
+    return res.status(200).json({
+        msg:`Set checkin into staffs list successfully!`
+    })
 })
 
 router.get('/list-staffs-by-module', authenticateTLAToken, (req, res) => {
@@ -65,10 +72,11 @@ router.get('/list-staffs-by-module', authenticateTLAToken, (req, res) => {
                                 })
                             }
 
-                            Promise.all([GetCheckInList(users)])
+                            Promise.all([GetCheckInList(users),GetCheckOutList(users)])
 
                                 .then(rs => {
                                     checkIn = rs[0];
+                                    checkOut = rs[1];
                                     return res.status(200).json({
                                         msg: `Load checkin & checkOut list successfully!`,
                                         checkIn,
@@ -119,6 +127,23 @@ router.get('/list-modules', authenticateTLAToken, (req, res) => {
 
 
 module.exports = router;
+
+const GetCheckOutList = (users)=>{
+    return new Promise((resolve,reject)=>{
+        CheckIn
+        .find({ 'check.out': {$ne:null} })
+        .populate('staff', 'username fullname')
+        .then(ci => {
+            return resolve(ci.map(x => x.staff));
+        })
+        .catch(err => {
+            return reject({
+                code: 500,
+                msg: `Can not load checkin list with err: ${new Error(err.message)}`
+            })
+        })
+    })
+}
 
 const GetCheckInList = (users) => {
     return new Promise((resolve, reject) => {

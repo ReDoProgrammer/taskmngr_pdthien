@@ -94,6 +94,10 @@
         $('#btnCheckOut').hide();
     })
 
+    $('#btnSearch').click(function(){
+        LoadStaffs();
+    })
+
     $('#btnCheckOut').click(function(){
         $.ajax({
             url:'/tla/checkin/out',
@@ -147,7 +151,7 @@
         }       
     })
 
-    
+
 
 
     $(document).on("click", "input[name='ckbCheckOut']", function () {
