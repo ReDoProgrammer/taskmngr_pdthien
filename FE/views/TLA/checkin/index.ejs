@@ -18,7 +18,19 @@
 <div class="row mt-2">
     <div class="col-md-6">
         <div class="panel panel-success">
-            <div class="panel-heading">Check in</div>
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-10">
+                        Check out
+                    </div>
+                    <div class="col-md-2 text-right">
+                        <button class="btn btn-xs btn-danger" id="btnCheckOut">
+                            <i class="fa fa-sign-in" aria-hidden="true"></i>
+                            Check Out
+                        </button>
+                    </div>
+                </div>
+            </div>
             <div class="panel-body">
                 <div class="tableFixHead table-responsive mt-2">
                     <table class="table mt-1 table-striped bg-white text-dark text-nowrap">
@@ -79,6 +91,23 @@
     $(document).ready(function () {
         LoadModules();
         $('#btnCheckIn').hide();
+        $('#btnCheckOut').hide();
+    })
+
+    $('#btnCheckOut').click(function(){
+        $.ajax({
+            url:'/tla/checkin/out',
+            type:'put',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data:{
+                checkOut
+            },
+            success:function(data){
+                LoadStaffs();
+            }
+        })
     })
 
     $('#btnCheckIn').click(function(){
@@ -99,6 +128,27 @@
 
     let checkIn = [];
     let checkOut = [];
+
+    $(document).on("click", "input[name='ckbCheckOut']", function () {
+        let staffId = $(this).closest('tr').attr('id');
+       
+        chk = checkOut.filter(x=>x == staffId);
+        if(chk.length === 0){
+            checkOut.push(staffId)
+        }else{
+            checkOut = checkOut.filter(x=>x!==staffId);
+        }
+
+        console.log(checkOut)
+        if(checkOut.length>0){
+            $('#btnCheckOut').show();
+        }else{
+            $('#btnCheckOut').hide();
+        }       
+    })
+
+    
+
 
     $(document).on("click", "input[name='ckbCheckOut']", function () {
         let staffId = $(this).closest('tr').attr('id');
@@ -157,6 +207,15 @@
                     tr += '<td>' + u.fullname + '</td>';
                     tr += '</tr>';
                     $('#tblCheckOut').append(tr);
+                })
+
+                data.checkIn.forEach(u => {
+                    let tr = '<tr id="' + u._id + '">';
+                    tr += '<td> <input type="checkbox" name="ckbCheckOut" ></td>';
+                    tr += '<td class="font-weight-bold">' + u.username + '</td>';
+                    tr += '<td>' + u.fullname + '</td>';
+                    tr += '</tr>';
+                    $('#tblCheckIn').append(tr);
                 })
             }
         })
