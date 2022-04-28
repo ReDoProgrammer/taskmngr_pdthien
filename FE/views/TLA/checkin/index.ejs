@@ -133,7 +133,7 @@
     let checkIn = [];
     let checkOut = [];
 
-    $(document).on("click", "input[name='ckbCheckOut']", function () {
+    $('#tblCheckIn').on("click", "input[name='ckbCheckIn']", function () {
         let staffId = $(this).closest('tr').attr('id');
        
         chk = checkOut.filter(x=>x == staffId);
@@ -154,7 +154,7 @@
 
 
 
-    $(document).on("click", "input[name='ckbCheckOut']", function () {
+    $('#tblCheckOut').on("click", "input[name='ckbCheckOut']", function () {
         let staffId = $(this).closest('tr').attr('id');
        
         chk = checkIn.filter(x=>x == staffId);
@@ -215,7 +215,7 @@
 
                 data.checkIn.forEach(u => {
                     let tr = '<tr id="' + u._id + '">';
-                    tr += '<td> <input type="checkbox" name="ckbCheckOut" ></td>';
+                    tr += '<td> <input type="checkbox" name="ckbCheckIn" ></td>';
                     tr += '<td class="font-weight-bold">' + u.username + '</td>';
                     tr += '<td>' + u.fullname + '</td>';
                     tr += '</tr>';
