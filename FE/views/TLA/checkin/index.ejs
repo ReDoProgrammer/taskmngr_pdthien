@@ -29,7 +29,7 @@
                                 <th scope="col">Fullname</th>
                             </tr>
                         </thead>
-                        <tbody id="tblData">
+                        <tbody id="tblCheckIn">
                         </tbody>
                     </table>
                 </div>
@@ -39,18 +39,32 @@
 
     <div class="col-md-6">
         <div class="panel panel-danger">
-            <div class="panel-heading">Check out</div>
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-10">
+                        Check out
+                    </div>
+                    <div class="col-md-2 text-right">
+                        <button class="btn btn-xs btn-success" id="btnCheckIn">
+                            <i class="fa fa-sign-in" aria-hidden="true"></i>
+                            Check In
+                        </button>
+                    </div>
+                </div>
+            </div>
             <div class="panel-body">
                 <div class="tableFixHead table-responsive mt-2">
                     <table class="table mt-1 table-striped bg-white text-dark text-nowrap">
                         <thead class="thead-dark">
                             <tr>
-                                <th scope="col">#</th>
+                                <th scope="col">
+                                    <input type="checkbox" name="ckbCheckOutAll">
+                                </th>
                                 <th scope="col">Username</th>
                                 <th scope="col">Fullname</th>
                             </tr>
                         </thead>
-                        <tbody id="tblData">
+                        <tbody id="tblCheckOut">
                         </tbody>
                     </table>
                 </div>
@@ -64,6 +78,43 @@
 <script>
     $(document).ready(function () {
         LoadModules();
+        $('#btnCheckIn').hide();
+    })
+
+    $('#btnCheckIn').click(function(){
+        $.ajax({
+            url:'/tla/checkin/in',
+            type:'put',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data:{
+                checkIn
+            },
+            success:function(data){
+                LoadStaffs();
+            }
+        })
+    })
+
+    let checkIn = [];
+    let checkOut = [];
+
+    $(document).on("click", "input[name='ckbCheckOut']", function () {
+        let staffId = $(this).closest('tr').attr('id');
+       
+        chk = checkIn.filter(x=>x == staffId);
+        if(chk.length === 0){
+            checkIn.push(staffId)
+        }else{
+            checkIn = checkIn.filter(x=>x!==staffId);
+        }
+
+        if(checkIn.length>0){
+            $('#btnCheckIn').show();
+        }else{
+            $('#btnCheckIn').hide();
+        }       
     })
 
     function LoadModules() {
@@ -97,7 +148,16 @@
             },
             data: { moduleId },
             success: function (data) {
-                $('#tblData').empty();
+                $('#tblCheckIn').empty();
+                $('#tblCheckOut').empty();
+                data.checkOut.forEach(u => {
+                    let tr = '<tr id="' + u._id + '">';
+                    tr += '<td> <input type="checkbox" name="ckbCheckOut" ></td>';
+                    tr += '<td class="font-weight-bold">' + u.username + '</td>';
+                    tr += '<td>' + u.fullname + '</td>';
+                    tr += '</tr>';
+                    $('#tblCheckOut').append(tr);
+                })
             }
         })
     }
