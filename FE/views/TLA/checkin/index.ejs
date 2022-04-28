@@ -94,8 +94,8 @@
         $('#btnCheckOut').hide();
     })
 
-    $('#btnSearch').click(function(){
-        LoadStaffs();
+    $('#btnSearch').click(function(){      
+        LoadStaffs($('#slModules option:selected').val());
     })
 
     $('#btnCheckOut').click(function(){
@@ -109,7 +109,7 @@
                 checkOut
             },
             success:function(data){
-                LoadStaffs();
+                LoadStaffs($('#slModules option:selected').val());
             }
         })
     })
@@ -125,7 +125,7 @@
                 checkIn
             },
             success:function(data){
-                LoadStaffs();
+                LoadStaffs($('#slModules option:selected').val());
             }
         })
     })
@@ -193,7 +193,7 @@
         LoadStaffs($('#slModules option:selected').val());
     })
 
-    function LoadStaffs(moduleId) {
+    function LoadStaffs(moduleId) {       
         $.ajax({
             url: '/tla/checkin/list-staffs-by-module',
             type: 'get',

@@ -167,6 +167,7 @@ const GetUsersByModule = (moduleId) => {
         UserModule
             .find({ module: moduleId })
             .then(um => {
+                console.log(um)
                 let users = um.map(x => {
                     return x.user;
                 });
