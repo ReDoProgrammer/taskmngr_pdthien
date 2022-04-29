@@ -25,10 +25,12 @@
                 <div class="tableFixHead table-responsive mt-2">
                     <table class="table mt-1 table-striped bg-white text-dark text-nowrap">
                         <thead class="thead-dark">
-                            <tr>
-                                <th scope="col">#</th>
+                            <tr>                                                     
                                 <th scope="col">Username</th>
                                 <th scope="col">Fullname</th>
+                                <th scope="col">
+                                    <input type="checkbox" name="ckbCheckOutAll">
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="tblCheckIn">
@@ -50,7 +52,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th scope="col">
-                                    <input type="checkbox" name="ckbCheckOutAll">
+                                    <input type="checkbox" name="ckbCheckInAll">
                                 </th>
                                 <th scope="col">Username</th>
                                 <th scope="col">Fullname</th>
@@ -93,7 +95,7 @@
     })
 
   
-    $('#tblCheckIn').on("click", "input[name='ckbCheckIn']", function () {
+    $('#tblCheckIn').on("click", "button[name='btnCheckOut']", function () {
         let staffId = $(this).closest('tr').attr('id');
         CheckIn(staffId);
     })
@@ -101,7 +103,7 @@
 
 
 
-    $('#tblCheckOut').on("click", "input[name='ckbCheckOut']", function () {
+    $('#tblCheckOut').on("click", "button[name='btnCheckIn']", function () {
         let staffId = $(this).closest('tr').attr('id');
         CheckIn(staffId);
     })
@@ -142,7 +144,7 @@
 
                 data.checkOut.forEach(u => {
                     let tr = '<tr id="' + u._id + '">';
-                    tr += '<td> <input type="checkbox" name="ckbCheckOut" ></td>';
+                    tr += '<td><button class="btn btn-xs btn-success" name="btnCheckIn"><i class="fa fa-angle-double-left" aria-hidden="true"></i></button></td>';
                     tr += '<td class="font-weight-bold">' + u.username + '</td>';
                     tr += '<td>' + u.fullname + '</td>';
                     tr += '</tr>';
@@ -151,9 +153,10 @@
 
                 data.checkIn.forEach(u => {
                     let tr = '<tr id="' + u._id + '">';
-                    tr += '<td> <input type="checkbox" name="ckbCheckIn" ></td>';
+                  
                     tr += '<td class="font-weight-bold">' + u.username + '</td>';
                     tr += '<td>' + u.fullname + '</td>';
+                    tr += '<td class="text-right"><button class="btn btn-xs btn-danger" name="btnCheckOut"><i class="fa fa-angle-double-right" aria-hidden="true"></i></button></td>';
                     tr += '</tr>';
                     $('#tblCheckIn').append(tr);
                 })
@@ -161,3 +164,12 @@
         })
     }
 </script>
+
+<style>
+    button[name="btnCheckIn"]{
+        padding-right: 20px !important;
+    }
+    button[name="btnCheckOut"]{
+        padding-left: 20px !important;
+    }
+</style>
