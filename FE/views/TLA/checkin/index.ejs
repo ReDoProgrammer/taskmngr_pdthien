@@ -19,17 +19,7 @@
     <div class="col-md-6">
         <div class="panel panel-success">
             <div class="panel-heading">
-                <div class="row">
-                    <div class="col-md-10">
-                        Check out
-                    </div>
-                    <div class="col-md-2 text-right">
-                        <button class="btn btn-xs btn-danger" id="btnCheckOut">
-                            <i class="fa fa-sign-in" aria-hidden="true"></i>
-                            Check Out
-                        </button>
-                    </div>
-                </div>
+                Check In
             </div>
             <div class="panel-body">
                 <div class="tableFixHead table-responsive mt-2">
@@ -52,17 +42,7 @@
     <div class="col-md-6">
         <div class="panel panel-danger">
             <div class="panel-heading">
-                <div class="row">
-                    <div class="col-md-10">
-                        Check out
-                    </div>
-                    <div class="col-md-2 text-right">
-                        <button class="btn btn-xs btn-success" id="btnCheckIn">
-                            <i class="fa fa-sign-in" aria-hidden="true"></i>
-                            Check In
-                        </button>
-                    </div>
-                </div>
+                Check out
             </div>
             <div class="panel-body">
                 <div class="tableFixHead table-responsive mt-2">
@@ -94,63 +74,28 @@
         $('#btnCheckOut').hide();
     })
 
-    $('#btnSearch').click(function(){      
+    function CheckIn(staffId){
+        $.ajax({
+            url:'/tla/checkin',
+            type:'put',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data:{staffId},
+            success:function(data){
+                LoadStaffs($('#slModules option:selected').val());
+            }
+        })
+    }
+
+    $('#btnSearch').click(function () {
         LoadStaffs($('#slModules option:selected').val());
     })
 
-    $('#btnCheckOut').click(function(){
-        $.ajax({
-            url:'/tla/checkin/out',
-            type:'put',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data:{
-                checkOut
-            },
-            success:function(data){
-                $('#btnCheckOut').hide();
-                LoadStaffs($('#slModules option:selected').val());
-            }
-        })
-    })
-
-    $('#btnCheckIn').click(function(){
-        $.ajax({
-            url:'/tla/checkin/in',
-            type:'put',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data:{
-                checkIn
-            },
-            success:function(data){
-                $('#btnCheckIn').hide();
-                LoadStaffs($('#slModules option:selected').val());
-            }
-        })
-    })
-
-    let checkIn = [];
-    let checkOut = [];
-
+  
     $('#tblCheckIn').on("click", "input[name='ckbCheckIn']", function () {
         let staffId = $(this).closest('tr').attr('id');
-       
-        chk = checkOut.filter(x=>x == staffId);
-        if(chk.length === 0){
-            checkOut.push(staffId)
-        }else{
-            checkOut = checkOut.filter(x=>x!==staffId);
-        }
-
-        console.log(checkOut)
-        if(checkOut.length>0){
-            $('#btnCheckOut').show();
-        }else{
-            $('#btnCheckOut').hide();
-        }       
+        CheckIn(staffId);
     })
 
 
@@ -158,19 +103,7 @@
 
     $('#tblCheckOut').on("click", "input[name='ckbCheckOut']", function () {
         let staffId = $(this).closest('tr').attr('id');
-       
-        chk = checkIn.filter(x=>x == staffId);
-        if(chk.length === 0){
-            checkIn.push(staffId)
-        }else{
-            checkIn = checkIn.filter(x=>x!==staffId);
-        }
-
-        if(checkIn.length>0){
-            $('#btnCheckIn').show();
-        }else{
-            $('#btnCheckIn').hide();
-        }       
+        CheckIn(staffId);
     })
 
     function LoadModules() {
@@ -195,7 +128,7 @@
         LoadStaffs($('#slModules option:selected').val());
     })
 
-    function LoadStaffs(moduleId) {       
+    function LoadStaffs(moduleId) {
         $.ajax({
             url: '/tla/checkin/list-staffs-by-module',
             type: 'get',

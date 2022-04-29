@@ -6,51 +6,63 @@ const Module = require('../../models/module-model');
 const UserModule = require('../../models/user-module-model');
 
 
-router.put('/out', authenticateTLAToken, (req, res) => {
-    let { checkOut } = req.body;
-
-    checkOut.forEach(async u => {
-        let chk = await CheckIn.findOne({staff:u});   
-        console.log('before',chk)
-        chk.check[chk.check.length - 1] = {
-            in:  chk.check[chk.check.length - 1].in,
-            out: new Date()
-        }       
-        await chk.save();
-        console.log('out',chk)
-    })
-    return res.status(200).json({
-        msg: `Set checkout into staffs successfully!`
-    })
-})
-
-router.put('/in', authenticateTLAToken, (req, res) => {
-    let { checkIn } = req.body;
-    checkIn.forEach(async st => {
-        let user = await CheckIn.findOne({ staff: st });
-        if (!user) {
-            let s = new CheckIn({
-                staff: st,
-                check: [
-                    {
-                        in: new Date()
-                    }
-                ]
-            });
-            console.log('new in',s)
-            await s.save();
-        }else{
-           
-            user.check.push({
-                in:new Date()
-            });
-            console.log('exist in',user)
-            await user.save();            
+router.put('/', authenticateTLAToken, async (req, res) => {
+    let { staffId } = req.body;
+    let chk = await CheckIn.findOne({ staff: staffId });
+    if (!chk) {
+        chk = new CheckIn({
+            staff: staffId,
+            check: {
+                in: new Date()
+            }
+        })
+        await chk.save()
+            .then(_ => {
+                return res.status(201).json({
+                    msg: `Set check in into staff successfully!`
+                })
+            })
+            .catch(err => {
+                return res.status(500).json({
+                    msg: `Can not set checkin into staff with error: ${new Error(err.message)}`
+                })
+            })
+    } else {
+        if (chk.check[chk.check.length - 1].out == null) {
+            chk.check[chk.check.length - 1].out = new Date();
+            await chk.save()
+                .then(_ => {
+                    return res.status(200).json({
+                        msg: `Set checkout into staff successfully!`
+                    })
+                })
+                .catch(err => {
+                    console.log(`Can not set checkout into staff with error: ${new Error(err.message)}`)
+                    return res.status(500).json({
+                        msg: `Can not set checkout into staff with error: ${new Error(err.message)}`
+                    })
+                })
+        } else {
+            chk.check.push({
+                in: new Date()
+            })
+            await chk.save()
+                .then(_ => {
+                    return res.status(200).json({
+                        msg: `Set checkin into staff successfully!`
+                    })
+                })
+                .catch(err => {
+                    return res.status(500).json({
+                        msg: `Can not set checkin into staff with error: ${new Error(err.message)}`
+                    })
+                })
         }
-    })
-    return res.status(200).json({
-        msg:`Set checkin into staffs list successfully!`
-    })
+    }
+
+
+
+
 })
 
 router.get('/list-staffs-by-module', authenticateTLAToken, (req, res) => {
@@ -61,7 +73,7 @@ router.get('/list-staffs-by-module', authenticateTLAToken, (req, res) => {
             GetUsersInRange(userIds)
                 .then(users => {
                     CheckIn
-                        .find({staff:{$in: users.map(x=>x._id)}})
+                        .find({ staff: { $in: users.map(x => x._id) } })
                         .then(staffs => {
                             let checkIn = [];
                             checkOut = [];
@@ -75,7 +87,7 @@ router.get('/list-staffs-by-module', authenticateTLAToken, (req, res) => {
                                 })
                             }
 
-                            Promise.all([GetCheckInList(users),GetCheckOutList(users)])
+                            Promise.all([GetCheckInList(users), GetCheckOutList(users)])
 
                                 .then(rs => {
                                     checkIn = rs[0];
@@ -131,33 +143,33 @@ router.get('/list-modules', authenticateTLAToken, (req, res) => {
 
 module.exports = router;
 
-const GetCheckOutList = (users)=>{
-    return new Promise((resolve,reject)=>{
+const GetCheckOutList = (users) => {
+    return new Promise((resolve, reject) => {
         CheckIn
-        .find({ 
-            staff: {$in:users},
-            'check.out': {$ne:null} 
-        })
-        .populate('staff', 'username fullname')
-        .then(ci => {
-            return resolve(ci.map(x => x.staff));
-        })
-        .catch(err => {
-            return reject({
-                code: 500,
-                msg: `Can not load checkin list with err: ${new Error(err.message)}`
+            .find({
+                staff: { $in: users },
+                'check.out': { $ne: null }
             })
-        })
+            .populate('staff', 'username fullname')
+            .then(ci => {
+                return resolve(ci.map(x => x.staff));
+            })
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not load checkin list with err: ${new Error(err.message)}`
+                })
+            })
     })
 }
 
 const GetCheckInList = (users) => {
     return new Promise((resolve, reject) => {
         CheckIn
-            .find({ 
-                staff: {$in:users},
+            .find({
+                staff: { $in: users },
                 'check.out': null
-             })
+            })
             .populate('staff', 'username fullname')
             .then(ci => {
                 return resolve(ci.map(x => x.staff));
