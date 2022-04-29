@@ -11,13 +11,13 @@ router.put('/out', authenticateTLAToken, (req, res) => {
 
     checkOut.forEach(async u => {
         let chk = await CheckIn.findOne({staff:u});   
-
+        console.log('before',chk)
         chk.check[chk.check.length - 1] = {
             in:  chk.check[chk.check.length - 1].in,
             out: new Date()
-        }
-        console.log('out',chk)
+        }       
         await chk.save();
+        console.log('out',chk)
     })
     return res.status(200).json({
         msg: `Set checkout into staffs successfully!`
