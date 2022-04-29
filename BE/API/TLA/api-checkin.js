@@ -8,13 +8,15 @@ const UserModule = require('../../models/user-module-model');
 
 router.put('/out', authenticateTLAToken, (req, res) => {
     let { checkOut } = req.body;
+
     checkOut.forEach(async u => {
-        let chk = await CheckIn.findOne({staff:u});      
-        console.log(chk.check[chk.check.length - 1])
+        let chk = await CheckIn.findOne({staff:u});   
+
         chk.check[chk.check.length - 1] = {
             in:  chk.check[chk.check.length - 1].in,
             out: new Date()
         }
+        console.log('out',chk)
         await chk.save();
     })
     return res.status(200).json({
@@ -24,8 +26,6 @@ router.put('/out', authenticateTLAToken, (req, res) => {
 
 router.put('/in', authenticateTLAToken, (req, res) => {
     let { checkIn } = req.body;
-    console.log(checkIn)
-
     checkIn.forEach(async st => {
         let user = await CheckIn.findOne({ staff: st });
         if (!user) {
@@ -37,11 +37,14 @@ router.put('/in', authenticateTLAToken, (req, res) => {
                     }
                 ]
             });
+            console.log('new in',s)
             await s.save();
         }else{
+           
             user.check.push({
                 in:new Date()
             });
+            console.log('exist in',user)
             await user.save();            
         }
     })
@@ -57,7 +60,6 @@ router.get('/list-staffs-by-module', authenticateTLAToken, (req, res) => {
         .then(userIds => {
             GetUsersInRange(userIds)
                 .then(users => {
-                    console.log(users)
                     CheckIn
                         .find({staff:{$in: users.map(x=>x._id)}})
                         .then(staffs => {
@@ -132,7 +134,10 @@ module.exports = router;
 const GetCheckOutList = (users)=>{
     return new Promise((resolve,reject)=>{
         CheckIn
-        .find({ 'check.out': {$ne:null} })
+        .find({ 
+            staff: {$in:users},
+            'check.out': {$ne:null} 
+        })
         .populate('staff', 'username fullname')
         .then(ci => {
             return resolve(ci.map(x => x.staff));
@@ -149,7 +154,10 @@ const GetCheckOutList = (users)=>{
 const GetCheckInList = (users) => {
     return new Promise((resolve, reject) => {
         CheckIn
-            .find({ 'check.out': null })
+            .find({ 
+                staff: {$in:users},
+                'check.out': null
+             })
             .populate('staff', 'username fullname')
             .then(ci => {
                 return resolve(ci.map(x => x.staff));

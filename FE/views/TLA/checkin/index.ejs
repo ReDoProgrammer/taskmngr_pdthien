@@ -109,6 +109,7 @@
                 checkOut
             },
             success:function(data){
+                $('#btnCheckOut').hide();
                 LoadStaffs($('#slModules option:selected').val());
             }
         })
@@ -125,6 +126,7 @@
                 checkIn
             },
             success:function(data){
+                $('#btnCheckIn').hide();
                 LoadStaffs($('#slModules option:selected').val());
             }
         })
@@ -204,7 +206,7 @@
             success: function (data) {
                 $('#tblCheckIn').empty();
                 $('#tblCheckOut').empty();
-                console.log(data);
+
                 data.checkOut.forEach(u => {
                     let tr = '<tr id="' + u._id + '">';
                     tr += '<td> <input type="checkbox" name="ckbCheckOut" ></td>';
