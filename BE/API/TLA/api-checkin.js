@@ -57,8 +57,9 @@ router.get('/list-staffs-by-module', authenticateTLAToken, (req, res) => {
         .then(userIds => {
             GetUsersInRange(userIds)
                 .then(users => {
+                    console.log(users)
                     CheckIn
-                        .find({})
+                        .find({staff:{$in: users.map(x=>x._id)}})
                         .then(staffs => {
                             let checkIn = [];
                             checkOut = [];
@@ -167,7 +168,6 @@ const GetUsersByModule = (moduleId) => {
         UserModule
             .find({ module: moduleId })
             .then(um => {
-                console.log(um)
                 let users = um.map(x => {
                     return x.user;
                 });

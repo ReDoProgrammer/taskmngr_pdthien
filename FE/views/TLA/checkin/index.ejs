@@ -204,6 +204,7 @@
             success: function (data) {
                 $('#tblCheckIn').empty();
                 $('#tblCheckOut').empty();
+                console.log(data);
                 data.checkOut.forEach(u => {
                     let tr = '<tr id="' + u._id + '">';
                     tr += '<td> <input type="checkbox" name="ckbCheckOut" ></td>';
