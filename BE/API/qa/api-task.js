@@ -52,26 +52,24 @@ router.put('/get-task', authenticateQAToken, (req, res) => {
         if (chk.check[chk.check.length - 1].out == undefined) {
             getTask(req.user._id)
                 .then(async rs => {
-
-                    console.log(rs)
-                   
-                    // let task = rs.task;
-                    // task.qa.push({
-                    //     staff: req.user._id,
-                    //     timestamp: new Date(),
-                    //     wage: rs.wage.wage
-                    // })
-                    // await task.save()
-                    //     .then(_ => {
-                    //         return res.status(200).json({
-                    //             msg: `You have gotten more task successfully!`
-                    //         })
-                    //     })
-                    //     .catch(err => {
-                    //         return res.status(500).json({
-                    //             msg: `Get more task failed with error: ${new Error(err.message)}`
-                    //         })
-                    //     })
+                  
+                    let task = rs.task;
+                    task.qa.push({
+                        staff: req.user._id,
+                        timestamp: new Date(),
+                        wage: rs.wage.wage
+                    })
+                    await task.save()
+                        .then(_ => {
+                            return res.status(200).json({
+                                msg: `You have gotten more task successfully!`
+                            })
+                        })
+                        .catch(err => {
+                            return res.status(500).json({
+                                msg: `Get more task failed with error: ${new Error(err.message)}`
+                            })
+                        })
                 })
                 .catch(err => {
                     console.log(err)
