@@ -21,8 +21,7 @@ const getTask = (staffId) => {
                                 .then(m => {
                                     let jobLevels = rs[1].map(x => {
                                         return x.job_lv;
-                                    })
-                                    let jobIds = rs[0].map(x => { return x._id });
+                                    })                                   
                                     switch (rs[0].length) {                                       
                                         case 0://trường hợp Q.A hiện không xử lý bất kì job nào
                                             NoJOB(jobLevels)
@@ -46,7 +45,7 @@ const getTask = (staffId) => {
                                             break;
                                         case 1:
                                             //trường hợp Q.A đang xử lý 1 job                                           
-                                            HaveJOB(jobIds, jobLevels)
+                                            HaveJOB(rs[0], jobLevels)
                                                 .then(task => {
                                                     getWage(u._id, task.basic.level, m._id)
                                                         .then(wage => {
@@ -87,7 +86,7 @@ const getTask = (staffId) => {
                                             break;
                                         case 2:
                                             
-                                            HaveJOB(jobIds, jobLevels)
+                                            HaveJOB(rs[0], jobLevels)
                                                 .then(task => {
                                                     getWage(u._id, task.basic.level, m._id)
                                                         .then(wage => {
@@ -158,10 +157,13 @@ const HaveJOB = (jobIds, jobLevelIds) => {
             //lấy những task chưa có qa nào nhận
             .findOne({
                 'basic.job': { $in: jobIds },
-                'basic.level': { $in: jobLevelIds },
-                qa: { $size: 0 },//chưa có Q.A nào nhận xử lý 
+                'basic.level': { $in: jobLevelIds },               
                 status: { $in: [0, 1] }
             })
+            .or([
+                { qa:{$size:0}},
+                {'qa.unregisted': true}
+             ])
             .sort({ 'basic.deadline.end': 1 })// sắp xếp tăng dần theo deadline
             .then(task => {
                 if (!task) {
@@ -191,7 +193,7 @@ const NoJOB = (jobLevelIds) => {
             })
             .or([
                { qa:{$size:0}},
-               {'qa.staff.unregisted': true}
+               {'qa.unregisted': true}
             ])
             .sort({ 'basic.deadline.end': 1 })
             .then(task => {
@@ -226,13 +228,15 @@ const GetProcessingJobs = (staffId) => {
                 {
                     $match: {
                         'qa.staff': ObjectId(staffId),
-                        status: { $in: [0, 1] }
+                        status: { $in: [0, 1] },
+                        'qa.unregisted':false// task có trạng thái unregisted = false <=> đang xử lý
                     }
                 },
                 { $group: { _id: '$basic.job' } }
             ])
-            .then(jobs => {
-                return resolve(jobs)
+            .then(jobs => {     
+                console.log('jobs found: ',jobs)                    
+                return resolve(jobs.map(x=>{return x._id}))
             })
             .catch(err => {
                 return reject({
