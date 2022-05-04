@@ -1,9 +1,13 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
 const Remark = require('../../models/remark-model');
+const CheckIn = require('../../models/staff-checkin');
 const { authenticateQAToken } = require("../../../middlewares/qa-middleware");
 const { getWage, getModule, getCustomer, getTaskDetail } = require('../common');
 const _MODULE = 'QA';
+
+const { getTask } = require('./get-task')
+
 
 router.put('/unregister', authenticateQAToken, async (req, res) => {
     let { taskId } = req.body;
@@ -36,83 +40,56 @@ router.put('/unregister', authenticateQAToken, async (req, res) => {
 })
 
 router.put('/get-task', authenticateQAToken, (req, res) => {
-    let { taskId } = req.body;
-    Task
-        .countDocuments({
-            /*
-                kiểm tra số task mà Q.A đang nhận chưa submit
-                nếu quá 2 task thì sẽ không được nhận thêm task
-            */
-            'qa.staff': req.user._id,
-            'qa.tla':{$ne:null},
-            status: { $in: [0, 1] }
-        }, async (err, count) => {
-            if (err) {
-                return res.status(500).json({
-                    msg: `Can not check task have been processing with error: ${new Error()}`
-                })
-            }
-            if (count > 2) {
-                return res.status(403).json({
-                    msg: `You can not get more task when your tasks have been not submited!`
-                })
-            }
+    CheckIn
+    .findOne({ staff: req.user._id })
+    .then(chk => {
+        if (!chk) {
+            return res.status(404).json({
+                msg: `Staff check in not found!`
+            })
+        }
 
-            /*
-                Kiểm tra xem task được nhận có phù hợp với trình độ của Q.A 
-                và đã được thiết lập tiền công rồi hay chưa
-            */
-            let task = await Task.findById(taskId);
-            if (!task) {
-                return res.status(404).json({
-                    msg: `Task not found!`
-                })
-            }
+        if (chk.check[chk.check.length - 1].out == undefined) {
+            getTask(req.user._id)
+                .then(async rs => {
 
-            if (task.qa.length > 0 && !task.qa[task.qa.length - 1].unregisted) {
-                return res.status(403).json({
-                    msg: `This task has been registed by another Q.A!`
-                })
-            }
-
-            await getModule(_MODULE)//lay module
-                .then(async m => {
-                    getWage(req.user._id, task.basic.level, m._id)//kiem tra xem level va q.a nay da duoc set tien cong chua
-                        .then(async w => {
-                            let q = {
-                                staff:req.user._id,
-                                wage: w.wage,
-                                timestamp: new Date()
-                            };
-                            task.qa.push(q);
-
-                            await task.save()
-                            .then(_=>{
-                                return res.status(200).json({
-                                    msg:`You have registed the task successfully!`
-                                })
-                            })
-                            .catch(err=>{
-                                return res.status(500).json({
-                                    msg:`Can not register this task with error: ${new Error(err.message)}`
-                                })
-                            })
-                        })
-                        .catch(err => {
-                            return res.status(err.code).json({
-                                msg: err.msg
-                            })
-                        })
+                    console.log(rs)
+                   
+                    // let task = rs.task;
+                    // task.qa.push({
+                    //     staff: req.user._id,
+                    //     timestamp: new Date(),
+                    //     wage: rs.wage.wage
+                    // })
+                    // await task.save()
+                    //     .then(_ => {
+                    //         return res.status(200).json({
+                    //             msg: `You have gotten more task successfully!`
+                    //         })
+                    //     })
+                    //     .catch(err => {
+                    //         return res.status(500).json({
+                    //             msg: `Get more task failed with error: ${new Error(err.message)}`
+                    //         })
+                    //     })
                 })
                 .catch(err => {
+                    console.log(err)
                     return res.status(err.code).json({
                         msg: err.msg
                     })
                 })
-
-
-
+        } else {
+            return res.status(403).json({
+                msg: `You can not get more task when you are not in office!`
+            })
+        }
+    })
+    .catch(err => {
+        return res.status(500).json({
+            msg: `Can not load staff checkin with error: ${new Error(err.message)}`
         })
+    })
 })
 
 router.put('/submit', authenticateQAToken, async (req, res) => {

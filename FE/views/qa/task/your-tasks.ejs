@@ -1,8 +1,5 @@
 <div class="row">
-    <div class="col-md-6 col-sm-6 col-xs-8 mt-2">
-        <label for=""></label>
-    </div>
-    <div class="col-md-2 col-sm-2 col-xs-4 mt-2">
+    <div class="col-md-2 col-md-offset-6 col-sm-2 col-xs-4 mt-2">
         <select name="" id="slStatus" class="form-control">
             <option value="100">All</option>
             <option value="1">Editor submited</option>
@@ -19,6 +16,11 @@
             <div class="input-group-btn">
                 <button class="btn btn-info" type="submit" id="btnSearch">
                     <i class="fa fa-search" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="col-md-2 col-sm-2 col-xs-3 text-right">
+                <button class="btn btn-primary" id="btnGetTask">
+                    <i class="fa fa-plus" aria-hidden="true"></i> Get task
                 </button>
             </div>
         </div>
@@ -70,6 +72,24 @@
             var taskId = '';
             $(document).ready(function () {
                 LoadTasks();
+            })
+
+            $('#btnGetTask').click(function () {
+                $.ajax({
+                    url: '/qa/task/get-task',
+                    type: 'put',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                    success: function (data) {
+                        alert(data.msg);
+                        LoadTasks();
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseJSON.msg);
+
+                    }
+                })
             })
 
             $(document).on('click', '#funcMenu  li', function () {
@@ -241,20 +261,20 @@
                             tr += '</td>';
 
                             tr += '<td class="text-right">';
-                            if (t.editor.length>0 && t.editor[t.editor.length-1].submited.length>0) {
-                                tr += t.editor[t.editor.length-1].submited[t.editor[t.editor.length-1].submited.length-1].amount;
+                            if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                                tr += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount;
                             }
                             tr += '</td>';
 
                             tr += '<td class="text-right">';
-                            if (t.editor.length>0 && t.editor[t.editor.length-1].submited.length > 0) {
-                                tr += t.editor[t.editor.length-1].submited.length;
+                            if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                                tr += t.editor[t.editor.length - 1].submited.length;
                             }
                             tr += '</td>';
 
 
                             tr += '<td>';
-                            if (t.editor.length>0) {
+                            if (t.editor.length > 0) {
                                 tr += t.editor[t.editor.length - 1].staff.fullname;
                             }
                             tr += '</td>';
@@ -269,7 +289,7 @@
                                     break;
                                 case 1:
                                     {
-                                        if (t.editor.length>0 && t.editor[t.editor.length-1].submited.length > 1) {
+                                        if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 1) {
                                             tr += '<span class="text-primary">Fixed</span>';
                                         } else {
                                             tr += '<span class="text-primary">Edited</span>';
