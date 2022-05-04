@@ -208,16 +208,11 @@ router.put('/get-more', authenticateEditorToken, async (req, res) => {
     
     */
 
-       getUser(req.user._id)
-       .then(u=>{
-        console.log(u)
-       })
-       .catch(err=>{
-           console.log(err)
-       })
+      
    
-    // getTask(req.user._id)
-    // .then(async rs=>{
+    getTask(req.user._id)
+    .then(async rs=>{
+        console.log(rs)
     //    let task = rs.task;
     //     task.status = 0;
     //     task.editor.push({
@@ -236,13 +231,13 @@ router.put('/get-more', authenticateEditorToken, async (req, res) => {
     //             msg:`Get more task failed with error: ${new Error(err.message)}`
     //         })
     //     })
-    // })
-    // .catch(err=>{
-    //     console.log(err)
-    //     return res.status(err.code).json({
-    //         msg:err.msg
-    //     })
-    // })
+    })
+    .catch(err=>{
+        console.log(err)
+        return res.status(err.code).json({
+            msg:err.msg
+        })
+    })
 
 
 })

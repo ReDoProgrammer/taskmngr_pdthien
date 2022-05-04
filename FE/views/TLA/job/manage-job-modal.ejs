@@ -655,7 +655,6 @@
     let levelId = $("#slJobLevels option:selected").val();
     LoadEditor(levelId);
     LoadQA(levelId);
-    LoadQueue(levelId);
   });
 
   function LoadJobLevels() {
@@ -675,9 +674,7 @@
         data.jl.forEach(j => {
           let opt = '<option value="' + j._id + '" class="font-weight-bold text-danger">' + j.name + '</option>';
           $('#slJobLevels').append(opt);
-        })
-
-        LoadQueue($('#slJobLevels option:selected').val());
+        })       
       },
       error: function (jqXHR, textStatus, errorThrown) {
         $('#msgError').text(jqXHR.responseJSON.msg);
@@ -743,19 +740,7 @@
 
 
 
-  function LoadQueue(levelId) {
-    $.ajax({
-      url: '/tla/queue/list-by-level',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: { levelId },
-      success: function (data) {
-        console.log(data)
-      }
-    })
-  }
+
 
   $('.inputDate').inputmask("datetime", {
     mask: "1/2/y h:s",
