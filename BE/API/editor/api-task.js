@@ -118,11 +118,16 @@ router.get('/', authenticateEditorToken, (req, res) => {
         ])
         .sort({ 'editor.timestamp': -1 })//sắp xếp giảm dần thời gian đăng ký của editor
         .sort({ status: 1 })//sắp xếp tăng dần theo trạng thái của task
+
         .exec()
         .then(tasks => {
+            var rs = tasks.slice((page-1)*20,20);
+            var pageSize = tasks.length%20==0?tasks.length/20:Math.floor(tasks.length/20)+1;           
+          
             return res.status(200).json({
                 msg: `Load your tasks list successfully!`,
-                tasks
+                tasks: rs,
+                pageSize
             })
         })
         .catch(err => {

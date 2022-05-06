@@ -60,7 +60,7 @@
         var search = '';
         var taskId = '';
         var status = 100;
-        let val = 1;
+        var idx = 1;
         $(document).ready(function () {
           LoadTask();
           setInterval(function () {
@@ -115,8 +115,61 @@
 
 
 
+        $(document).on("click", "button[name='functions']", function (e) {
+          var $contextMenu = $("#contextMenu");
+          $contextMenu.css({
+            display: "block",
+            left: e.pageX,
+            top: e.pageY
+          });
 
-        function LoadTask() {        
+          taskId = $(this).closest('tr').attr('id');
+
+          $.ajax({
+            url: '/editor/task/detail',
+            type: 'get',
+            headers: {
+              authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+              taskId
+            },
+            success: function (data) {
+             
+              customerId = data.customer._id;
+              levelId = data.task.basic.level._id;
+
+              $('#funcMenu').empty();
+              let mn = '';
+              switch (data.task.status) {
+                case 0:
+                  console.log(1111111)
+                  mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
+                  break;
+
+                default:
+                  $contextMenu.css({
+                    display: "none"
+                  });
+                  break;
+
+              }
+              $('#funcMenu').append(mn);
+            }
+          })
+
+
+          $('html').click(function () {
+            $contextMenu.hide();
+          });
+
+        });
+
+
+
+
+
+        function LoadTask() {
           $.ajax({
             url: '/editor/task',
             type: 'get',
@@ -129,11 +182,15 @@
               status: $('#slStatus option:selected').val()
             },
             success: function (data) {
+              console.log(data)
               $('#tbdTasks').empty();
-              let idx = 1;
-              data.tasks.forEach(t => {
-                let tr = '<tr id="' + t._id + '">';
 
+              data.tasks.forEach(t => {
+                let tr = '<tr id="' + t._id + '" data-status="' + t.status + '">';
+
+                tr += '<td>';
+                tr += '<button class="btn btn-xs btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
+                tr += '</td>';
                 tr += '<td>' + (idx++) + '</td>';
                 tr += '<td class="font-weight-bold text-primary">' + t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname + '</td>';
                 tr += '<td class="font-weight-bold">' + t.basic.job.name + '</td>';
@@ -250,3 +307,17 @@
         }
 
       </script>
+
+
+
+      <style>
+        #contextMenu {
+          position: absolute;
+          display: none;
+        }
+
+        tr:hover {
+          background: #c9e8f7;
+          position: relative;
+        }
+      </style>
