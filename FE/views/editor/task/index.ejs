@@ -31,6 +31,7 @@
   <table class="table table-striped text-nowrap">
     <thead class="thead-dark">
       <tr>
+        <th scope="col"></th>
         <th scope="col">#</th>
         <th scope="col">Customer</th>
         <th scope="col">Job</th>
@@ -49,6 +50,15 @@
     </tbody>
   </table>
 </div>
+<nav aria-label="...">
+  <ul class="pagination pagination-sm" id="navPages">
+    <li class="page-item disabled">
+      <a class="page-link" href="#" tabindex="-1">1</a>
+    </li>
+    <li class="page-item"><a class="page-link" href="#">2</a></li>
+    <li class="page-item"><a class="page-link" href="#">3</a></li>
+  </ul>
+</nav>
 
 <%-include('task_detail')%>
   <%-include('submit_modal')%>
@@ -60,7 +70,7 @@
         var search = '';
         var taskId = '';
         var status = 100;
-        var idx = 1;
+
         $(document).ready(function () {
           LoadTask();
           setInterval(function () {
@@ -135,7 +145,7 @@
               taskId
             },
             success: function (data) {
-             
+
               customerId = data.customer._id;
               levelId = data.task.basic.level._id;
 
@@ -166,8 +176,7 @@
         });
 
 
-
-
+   
 
         function LoadTask() {
           $.ajax({
@@ -183,15 +192,29 @@
             },
             success: function (data) {
               console.log(data)
+
+
+              //phan phan trang
+              $('#navPages').empty();
+              for (i = 1; i <= data.pages; i++) {
+                if (i === page) {
+                  $('#navPages').append('<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1">' + i + '</a></li>');
+                } else {
+                  $('#navPages').append('<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>');
+                }
+              }
+
+
               $('#tbdTasks').empty();
 
+              var idx = (page - 1) * 20;
               data.tasks.forEach(t => {
                 let tr = '<tr id="' + t._id + '" data-status="' + t.status + '">';
 
                 tr += '<td>';
                 tr += '<button class="btn btn-xs btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
                 tr += '</td>';
-                tr += '<td>' + (idx++) + '</td>';
+                tr += '<td>' + (++idx) + '</td>';
                 tr += '<td class="font-weight-bold text-primary">' + t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname + '</td>';
                 tr += '<td class="font-weight-bold">' + t.basic.job.name + '</td>';
                 tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';

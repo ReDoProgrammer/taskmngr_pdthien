@@ -121,13 +121,13 @@ router.get('/', authenticateEditorToken, (req, res) => {
 
         .exec()
         .then(tasks => {
-            var rs = tasks.slice((page-1)*20,20);
-            var pageSize = tasks.length%20==0?tasks.length/20:Math.floor(tasks.length/20)+1;           
+            var rs = tasks.slice((page-1)*2,2);
+            var pages = tasks.length%2==0?tasks.length/2:Math.floor(tasks.length/2)+1;           
           
             return res.status(200).json({
                 msg: `Load your tasks list successfully!`,
                 tasks: rs,
-                pageSize
+                pages
             })
         })
         .catch(err => {
