@@ -12,20 +12,18 @@
       <option value="-4">Canceled</option>
     </select>
   </div>
-  <div class="col-md-4 col-sm-4 col-xs-5  text-right">
+  <div class="col-md-6 col-sm-6 col-xs-8  text-right">
     <div class="input-group">
       <input type="text" class="form-control" placeholder="Seach task..." id="txtSearchTask" />
       <div class="input-group-btn">
         <button class="btn btn-info" type="submit" id="btnSearchTask">
           <i class="fa fa-search" aria-hidden="true"></i>
         </button>
+        <button class="btn btn-primary" id="btnGetTask">
+          <i class="fa fa-plus" aria-hidden="true"></i> Get task
+        </button>
       </div>
     </div>
-  </div>
-  <div class="col-md-2 col-sm-2 col-xs-3 text-right">
-    <button class="btn btn-primary" id="btnGetTask">
-      <i class="fa fa-plus" aria-hidden="true"></i> Get task
-    </button>
   </div>
 </div>
 
@@ -42,7 +40,7 @@
         <th scope="col" class="text-right">I-N</th>
         <th scope="col">Q.A</th>
         <th scope="col">DC</th>
-        <th scope="col">Status</th>       
+        <th scope="col">Status</th>
         <th scope="col">Remark</th>
         <th scope="col"></th>
       </tr>
@@ -62,9 +60,12 @@
         var search = '';
         var taskId = '';
         var status = 100;
-
+        let val = 1;
         $(document).ready(function () {
           LoadTask();
+          setInterval(function () {
+            LoadTask();
+          }, 10000);//run this thang every 10 seconds
         })
 
         $('#slStatus').on('change', function () {
@@ -85,7 +86,7 @@
             }, error: function (request, status, error) {
 
               if (request.status === 404) {
-               alert(request.responseJSON.msg);
+                alert(request.responseJSON.msg);
               } else {
                 alert(request.responseJSON.msg)
               }
@@ -115,8 +116,7 @@
 
 
 
-        function LoadTask() {
-
+        function LoadTask() {        
           $.ajax({
             url: '/editor/task',
             type: 'get',
@@ -157,15 +157,15 @@
                 tr += '</td>';
 
                 tr += '<td>';
-                  if(t.qa.length>0 && !t.qa[t.qa.length-1].unregisted){
-                    tr+=  t.qa[t.qa.length-1].staff.fullname;
-                  }                 
+                if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
+                  tr += t.qa[t.qa.length - 1].staff.fullname;
+                }
                 tr += '</td>';
 
                 tr += '<td>';
-                  if(t.dc.length>0 && !t.dc[t.dc.length-1].unregisted){
-                    tr+=  t.dc[t.dc.length-1].staff.fullname;
-                  }                 
+                if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
+                  tr += t.dc[t.dc.length - 1].staff.fullname;
+                }
                 tr += '</td>';
 
                 tr += '<td><i>';
@@ -209,7 +209,7 @@
                 }
                 tr += '</i></td>';
 
-            
+
 
                 tr += '<td>';
                 if (typeof t.remarks[0] != 'undefined') {
