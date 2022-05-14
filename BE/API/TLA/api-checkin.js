@@ -9,56 +9,37 @@ const UserModule = require('../../models/user-module-model');
 router.put('/', authenticateTLAToken, async (req, res) => {
     let { staffId } = req.body;
     let chk = await CheckIn.findOne({ staff: staffId });
+
     if (!chk) {
         chk = new CheckIn({
             staff: staffId,
             check: {
                 in: new Date()
             }
-        })
-        await chk.save()
-            .then(_ => {
-                return res.status(201).json({
-                    msg: `Set check in into staff successfully!`
-                })
-            })
-            .catch(err => {
-                return res.status(500).json({
-                    msg: `Can not set checkin into staff with error: ${new Error(err.message)}`
-                })
-            })
+        })       
     } else {
-        if (chk.check[chk.check.length - 1].out == null) {
+        
+        if (!chk.check[chk.check.length - 1].out) {
             chk.check[chk.check.length - 1].out = new Date();
-            await chk.save()
-                .then(_ => {
-                    return res.status(200).json({
-                        msg: `Set checkout into staff successfully!`
-                    })
-                })
-                .catch(err => {
-                    console.log(`Can not set checkout into staff with error: ${new Error(err.message)}`)
-                    return res.status(500).json({
-                        msg: `Can not set checkout into staff with error: ${new Error(err.message)}`
-                    })
-                })
         } else {
             chk.check.push({
                 in: new Date()
             })
-            await chk.save()
-                .then(_ => {
-                    return res.status(200).json({
-                        msg: `Set checkin into staff successfully!`
-                    })
-                })
-                .catch(err => {
-                    return res.status(500).json({
-                        msg: `Can not set checkin into staff with error: ${new Error(err.message)}`
-                    })
-                })
-        }
+        }       
     }
+    console.log(chk)
+    await chk.save()
+        .then(_ => {
+            return res.status(200).json({
+                msg: `Set checkout into staff successfully!`
+            })
+        })
+        .catch(err => {
+            console.log(`Can not set checkout into staff with error: ${new Error(err.message)}`)
+            return res.status(500).json({
+                msg: `Can not set checkout into staff with error: ${new Error(err.message)}`
+            })
+        })
 
 
 
@@ -69,12 +50,14 @@ router.get('/list-staffs-by-module', authenticateTLAToken, (req, res) => {
     let { moduleId } = req.query;
 
     GetUsersByModule(moduleId)
-        .then(userIds => {
+        .then(userIds => {          
             GetUsersInRange(userIds)
                 .then(users => {
+                    console.log(users)
                     CheckIn
                         .find({ staff: { $in: users.map(x => x._id) } })
                         .then(staffs => {
+                            
                             let checkIn = [];
                             checkOut = [];
 
@@ -207,7 +190,7 @@ const GetUsersInRange = (userIds) => {
         User
             .find({ _id: { $in: userIds } })
             .select('username fullname username')
-            .then(users => {
+            .then(users => {               
                 return resolve(users);
             })
             .catch(err => {
