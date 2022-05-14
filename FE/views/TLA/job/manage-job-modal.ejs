@@ -229,12 +229,14 @@
 
         //xu ly checkbox va dropdown lien quan toi editor va qa
 
-        $('#ckbAssignEditor').prop('checked', (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla!=='undefined') ? true : false);
+        
         $('#ckbAssignQA').prop('checked', (data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla !== 'undefined') ? true : false);
 
 
 
-        if (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla!=='undefined') {
+        if (data.task.status <1 && data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla!=='undefined') {
+          $('#ckbAssignEditor').show();
+          $('#ckbAssignEditor').prop('checked', (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla!=='undefined') ? true : false);
           $('#colEditor').show();
           $('#slEditor').val(data.task.editor[data.task.editor.length - 1].staff);
           if (data.task.status > 1) {
@@ -246,6 +248,7 @@
           }
         } else {
           $('#colEditor').hide();
+          $('#ckbAssignEditor').hide();
         }
 
         if ((data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla !=='undefined')) {
@@ -438,13 +441,13 @@
 
 
           tr += '<td>';
-          if (typeof t.editor !== 'undefined' && t.editor.length > 0)
-            tr += t.editor[0].staff.fullname;
+          if (t.status !== -1)
+            tr += t.editor[t.editor.length-1].staff.fullname;
           tr += "</td>";
 
           tr += '<td>';
           if (typeof t.qa !== 'undefined' && t.qa.length > 0)
-            tr += t.qa[0].staff.fullname;
+            tr += t.qa[t.qa.length-1].staff.fullname;
           tr += '</td>'
 
 

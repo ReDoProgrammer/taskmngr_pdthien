@@ -238,7 +238,7 @@
                                                 mn = '';
                                                 mn += '<li id="cancel-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Cancel</a></li>';
                                                 if (data.task.bp !== null && data.task.bp.length > 0) {
-                                                    if (data.task.bp[0].is_bonus) {
+                                                    if (data.task.bp[data.task.pb.length-1].is_bonus) {
                                                         mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-trophy text-warning" aria-hidden="true"></i> Bonus</a></li>';
                                                     } else {
                                                         mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-credit-card text-danger"  aria-hidden="true"></i> Penalty</a></li>';
@@ -248,7 +248,7 @@
                                                 break;
                                             case 4: case 5: case 6:
                                                 if (data.task.bp !== null && data.task.bp.length > 0) {
-                                                    if (data.task.bp[0].is_bonus) {
+                                                    if (data.task.bp[data.task.pb.length-1].is_bonus) {
                                                         mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-trophy text-warning" aria-hidden="true"></i> Bonus</a></li>';
                                                     } else {
                                                         mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-credit-card text-danger"  aria-hidden="true"></i> Penalty</a></li>';
@@ -313,7 +313,7 @@
                                         data.tasks.forEach(t => {
                                             let tr = '<tr id="' + t._id + '"  data-level="' + t.basic.level._id + '">';
                                             if (t.bp !== null && t.bp.length > 0) {
-                                                if (t.bp[0].is_bonus) {
+                                                if (t.bp[data.task.pb.length-1].is_bonus) {
                                                     tr = '<tr id="' + t._id + '" data-customer = "' + t.job.customer + '" data-level="' + t.level._id + '" style="background-color: #A9F5F2">';
                                                 } else {
                                                     tr = '<tr id="' + t._id + '" data-customer = "' + t.job.customer + '" data-level="' + t.level._id + '" style="background-color: #F6E3CE">';
@@ -323,7 +323,7 @@
 
                                             tr += '<td>';
                                             if (t.bp !== null && t.bp.length > 0) {
-                                                if (t.bp[0].is_bonus) {
+                                                if (t.bp[data.task.pb.length-1].is_bonus) {
                                                     tr += '<span class="text-success"><i class="fa fa-trophy" aria-hidden="true"></i></span>'
 
                                                 } else {
@@ -350,7 +350,7 @@
 
 
                                             tr += '<td>';
-                                            if (t.editor.length > 0 && !t.editor[t.editor.length-1].unregisted) {
+                                            if (t.status !== -1) {
                                                 tr += t.editor[t.editor.length - 1].staff.fullname
                                             }
                                             tr += '</td>';
@@ -369,7 +369,7 @@
 
                                             tr += '<td class="text-right">';
                                             if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                                                tr += t.editor[0].submited.length;
+                                                tr += t.editor[t.editor.length-1].submited.length;
                                             }
                                             tr += '</td>';
 
@@ -377,8 +377,8 @@
 
 
                                             tr += '<td>';
-                                            if (typeof t.remarks[0] !== 'undefined') {
-                                                tr += t.remarks[0].content;
+                                            if (typeof t.remarks[t.remarks.length-1] !== 'undefined') {
+                                                tr += t.remarks[t.remarks.length-1].content;
                                             }
                                             tr += '</td>';
 

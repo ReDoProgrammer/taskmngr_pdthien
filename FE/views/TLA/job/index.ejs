@@ -110,7 +110,7 @@
                                     newRow += '<td class="text-right">' + (idx++) + '</td>';
                                     newRow += '<td class="font-weight-bold text-primary">' + t.basic.level.name + '</td>';
                                     newRow += '<td>';
-                                    if (t.editor.length > 0) {
+                                    if (t.status !== -1) {
                                         newRow += t.editor[t.editor.length - 1].staff.fullname;
                                     }
                                     newRow += '</td>';
