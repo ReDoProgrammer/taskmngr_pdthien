@@ -1,0 +1,48 @@
+<div class="modal" tabindex="-1" role="dialog" id="modalReject">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Unregisted task</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-10 col-sm-10 col-xs-10">
+                        <input type="text" name="reason" id="txtRejectReason" class="form-control"
+                            placeholder="Reject note">
+                    </div>
+
+                    <div class="col-md-2 col-sm-2 col-xs-2">
+                        <button class="btn btn-sm btn-warning" id="btnSubmitReject">
+                            <i class="fa fa-close"></i> Submit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#btnSubmitReject').click(function () {
+        $.ajax({
+            url: '/editor/task/reject',
+            type: 'put',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                taskId,
+                remark: $('#txtRejectReason').val()
+            },
+            success: function (data) {
+                alert(data.msg);
+                $('#modalReject').modal('hide');
+            }
+        })
+    })
+
+    $('#modalReject').on('hidden.bs.modal', function () {
+        LoadTask();
+    })
+</script>

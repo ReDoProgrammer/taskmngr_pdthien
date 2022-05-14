@@ -33,7 +33,7 @@ const taskSchema = new Schema({
             input: {
                 type: String,
                 default: ''
-            },           
+            },
             output: {
                 type: String,
                 default: ''
@@ -60,10 +60,10 @@ const taskSchema = new Schema({
             //Tiền công của DC
             type: Number
         },
-        unregisted:{
+        unregisted: {
             //lưu trạng thái task có bị DC hủy đăng ký hay không
-            type:Boolean,
-            default:false
+            type: Boolean,
+            default: false
         },
         rejected: [
             {
@@ -75,7 +75,7 @@ const taskSchema = new Schema({
                     type: Schema.Types.ObjectId,
                     ref: 'user'
                 },
-                rm:{
+                rm: {
                     type: Schema.Types.ObjectId,
                     ref: 'remark'
                 }
@@ -90,22 +90,22 @@ const taskSchema = new Schema({
         wage: {
             type: Number,
             default: 0
-        },       
+        },
         tla: {
             type: Schema.Types.ObjectId,
             ref: 'user'
         },
-        timestamp:{
+        timestamp: {
             //thời điểm nhận or được gán
-            type:Date
+            type: Date
         },
         submited_at: [{
             type: Date
         }],
-        unregisted:{
+        unregisted: {
             //lưu trạng thái task có bị DC hủy đăng ký hay không
-            type:Boolean,
-            default:false
+            type: Boolean,
+            default: false
         },
         rejected: [
             {
@@ -117,7 +117,7 @@ const taskSchema = new Schema({
                     type: Schema.Types.ObjectId,
                     ref: 'user'
                 },
-                rm:{
+                rm: {
                     type: Schema.Types.ObjectId,
                     ref: 'remark'
                 }
@@ -130,22 +130,23 @@ const taskSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'user'
         },
-        timestamp:{
+        timestamp: {
             //thời điểm nhận or được gán
-            type:Date
+            type: Date,
+            default: new Date()
         },
         wage: {
             type: Number,
             default: 0
-        },      
+        },
         tla: {
             type: Schema.Types.ObjectId,
             ref: 'user'
-        },        
+        },
         submited: [{
             at: {
                 type: Date
-            },           
+            },
             amount: {
                 //số lượng file xuất ra của editor
                 type: Number,
@@ -157,7 +158,18 @@ const taskSchema = new Schema({
                 default: ''
             }
         }],
-       
+        rejected: [
+            {
+                at: {
+                    type: Date
+                },
+                reason: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'remark'
+                }
+            }
+        ]
+
 
     }],
 
@@ -183,9 +195,9 @@ const taskSchema = new Schema({
             */
 
     },
-  
 
-   
+
+
     tla: {
         created: {
             at: {
@@ -199,27 +211,27 @@ const taskSchema = new Schema({
         },
         updated: [{
             at: {
-                type: Date               
+                type: Date
             },
             by: {
                 type: Schema.Types.ObjectId,
                 ref: 'user'
-            }           
+            }
         }],
         uploaded: [{
             at: {
-                type: Date                
+                type: Date
             },
             by: {
                 type: Schema.Types.ObjectId,
                 ref: 'user'
             },
-            link:{
-                type:String,
-                default:''
+            link: {
+                type: String,
+                default: ''
             }
-            
-        }]      
+
+        }]
 
     },
 
@@ -232,7 +244,7 @@ const taskSchema = new Schema({
             by: {
                 type: Schema.Types.ObjectId,
                 ref: 'user'
-            }       
+            }
         }
     ],
 
@@ -252,7 +264,7 @@ const taskSchema = new Schema({
         }
     },
 
-    
+
 
     canceled: {
         reason: {

@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
 const CheckIn = require('../../models/staff-checkin');
+const Remark = require('../../models/remark-model');
 
 const {
     getCustomer,
@@ -14,7 +15,49 @@ const { getTask } = require('./get-task')
 const { authenticateEditorToken } = require("../../../middlewares/editor-middleware");
 
 
+router.put('/reject',authenticateEditorToken,async (req,res)=>{
+    let {taskId,remark} = req.body;
+    let task = await Task.findById(taskId);
+    if(!task){
+        return res.status(404).json({
+            msg:`Task not found!`
+        })
+    }
 
+    task.status = -1;
+
+    let rm = new Remark({
+        tid:task._id,
+        content:remark,
+        user:req.user._id
+    });
+    await rm.save()
+    .then(async _=>{
+        task.remarks.push(rm);
+        task.editor[task.editor.length-1].rejected.push({
+            at:new Date(),
+            reason:rm._id
+        });
+        await task.save()
+        .then(_=>{
+            return res.status(200).json({
+                msg:`You have rejected task successfully!`
+            })
+        })
+        .catch(err=>{
+            return res.status(500).json({
+                msg:`You can not reject this task with error: ${new Error(err.message)}`
+            })
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not set remark into this task with error: ${new Error(err.message)}`
+        })
+    })
+
+    
+})
 
 router.put('/change-amount', authenticateEditorToken, async (req, res) => {
     let { amount, taskId } = req.body;
@@ -76,10 +119,16 @@ router.get('/statistic', authenticateEditorToken, (req, res) => {
         })
 })
 
+
+
+
 router.get('/', authenticateEditorToken, (req, res) => {
     let { page, search, status } = req.query;
     Task
-        .find({ 'editor.staff': req.user._id })//chỉ load những task đã được TLA gán hoặc editor đã nhận được        
+        .find({ 
+            'editor.staff': req.user._id,
+            status: {$gt:-1}
+        })//chỉ load những task đã được TLA gán hoặc editor đã nhận được        
         .populate([
             {
                 path: 'basic.job',
@@ -121,8 +170,8 @@ router.get('/', authenticateEditorToken, (req, res) => {
 
         .exec()
         .then(tasks => {
-            var rs = tasks.slice((page-1)*2,2);
-            var pages = tasks.length%2==0?tasks.length/2:Math.floor(tasks.length/2)+1;           
+            var rs = tasks.slice((page-1)*10,10);           
+            var pages = tasks.length%10==0?tasks.length/10:Math.floor(tasks.length/10)+1;           
           
             return res.status(200).json({
                 msg: `Load your tasks list successfully!`,
@@ -147,7 +196,6 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
 
             await getCustomer(task.basic.job.customer)
                 .then(customer => {
-                    console.log(task)
                     return res.status(200).json({
                         msg: `Load task detail successfully!`,
                         task,

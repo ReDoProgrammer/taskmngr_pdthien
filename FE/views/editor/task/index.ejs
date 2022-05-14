@@ -63,6 +63,7 @@
 <%-include('task_detail')%>
   <%-include('submit_modal')%>
     <%-include('modal_change')%>
+    <%-include('modal_reject')%>
 
       <script src="/js/common.js"></script>
       <script>
@@ -130,58 +131,10 @@
           $('#modalTaskDetail').modal();
         })
 
-
-
-        $(document).on("click", "button[name='functions']", function (e) {
-          var $contextMenu = $("#contextMenu");
-          $contextMenu.css({
-            display: "block",
-            left: e.pageX,
-            top: e.pageY
-          });
-
-          taskId = $(this).closest('tr').attr('id');
-
-          $.ajax({
-            url: '/editor/task/detail',
-            type: 'get',
-            headers: {
-              authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-              taskId
-            },
-            success: function (data) {
-
-              customerId = data.customer._id;
-              levelId = data.task.basic.level._id;
-
-              $('#funcMenu').empty();
-              let mn = '';
-              switch (data.task.status) {
-                case 0:
-                  console.log(1111111)
-                  mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
-                  break;
-
-                default:
-                  $contextMenu.css({
-                    display: "none"
-                  });
-                  break;
-
-              }
-              $('#funcMenu').append(mn);
-            }
-          })
-
-
-          $('html').click(function () {
-            $contextMenu.hide();
-          });
-
-        });
-
+        $(document).on("click", "button[name='btnRejectTask']", function () {
+          taskId = $(this).closest("tr").attr("id");
+          $('#modalReject').modal();
+        })
 
 
 
@@ -217,9 +170,10 @@
               var idx = (page - 1) * 20;
               data.tasks.forEach(t => {
                 let tr = '<tr id="' + t._id + '" data-status="' + t.status + '">';
-
                 tr += '<td>';
-                tr += '<button class="btn btn-xs btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
+                tr += '<button class="btn btn-xs btn-info ml-2" name="btnTaskInfo">';
+                tr += '<i class="fa fa-info-circle" aria-hidden="true"></i>';
+                tr += '</button>';
                 tr += '</td>';
                 tr += '<td>' + (++idx) + '</td>';
                 tr += '<td class="font-weight-bold text-primary">' + t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname + '</td>';
@@ -264,7 +218,7 @@
                     break;
                   case 1:
                     {
-                      if (t.editor[0].submited.length > 1) {
+                      if (t.editor[t.editor.length - 1].submited.length > 1) {
                         tr += '<span class="text-primary">Fixed</span>';
                       } else {
                         tr += '<span class="text-primary">Edited</span>';
@@ -306,9 +260,15 @@
 
 
                 tr += '<td class="text-right">';
+                
                 if (t.status == 0 || t.status == -1 || t.status == -2 || t.status == -3 || t.status == -4) {
                   tr += '<button class="btn btn-xs btn-success" name="btnSubmitTask">';
                   tr += '<i class="fa fa-send-o"></i>';
+                  tr += '</button>';
+                }
+                if (t.status === 0) {
+                  tr += '<button class="btn btn-xs btn-danger ml-2" name="btnRejectTask">';
+                  tr += '<i class="fa fa-undo" aria-hidden="true"></i>';
                   tr += '</button>';
                 }
                 if (t.status === 1) {
@@ -316,9 +276,7 @@
                   tr += ' <i class="fa fa-edit"></i> ';
                   tr += '</button>';
                 }
-                tr += '<button class="btn btn-xs btn-info ml-2" name="btnTaskInfo">';
-                tr += '<i class="fa fa-info-circle" aria-hidden="true"></i>';
-                tr += '</button>';
+
 
 
                 tr += '</td>';
@@ -337,17 +295,3 @@
         }
 
       </script>
-
-
-
-      <style>
-        #contextMenu {
-          position: absolute;
-          display: none;
-        }
-
-        tr:hover {
-          background: #c9e8f7;
-          position: relative;
-        }
-      </style>
