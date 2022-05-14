@@ -52,12 +52,19 @@ router.get('/list-staffs-by-module', authenticateTLAToken, (req, res) => {
     GetUsersByModule(moduleId)
         .then(userIds => {          
             GetUsersInRange(userIds)
-                .then(users => {
-                    console.log(users)
+                .then(users => {                  
+
+
                     CheckIn
                         .find({ staff: { $in: users.map(x => x._id) } })
                         .then(staffs => {
-                            
+                           
+                            let staffIds = staffs.map(x=>{return x.staff});                       
+                            let notInChecking = users.filter(x=>!staffIds.includes(x._id));
+                           
+                            console.log({staffs,notInChecking})
+                           
+                           
                             let checkIn = [];
                             checkOut = [];
 
