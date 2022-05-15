@@ -245,7 +245,7 @@
                             tr += '</td>';
                             tr += '<td>' + (idx++) + '</td>';
 
-                            tr += '<td class="font-weight-bold text-primary">' + t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname + '</td>';
+                            tr += '<td class="font-weight-bold text-primary">' +getFirstLetters(t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname)+getLastLetters(t.basic.job.customer._id)+ '</td>';
                             tr += '<td class="font-weight-bold text-danger">' + t.basic.job.name + '</td>';
                             tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';
                             tr += '<td class="text-danger">';
