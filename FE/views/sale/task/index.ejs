@@ -41,6 +41,7 @@
                 <th scope="col"></th>
                 <th scope="col">#</th>
                 <th scope="col">Customer</th>
+                <th scope="col">Short name</th>
                 <th scope="col">Job</th>
                 <th scope="col">Level</th>
                 <th scope="col">Deadline</th>
@@ -219,7 +220,8 @@
                             tr += '<td>' + (idx++) + '</td>';
 
                             tr += '<td class="font-weight-bold text-primary">' + t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname + '</td>';
-                            tr += '<td class="font-weight-bold text-danger">' + t.basic.job.name + '</td>';
+                            tr+='<td class="font-weight-bold text-danger">'+getFirstLetters(t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname)+getLastLetters(t.basic.job.customer._id)+'</td>';
+                            tr += '<td class="font-weight-bold text-info">' + t.basic.job.name + '</td>';
                             tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';
 
                             tr += '<td>';

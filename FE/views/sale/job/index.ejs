@@ -19,6 +19,7 @@
     <th></th>
     <th>#</th>
     <th>Customer</th>
+    <th>Short name</th>
     <th>Job</th>
     <th>Receive date</th>
     <th>Delivery date</th>
@@ -374,6 +375,7 @@
               tr += '</td>';
               tr += '<td>' + (idx++) + '</td>';
               tr += '<td class="font-weight-bold text-primary">' + j.customer.firstname + ' ' + j.customer.lastname + '</td>';
+              tr+='<td class="font-weight-bold text-danger">'+getFirstLetters(j.customer.firstname + ' ' + j.customer.lastname)+getLastLetters(j.customer._id)+'</td>';
               tr += '<td class="font-weight-bold text-warning">' + j.name + '</td>';
               tr += '<td>' + convertISODateToTimeFormat(j.received_date) + '</td>';
               tr += '<td>' + convertISODateToTimeFormat(j.delivery_date) + '</td>';

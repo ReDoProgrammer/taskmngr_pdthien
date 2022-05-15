@@ -22,6 +22,7 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Customer</th>
+                <th scope="col">Short name</th>
                 <th scope="col">Phone</th>
                 <th scope="col">Email</th>
                 <th></th>
@@ -97,6 +98,7 @@
                         let tr = '<tr id = "' + cus._id + '">';
                         tr += '<td>' + (idx++) + '</td>';
                         tr += '<td class="font-weight-bold text-info">' + cus.firstname + ' ' + cus.lastname + '</td>';
+                        tr+= '<td class="font-weight-bold text-danger">'+getFirstLetters(cus.firstname + ' ' + cus.lastname)+getLastLetters(cus._id)+'</td>';
                         tr += '<td>' + cus.phone + '</td>';
                         tr += '<td>' + cus.email + '</td>';
                         tr += '<td class="text-right"><button class="btn-sm btn-primary" name="btnAddJob"><i class="fa fa-plus" aria-hidden="true"></i> Add job</button></td>'
