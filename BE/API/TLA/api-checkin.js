@@ -4,7 +4,7 @@ const CheckIn = require('../../models/staff-checkin');
 const User = require('../../models/user-model');
 const Module = require('../../models/module-model');
 const UserModule = require('../../models/user-module-model');
-
+const { ObjectId } = require('mongodb');
 
 router.put('/', authenticateTLAToken, async (req, res) => {
     let { staffId } = req.body;
@@ -53,46 +53,26 @@ router.get('/list-staffs-by-module', authenticateTLAToken, (req, res) => {
         .then(userIds => {          
             GetUsersInRange(userIds)
                 .then(users => {                  
-
-
                     CheckIn
                         .find({ staff: { $in: users.map(x => x._id) } })
                         .then(staffs => {
-                           
-                            let staffIds = staffs.map(x=>{return x.staff});                       
-                            let notInChecking = users.filter(x=>!staffIds.includes(x._id));
-                           
-                            console.log({staffs,notInChecking})
-                           
-                           
-                            let checkIn = [];
-                            checkOut = [];
+                         
+                           let staffIds = staffs.map(x=>{return x.staff.toString();})
+                           let outList = users.filter(x=>!staffIds.includes(x._id.toString()));
 
-                            if (staffs.length == 0) {
-                                checkOut = users;
-                                return res.status(200).json({
-                                    msg: `Load checkin and checkout staff successfully!`,
-                                    checkIn,
-                                    checkOut
-                                })
-                            }
-
-                            Promise.all([GetCheckInList(users), GetCheckOutList(users)])
-
-                                .then(rs => {
-                                    checkIn = rs[0];
-                                    checkOut = rs[1];
-                                    return res.status(200).json({
-                                        msg: `Load checkin & checkOut list successfully!`,
-                                        checkIn,
-                                        checkOut
-                                    })
-                                })
-                                .catch(err => {
-                                    return res.status(err.code).json({
-                                        msg: err.msg
-                                    })
-                                })
+                            Promise.all([GetCheckInList(staffIds),GetCheckOutList(staffIds)])
+                           .then(rs=>{                             
+                               return res.status(200).json({
+                                   msg:`Get checkin and checkout staff successfully!`,
+                                   checkIn:rs[0],
+                                   checkOut:rs[1].concat(outList)
+                               })
+                           })
+                           .catch(err=>{
+                               return res.status(err.code).json({
+                                   msg:err.msg
+                               })
+                           })
                         })
                         .catch(err => {
                             console.log(`Can not get checkin staffs with error: ${new Error(err.message)}`);
