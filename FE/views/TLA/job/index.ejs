@@ -295,7 +295,7 @@
                                 tr += '</td>';
 
 
-                                tr += '<td class="text-info font-weight-bold">' + job.customer.firstname + ' ' + job.customer.lastname + '</td>';
+                                tr += '<td class="text-info font-weight-bold">' +getFirstLetters(job.customer.firstname + ' ' + job.customer.lastname)+getLastLetters(job.customer._id)+ '</td>';
                                 tr += '<td class="text-warning">' + job.name + '</td>';
                                 tr += '<td class="font-weight-bold text-danger">';
 
@@ -375,7 +375,7 @@
                         },
                         success: function (data, textStatus, xhr) {
 
-                            $('.lblCustomer').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
+                            $('.lblCustomer').text(getFirstLetters(data.job.customer.firstname + ' ' + data.job.customer.lastname)+getLastLetters(data.job.customer._id));
                             $('.lblJobName').text(data.job.name);
                             $('.lblReceivedDate').text(convertISODateToTimeFormat(data.job.received_date));
                             $('.lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.delivery_date));

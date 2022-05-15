@@ -34,6 +34,7 @@
                 <th scope="col">#</th>
                 <th scope="col"></th>
                 <th scope="col"></th>
+                <th scope="col">Customer</th>
                 <th scope="col">Job</th>
                 <th scope="col">Level</th>
                 <th scope="col">Begin date</th>
@@ -336,7 +337,7 @@
                                             tr += '<button class="btn btn-xs btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
                                             tr += '</td>';
 
-
+                                                tr+='<td class="font-weight-bold text-info">'+getFirstLetters(t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname)+getLastLetters(t.basic.job.customer._id)+'</td>';
 
                                             tr += '<td class="text-primary font-weight-bold">' + t.basic.job.name + '</td>';
                                             tr += '<td class="text-warning font-weight-bold">' + t.basic.level.name + '</td>';
