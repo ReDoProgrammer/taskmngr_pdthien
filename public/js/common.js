@@ -16,6 +16,21 @@ function convertISODateToTimeFormat(ISO_Date) {
   return dateTemplate;
 }
 
+function getFirstLetters(str){
+  let arr = str.split(' ');
+  let result='';
+  for(i =0; i<arr.length; i++){
+    result+=arr[i].charAt(0)
+  }
+  return result;
+}
+
+function getLastLetters(str){
+  return str.slice(str.length-5,str.length-1).toUpperCase();
+}
+
+ 
+
 Date.prototype.addHours= function(h){
   this.setHours(this.getHours()+h);
   return this;
