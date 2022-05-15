@@ -263,7 +263,7 @@
                 tr += '<button class="btn btn-sm btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
                 tr += '</td>';
 
-                tr += '<td class="font-weight-bold text-success">' + t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname + '</td>';
+                tr += '<td class="font-weight-bold text-success">' +getFirstLetters(t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname)+getLastLetters(t.basic.job.customer._id)+ '</td>';
 
                 tr += '<td class="font-weight-bold text-danger">' + t.basic.job.name + '</td>';
                 tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';
