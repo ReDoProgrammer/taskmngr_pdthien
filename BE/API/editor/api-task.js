@@ -282,10 +282,10 @@ router.put('/get-more', authenticateEditorToken, async (req, res) => {
                             wage: rs.wage.wage
                         })
                         await task.save()
-                            .then(_ => {
+                            .then(async t => {                               
                                 return res.status(200).json({
                                     msg: `You have gotten more task successfully!`,
-                                    task: getTaskDetail(task._id)
+                                    newTask: t._id
                                 })
                             })
                             .catch(err => {
