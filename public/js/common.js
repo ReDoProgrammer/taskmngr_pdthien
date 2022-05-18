@@ -16,23 +16,23 @@ function convertISODateToTimeFormat(ISO_Date) {
   return dateTemplate;
 }
 
-function getFirstLetters(str){
+function getFirstLetters(str) {
   let arr = str.split(' ');
-  let result='';
-  for(i =0; i<arr.length; i++){
-    result+=arr[i].charAt(0)
+  let result = '';
+  for (i = 0; i < arr.length; i++) {
+    result += arr[i].charAt(0)
   }
   return result;
 }
 
-function getLastLetters(str){
-  return str.slice(str.length-5,str.length-1).toUpperCase();
+function getLastLetters(str) {
+  return str.slice(str.length - 5, str.length - 1).toUpperCase();
 }
 
- 
 
-Date.prototype.addHours= function(h){
-  this.setHours(this.getHours()+h);
+
+Date.prototype.addHours = function (h) {
+  this.setHours(this.getHours() + h);
   return this;
 }
 
@@ -42,27 +42,25 @@ function strToDate(dtStr) {
     let dateParts = dtStr.split("/");
     let timeParts = dateParts[2].split(" ")[1].split(":");
     dateParts[2] = dateParts[2].split(" ")[0];
-    return  new Date(dateParts[2], dateParts[1] - 1, dateParts[0], timeParts[0], timeParts[1]);
+    return new Date(dateParts[2], dateParts[1] - 1, dateParts[0], timeParts[0], timeParts[1]);
   } catch (error) {
     return null;
   }
 }
 
 function getCurrentTime() {
-  var currentdate = new Date();
-  return currentdate.getDate() + "/"
-    + (currentdate.getMonth() + 1) + "/"
-    + currentdate.getFullYear() + " "
-    + currentdate.getHours() + ":"
-    + currentdate.getMinutes();
+  var dt = new Date();
+
+  return `${dt.getDate().toString().padStart(2, '0')}/${(dt.getMonth() + 1).toString().padStart(2, '0')}/${dt.getFullYear().toString().padStart(4, '0')} ${dt.getHours().toString().padStart(2, '0')}:${dt.getMinutes().toString().padStart(2, '0')}:${dt.getSeconds().toString().padStart(2, '0')}`;
+    ;
 }
 
 function isValidHttpUrl(string) {
-  let url;  
+  let url;
   try {
     url = new URL(string);
   } catch (_) {
-    return false;  
+    return false;
   }
 
   return url.protocol === "http:" || url.protocol === "https:";
