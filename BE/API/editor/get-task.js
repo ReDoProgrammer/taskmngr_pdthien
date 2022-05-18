@@ -84,28 +84,46 @@ const getTask = (staffId) => {
                                                 })
                                             break;
                                         case 2:
-                                            HaveJOB(rs[0], jobLevels)
-                                                .then(task => {
-                                                    getWage(u._id, task.basic.level, m._id)
-                                                        .then(wage => {
-                                                            return resolve({
-                                                                task,
-                                                                wage
-                                                            });
-                                                        })
-                                                        .catch(err => {
-                                                            return reject(err);
-                                                        })
+                                               
+                                                rs[0].forEach(j=>{
+                                                    GetTaskByJobId(j._id)
+                                                    .then(async tasks=>{
+                                                        var chk = tasks.filter(x=>x.status < 2);
+                                                        if(chk.length>0){
+                                                            return reject({
+                                                                code:403,
+                                                                msg:`You can not get more task until you submit current tasks and Q.A submit them!`
+                                                            })
+                                                        }else{
+                                                            HaveJOB(rs[0], jobLevels)
+                                                                .then(task => {
+                                                                    getWage(u._id, task.basic.level, m._id)
+                                                                        .then(wage => {
+                                                                            return resolve({
+                                                                                task,
+                                                                                wage
+                                                                            });
+                                                                        })
+                                                                        .catch(err => {
+                                                                            return reject(err);
+                                                                        })
+                                                                })
+                                                                .catch(err => {
+                                                                    if (err.code == 404) {
+                                                                        return reject({
+                                                                            code: 404,
+                                                                            msg: `You can not get task more than two jobs`
+                                                                        })
+                                                                    }
+                                                                    return reject(err);
+                                                                })
+                                                        }
+                                                    })
+                                                    .catch(err=>{
+                                                        return reject(err);
+                                                    })
                                                 })
-                                                .catch(err => {
-                                                    if(err.code == 404){
-                                                       return reject({
-                                                           code:404,
-                                                           msg:`You can not get task more than two jobs`
-                                                       })
-                                                    }
-                                                    return reject(err);
-                                                })
+                                            
                                             break;
                                         default:
                                             return reject({
@@ -146,6 +164,23 @@ const getTask = (staffId) => {
 module.exports = {
     getTask
 }
+
+const GetTaskByJobId = (jobId)=>{
+    return new Promise((resolve,reject)=>{
+        Task
+        .find({'basic.job':jobId})
+        .then(tasks=>{
+            return resolve(tasks);
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not get task by job id with error: ${new Error(err.message)}`
+            })
+        })
+    })
+}
+
 
 //lấy những task chưa có editor nào xử lý
 const HaveJOB = (jobIds, jobLevelIds) => {

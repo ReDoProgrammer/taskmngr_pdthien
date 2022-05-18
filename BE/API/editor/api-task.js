@@ -258,7 +258,8 @@ router.put('/submit', authenticateEditorToken, async (req, res) => {
 router.put('/get-more', authenticateEditorToken, async (req, res) => {
     //----------TÁC VỤ NHẬN task MỚI ---------------//
     /*
-       Đăng ký nhận task miễn phù hợp và những task đó không vượt quá 2 job
+      Tại một thời điểm, editor có thể nhận tối đa 2 job ( không tính số lượng task)
+      Muốn nhận task của job thứ 3 thì phải đợi tất cả task của những job trước đó được Q.A submit (Q.A ok)
     
     */
 
