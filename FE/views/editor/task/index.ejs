@@ -99,8 +99,9 @@
               authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
             success: function (data) {
-              alert(data.msg);
+              alert(data.msg);              
               LoadTask();
+              console.log(data.task)
             }, error: function (request, status, error) {
 
               if (request.status === 404) {
