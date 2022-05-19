@@ -24,16 +24,12 @@ const getTask = (staffId) => {
                                     })
 
                                     switch (rs[0].length) {
-
+                                        
                                         case 0://trường hợp Q.A hiện không xử lý bất kì job nào
+                                        console.log('no job is processing');
                                             NoJOB(jobLevels)
-                                                .then(task => {
-                                                    if(!task){
-                                                        return reject({
-                                                            code:404,
-                                                            msg:`No available task!`
-                                                        })
-                                                    }
+                                                .then(task => {  
+
                                                     getWage(u._id, task.basic.level, m._id)
                                                         .then(wage => {
                                                             return resolve({
@@ -51,6 +47,8 @@ const getTask = (staffId) => {
                                                 })
                                             break;
                                         case 1:
+
+                                                
                                             //trường hợp Q.A đang xử lý 1 job                                           
                                             HaveJOB(rs[0], jobLevels)
                                                 .then(task => {
@@ -60,74 +58,45 @@ const getTask = (staffId) => {
                                                             msg:`No available task!`
                                                         })
                                                     }
-                                                    getWage(u._id, task.basic.level, m._id)
-                                                        .then(wage => {
-                                                            return resolve({
-                                                                task,
-                                                                wage
-                                                            });
-                                                        })
-                                                        .catch(err => {
-                                                            return reject(err);
-                                                        })
+                                                    console.log({task})
+
+                                                    // getWage(u._id, task.basic.level, m._id)
+                                                    //     .then(wage => {
+                                                    //         return resolve({
+                                                    //             task,
+                                                    //             wage
+                                                    //         });
+                                                    //     })
+                                                    //     .catch(err => {
+                                                    //         return reject(err);
+                                                    //     })
                                                 })
                                                 .catch(err => {
-                                                    if (err.code == 404) {
-                                                        console.log('no task found')
-                                                        NoJOB(jobLevels)
-                                                            .then(task => {
-                                                                getWage(u._id, task.basic.level, m._id)
-                                                                    .then(wage => {
-                                                                        return resolve({
-                                                                            task,
-                                                                            wage
-                                                                        });
-                                                                    })
-                                                                    .catch(err => {
-                                                                        return reject(err);
-                                                                    })
+                                                    // if (err.code == 404) {
+                                                    //     console.log('no task found')
+                                                    //     NoJOB(jobLevels)
+                                                    //         .then(task => {
+                                                    //             getWage(u._id, task.basic.level, m._id)
+                                                    //                 .then(wage => {
+                                                    //                     return resolve({
+                                                    //                         task,
+                                                    //                         wage
+                                                    //                     });
+                                                    //                 })
+                                                    //                 .catch(err => {
+                                                    //                     return reject(err);
+                                                    //                 })
 
-                                                            })
-                                                            .catch(err => {
-                                                                return reject(err);
-                                                            })
-                                                    } else {
-                                                        return reject(err);
-                                                    }
+                                                    //         })
+                                                    //         .catch(err => {
+                                                    //             return reject(err);
+                                                    //         })
+                                                    // } else {
+                                                    //     return reject(err);
+                                                    // }
 
                                                 })
-                                            break;
-                                        case 2:
-
-                                            HaveJOB(rs[0], jobLevels)
-                                                .then(task => {
-                                                    if(!task){
-                                                        return reject({
-                                                            code:404,
-                                                            msg:`No available task!`
-                                                        })
-                                                    }
-                                                    getWage(u._id, task.basic.level, m._id)
-                                                        .then(wage => {
-                                                            return resolve({
-                                                                task,
-                                                                wage
-                                                            });
-                                                        })
-                                                        .catch(err => {
-                                                            return reject(err);
-                                                        })
-                                                })
-                                                .catch(err => {
-                                                    if (err.code == 404) {
-                                                        return reject({
-                                                            code: 403,
-                                                            msg: `You can not get task more than two jobs`
-                                                        })
-                                                    }
-                                                    return reject(err);
-                                                })
-                                            break;
+                                            break;                                       
                                         default:
                                             return reject({
                                                 code: 403,
@@ -148,6 +117,8 @@ const getTask = (staffId) => {
                                 msg: `You are not set wage. Please contact administrator first!`
                             })
                         }
+
+
 
                     })
                     .catch(err => {
@@ -222,6 +193,12 @@ const NoJOB = (jobLevelIds) => {
                         msg: `No available task!`
                     })
                 }
+                if(task.qa[task.qa.length-1].unregisted == false){
+                    return reject({
+                        code:403,
+                        msg:`Task has been processing by another Q.A!`
+                    })
+                }
                 return resolve(task);
             })
             .catch(err => {
@@ -252,7 +229,7 @@ const GetProcessingJobs = (staffId) => {
                 },
                 { $group: { _id: '$basic.job' } }
             ])
-            .then(jobs => {
+            .then(jobs => {                
                 return resolve(jobs.map(x => { return x._id }))
             })
             .catch(err => {

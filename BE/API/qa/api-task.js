@@ -19,17 +19,20 @@ router.put('/unregister', authenticateQAToken, async (req, res) => {
     }
 
     task.qa[task.qa.length - 1].unregisted = true;
-    await task.save()
-        .then(_ => {
-            return res.status(200).json({
-                msg: `You have unregisted this task successfully!`
-            })
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not unregister this task with error: ${new Error(err.message)}`
-            })
-        })
+
+    console.log('task ne: ',task)
+
+    // await task.save()
+    //     .then(_ => {
+    //         return res.status(200).json({
+    //             msg: `You have unregisted this task successfully!`
+    //         })
+    //     })
+    //     .catch(err => {
+    //         return res.status(500).json({
+    //             msg: `Can not unregister this task with error: ${new Error(err.message)}`
+    //         })
+    //     })
 
 })
 
@@ -48,6 +51,7 @@ router.put('/get-task', authenticateQAToken, (req, res) => {
                     .then(async rs => {
 
                         let task = rs.task;
+
                         task.qa.push({
                             staff: req.user._id,
                             timestamp: new Date(),
@@ -200,7 +204,7 @@ router.get('/personal', authenticateQAToken, (req, res) => {
         Task
             .find({
                 'qa.staff': req.user._id,
-                'qa.unregisted': false
+                // 'qa.unregisted': false
             })
             .populate([
                 {
@@ -240,9 +244,10 @@ router.get('/personal', authenticateQAToken, (req, res) => {
             ])
             .exec()
             .then(tasks => {
+                let rs = tasks.filter(x => x.qa[x.qa.length - 1].unregisted == false);
                 return res.status(200).json({
                     msg: `Load tasks list successfully!`,
-                    tasks
+                    tasks: rs
                 })
             })
             .catch(err => {
