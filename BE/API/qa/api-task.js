@@ -56,7 +56,8 @@ router.put('/get-task', authenticateQAToken, (req, res) => {
                         await task.save()
                             .then(_ => {
                                 return res.status(200).json({
-                                    msg: `You have gotten more task successfully!`
+                                    msg: `You have gotten more task successfully!`,
+                                    task
                                 })
                             })
                             .catch(err => {
@@ -165,88 +166,6 @@ router.put('/reject', authenticateQAToken, async (req, res) => {
                 msg: `Can not created remark with error: ${new Error(err.message)}`
             })
         })
-})
-
-router.get('/list', authenticateQAToken, (req, res) => {
-    let { page, search, status } = req.query;
-    if (status == 100) {
-        Task
-            .find({})
-            .populate([
-                {
-                    path: 'basic.job',
-                    populate: {
-                        path: 'customer'
-                    }
-                },
-                {
-                    path: 'basic.level',
-                    select: 'name'
-                },
-                {
-                    path: 'editor.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'qa.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'dc.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'tla.created.by',
-                    select: 'fullname'
-                },
-                {
-                    path: 'tla.uploaded.by',
-                    select: 'fullname'
-                },
-                {
-                    path: 'remarks',
-                    options: { sort: { 'timestamp': -1 } }
-                }
-            ])
-            .exec()
-            .then(tasks => {
-                return res.status(200).json({
-                    msg: `Load tasks list successfully!`,
-                    tasks
-                })
-            })
-            .catch(err => {
-                return res.status(500).json({
-                    msg: `Can not get tasks list with error: ${new Error(err.message)}`
-                })
-            })
-    } else {
-        Task
-            .find({
-                status
-            })
-            .populate({
-                path: 'job',
-                populate: {
-                    path: 'customer'
-                }
-            })
-            .populate('level')
-
-            .exec()
-            .then(tasks => {
-                return res.status(200).json({
-                    msg: `Load tasks list successfully!`,
-                    tasks
-                })
-            })
-            .catch(err => {
-                return res.status(500).json({
-                    msg: `Can not get tasks list with error: ${new Error(err.message)}`
-                })
-            })
-    }
-
 })
 
 router.get('/detail', authenticateQAToken, (req, res) => {

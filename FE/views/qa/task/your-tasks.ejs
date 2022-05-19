@@ -84,6 +84,8 @@
                     success: function (data) {
                         alert(data.msg);
                         LoadTasks();
+                        taskId = data.task._id;
+                        $('#modalTaskDetail').modal();
                     },
                     error: function (request, status, error) {
                         alert(request.responseJSON.msg);

@@ -21,12 +21,19 @@ const getTask = (staffId) => {
                                 .then(m => {
                                     let jobLevels = rs[1].map(x => {
                                         return x.job_lv;
-                                    })                                   
-                                    switch (rs[0].length) {                                       
+                                    })
+
+                                    switch (rs[0].length) {
+
                                         case 0://trường hợp Q.A hiện không xử lý bất kì job nào
                                             NoJOB(jobLevels)
                                                 .then(task => {
-
+                                                    if(!task){
+                                                        return reject({
+                                                            code:404,
+                                                            msg:`No available task!`
+                                                        })
+                                                    }
                                                     getWage(u._id, task.basic.level, m._id)
                                                         .then(wage => {
                                                             return resolve({
@@ -47,6 +54,12 @@ const getTask = (staffId) => {
                                             //trường hợp Q.A đang xử lý 1 job                                           
                                             HaveJOB(rs[0], jobLevels)
                                                 .then(task => {
+                                                    if(!task){
+                                                        return reject({
+                                                            code:404,
+                                                            msg:`No available task!`
+                                                        })
+                                                    }
                                                     getWage(u._id, task.basic.level, m._id)
                                                         .then(wage => {
                                                             return resolve({
@@ -85,9 +98,15 @@ const getTask = (staffId) => {
                                                 })
                                             break;
                                         case 2:
-                                            
+
                                             HaveJOB(rs[0], jobLevels)
                                                 .then(task => {
+                                                    if(!task){
+                                                        return reject({
+                                                            code:404,
+                                                            msg:`No available task!`
+                                                        })
+                                                    }
                                                     getWage(u._id, task.basic.level, m._id)
                                                         .then(wage => {
                                                             return resolve({
@@ -157,13 +176,13 @@ const HaveJOB = (jobIds, jobLevelIds) => {
             //lấy những task chưa có qa nào nhận
             .findOne({
                 'basic.job': { $in: jobIds },
-                'basic.level': { $in: jobLevelIds },               
-                status: { $in: [0, 1] }
+                'basic.level': { $in: jobLevelIds },
+                status: 1
             })
             .or([
-                { qa:{$size:0}},
-                {'qa.unregisted': true}
-             ])
+                { qa: { $size: 0 } },
+                { 'qa.unregisted': true }
+            ])
             .sort({ 'basic.deadline.end': 1 })// sắp xếp tăng dần theo deadline
             .then(task => {
                 if (!task) {
@@ -188,12 +207,12 @@ const NoJOB = (jobLevelIds) => {
     return new Promise((resolve, reject) => {
         Task
             .findOne({
-                'basic.level': { $in: jobLevelIds },               
-                status: { $in: [1] }
+                'basic.level': { $in: jobLevelIds },
+                status: 1
             })
             .or([
-               { qa:{$size:0}},
-               {'qa.unregisted': true}
+                { qa: { $size: 0 } },
+                { 'qa.unregisted': true }
             ])
             .sort({ 'basic.deadline.end': 1 })
             .then(task => {
@@ -203,7 +222,6 @@ const NoJOB = (jobLevelIds) => {
                         msg: `No available task!`
                     })
                 }
-                console.log('found task: ', task)
                 return resolve(task);
             })
             .catch(err => {
@@ -228,15 +246,14 @@ const GetProcessingJobs = (staffId) => {
                 {
                     $match: {
                         'qa.staff': ObjectId(staffId),
-                        status: { $in: [1] },
-                        'qa.unregisted':false// task có trạng thái unregisted = false <=> đang xử lý
+                        status: 1,
+                        'qa.unregisted': false// task có trạng thái unregisted = false <=> đang xử lý
                     }
                 },
                 { $group: { _id: '$basic.job' } }
             ])
-            .then(jobs => {     
-                console.log('jobs found: ',jobs)                    
-                return resolve(jobs.map(x=>{return x._id}))
+            .then(jobs => {
+                return resolve(jobs.map(x => { return x._id }))
             })
             .catch(err => {
                 return reject({
