@@ -273,34 +273,55 @@ router.put('/get-more', authenticateEditorToken, async (req, res) => {
             }
 
             if (chk.check[chk.check.length - 1].out == undefined) {
-                getTask(req.user._id)
-                    .then(async rs => {
-                        let task = rs.task;
-                        task.status = 0;
-                        task.editor.push({
-                            staff: req.user._id,
-                            timestamp: new Date(),
-                            wage: rs.wage.wage
+
+                Task
+                .countDocuments({
+                    'editor.staff':req.user._id,
+                    status: {$lte:0}
+                })
+                .then(c=>{
+                    if(c>0){
+                        return res.status(403).json({
+                            msg:`You can not get more task before submiting current tasks!`
                         })
-                        await task.save()
-                            .then(async t => {                               
-                                return res.status(200).json({
-                                    msg: `You have gotten more task successfully!`,
-                                    newTask: t._id
-                                })
+                    }else{
+                        getTask(req.user._id)
+                        .then(async rs => {
+                            let task = rs.task;
+                            task.status = 0;
+                            task.editor.push({
+                                staff: req.user._id,
+                                timestamp: new Date(),
+                                wage: rs.wage.wage
                             })
-                            .catch(err => {
-                                return res.status(500).json({
-                                    msg: `Get more task failed with error: ${new Error(err.message)}`
+                            await task.save()
+                                .then(async t => {                               
+                                    return res.status(200).json({
+                                        msg: `You have gotten more task successfully!`,
+                                        newTask: t._id
+                                    })
                                 })
-                            })
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        return res.status(err.code).json({
-                            msg: err.msg
+                                .catch(err => {
+                                    return res.status(500).json({
+                                        msg: `Get more task failed with error: ${new Error(err.message)}`
+                                    })
+                                })
                         })
+                        .catch(err => {
+                            console.log(err)
+                            return res.status(err.code).json({
+                                msg: err.msg
+                            })
+                        })
+                    }
+                })
+                .catch(err=>{
+                    return res.status(500).json({
+                        msg:`Can not count current processing tasks with error: ${new Error(err.message)}`
                     })
+                })
+
+               
             } else {
                 return res.status(403).json({
                     msg: `You can not get more task when you are not in office!`
