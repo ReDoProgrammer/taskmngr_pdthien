@@ -57,42 +57,40 @@ const getTask = (staffId) => {
                                                             msg:`No available task!`
                                                         })
                                                     }
-                                                    console.log({task})
 
-                                                    // getWage(u._id, task.basic.level, m._id)
-                                                    //     .then(wage => {
-                                                    //         return resolve({
-                                                    //             task,
-                                                    //             wage
-                                                    //         });
-                                                    //     })
-                                                    //     .catch(err => {
-                                                    //         return reject(err);
-                                                    //     })
+                                                    getWage(u._id, task.basic.level, m._id)
+                                                        .then(wage => {
+                                                            return resolve({
+                                                                task,
+                                                                wage
+                                                            });
+                                                        })
+                                                        .catch(err => {
+                                                            return reject(err);
+                                                        })
                                                 })
                                                 .catch(err => {
-                                                    // if (err.code == 404) {
-                                                    //     console.log('no task found')
-                                                    //     NoJOB(jobLevels)
-                                                    //         .then(task => {
-                                                    //             getWage(u._id, task.basic.level, m._id)
-                                                    //                 .then(wage => {
-                                                    //                     return resolve({
-                                                    //                         task,
-                                                    //                         wage
-                                                    //                     });
-                                                    //                 })
-                                                    //                 .catch(err => {
-                                                    //                     return reject(err);
-                                                    //                 })
+                                                    if (err.code == 404) {
+                                                        NoJOB(jobLevels)
+                                                            .then(task => {
+                                                                getWage(u._id, task.basic.level, m._id)
+                                                                    .then(wage => {
+                                                                        return resolve({
+                                                                            task,
+                                                                            wage
+                                                                        });
+                                                                    })
+                                                                    .catch(err => {
+                                                                        return reject(err);
+                                                                    })
 
-                                                    //         })
-                                                    //         .catch(err => {
-                                                    //             return reject(err);
-                                                    //         })
-                                                    // } else {
-                                                    //     return reject(err);
-                                                    // }
+                                                            })
+                                                            .catch(err => {
+                                                                return reject(err);
+                                                            })
+                                                    } else {
+                                                        return reject(err);
+                                                    }
 
                                                 })
                                             break;                                       
@@ -147,7 +145,7 @@ const HaveJOB = (jobIds, jobLevelIds) => {
             .findOne({
                 'basic.job': { $in: jobIds },
                 'basic.level': { $in: jobLevelIds },
-                status: 1
+                status: 1// đã được editor submit
             })
             .or([
                 { qa: { $size: 0 } },
@@ -155,8 +153,6 @@ const HaveJOB = (jobIds, jobLevelIds) => {
             ])
             .sort({ 'basic.deadline.end': 1 })// sắp xếp tăng dần theo deadline
             .then(task => {
-
-
                 if (!task) {
                     return reject({
                         code: 404,
@@ -166,8 +162,7 @@ const HaveJOB = (jobIds, jobLevelIds) => {
                 return resolve(task)
             })
             .catch(err => {
-
-                console.log(1234)
+                console.log( `HAVE JOB. Can not get initial task in jobs list with error: ${new Error(err.message)}`);
                 return reject({
                     code: 500,
                     msg: `Can not get initial task in jobs list with error: ${new Error(err.message)}`
@@ -205,6 +200,7 @@ const NoJOB = (jobLevelIds) => {
                 return resolve(task);
             })
             .catch(err => {
+                console.log(`NO JOB. Can not get more task with error: ${new Error(err.message)}`);
                 return reject({
                     code: 500,
                     msg: `Can not get more task with error: ${new Error(err.message)}`
