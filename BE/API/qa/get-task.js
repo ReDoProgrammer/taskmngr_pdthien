@@ -25,7 +25,6 @@ const getTask = (staffId) => {
                                     switch (rs[0].length) {
                                         
                                         case 0://trường hợp Q.A hiện không xử lý bất kì job nào
-                                        console.log('no job is processing');
                                             NoJOB(jobLevels)
                                                 .then(task => {  
 
@@ -46,7 +45,6 @@ const getTask = (staffId) => {
                                                 })
                                             break;
                                         case 1:
-
                                                 
                                             //trường hợp Q.A đang xử lý 1 job                                           
                                             HaveJOB(rs[0], jobLevels)
