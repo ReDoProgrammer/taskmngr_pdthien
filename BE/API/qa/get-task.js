@@ -5,7 +5,6 @@ const ObjectId = require('mongodb').ObjectId;
 const _MODULE = 'QA';
 const {
     getUser,
-    getCustomer,
     getModule,
     getWage,
     GetJobLevelsByStaffLevel } = require('../common');
@@ -156,6 +155,8 @@ const HaveJOB = (jobIds, jobLevelIds) => {
             ])
             .sort({ 'basic.deadline.end': 1 })// sắp xếp tăng dần theo deadline
             .then(task => {
+
+
                 if (!task) {
                     return reject({
                         code: 404,
@@ -165,6 +166,8 @@ const HaveJOB = (jobIds, jobLevelIds) => {
                 return resolve(task)
             })
             .catch(err => {
+
+                console.log(1234)
                 return reject({
                     code: 500,
                     msg: `Can not get initial task in jobs list with error: ${new Error(err.message)}`
@@ -193,7 +196,7 @@ const NoJOB = (jobLevelIds) => {
                         msg: `No available task!`
                     })
                 }
-                if(task.qa[task.qa.length-1].unregisted == false){
+                if(task.qa.length> 0 && task.qa[task.qa.length-1].unregisted == false){
                     return reject({
                         code:403,
                         msg:`Task has been processing by another Q.A!`
@@ -224,7 +227,7 @@ const GetProcessingJobs = (staffId) => {
                     $match: {
                         'qa.staff': ObjectId(staffId),
                         status: 1,
-                        'qa.unregisted': false// task có trạng thái unregisted = false <=> đang xử lý
+                       'qa.unregisted': false// task có trạng thái unregisted = false <=> đang xử lý
                     }
                 },
                 { $group: { _id: '$basic.job' } }
