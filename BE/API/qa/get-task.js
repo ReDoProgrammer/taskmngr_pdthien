@@ -175,7 +175,7 @@ const NoJOB = (jobLevelIds) => {
         Task
             .findOne({
                 'basic.level': { $in: jobLevelIds },
-                status: 1
+                status: 1// đã được editor submited
             })
             .or([
                 { qa: { $size: 0 } },
@@ -220,7 +220,7 @@ const GetProcessingJobs = (staffId) => {
                 {
                     $match: {
                         'qa.staff': ObjectId(staffId),
-                        status: 1,
+                        status: {$lt:2},
                        'qa.unregisted': false// task có trạng thái unregisted = false <=> đang xử lý
                     }
                 },
