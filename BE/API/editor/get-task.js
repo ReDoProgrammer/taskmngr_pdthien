@@ -252,7 +252,7 @@ const GetProcessingJobs = (staffId) => {
                 {
                     $match: {
                         'editor.staff': ObjectId(staffId),
-                        status: {$lte:2}
+                        status: {$lt:2}
                     }
                 },
                 { $group: { _id: '$basic.job' } }
