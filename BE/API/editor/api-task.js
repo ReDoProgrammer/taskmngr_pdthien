@@ -127,7 +127,7 @@ router.get('/', authenticateEditorToken, (req, res) => {
     Task
         .find({ 
             'editor.staff': req.user._id,
-            status: {$gt:-1}
+            // status: {$gt:-1}
         })//chỉ load những task đã được TLA gán hoặc editor đã nhận được        
         .populate([
             {
