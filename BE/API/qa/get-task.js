@@ -220,7 +220,7 @@ const GetProcessingJobs = (staffId) => {
                 {
                     $match: {
                         'qa.staff': ObjectId(staffId),
-                        status: {$lt:2},
+                        status: 1,
                        'qa.unregisted': false// task có trạng thái unregisted = false <=> đang xử lý
                     }
                 },
