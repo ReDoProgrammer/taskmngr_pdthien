@@ -46,36 +46,57 @@ router.put('/get-task', authenticateQAToken, (req, res) => {
                 })
             }
 
+           
+
             if (chk.check[chk.check.length - 1].out == undefined) {
-                getTask(req.user._id)
-                    .then(async rs => {
-
-                        let task = rs.task;
-
-                        task.qa.push({
-                            staff: req.user._id,
-                            timestamp: new Date(),
-                            wage: rs.wage.wage
+                Task
+                .countDocuments({
+                    status:{$lt:2},
+                    'qa.staff':reg.user._id
+                })
+                .then(count=>{
+                    if(count>0){
+                        return res.status(403).json({
+                            msg:`Can not get more tasks when your current tasks have been not submited!`
                         })
-                        await task.save()
-                            .then(_ => {
-                                return res.status(200).json({
-                                    msg: `You have gotten more task successfully!`,
-                                    task
-                                })
+                    }else{
+                        getTask(req.user._id)
+                        .then(async rs => {
+    
+                            let task = rs.task;
+    
+                            task.qa.push({
+                                staff: req.user._id,
+                                timestamp: new Date(),
+                                wage: rs.wage.wage
                             })
-                            .catch(err => {
-                                return res.status(500).json({
-                                    msg: `Get more task failed with error: ${new Error(err.message)}`
+                            await task.save()
+                                .then(_ => {
+                                    return res.status(200).json({
+                                        msg: `You have gotten more task successfully!`,
+                                        task
+                                    })
                                 })
-                            })
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        return res.status(err.code).json({
-                            msg: err.msg
+                                .catch(err => {
+                                    return res.status(500).json({
+                                        msg: `Get more task failed with error: ${new Error(err.message)}`
+                                    })
+                                })
                         })
+                        .catch(err => {
+                            console.log(err)
+                            return res.status(err.code).json({
+                                msg: err.msg
+                            })
+                        })
+                    }
+                })
+                .catch(err=>{
+                    return res.status(500).json({
+                        msg:`Can not count processing tasks with error: ${new Error(err.message)}`
                     })
+                })    
+               
             } else {
                 return res.status(403).json({
                     msg: `You can not get more task when you are not in office!`
