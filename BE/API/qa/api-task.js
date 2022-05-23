@@ -242,6 +242,7 @@ router.get('/personal', authenticateQAToken, (req, res) => {
                     options: { sort: { 'timestamp': -1 } }
                 }
             ])
+            .sort({status:1})
             .exec()
             .then(tasks => {
                 let rs = tasks.filter(x => x.qa[x.qa.length - 1].unregisted == false);

@@ -158,8 +158,13 @@ const taskSchema = new Schema({
                 default: ''
             }
         }],
-        rejected: [
+        timeline: [
             {
+                unregisted: {
+                    //lưu trạng thái task có bị DC hủy đăng ký hay không
+                    type: Boolean,
+                    default: false
+                },
                 at: {
                     type: Date
                 },
