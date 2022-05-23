@@ -103,6 +103,7 @@
               LoadTask();
               taskId = data.newTask;
               $('#modalTaskDetail').modal();
+              $('#btn-task-info').click();
             }, error: function (request, status, error) {
 
               if (request.status === 404) {

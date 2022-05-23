@@ -86,6 +86,7 @@
                         LoadTasks();
                         taskId = data.task._id;
                         $('#modalTaskDetail').modal();
+                        $('#btn-task-info').click();
                     },
                     error: function (request, status, error) {
                         alert(request.responseJSON.msg);
