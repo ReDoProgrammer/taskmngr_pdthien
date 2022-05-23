@@ -303,6 +303,7 @@ router.put('/get-more', authenticateEditorToken, async (req, res) => {
                                     })
                                 })
                                 .catch(err => {
+                                    console.log(`Get more task failed with error: ${new Error(err.message)}`)
                                     return res.status(500).json({
                                         msg: `Get more task failed with error: ${new Error(err.message)}`
                                     })
@@ -317,6 +318,7 @@ router.put('/get-more', authenticateEditorToken, async (req, res) => {
                     }
                 })
                 .catch(err=>{
+                    console.log(`Can not count current processing tasks with error: ${new Error(err.message)}`)
                     return res.status(500).json({
                         msg:`Can not count current processing tasks with error: ${new Error(err.message)}`
                     })
@@ -324,12 +326,14 @@ router.put('/get-more', authenticateEditorToken, async (req, res) => {
 
                
             } else {
+                console.log(`You can not get more task when you are not in office!`)
                 return res.status(403).json({
                     msg: `You can not get more task when you are not in office!`
                 })
             }
         })
         .catch(err => {
+            console.log(`Can not load staff checkin with error: ${new Error(err.message)}`)
             return res.status(500).json({
                 msg: `Can not load staff checkin with error: ${new Error(err.message)}`
             })
