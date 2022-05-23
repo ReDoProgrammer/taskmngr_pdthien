@@ -52,7 +52,8 @@ router.put('/get-task', authenticateQAToken, (req, res) => {
                 Task
                 .countDocuments({
                     status:{$lt:2},
-                    'qa.staff':req.user._id
+                    'qa.staff':req.user._id,
+                    'qa.unregisted':false
                 })
                 .then(count=>{
                     if(count>0){
