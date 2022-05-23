@@ -1,0 +1,87 @@
+<div class="modal" tabindex="-1" id="uploadTaskModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body text-dark">
+                <div class="panel panel-info mb-3">
+                    <div class="panel-heading font-weight-bold">
+                        <div class="row">
+                            <div class="col-sm-10">Upload job</div>
+                            <div class="col-sm-2 text-right">
+                                <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xs-12 mt-2 form-group">
+                                <label for="">Link:</label>
+                                <input type="text" class="form-control" id="txtUploadLink" placeholder="Upload link">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xs-12 mt-2">
+                                <label for="">Remark:</label>
+                                <input type="text" class="form-control" id="txtUploadRemark"
+                                    placeholder="Upload remark">
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                                <button class="btn btn-warning" id="btnSubmitUploadTask">
+                                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                    Submit upload
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xs-12 mt-2">
+                                <label id="lblUploadTaskMessage" class="font-weight-bold"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="/js/common.js"></script>
+<script>
+    $("#uploadTaskModal").on('shown.bs.modal', function (e) {
+        $('#txtUploadLink').val(submitedLink);
+        $('#txtUploadRemark').val('');
+    });
+
+    $('#btnSubmitUploadTask').click(function () {
+        $.ajax({
+            url: '/tla/task/upload',
+            type: 'put',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                taskId,
+                uploaded_link: $('#txtUploadLink').val(),
+                remark: $('#txtUploadRemark').val()
+            },
+            success: function (data) {
+                alert(data.msg);
+                $("#uploadTaskModal").modal('hide');
+            }
+        })
+    })
+
+    $('#uploadTaskModal').on('hidden.bs.modal', function () {
+        LoadTasksList();
+    })
+</script>

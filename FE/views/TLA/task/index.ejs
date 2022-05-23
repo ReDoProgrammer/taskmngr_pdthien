@@ -74,6 +74,7 @@
             <%-include('task_detail')%>
                 <%-include('cancel-task-modal')%>
                     <%-include('bonus-penalty-modal')%>
+                    <%-include('upload-task-modal')%>
 
                         <script src="/js/bootstrap-select.min.js"></script>
                         <script src="/js/common.js"></script>
@@ -85,34 +86,14 @@
                             var customerId = '';
                             var status = 100;
                             var levelId = '';
+                            var taskId= '';
+                            var submitedLink = '';
 
                             $(document).ready(function () {
                                 LoadTasksList();
                             })
 
-                            function AutoAssignEditor() {
-                                if (confirm('Are you sure want to set editor automatically')) {
-                                    $.ajax({
-                                        url: '/tla/queue',
-                                        type: 'post',
-                                        headers: {
-                                            authorization: "Bearer " + localStorage.getItem("accessToken"),
-                                        },
-                                        data: {
-                                            taskId
-                                        },
-                                        success: function (data) {
-                                            alert(data.msg);
-                                            LoadTasksList();
-                                            taskId = '';
-                                        },
-                                        error: function (jqXHR, textStatus, errorThrown) {
-                                            console.log({ jqXHR, textStatus, errorThrown });
-                                            alert(jqXHR.responseJSON.msg);
-                                        }
-                                    })
-                                }
-                            }
+                            
 
                             function DeleteTask() {
 
@@ -171,6 +152,10 @@
                                     case 'bonus-penalty':
                                         $('#modalBonusPenalty').modal();
                                         break;
+                                    case 'upload-task':
+                                        $('#uploadTaskModal').modal();
+                                        break;
+
                                 }
                             });
 
@@ -200,7 +185,10 @@
                                         customerId = data.customer._id;
                                         $('#funcMenu').empty();
                                         let mn = '';
-                                        switch (data.task.status) {
+                                        if(data.task.editor.length>0 && data.task.editor[data.task.editor.length-1].submited.length>0){
+                                            submitedLink = data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link;                                           
+                                        }
+                                        switch (data.task.status) {                                            
                                             case -1:
                                                 mn = '<li id="assign-editor"><a tabindex="-1" href="#"><i class="fa fa-user text-primary" aria-hidden="true"></i> Assign Editor </a></li>';
                                                 mn += '<li id="auto-assign-editor"><a tabindex="-1" href="#"><i class="fa fa-user text-primary" aria-hidden="true"></i> Auto assign Editor</a></li>';
@@ -242,7 +230,7 @@
                                                 mn += '<li id="cancel-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Cancel</a></li>';
                                                 mn += '<li id="upload-task"><a tabindex="-1" href="#"> <i class="fa fa-upload text-success" aria-hidden="true"></i>Upload</a></li>';
                                                 if (data.task.bp !== null && data.task.bp.length > 0) {
-                                                    if (data.task.bp[data.task.pb.length-1].is_bonus) {
+                                                    if (data.task.bp[data.task.pb.length - 1].is_bonus) {
                                                         mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-trophy text-warning" aria-hidden="true"></i> Bonus</a></li>';
                                                     } else {
                                                         mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-credit-card text-danger"  aria-hidden="true"></i> Penalty</a></li>';
@@ -252,7 +240,7 @@
                                                 break;
                                             case 4: case 5: case 6:
                                                 if (data.task.bp !== null && data.task.bp.length > 0) {
-                                                    if (data.task.bp[data.task.pb.length-1].is_bonus) {
+                                                    if (data.task.bp[data.task.pb.length - 1].is_bonus) {
                                                         mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-trophy text-warning" aria-hidden="true"></i> Bonus</a></li>';
                                                     } else {
                                                         mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-credit-card text-danger"  aria-hidden="true"></i> Penalty</a></li>';
@@ -317,7 +305,7 @@
                                         data.tasks.forEach(t => {
                                             let tr = '<tr id="' + t._id + '"  data-level="' + t.basic.level._id + '">';
                                             if (t.bp !== null && t.bp.length > 0) {
-                                                if (t.bp[data.task.pb.length-1].is_bonus) {
+                                                if (t.bp[data.task.pb.length - 1].is_bonus) {
                                                     tr = '<tr id="' + t._id + '" data-customer = "' + t.job.customer + '" data-level="' + t.level._id + '" style="background-color: #A9F5F2">';
                                                 } else {
                                                     tr = '<tr id="' + t._id + '" data-customer = "' + t.job.customer + '" data-level="' + t.level._id + '" style="background-color: #F6E3CE">';
@@ -327,7 +315,7 @@
 
                                             tr += '<td>';
                                             if (t.bp !== null && t.bp.length > 0) {
-                                                if (t.bp[data.task.pb.length-1].is_bonus) {
+                                                if (t.bp[data.task.pb.length - 1].is_bonus) {
                                                     tr += '<span class="text-success"><i class="fa fa-trophy" aria-hidden="true"></i></span>'
 
                                                 } else {
@@ -340,7 +328,7 @@
                                             tr += '<button class="btn btn-xs btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
                                             tr += '</td>';
 
-                                                tr+='<td class="font-weight-bold text-info">'+getFirstLetters(t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname)+getLastLetters(t.basic.job.customer._id)+'</td>';
+                                            tr += '<td class="font-weight-bold text-info">' + getFirstLetters(t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname) + getLastLetters(t.basic.job.customer._id) + '</td>';
 
                                             tr += '<td class="text-primary font-weight-bold">' + t.basic.job.name + '</td>';
                                             tr += '<td class="text-warning font-weight-bold">' + t.basic.level.name + '</td>';
@@ -359,7 +347,7 @@
                                             }
                                             tr += '</td>';
                                             tr += '<td>';
-                                            if (t.qa.length > 0 && !t.qa[t.qa.length-1].unregisted) {
+                                            if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
                                                 tr += t.qa[t.qa.length - 1].staff.fullname
                                             }
                                             tr += '</td>';
@@ -369,20 +357,20 @@
                                             if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
                                                 tr += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount
                                             }
-                                            tr+= '</td>';
+                                            tr += '</td>';
 
                                             tr += '<td class="text-right">';
                                             if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                                                tr += t.editor[t.editor.length-1].submited.length;
+                                                tr += t.editor[t.editor.length - 1].submited.length;
                                             }
                                             tr += '</td>';
 
-                                         
+
 
 
                                             tr += '<td>';
-                                            if (typeof t.remarks[t.remarks.length-1] !== 'undefined') {
-                                                tr += t.remarks[t.remarks.length-1].content;
+                                            if (typeof t.remarks[t.remarks.length - 1] !== 'undefined') {
+                                                tr += t.remarks[t.remarks.length - 1].content;
                                             }
                                             tr += '</td>';
 
@@ -396,7 +384,7 @@
                                                     break;
                                                 case 1:
                                                     {
-                                                        if (t.editor[t.editor.length-1].submited.length > 1) {
+                                                        if (t.editor[t.editor.length - 1].submited.length > 1) {
                                                             tr += '<span class="text-primary">Fixed</span>';
                                                         } else {
                                                             tr += '<span class="text-primary">Edited</span>';
