@@ -280,6 +280,7 @@ router.put('/get-more', authenticateEditorToken, async (req, res) => {
                     status: {$lte:0}
                 })
                 .then(c=>{
+                    console.log({c})
                     if(c>0){
                         return res.status(403).json({
                             msg:`You can not get more task before submiting current tasks!`
