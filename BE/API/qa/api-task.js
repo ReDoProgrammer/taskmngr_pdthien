@@ -51,7 +51,7 @@ router.put('/get-task', authenticateQAToken, (req, res) => {
             if (chk.check[chk.check.length - 1].out == undefined) {
                 Task
                 .countDocuments({
-                    status:{$lt:2},
+                    status: 1,
                     'qa.staff':req.user._id,
                     'qa.unregisted':false
                 })
