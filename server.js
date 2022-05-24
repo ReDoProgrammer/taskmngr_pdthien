@@ -27,6 +27,10 @@ app.use(bodyParser.json());
 
 app.use(layout); //set layout
 
+
+const homeController = require('./BE/controllers/home/home-controller');
+app.use('/',homeController);
+
 //accountant zone
 const accountantHomeController = require('./BE/controllers/accountant/home-controller');
 app.use('/accountant',accountantHomeController);
