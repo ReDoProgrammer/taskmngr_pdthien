@@ -8,6 +8,23 @@ const { authenticateAdminToken } = require("../../../middlewares/middleware");
     api này dùng để quản trị các joblevel ( loại mặt hàng của khác)
 */
 
+router.get('/list-by-parents',authenticateAdminToken,(req,res)=>{
+    let {levelId} = req.query;
+    JobLevel
+    .find({parents:levelId})
+    .then(levels =>{
+        return res.status(200).json({
+            msg:`Load job levels by parents level successfully!`,
+            levels
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Load job levels by parents level failed with error: ${new Error(err.message)}`
+        })
+    })
+})
+
 router.get('/',authenticateAdminToken,(req,res)=>{
     JobLevel
     .find({})

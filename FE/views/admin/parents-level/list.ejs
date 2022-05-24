@@ -1,0 +1,156 @@
+<script src="/js/bootstrap-select.min.js"></script>
+<link href="/css/bootstrap-select.min.css" rel="stylesheet" />
+
+<div class="modal" tabindex="-1" id="modalList">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Staff roles management</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="input-group">
+                            <select class="form-control selectpicker" id="select-levels"
+                                data-live-search="true"></select>
+                            <div class="input-group-btn">
+                                <button class="btn btn-info" type="submit" id="btnAddLevel">
+                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <lable class="text-danger" id="msgError"></lable>
+                    </div>
+                </div>
+
+                <table class="table table-dark" style="margin-top: 20px;">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Level</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblLevels">
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(function () {
+        $('.selectpicker').selectpicker();
+    });
+
+    $(document).on("click", "button[name='delete-level']", function () {
+
+        var r = confirm("Deleting level is not recomended. Are you sure want to delete ?");
+        if (r == true) {
+            $.ajax({
+                url: '/admin/parents-level/pull-child',
+                type: 'put',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem('accessToken'),
+                },
+                data: {
+                    levelId: $(this).closest("tr").attr("id"),
+                    plId
+                },
+                success: function (data) {
+                    alert(data.msg);
+                    LoadJobLevelsByParentsLevel();
+                },
+            })
+        }
+    })
+
+    $('#btnAddLevel').click(function () {
+
+        $.ajax({
+            url: '/admin/parents-level/push-child',
+            type: 'put',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem('accessToken'),
+            },
+            data: {
+                levelId: $('#select-levels option:selected').val(),
+                plId
+            },
+            success: function (data) {
+                alert(data.msg);
+                LoadJobLevelsByParentsLevel();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+            },
+        })
+
+
+    })
+
+    function LoadJobLevelsByParentsLevel() {
+        $.ajax({
+            url: '/admin/job-level/list-by-parents',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem('accessToken'),
+            },
+            data: {
+                levelId: plId
+            },
+            success: function (data) {
+                $('#tblLevels').empty();
+                let idx = 1;
+                data.levels.forEach(l => {
+                    let tr = '<tr id="' + l._id + '">';
+                    tr += '<td>' + (idx++) + '</td>';
+                    tr += '<td class="font-weight-bold text-primary">' + l.name + '</td>';
+                    tr += '<td class="text-right">';
+                    tr += '<button class="btn btn-xs btn-danger ml-1" name="delete-level"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
+                    tr += '</td>';
+                    tr += '</tr>';
+                    $('#tblLevels').append(tr);
+                })
+
+            }
+        })
+    }
+
+    $('#modalList').on('show.bs.modal', function (e) {
+        $.ajax({
+            url: '/admin/job-level',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem('accessToken'),
+            },
+            success: function (data) {
+                $('#select-levels').empty();
+                data.jl.forEach(j => {
+                    let opt = '<option value="' + j._id + '">' + j.name + '</option>';
+                    $('#select-levels').append(opt);
+                })
+                $('#select-levels').selectpicker();
+                $('#select-levels').selectpicker('refresh');
+            }
+        })
+
+        LoadJobLevelsByParentsLevel();
+
+    })
+
+</script>
