@@ -156,7 +156,7 @@
                 taskId
             },
             success: function (data) {
-
+                console.log(data.task)
 
                 $('#divNationalStyle').html(data.customer.nation.name)
                 $('#divColor').html(data.customer.color.name)
@@ -194,11 +194,15 @@
                     $('#lblInputLink').html('<span class="font-weight-bold font-italic">' + data.task.basic.link.input + '</span>');
                 }
 
-                if (isValidHttpUrl(data.task.basic.link.output)) {
-                    $('#lblOutputLink').html('<a href="' + data.task.basic.link.output + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                if(data.task.editor.length>0 && data.task.editor[data.task.editor.length-1].submited.length>0){
+                    if (isValidHttpUrl(data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link)) {
+                    $('#lblOutputLink').html('<a href="' + data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
                 } else {
-                    $('#lblOutputLink').html('<span class="font-weight-bold font-italic">' + data.task.basic.link.output+ '</span>');
+                    $('#lblOutputLink').html('<span class="font-weight-bold font-italic">' + data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link+ '</span>');
+                    window.open("file:///" + data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link);
                 }
+                }
+               
 
 
                 if (data.customer.is_align) {
