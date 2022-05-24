@@ -4,10 +4,14 @@ const { authenticateCustomerToken } = require("../../../middlewares/customer-mid
 
 router.get('/',authenticateCustomerToken,(req,res)=>{
     let {search,page} = req.query;
+    console.log({search,page})
     Job
-    .find({})
+    .find({
+        customer:req.customer._id
+    })
     .sort({status:1})
     .then(jobs=>{
+        console.log(jobs)
         return res.status(200).json({
             msg:`Load jobs list successfully!`,
             jobs
