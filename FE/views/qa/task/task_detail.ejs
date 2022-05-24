@@ -198,6 +198,7 @@
                     if (isValidHttpUrl(data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link)) {
                     $('#lblOutputLink').html('<a href="' + data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
                 } else {
+                    console.log(data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link.replace('/','\\'))
                     $('#lblOutputLink').html('<a href="'+data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link.replace('/','\\')+'">Click here to open the folder </a>');
                     
 		
