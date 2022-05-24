@@ -2,13 +2,14 @@ const router = require('express').Router();
 const Job = require('../../models/job-model');
 const { authenticateCustomerToken } = require("../../../middlewares/customer-middleware");
 
-router.get('/',authenticateCustomerToken,(req,res)=>{
+router.get('/list',authenticateCustomerToken,(req,res)=>{
     let {search,page} = req.query;
     console.log({search,page})
     Job
     .find({
         customer:req.customer._id
     })
+    .populate('cb')
     .sort({status:1})
     .then(jobs=>{
         console.log(jobs)
