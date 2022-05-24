@@ -64,16 +64,23 @@
             </div>
           </div>
           <div class="panel-body">
-
             <div class="row">
-              <div class="col-md-4 col-sm-12 col-xs-12">
+              <div class="col-md-6 col-sm-12 col-xs-12">
+                <div class="form-group">
+                  <label for="">Job level</label>
+                  <select name="" id="slParentsLevel" class="form-control"></select>
+                </div>
+              </div>
+              <div class="col-md-6 col-sm-12 col-xs-12">
                 <div class="form-group">
                   <label for="">Job level</label>
                   <select name="" id="slJobLevels" class="form-control"></select>
                 </div>
-
               </div>
-              <div class="col-md-3 col-sm-5 col-xs-5">
+            </div>
+
+            <div class="row">
+              <div class="col-md-5 col-sm-5 col-xs-5">
                 <div class="form-group">
                   <label for="">Assign Date<span class="text-danger font-weight-bold">(*)</span>: </label>
                   <input type="text" class="inputDate form-control" id="txtAssignDate">
@@ -87,7 +94,7 @@
                 </div>
               </div>
 
-              <div class="col-md-3 col-sm-5 col-xs-5">
+              <div class="col-md-5 col-sm-5 col-xs-5">
                 <div class=" form-group">
                   <label for="">Deadline<span class="text-danger font-weight-bold">(*)</span>:</label>
                   <input type="text" class="inputDate form-control" id="txtDeadline">
@@ -131,8 +138,8 @@
 
             <div class="row mt-2">
               <div class="form-group mt-2 col-md-6 col-sm-6 col-xs-12">
-                <div id="colEditor">                  
-                    <select name="" id="slEditor" class="form-control selectpicker" data-live-search="true"></select> 
+                <div id="colEditor">
+                  <select name="" id="slEditor" class="form-control selectpicker" data-live-search="true"></select>
                 </div>
               </div>
 
@@ -187,7 +194,9 @@
   var taskId = '';
   var levelId = '';
 
-
+$(document).ready(function(){
+  LoadParentsLevel();
+})
 
 
 
@@ -229,14 +238,14 @@
 
         //xu ly checkbox va dropdown lien quan toi editor va qa
 
-        
+
         $('#ckbAssignQA').prop('checked', (data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla !== 'undefined') ? true : false);
 
 
 
-        if (data.task.status <1 && data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla!=='undefined') {
+        if (data.task.status < 1 && data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla !== 'undefined') {
           $('#ckbAssignEditor').show();
-          $('#ckbAssignEditor').prop('checked', (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla!=='undefined') ? true : false);
+          $('#ckbAssignEditor').prop('checked', (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla !== 'undefined') ? true : false);
           $('#colEditor').show();
           $('#slEditor').val(data.task.editor[data.task.editor.length - 1].staff);
           if (data.task.status > 1) {
@@ -251,7 +260,7 @@
           $('#ckbAssignEditor').hide();
         }
 
-        if ((data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla !=='undefined')) {
+        if ((data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla !== 'undefined')) {
           $('#colQA').show();
           $('#slQA').val(data.task.qa[data.task.qa.length - 1].staff);
           if (data.task.status > 1) {
@@ -285,7 +294,7 @@
     $('#txtDeadline').val(convertISODateToTimeFormat(deadline));
   });
 
- 
+
 
   $('#btnAddTask').click(function () {
     $('#txtInputLink').val('');
@@ -442,12 +451,12 @@
 
           tr += '<td>';
           if (t.status !== -1)
-            tr += t.editor[t.editor.length-1].staff.fullname;
+            tr += t.editor[t.editor.length - 1].staff.fullname;
           tr += "</td>";
 
           tr += '<td>';
           if (typeof t.qa !== 'undefined' && t.qa.length > 0)
-            tr += t.qa[t.qa.length-1].staff.fullname;
+            tr += t.qa[t.qa.length - 1].staff.fullname;
           tr += '</td>'
 
 
@@ -486,7 +495,7 @@
 
 
 
-          tr += '<td class="text-right">';         
+          tr += '<td class="text-right">';
 
           if (t.status < 1) {
             tr += '<button class="ml-1 btn btn-xs btn-danger" name="btnDelTask"><i class="fa fa-trash text-white" aria-hidden="true"></i></button>';
@@ -677,7 +686,7 @@
         data.jl.forEach(j => {
           let opt = '<option value="' + j._id + '" class="font-weight-bold text-danger">' + j.name + '</option>';
           $('#slJobLevels').append(opt);
-        })       
+        })
       },
       error: function (jqXHR, textStatus, errorThrown) {
         $('#msgError').text(jqXHR.responseJSON.msg);
@@ -742,6 +751,21 @@
   }
 
 
+  function LoadParentsLevel(){
+    $.ajax({
+      url:'/tla/parents-level/list',
+      type:'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      success:function(data){
+        $('#slParentsLevel').empty();
+        data.pls.forEach(p=>{
+          $('#slParentsLevel').append('<option value="'+p._id+'">'+p.name+'</option>');
+        })
+      }
+    })
+  }
 
 
 
