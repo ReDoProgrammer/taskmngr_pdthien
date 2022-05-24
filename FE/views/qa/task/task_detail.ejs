@@ -168,12 +168,12 @@
                 $('#lblJobName').text(data.task.basic.job.name);
                 $('#lblLevelName').text(data.task.basic.level.name);
                 $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.basic.deadline.begin));
-                if(data.task.basic.deadline.end){
+                if (data.task.basic.deadline.end) {
                     $('#lblDeadline').text(convertISODateToTimeFormat(data.task.basic.deadline.end));
                 }
-              
+
                 $('#lblStyleNote').text(data.customer.remark);
-                $('#lblIntruction').text(data.task.basic.job.intruction);              
+                $('#lblIntruction').text(data.task.basic.job.intruction);
 
 
                 $('#remarks').empty();
@@ -194,16 +194,14 @@
                     $('#lblInputLink').html('<span class="font-weight-bold font-italic">' + data.task.basic.link.input + '</span>');
                 }
 
-                if(data.task.editor.length>0 && data.task.editor[data.task.editor.length-1].submited.length>0){
-                    if (isValidHttpUrl(data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link)) {
-                    $('#lblOutputLink').html('<a href="' + data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
-                } else {
-                   
-                    $('#lblOutputLink').html(data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1]);                   
-		
+                if (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].submited.length > 0) {
+                    if (isValidHttpUrl(data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link)) {
+                        $('#lblOutputLink').html('<a href="' + data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                    } else {
+                        $('#lblOutputLink').html(data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link);
+                    }
                 }
-                }
-               
+
 
 
                 if (data.customer.is_align) {
