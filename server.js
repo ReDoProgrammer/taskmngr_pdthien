@@ -26,16 +26,26 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(layout); //set layout
+const homeController = require('./BE/controllers/home/home-controller');
+app.use('/',homeController);
+
 
 const customerHomeController = require('./BE/controllers/customer/home-controller');
 app.use('/customer',customerHomeController);
 
+const customerJobController = require('./BE/controllers/customer/job-controller');
+app.use('/customer/job',customerJobController);
+
 const customerAuthAPI = require('./BE/API/customer/api-account');
 app.use('/customer/account',customerAuthAPI);
 
+const customerJobAPI = require('./BE/API/customer/api-job');
+app.use('/customer/job',customerJobAPI);
 
-const homeController = require('./BE/controllers/home/home-controller');
-app.use('/',homeController);
+const customerTaskAPI = require('./BE/API/customer/api-task');
+app.use('/customer/task',customerTaskAPI);
+
+
 
 //accountant zone
 const accountantHomeController = require('./BE/controllers/accountant/home-controller');
