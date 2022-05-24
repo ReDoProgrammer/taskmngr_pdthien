@@ -198,11 +198,8 @@
                     if (isValidHttpUrl(data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link)) {
                     $('#lblOutputLink').html('<a href="' + data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
                 } else {
-                    console.log(data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link.replace('/','\\'))
-                    let path = data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link.replace('/','\\');
-                    $('#lblOutputLink').html('<a href="file:///C:/">Click here to open the folder </a>');
-                    var objShell = new ActiveXObject("Shell.Application");
-                    objShell.ShellExecute("cmd.exe", "C: cd C:\\pr main.exe blablafile.txt auto", "C:\\WINDOWS\\system32", "open", "1");
+                   
+                    $('#lblOutputLink').html(data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1]);                   
 		
                 }
                 }
