@@ -21,7 +21,9 @@
                 <th scope="col">Combo</th>
                 <th scope="col">Received date</th>
                 <th scope="col">Delivery date</th>
-                <th scope="col" colspan="2">Status</th>
+                <th scope="col">Status</th>
+                <th>Remark</th>
+                <th></th>
             </tr>
         </thead>
         <tbody id="tblData">
@@ -29,176 +31,188 @@
     </table>
 </div>
 
-<script src="/js/common.js"></script>
-<script>
-    var page = 1;
-    var search = '';
-    $(document).ready(function () {
-        LoadJobs();
-    })
-    function LoadJobs() {
-        $.ajax({
-            url: '/customer/job/list',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-                search,
-                page
-            },
-            success: function (data) {
+<%-include('modalCC')%>
 
-                let idx = 1;
-                $('#tblData').empty();
-
-                data.jobs.forEach(job => {
-                    let tr = '<tr id = "' + job._id + '">';
-
-                    tr += '<td>';
-                    if (job.tasks.length > 0) {
-                        tr += '<button class="btn btn-xs btn-info parents js-view-parents" name="js-view-parents"> (' + job.tasks.length + ') <i class="fa fa-plus"></i></button>';
-                    }
-                    tr += '</td>';
-                    tr += '<td>' + (idx++) + '</td>';
-                    tr += '<td class="text-warning">' + job.name + '</td>';
-                    tr += '<td class="font-weight-bold text-danger">';
-
-                    if (job.cb_ticked) {
-                        tr += job.cb.name;
-                    } else {
-                        tr += '';
-                    }
-                    tr += '</td>';
-
-
-                    tr += "<td>" + convertISODateToTimeFormat(job.received_date) + "</td>";
-                    tr += "<td>" + convertISODateToTimeFormat(job.delivery_date) + "</td>";
-                    tr += '<td><i>';
-                    switch (job.status) {
-                        case -1:
-                            tr += '<span class = "text-warning">Initial</span>';
-                            break;
-                        case 0:
-                            tr += '<span class = "text-info">Processing</span>';
-                            break;
-                        case 1:
-                            tr += '<span class = "text-primary">Upload</span>';
-                            break;
-                        case 2:
-                            tr += '<span class = "text-success">Done</span>';
-                            break;
-                        case -2:
-                            tr += '<span class = "text-danger">Rejected</span>';
-                            break;
-                        case -3:
-                            tr += '<span class = "text-muted">Canceled</span>';
-                            break;
-                    }
-                    tr += '</i></td>';
-                    tr += '</tr>';
-                    $('#tblData').append(tr);
-                })
-
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
-            }
+    <script src="/js/common.js"></script>
+    <script>
+        var page = 1;
+        var search = '';
+        var jobId = '';
+        $(document).ready(function () {
+            LoadJobs();
         })
-    }
 
-
-    $(document).on("click", "button[name='js-view-parents']", async function (e) {
-
-        var $btn = $(e.target), $row = $btn.closest('tr'), $nextRow = $row.next('tr.expand-child');
-
-        $btn.toggleClass('fa-minus');
-
-        if ($nextRow.length) {
-            $nextRow.toggle($btn.hasClass('fa-minus'));
-        } else {
-            var newRow = '<tr class="expand-child" id="collapse' + $btn.data('id') + '">' +
-                '<td colspan="7">' +
-                '<table class="table table-condensed table-bordered table-striped" width=100% >' +
-                '<thead>' +
-                '<tr>' +
-                '<th class="text-right  ">#</th>' +
-                '<th>Level</th>' +               
-                '<th class="text-center">I-N</th>' +                   
-                '<th>Uploaded at</th>' +               
-                '<th>U-Link</th>' +
-                '<th>Status</th>' +
-                '</tr>' +
-                '</thead>' +
-                '<tbody>';
+        $(document).on("click", "button[name='btnCC']", function () {
             jobId = $(this).closest('tr').attr('id');
+            $('#modalCC').modal();
+        })
 
-            await $.ajax({
-                url: '/customer/task/list-by-job',
+
+
+        function LoadJobs() {
+            $.ajax({
+                url: '/customer/job/list',
                 type: 'get',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem("accessToken"),
                 },
                 data: {
-                    jobId
+                    search,
+                    page
                 },
                 success: function (data) {
+
                     let idx = 1;
-                    data.tasks.forEach(t => {
-                        newRow += '<tr>';
-                        newRow += '<td class="text-right">' + (idx++) + '</td>';
-                        newRow += '<td class="font-weight-bold text-primary">' + t.basic.level.name + '</td>';
-                        newRow += '<td class="text-center">';
-                                    if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                                        newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount;
-                                    }else{
-                                        newRow +='<i class="text-info">Processing..</i>';
-                                    }
-                                    newRow += '</td>';
+                    $('#tblData').empty();
 
+                    data.jobs.forEach(job => {
+                        let tr = '<tr id = "' + job._id + '">';
 
-                        newRow += '<td>';
-                        if (t.tla.uploaded.length > 0) {
-                            newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
-                        }else{
-                            newRow +='<i class="text-info">Processing..</i>';
+                        tr += '<td>';
+                        if (job.tasks.length > 0) {
+                            tr += '<button class="btn btn-xs btn-info parents js-view-parents" name="js-view-parents"> (' + job.tasks.length + ') <i class="fa fa-plus"></i></button>';
                         }
-                        newRow += '</td>';
+                        tr += '</td>';
+                        tr += '<td>' + (idx++) + '</td>';
+                        tr += '<td class="text-warning">' + job.name + '</td>';
+                        tr += '<td class="font-weight-bold text-danger">';
 
-                        newRow += '<td  class="text-center">';
-
-                        if (t.tla.uploaded.length > 0) {                           
-                                newRow += '<a href="' + t.tla.uploaded[t.tla.uploaded.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';                           
-                        }else{
-                            newRow +='<i class="text-info">Processing..</i>';
+                        if (job.cb_ticked) {
+                            tr += job.cb.name;
+                        } else {
+                            tr += '';
                         }
-
-                        newRow += '</td>';
-
+                        tr += '</td>';
 
 
-                        newRow += '<td>';
-                            if (t.tla.uploaded.length > 0) {                           
-                                newRow +='<i class="text-primary font-weight-bold">Uploaded</i>';
-                        }else{
-                            newRow +='<i class="text-info">Processing..</i>';
+                        tr += "<td>" + convertISODateToTimeFormat(job.received_date) + "</td>";
+                        tr += "<td>" + convertISODateToTimeFormat(job.delivery_date) + "</td>";
+                        tr += '<td><i>';
+                        switch (job.status) {
+                            case -1:
+                                tr += '<span class = "text-warning">Initial</span>';
+                                break;
+                            case 0:
+                                tr += '<span class = "text-info">Processing</span>';
+                                break;
+                            case 1:
+                                tr += '<span class = "text-primary">Upload</span>';
+                                break;
+                            case 2:
+                                tr += '<span class = "text-success">Done</span>';
+                                break;
+                            case -2:
+                                tr += '<span class = "text-danger">Rejected</span>';
+                                break;
+                            case -3:
+                                tr += '<span class = "text-muted">Canceled</span>';
+                                break;
                         }
-                       
-                        newRow += '</td>';
-
-                        newRow += '</tr>';
+                        tr += '</i></td>';
+                        tr += '<td class="text-right"><button class="btn btn-xs btn-warning text-white" name="btnCC"><i class="fa fa-cc" aria-hidden="true"></i></button></td>'
+                        tr += '</tr>';
+                        $('#tblData').append(tr);
                     })
+
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
                 }
             })
-            newRow += '</tbody></table></td></tr>';
-            // set next row
-            $nextRow = $(newRow).insertAfter($row);
-
-
-            /*}
-                });*/
         }
-    });
 
 
-</script>
+        $(document).on("click", "button[name='js-view-parents']", async function (e) {
+
+            var $btn = $(e.target), $row = $btn.closest('tr'), $nextRow = $row.next('tr.expand-child');
+
+            $btn.toggleClass('fa-minus');
+
+            if ($nextRow.length) {
+                $nextRow.toggle($btn.hasClass('fa-minus'));
+            } else {
+                var newRow = '<tr class="expand-child" id="collapse' + $btn.data('id') + '">' +
+                    '<td colspan="8">' +
+                    '<table class="table table-condensed table-bordered table-striped" width=100% >' +
+                    '<thead>' +
+                    '<tr>' +
+                    '<th class="text-right  ">#</th>' +
+                    '<th>Level</th>' +
+                    '<th class="text-center">I-N</th>' +
+                    '<th>Uploaded at</th>' +
+                    '<th>U-Link</th>' +
+                    '<th>Status</th>' +
+                    '</tr>' +
+                    '</thead>' +
+                    '<tbody>';
+                jobId = $(this).closest('tr').attr('id');
+
+                await $.ajax({
+                    url: '/customer/task/list-by-job',
+                    type: 'get',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                    data: {
+                        jobId
+                    },
+                    success: function (data) {
+                        let idx = 1;
+                        data.tasks.forEach(t => {
+                            newRow += '<tr>';
+                            newRow += '<td class="text-right">' + (idx++) + '</td>';
+                            newRow += '<td class="font-weight-bold text-primary">' + t.basic.level.name + '</td>';
+                            newRow += '<td class="text-center">';
+                            if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                                newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount;
+                            } else {
+                                newRow += '<i class="text-info">Processing..</i>';
+                            }
+                            newRow += '</td>';
+
+
+                            newRow += '<td>';
+                            if (t.tla.uploaded.length > 0) {
+                                newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
+                            } else {
+                                newRow += '<i class="text-info">Processing..</i>';
+                            }
+                            newRow += '</td>';
+
+                            newRow += '<td  class="text-center">';
+
+                            if (t.tla.uploaded.length > 0) {
+                                newRow += '<a href="' + t.tla.uploaded[t.tla.uploaded.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                            } else {
+                                newRow += '<i class="text-info">Processing..</i>';
+                            }
+
+                            newRow += '</td>';
+
+
+
+                            newRow += '<td>';
+                            if (t.tla.uploaded.length > 0) {
+                                newRow += '<i class="text-primary font-weight-bold">Uploaded</i>';
+                            } else {
+                                newRow += '<i class="text-info">Processing..</i>';
+                            }
+
+                            newRow += '</td>';
+
+                            newRow += '</tr>';
+                        })
+                    }
+                })
+                newRow += '</tbody></table></td></tr>';
+                // set next row
+                $nextRow = $(newRow).insertAfter($row);
+
+
+                /*}
+                    });*/
+            }
+        });
+
+
+    </script>

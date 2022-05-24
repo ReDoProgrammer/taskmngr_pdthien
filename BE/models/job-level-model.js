@@ -18,6 +18,10 @@ const jobLevel = new Schema({
     description:{
         type:String,
         default:''
+    },
+    parents:{
+        type:Schema.Types.ObjectId,
+        ref:'parents-level'
     }    
 });
 

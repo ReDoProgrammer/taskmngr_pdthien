@@ -27,4 +27,26 @@ router.get('/list',authenticateCustomerToken,(req,res)=>{
     })
 })
 
+router.put('/cc',authenticateCustomerToken,async (req,res)=>{
+    let {jobId,cc} = req.body;
+    let job = await Job.findById(jobId);
+    if(!job){
+        return res.status(404).json({
+            msg:`Job not found!`
+        })
+    }
+    job.cc.push(cc);
+    await job.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`CC job successfully!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not push CC into job with error: ${new Error(err.message)}`
+        })
+    })
+})
+
 module.exports = router;

@@ -67,6 +67,10 @@ const jobSchema = new Schema({
     tasks:[{
         type: Schema.Types.ObjectId,
         ref:'task'
+    }],
+    cc:[{
+        type:String,
+        default:''
     }]
    
 });

@@ -1,0 +1,55 @@
+<!-- The modal -->
+<div class="modal fade" id="modalCC" tabindex="-1" role="dialog" aria-labelledby="modalLabelSmall" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="modalLabelSmall">Job CC</h4>
+            </div>
+
+            <div class="modal-body">
+                <textarea name="CC_content" id="CC_content" rows="5" class="form-control"
+                    placeholder="CC content"></textarea>
+                <button id="btnSubmitCC" class="btn btn-warning mt-2">
+                    <i class="fa fa-paper-plane" aria-hidden="true"></i> Send CC
+                </button>
+                <div class="mt-2">
+                    <label class="d-none font-weight-bold text-danger" id="cc_msg"></label>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#btnSubmitCC').click(function () {
+        let cc = $('#CC_content').val();
+        if (cc.trim().length === 0) {
+            $('#cc_msg').text('Please input CC remark!');
+            $('#cc_msg').show().fadeOut(3000);
+            return;
+        }
+
+        $.ajax({
+            url: '/customer/job/cc',
+            type: 'put',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                jobId,
+                cc
+            },
+            success: function (data) {
+                alert(data.msg);
+                $('#modalCC').modal('hide');
+                LoadJobs();
+            }
+        })
+    })
+</script>
