@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <%-include('child/common')%>
+
+    <title>Customer dashboard</title>
+</head>
+
+<body>
+  <div class="container-fluid mt-2">
+    <%- include('child/customer/navbar') %>
+      <div class="panel panel-primary">
+        <div class="panel-heading">Welcome: - <%-title-%></div>
+        <div class="panel-body" style="min-height: 600px">
+          <%- body %>
+        </div>
+        <div class="panel-footer">
+          <%- include('child/customer/footer') %>
+        </div>
+      </div>
+  </div>
+</body>
+
+</html>

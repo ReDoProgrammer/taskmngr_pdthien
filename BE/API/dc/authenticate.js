@@ -39,7 +39,6 @@ router.get('/profile',authenticateDCToken,(req,res)=>{
 
 router.post("/login", (req, res) => {
   let { username, password } = req.body;
-  console.log( { username, password });
   Promise.all([getModule(_MODULE), checkAccount(username, password)])
     .then(result => {
       getRole(result[0]._id, result[1]._id)

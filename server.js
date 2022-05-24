@@ -27,6 +27,12 @@ app.use(bodyParser.json());
 
 app.use(layout); //set layout
 
+const customerHomeController = require('./BE/controllers/customer/home-controller');
+app.use('/customer',customerHomeController);
+
+const customerAuthAPI = require('./BE/API/customer/api-account');
+app.use('/customer/account',customerAuthAPI);
+
 
 const homeController = require('./BE/controllers/home/home-controller');
 app.use('/',homeController);

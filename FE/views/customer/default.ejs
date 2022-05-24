@@ -1,0 +1,22 @@
+<script>
+	$('#btnLogin').click(function () {
+		let username = $('#txtUsername').val();
+		let password = $('#txtPassword').val();
+		$.ajax({
+			url: '/customer/account/login',
+			type: 'post',
+			data: {
+				email:username,
+				password
+			},
+			success: function (data) {
+				window.localStorage.setItem('accessToken', data.accessToken);
+        		window.location.href=data.url;
+			},
+			error: function (request, status, error) {
+				console.log(request.responseJSON);
+				// $('#lblError').text(request.responseJSON.msg);				
+			}
+		})
+	})
+</script>
