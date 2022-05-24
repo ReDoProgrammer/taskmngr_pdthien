@@ -8,13 +8,13 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="/editor">Editor Module - Hello: <span id="spUser"
+        <a class="navbar-brand" href="/editor">Customer dashboard - Hello: <span id="spUser"
           class="font-weight-bold text-info"></span></a>
       </div>
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
-          <li class="active"><a href="/editor">Home</a></li>   
-          <li> <a href="/editor/task/all">Task</a></li>      
+          <li class="active"><a href="/customer">Home</a></li>   
+          <li> <a href="/customer/job">Jobs</a></li>      
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <button class="btn btn-sm btn-danger mt-2" id="btnLogout">
@@ -39,7 +39,7 @@
   
     function getProfile() {
       $.ajax({
-        url: '/editor/auth/profile',
+        url: '/customer/account/profile',
         type: 'get',
         headers: {
           authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -48,7 +48,7 @@
           $('#spUser').text(data.fullname)
         },
         error: function (err) {
-          window.location.href = '/editor/login';
+          window.location.href = '/customer/login';
         }
   
       })

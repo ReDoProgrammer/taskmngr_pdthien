@@ -10,7 +10,7 @@ router.get('/login',(req,res)=>{
 router.get('/',(req,res)=>{  
     res.render('customer/home/index',{
         layout:'layouts/customer-layout',
-        title:'Customer Homepage'      
+        title:'<i class="fa fa-home" aria-hidden="true"></i> Homepage'      
     });
 })
 
