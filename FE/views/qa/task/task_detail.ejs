@@ -56,6 +56,7 @@
                         <div class="row mt-2">
                             <div class="col-md-2 col-sm-2 col-xs-4">Output:</div>
                             <div class="col-md-10 col-sm-10 col-xs-8" id="lblOutputLink"></div>
+
                         </div>
 
 
@@ -156,8 +157,6 @@
                 taskId
             },
             success: function (data) {
-                console.log(data.task)
-
                 $('#divNationalStyle').html(data.customer.nation.name)
                 $('#divColor').html(data.customer.color.name)
                 $('#divOutput').html(data.customer.output.name)
@@ -196,9 +195,17 @@
 
                 if (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].submited.length > 0) {
                     if (isValidHttpUrl(data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link)) {
-                        $('#lblOutputLink').html('<a href="' + data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                        $('#txtOutputLink').html('<a href="' + data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
                     } else {
-                        $('#lblOutputLink').html(data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link);
+                        //$('#txtOutputLink').val(data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link);
+                        let ht = ' <div class="input-group">';
+                        ht += '<input type="text" class="form-control" val="'+data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link+'" readonly>'
+                        ht += ' <div class="input-group-btn">'
+                        ht += ' <button onclick="copyToClipboard('+"txtOutputLink"+')">copy</button>'
+                        ht += ' </div>         '
+                        ht += '</div>';
+                        $('#lblOutputLink').html(ht);
+
                     }
                 }
 
