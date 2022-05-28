@@ -304,6 +304,9 @@ app.use('/tla/auth',apiTLAAuth);
 const apiTLABonusPenaltyLine = require('./BE/API/TLA/api-bonus-penalty-line');
 app.use('/tla/bonus-penalty-line',apiTLABonusPenaltyLine);
 
+const apiTLACC = require('./BE/API/TLA/api-cc');
+app.use('/tla/cc',apiTLACC);
+
 const apiTLAComboLine = require('./BE/API/TLA/api-tla-combo-line');
 app.use('/tla/combo-line',apiTLAComboLine);
 

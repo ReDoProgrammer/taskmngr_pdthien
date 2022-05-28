@@ -66,6 +66,12 @@
                     }, 10000);//run this thang every 10 seconds
                 })
 
+
+                $(document).on("click", "button[name='btnNewCC']", function () {
+                    jobId = $(this).closest('tr').attr('id');
+
+                })
+
                 $(document).on("click", "button[name='js-view-parents']", async function (e) {
 
                     var $btn = $(e.target), $row = $btn.closest('tr'), $nextRow = $row.next('tr.expand-child');
@@ -278,7 +284,11 @@
                             let idx = 1;
                             $('#tblData').empty();
                             data.jobs.forEach(job => {
-                                let tr = '<tr id = "' + job._id + '" data-customer="' + job.customer._id + '"  >';
+                                let tr = '<tr id = "' + job._id + '" data-customer="' + job.customer._id + '"';
+                                if (job.cc.length > 0 && job.cc[job.cc.length - 1].status === -1) {
+                                    tr += 'data-cc="'+job.cc[job.cc.length-1]._id+'"'
+                                }
+                                tr+='>';
 
                                 tr += '<td>';
                                 if (job.tasks.length > 0) {
