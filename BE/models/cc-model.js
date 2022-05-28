@@ -48,6 +48,15 @@ const ccSchema = new Schema({
             default: new Date()
         }
     },
+    updated:{
+        by:{
+            type:Schema.Types.ObjectId,
+            ref:'user'
+        },
+        at:{
+            type:Date
+        }
+    },
     task: [
         //danh sách tham chiếu tới task được tạo để giải quyết CC
         //danh sách này có thể rỗng vì cc chỉ yêu cầu sửa lại task cũ
