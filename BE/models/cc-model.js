@@ -19,6 +19,8 @@ const ccSchema = new Schema({
             2: QA đã submit
             3: DC đã submit
             4: SALE đã submit
+            5: TLA uploaded
+            6: paid
         */
         type:Number,
         default:-1
@@ -57,7 +59,7 @@ const ccSchema = new Schema({
             type:Date
         }
     },
-    task: [
+    tasks: [
         //danh sách tham chiếu tới task được tạo để giải quyết CC
         //danh sách này có thể rỗng vì cc chỉ yêu cầu sửa lại task cũ
         {

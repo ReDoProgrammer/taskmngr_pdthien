@@ -51,6 +51,9 @@
 <%-include('manage-job-modal')%>
     <%-include('upload-job-modal')%>
         <%-include('job-detail-modal')%>
+        <%-include('job-detail-modal')%>
+        <%-include('modal-cc-new-task')%>
+        <%-include('modal-cc-reject-task')%>
 
             <script>
                 var search = '';
@@ -68,7 +71,26 @@
 
 
                 $(document).on("click", "button[name='btnNewCC']", function () {
+                    ccId = $(this).closest('tr').data('cc');
                     jobId = $(this).closest('tr').attr('id');
+                    customerId = $(this).closest('tr').data('customer');
+                    $.ajax({
+                        url: '/tla/cc/detail',
+                        type: 'get',
+                        headers: {
+                            authorization: "Bearer " + localStorage.getItem("accessToken"),
+                        },
+                        data: {
+                            ccId
+                        },
+                        success: function (data) {
+                            if(data.cc.type){
+                                $('#modalCCNewTask').modal();
+                            }else{
+                                $('#modalCCRejectTask').modal();
+                            }
+                        }
+                    })
 
                 })
 
@@ -286,9 +308,9 @@
                             data.jobs.forEach(job => {
                                 let tr = '<tr id = "' + job._id + '" data-customer="' + job.customer._id + '"';
                                 if (job.cc.length > 0 && job.cc[job.cc.length - 1].status === -1) {
-                                    tr += 'data-cc="'+job.cc[job.cc.length-1]._id+'"'
+                                    tr += 'data-cc="' + job.cc[job.cc.length - 1]._id + '"'
                                 }
-                                tr+='>';
+                                tr += '>';
 
                                 tr += '<td>';
                                 if (job.tasks.length > 0) {

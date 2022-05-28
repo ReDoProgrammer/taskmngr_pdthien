@@ -1,0 +1,358 @@
+<div id="modalCCNewTask" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">CC new task</h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-md-6 col-sm-12 col-xs-12">
+                        <div class="form-group">
+                            <label for="">Job level</label>
+                            <select name="" id="slCCParentsLevel" class="form-control"></select>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12 col-xs-12">
+                        <div class="form-group">
+                            <label for="">Job level</label>
+                            <select name="" id="slCCJobLevels" class="form-control"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-5 col-sm-5 col-xs-5">
+                        <div class="form-group">
+                            <label for="">Assign Date<span class="text-danger font-weight-bold">(*)</span>: </label>
+                            <input type="text" class="inputDate form-control" id="txtCCAssignDate">
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 col-sm-2 col-xs-2">
+                        <div class="form-group">
+                            <label for="">Hours:</label>
+                            <input type="text" class="form-control text-right" id="txtCCDuration" value="0">
+                        </div>
+                    </div>
+
+                    <div class="col-md-5 col-sm-5 col-xs-5">
+                        <div class=" form-group">
+                            <label for="">Deadline<span class="text-danger font-weight-bold">(*)</span>:</label>
+                            <input type="text" class="inputDate form-control" id="txtCCDeadline">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                        <label for="">Images Link:</label>
+                        <input type="text" class="form-control" id="txtCCInputLink">
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                        <label for="">Remark:</label>
+                        <input type="text" name="txtRemark" id="txtCCRemark" class="form-control"
+                            placeholder="Task remark">
+                    </div>
+                </div>
+
+                <hr />
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox" value="" id="ckbCCAssignEditor" />
+                            <label class="form-check-label" for="defaultCheck1">
+                                Assign Editor
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox" value="" id="ckbCCAssignQA" />
+                            <label class="form-check-label" for="defaultCheck1">
+                                Assign Q.A
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="form-group mt-2 col-md-6 col-sm-6 col-xs-12">
+                        <div id="colCCEditor">
+                            <select name="" id="slCCEditor" class="form-control selectpicker"
+                                data-live-search="true"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-2 col-md-6 col-sm-6 col-xs-12">
+                        <div id="colCCQA">
+                            <select name="" id="slCCQA" class="form-control  selectpicker"
+                                data-live-search="true"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-md-12">
+                        <label for="" class="font-weight-bold text-danger" id="lblCCError"></label>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" id="btnSubmitCC">Submit</button>
+                <button type="button" class="btn btn-default" id="btnCancelCC">Cancel</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    var ccTaskId = '';
+    $("#modalCCNewTask").on('shown.bs.modal', function (e) {
+        LoadCCJobLevels();
+        LoadCCParentsLevel();
+        $('#txtCCAssignDate').val(getCurrentTime());
+        $('#colCCEditor').hide();
+        $('#colCCQA').hide();
+    });
+
+    $('#btnSubmitCC').click(function () {
+        let level = $("#slCCJobLevels option:selected").val();
+        let name = $("#slCCJobLevels option:selected").text();
+
+        let assigned_date = strToDate($('#txtCCAssignDate').val());
+        let deadline = strToDate($('#txtCCDeadline').val());
+        let input_link = $('#txtCCInputLink').val();
+        let remark = $('#txtCCRemark').val();
+        let editor = $("#ckbCCAssignEditor").is(':checked') ? $('#slCCEditor option:selected').val() : null;
+        let qa = $("#ckbCCAssignQA").is(':checked') ? $('#slCCQA option:selected').val() : null;
+
+        console.log({ level, name, assigned_date, deadline, input_link, remark, editor, qa, jobId })
+
+        // validateion component inputs
+
+        if (isNaN(assigned_date) || assigned_date === null) {
+            $('#msgCCError').text('(*) Assign date or deadline is invalid!');
+            $('#msgCCError').show().delay(3000).fadeOut();
+            return;
+        }
+
+
+
+        if (ccTaskId.trim().length == 0) {
+            $.ajax({
+                url: '/tla/task/cc',
+                type: 'post',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                    jobId,
+                    level,
+                    assigned_date,
+                    deadline,
+                    input_link,
+                    remark,
+                    qa,
+                    editor,
+                    customerId,
+                    ccId
+                },
+                success: function (data) {
+                    alert(data.msg);
+                    LoadTasks();
+                    $('#txtInputLink').val('');
+                    $('#txtRemark').val('');
+                    $('#divAddOrUpdateTask').slideUp(500);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
+                    $('#msgError').show().delay(10000).fadeOut();
+                },
+            })
+        } else {
+            $.ajax({
+                url: '/tla/task',
+                type: 'put',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                    taskId,
+                    assigned_date,
+                    deadline,
+                    input_link,
+                    remark,
+                    qa_assigned,
+                    editor_assigned,
+                    qa,
+                    editor
+                },
+                success: function (data) {
+                    alert(data.msg);
+                    LoadTasks();
+                    LoadJob();
+                    $('#txtInputLink').val('');
+                    $('#txtRemark').val('');
+                    $('#divAddOrUpdateTask').slideUp(500);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
+                    $('#msgError').show().delay(3000).fadeOut();
+                },
+            })
+        }
+    })
+
+    $("#ckbCCAssignEditor").change(function () {
+        if (this.checked) {
+            $('#colCCEditor').slideDown(500);
+        } else {
+            $('#colCCEditor').slideUp(500);
+        }
+    });
+    $("#ckbCCAssignQA").change(function () {
+        if (this.checked) {
+            $('#colCCQA').slideDown(500);
+        } else {
+            $('#colCCQA').slideUp(500);
+        }
+    });
+
+    $('#txtCCDuration').keyup(function (e) {
+        if (/\D/g.test(this.value)) {
+            // Filter non-digits from input value.
+            this.value = this.value.replace(/\D/g, '');
+        }
+        let duration = parseInt($('#txtCCDuration').val());
+        let assigned_date = strToDate($('#txtCCAssignDate').val());
+        let deadline = assigned_date.addHours(duration);
+        $('#txtCCDeadline').val(convertISODateToTimeFormat(deadline));
+    });
+
+    $('#slCCJobLevels').on('change', function (e) {
+        console.log(1234);
+        LoadCCEditor($('#slCCJobLevels option:selected').val());
+        LoadCCQA($('#slCCJobLevels option:selected').val());
+    });
+
+    function LoadCCJobLevels() {
+
+        $.ajax({
+            url: '/tla/job-level',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                customerId
+            },
+
+            success: function (data) {
+                $('#slCCJobLevels').empty();
+                data.jl.forEach(j => {
+                    let opt = '<option value="' + j._id + '" class="font-weight-bold text-danger">' + j.name + '</option>';
+                    $('#slCCJobLevels').append(opt);
+                })
+                LoadCCEditor($('#slCCJobLevels option:selected').val());
+                LoadCCQA($('#slCCJobLevels option:selected').val());
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $('#msgError').text(jqXHR.responseJSON.msg);
+            },
+        })
+    }
+
+    function LoadCCEditor(levelId) {
+        $.ajax({
+            url: '/tla/user/list-editor',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                levelId
+            },
+            success: function (data) {
+                $('#slCCEditor').empty();
+                data.editors.forEach(e => {
+                    let opt = '<option value="' + e._id + '">' + e.fullname + '</option>';
+                    $('#slCCEditor').append(opt);
+                    $('#slCCEditorInEditDiv').append(opt);
+                })
+                $('#slCCEditor').selectpicker();
+                $('#slCCEditor').selectpicker('refresh');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $('#msgError').text(jqXHR.responseJSON.msg);
+            },
+        })
+    }
+
+
+    function LoadCCQA(levelId) {
+        $.ajax({
+            url: '/tla/user/list-qa',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                levelId
+            },
+            success: function (data) {
+                $('#slCCQA').empty();
+                $('#slCCQAInEditDiv').empty();
+                data.qas.forEach(q => {
+                    let opt = '<option value="' + q._id + '">' + q.fullname + '</option>';
+                    $('#slCCQA').append(opt);
+                    $('#slCCQAInEditDiv').append(opt);
+                })
+                $('#slCCQA').selectpicker();
+                $('#slCCQAInEditDiv').selectpicker();
+                $('#slCCQA').selectpicker('refresh');
+                $('#slCCQAInEditDiv').selectpicker('refresh');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $('#msgError').text(jqXHR.responseJSON.msg);
+            },
+        })
+    }
+
+
+    function LoadCCParentsLevel() {
+        $.ajax({
+            url: '/tla/parents-level/list',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            success: function (data) {
+                $('#slCCParentsLevel').empty();
+                data.pls.forEach(p => {
+                    $('#slCCParentsLevel').append('<option value="' + p._id + '">' + p.name + '</option>');
+                })
+            }
+        })
+    }
+
+
+
+    $('.inputDate').inputmask("datetime", {
+        mask: "1/2/y h:s",
+        placeholder: "dd/mm/yyyy hh:mm",
+        leapday: "-02-29",
+        separator: "/",
+        alias: "dd/mm/yyyy hh:mm"
+    })
+
+
+</script>
