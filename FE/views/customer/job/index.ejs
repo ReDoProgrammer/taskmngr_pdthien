@@ -40,6 +40,9 @@
         var jobId = '';
         $(document).ready(function () {
             LoadJobs();
+            setInterval(function () {
+                LoadJobs();
+            }, 10000);//run this thang every 10 seconds
         })
 
         $(document).on("click", "button[name='btnCC']", function () {

@@ -51,164 +51,35 @@
 
 <%-include('edit-job')%>
   <%-include('job-detail-modal')%>
-  <%-include('modalCC')%>
+    <%-include('modalCC')%>
 
 
-    <script type='text/javascript'
-      src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
+      <script type='text/javascript'
+        src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
 
 
-    <script src="/js/common.js"></script>
+      <script src="/js/common.js"></script>
 
-    <script>
-      var search = "";
-      var page = 1;
-      var jobId = '';
-      var customerId = '';
-
-
-
-      $(document).on("click", "button[name='btn-job-functions']", function (e) {
-        var $contextMenu = $("#contextMenu");
-        $contextMenu.css({
-          display: "block",
-          left: e.pageX,
-          top: e.pageY
-        });
-
-        jobId = $(this).closest('tr').attr('id');
-
-        $.ajax({
-          url: '/sale/job/detail',
-          type: 'get',
-          headers: {
-            authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-          data: {
-            jobId
-          },
-          success: function (data) {
-
-
-            $('#funcMenu').empty();
-            let mn = '';
-            mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Q.A ok</a></li>';
-
-            $('#funcMenu').append(mn);
-          }
-        })
-
-
-        $('html').click(function () {
-          $contextMenu.hide();
-        });
-
-      });
-
-      $(document).on("click", "button[name='btnCC']", function () {
-        jobId = $(this).closest("tr").attr("id");
-        $('#modalCC').modal();
-      })
-
-      $(document).on("click", "button[name='btn-job-info']", function () {
-        jobId = $(this).closest("tr").attr("id");
-        customerId = $(this).closest("tr").data("customer");
-        $('#JobDetailModal').modal();
-
-      })
-
-      $(document).on("click", "button[name='delete-job']", function () {
-        jobId = $(this).closest("tr").attr("id");
-        if (confirm('Are you sure want to delete this job?')) {
-          $.ajax({
-            url: '/sale/job',
-            type: 'delete',
-            headers: {
-              authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-              jobId
-            },
-            success: function (data) {
-              alert(data.msg);
-              LoadJobs();
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-              alert(jqXHR.responseJSON.msg);
-            },
-          })
-        }
-
-      })
-
-      $(document).on("click", "button[name='edit-job']", function () {
-        jobId = $(this).closest("tr").attr("id");
-        $('#updateJobModal').modal();
-
-      })
-
-      $(document).ready(function () {
-        LoadJobs();
-      });
-
-      $('#updateJobModal').on('hidden.bs.modal', function () {
-        LoadJobs();
-      })
-
-      $('#btnSearch').click(function () {
-        search = $('#txtSearch').val();
-        LoadJobs();
-      })
+      <script>
+        var search = "";
+        var page = 1;
+        var jobId = '';
+        var customerId = '';
 
 
 
-      $('#txtSearch').keyup(function (e) {
-        if (e.keyCode == 13) {
-          $("#btnSearch").click()
-        }
-      });
+        $(document).on("click", "button[name='btn-job-functions']", function (e) {
+          var $contextMenu = $("#contextMenu");
+          $contextMenu.css({
+            display: "block",
+            left: e.pageX,
+            top: e.pageY
+          });
 
-
-
-
-
-
-      var $table = $('.js-table');
-
-
-      $(document).on("click", "button[name='js-view-parents']", async function (e) {
-
-        var $btn = $(e.target), $row = $btn.closest('tr'), $nextRow = $row.next('tr.expand-child');
-
-        $btn.toggleClass('fa-minus');
-
-        if ($nextRow.length) {
-          $nextRow.toggle($btn.hasClass('fa-minus'));
-        } else {
-          var newRow = '<tr class="expand-child" id="collapse' + $btn.data('id') + '">' +
-            '<td colspan="9">' +
-            '<table class="table table-condensed table-bordered table-striped" width=100% >' +
-            '<thead>' +
-            '<tr>' +
-            '<th class="text-right  ">#</th>' +
-            '<th>Level</th>' +
-            '<th>Editor</th>' +
-            '<th class="text-center">I-N</th>' +
-            '<th>Q.A</th>' +
-            '<th>DC</th>' +
-            '<th>Uploaded by</th>' +
-            '<th>Uploaded at</th>' +
-            '<th>I-Link</th>' +
-            '<th>O-Link</th>' +
-            '<th>U-Link</th>' +
-            '<th>Status</th>' +
-            '</tr>' +
-            '</thead>' +
-            '<tbody>';
           jobId = $(this).closest('tr').attr('id');
 
-          await $.ajax({
-            url: '/sale/task/list',
+          $.ajax({
+            url: '/sale/job/detail',
             type: 'get',
             headers: {
               authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -217,234 +88,366 @@
               jobId
             },
             success: function (data) {
-              let idx = 1;
-              data.tasks.forEach(t => {
-                newRow += '<tr>';
-                newRow += '<td class="text-right">' + (idx++) + '</td>';
-                newRow += '<td class="font-weight-bold text-primary">' + t.basic.level.name + '</td>';
-                newRow += '<td>';
-                if (t.status!==-1) {
-                  newRow += t.editor[t.editor.length - 1].staff.fullname;
-                }
-                newRow += '</td>';
-
-                newRow += '<td class="text-center">';
-                if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                  newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount
-                }
-                newRow += '</td>';
-
-                newRow += '<td>';
-                if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
-                  newRow += t.qa[t.qa.length - 1].staff.fullname
-                }
-                newRow += '</td>';
-
-                newRow += '<td>';
-                if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
-                  newRow += t.dc[t.dc.length - 1].staff.fullname
-                }
-                newRow += '</td>';
-
-                newRow += '<td>';
-                if (t.tla.uploaded.length > 0) {
-                  newRow += t.tla.uploaded[t.tla.uploaded.length - 1].by.fullname;
-                }
-                newRow += '</td>';
-
-                newRow += '<td>';
-                if (t.tla.uploaded.length > 0) {
-                  newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
-                }
-                newRow += '</td>';
-
-                newRow += '<td  class="text-center">';
-                if (isValidHttpUrl(t.basic.link.input)) {
-                  newRow += '<a href="' + t.basic.link.input + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
-                } else {
-                  newRow += t.basic.link.input;
-                }
-                newRow += '</td>';
-
-                newRow += '<td class="text-center">';
-                if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                  if (isValidHttpUrl(t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link)) {
-                    newRow += '<a href="' + t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
-                  } else {
-                    newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link;
-                  }
-                }
-
-                newRow += '</td>';
 
 
+              $('#funcMenu').empty();
+              let mn = '';
+              mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Q.A ok</a></li>';
 
-                newRow += '<td  class="text-center">';
-
-                if (t.tla.uploaded.length > 0) {
-                  if (isValidHttpUrl(t.tla.uploaded[t.tla.uploaded.length - 1].link)) {
-                    newRow += '<a href="' + t.tla.uploaded[t.tla.uploaded.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
-                  } else {
-                    newRow += t.tla.uploaded[t.tla.uploaded.length - 1].link
-                  }
-                }
-
-                newRow += '</td>';
-
-
-                newRow += '<td><i>';
-
-                switch (t.status) {
-                  case -1: newRow += '<span class="text-info">Initial</span>';
-                    break;
-                  case 0: newRow += '<span class="text-info">Processing</span>';
-                    break;
-                  case 1:
-                    {
-                      if (t.edited_time > 1) {
-                        newRow += '<span class="text-primary">Fixed</span>';
-                      } else {
-                        newRow += '<span class="text-primary">Edited</span>';
-                      }
-                      break;
-                    }
-                  case 2:
-                    newRow += '<span class="text-success">Q.A ok!</span>';
-                    break;
-                  case 3:
-                    newRow += '<span class="text-success">DC ok!</span>'
-                    break;
-                  case -2:
-                    newRow += '<span class="text-danger">Q.A rejected</span>';
-                    break;
-                  case -3:
-                    newRow += '<span class="text-danger">DC rejected</span>';
-                    break;
-                  case -4:
-                    newRow += '<span class="text-danger">Sale rejected</span>';
-                    break;
-                  case -5:
-                    newRow += '<span class="text-danger">Canceled</span>';
-                    break;
-                  case 4: newRow += '<span class="text-success font-weight-bold">Upload</span>'; break;
-                  case 5: newRow += '<span class="text-success font-weight-bold">Done</span>'; break;
-                  case 6: newRow += '<span class="text-success font-weight-bold">Finish</span>'; break;
-
-                }
-                newRow += '</i></td>';
-
-
-                // newRow += '<td class="text-center">';
-                // newRow += '<input type="checkbox" name="check_task">'
-                // newRow += '</td>';
-                newRow += '</tr>';
-              })
+              $('#funcMenu').append(mn);
             }
           })
-          newRow += '</tbody></table></td></tr>';
-          // set next row
-          $nextRow = $(newRow).insertAfter($row);
 
 
-          /*}
-              });*/
-        }
-      });
+          $('html').click(function () {
+            $contextMenu.hide();
+          });
 
-
-
-      function LoadJobs() {
-        $.ajax({
-          url: "/sale/job/list",
-          type: "get",
-          headers: {
-            authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-          data: {
-            search,
-            page,
-          },
-          success: function (data) {
-            $('#tblJobs').empty();
-            let idx = 1;
-            data.jobs.forEach(j => {
-              let isInit = j.tasks.filter(x => x.status !== 0);
-
-              let tr = '<tr id="' + j._id + '" data-customer="' + j.customer._id + '">';
-              tr += '<td>';
-              if (j.tasks.length > 0) {
-                tr += '<button class="btn btn-xs parents js-view-parents " name="js-view-parents">(';
-                tr += j.tasks.length + ') <i class="fa fa-plus"></i>'
-                tr += '</button>';
-              }
-
-              tr += '</td>';
-              tr += '<td>' + (idx++) + '</td>';
-              tr += '<td class="font-weight-bold text-primary">' + j.customer.firstname + ' ' + j.customer.lastname + '</td>';
-              tr+='<td class="font-weight-bold text-danger">'+getFirstLetters(j.customer.firstname + ' ' + j.customer.lastname)+getLastLetters(j.customer._id)+'</td>';
-              tr += '<td class="font-weight-bold text-warning">' + j.name + '</td>';
-              tr += '<td>' + convertISODateToTimeFormat(j.received_date) + '</td>';
-              tr += '<td>' + convertISODateToTimeFormat(j.delivery_date) + '</td>';
-
-              tr += '<td>';
-
-              /*            
-             0: Processing
-             1:Upload   
-             2:Done
-             3: finish
-  
-             -1: initial
-             -2:'Rejected
-             
-             - 3: Canceled           
-         */
-
-              switch (j.status) {
-                case -1: tr += '<i class="text-info">Initial</i>'; break;
-                case 0: tr += '<i class="text-primary">Processing</i>'; break;
-                case 1: tr += '<i class="text-warning">Uploaded</i>'; break;
-                case 2: tr += '<i class="text-warning">Done</i>'; break;
-                case 3: tr += '<i class="text-success">Finish</i>'; break;
-                case -2: tr += '<i class="text-danger">Rejected</i>'; break;
-                case -3: tr += '<i class="text-danger">Canceled</i>'; break;
-              }
-
-              tr += '</td>';
-
-              tr += '<td class="text-right">';
-              tr += '<button class="btn btn-xs btn-info" name="btn-job-info"><i class="fa fa-info-circle" aria-hidden="true" ></i></button>';
-              if (isInit.length === 0) {
-                tr += '<button class="btn btn-xs btn-warning ml-2" name="edit-job"><i class="fa fa-refresh" aria-hidden="true"></i></button>';
-                tr += '<button class="btn btn-xs btn-danger ml-2" name="delete-job"><i class="fa fa-trash" aria-hidden="true"></i></button>';
-              }
-              tr+='<button class="btn btn-xs btn-warning ml-1" name="btnCC"><i class="fa fa-cc" aria-hidden="true"></i></button>'
-
-              tr += '</td>';
-
-              tr += '</tr> ';
-              $('#tblJobs').append(tr);
-
-            })
-
-          },
-          error: function (jqXHR, textStatus, errorThrown) {
-            alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
-          },
         });
-      }
+
+        $(document).on("click", "button[name='btnCC']", function () {
+          jobId = $(this).closest("tr").attr("id");
+          $('#modalCC').modal();
+        })
+
+        $(document).on("click", "button[name='btn-job-info']", function () {
+          jobId = $(this).closest("tr").attr("id");
+          customerId = $(this).closest("tr").data("customer");
+          $('#JobDetailModal').modal();
+
+        })
+
+        $(document).on("click", "button[name='delete-job']", function () {
+          jobId = $(this).closest("tr").attr("id");
+          if (confirm('Are you sure want to delete this job?')) {
+            $.ajax({
+              url: '/sale/job',
+              type: 'delete',
+              headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+              },
+              data: {
+                jobId
+              },
+              success: function (data) {
+                alert(data.msg);
+                LoadJobs();
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+              },
+            })
+          }
+
+        })
+
+        $(document).on("click", "button[name='edit-job']", function () {
+          jobId = $(this).closest("tr").attr("id");
+          $('#updateJobModal').modal();
+
+        })
+
+        $(document).ready(function () {
+          LoadJobs();
+          setInterval(function () {
+            LoadJobs();
+          }, 10000);//run this thang every 10 seconds
+        });
+
+        $('#updateJobModal').on('hidden.bs.modal', function () {
+          LoadJobs();
+        })
+
+        $('#btnSearch').click(function () {
+          search = $('#txtSearch').val();
+          LoadJobs();
+        })
 
 
-    </script>
 
-    <style>
-      #contextMenu {
-        position: absolute;
-        display: none;
-      }
+        $('#txtSearch').keyup(function (e) {
+          if (e.keyCode == 13) {
+            $("#btnSearch").click()
+          }
+        });
 
-      tr:hover {
-        background: #c9e8f7;
-        position: relative;
-      }
-    </style>
+
+
+
+
+
+        var $table = $('.js-table');
+
+
+        $(document).on("click", "button[name='js-view-parents']", async function (e) {
+
+          var $btn = $(e.target), $row = $btn.closest('tr'), $nextRow = $row.next('tr.expand-child');
+
+          $btn.toggleClass('fa-minus');
+
+          if ($nextRow.length) {
+            $nextRow.toggle($btn.hasClass('fa-minus'));
+          } else {
+            var newRow = '<tr class="expand-child" id="collapse' + $btn.data('id') + '">' +
+              '<td colspan="9">' +
+              '<table class="table table-condensed table-bordered table-striped" width=100% >' +
+              '<thead>' +
+              '<tr>' +
+              '<th class="text-right  ">#</th>' +
+              '<th>Level</th>' +
+              '<th>Editor</th>' +
+              '<th class="text-center">I-N</th>' +
+              '<th>Q.A</th>' +
+              '<th>DC</th>' +
+              '<th>Uploaded by</th>' +
+              '<th>Uploaded at</th>' +
+              '<th>I-Link</th>' +
+              '<th>O-Link</th>' +
+              '<th>U-Link</th>' +
+              '<th>Status</th>' +
+              '</tr>' +
+              '</thead>' +
+              '<tbody>';
+            jobId = $(this).closest('tr').attr('id');
+
+            await $.ajax({
+              url: '/sale/task/list',
+              type: 'get',
+              headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+              },
+              data: {
+                jobId
+              },
+              success: function (data) {
+                let idx = 1;
+                data.tasks.forEach(t => {
+                  newRow += '<tr>';
+                  newRow += '<td class="text-right">' + (idx++) + '</td>';
+                  newRow += '<td class="font-weight-bold text-primary">' + t.basic.level.name + '</td>';
+                  newRow += '<td>';
+                  if (t.status !== -1) {
+                    newRow += t.editor[t.editor.length - 1].staff.fullname;
+                  }
+                  newRow += '</td>';
+
+                  newRow += '<td class="text-center">';
+                  if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                    newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount
+                  }
+                  newRow += '</td>';
+
+                  newRow += '<td>';
+                  if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
+                    newRow += t.qa[t.qa.length - 1].staff.fullname
+                  }
+                  newRow += '</td>';
+
+                  newRow += '<td>';
+                  if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
+                    newRow += t.dc[t.dc.length - 1].staff.fullname
+                  }
+                  newRow += '</td>';
+
+                  newRow += '<td>';
+                  if (t.tla.uploaded.length > 0) {
+                    newRow += t.tla.uploaded[t.tla.uploaded.length - 1].by.fullname;
+                  }
+                  newRow += '</td>';
+
+                  newRow += '<td>';
+                  if (t.tla.uploaded.length > 0) {
+                    newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
+                  }
+                  newRow += '</td>';
+
+                  newRow += '<td  class="text-center">';
+                  if (isValidHttpUrl(t.basic.link.input)) {
+                    newRow += '<a href="' + t.basic.link.input + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                  } else {
+                    newRow += t.basic.link.input;
+                  }
+                  newRow += '</td>';
+
+                  newRow += '<td class="text-center">';
+                  if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                    if (isValidHttpUrl(t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link)) {
+                      newRow += '<a href="' + t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                    } else {
+                      newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link;
+                    }
+                  }
+
+                  newRow += '</td>';
+
+
+
+                  newRow += '<td  class="text-center">';
+
+                  if (t.tla.uploaded.length > 0) {
+                    if (isValidHttpUrl(t.tla.uploaded[t.tla.uploaded.length - 1].link)) {
+                      newRow += '<a href="' + t.tla.uploaded[t.tla.uploaded.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                    } else {
+                      newRow += t.tla.uploaded[t.tla.uploaded.length - 1].link
+                    }
+                  }
+
+                  newRow += '</td>';
+
+
+                  newRow += '<td><i>';
+
+                  switch (t.status) {
+                    case -1: newRow += '<span class="text-info">Initial</span>';
+                      break;
+                    case 0: newRow += '<span class="text-info">Processing</span>';
+                      break;
+                    case 1:
+                      {
+                        if (t.edited_time > 1) {
+                          newRow += '<span class="text-primary">Fixed</span>';
+                        } else {
+                          newRow += '<span class="text-primary">Edited</span>';
+                        }
+                        break;
+                      }
+                    case 2:
+                      newRow += '<span class="text-success">Q.A ok!</span>';
+                      break;
+                    case 3:
+                      newRow += '<span class="text-success">DC ok!</span>'
+                      break;
+                    case -2:
+                      newRow += '<span class="text-danger">Q.A rejected</span>';
+                      break;
+                    case -3:
+                      newRow += '<span class="text-danger">DC rejected</span>';
+                      break;
+                    case -4:
+                      newRow += '<span class="text-danger">Sale rejected</span>';
+                      break;
+                    case -5:
+                      newRow += '<span class="text-danger">Canceled</span>';
+                      break;
+                    case 4: newRow += '<span class="text-success font-weight-bold">Upload</span>'; break;
+                    case 5: newRow += '<span class="text-success font-weight-bold">Done</span>'; break;
+                    case 6: newRow += '<span class="text-success font-weight-bold">Finish</span>'; break;
+
+                  }
+                  newRow += '</i></td>';
+
+
+                  // newRow += '<td class="text-center">';
+                  // newRow += '<input type="checkbox" name="check_task">'
+                  // newRow += '</td>';
+                  newRow += '</tr>';
+                })
+              }
+            })
+            newRow += '</tbody></table></td></tr>';
+            // set next row
+            $nextRow = $(newRow).insertAfter($row);
+
+
+            /*}
+                });*/
+          }
+        });
+
+
+
+        function LoadJobs() {
+          $.ajax({
+            url: "/sale/job/list",
+            type: "get",
+            headers: {
+              authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+              search,
+              page,
+            },
+            success: function (data) {
+              $('#tblJobs').empty();
+              let idx = 1;
+              data.jobs.forEach(j => {
+                let isInit = j.tasks.filter(x => x.status !== 0);
+
+                let tr = '<tr id="' + j._id + '" data-customer="' + j.customer._id + '">';
+                tr += '<td>';
+                if (j.tasks.length > 0) {
+                  tr += '<button class="btn btn-xs parents js-view-parents " name="js-view-parents">(';
+                  tr += j.tasks.length + ') <i class="fa fa-plus"></i>'
+                  tr += '</button>';
+                }
+
+                tr += '</td>';
+                tr += '<td>' + (idx++) + '</td>';
+                tr += '<td class="font-weight-bold text-primary">' + j.customer.firstname + ' ' + j.customer.lastname + '</td>';
+                tr += '<td class="font-weight-bold text-danger">' + getFirstLetters(j.customer.firstname + ' ' + j.customer.lastname) + getLastLetters(j.customer._id) + '</td>';
+                tr += '<td class="font-weight-bold text-warning">' + j.name + '</td>';
+                tr += '<td>' + convertISODateToTimeFormat(j.received_date) + '</td>';
+                tr += '<td>' + convertISODateToTimeFormat(j.delivery_date) + '</td>';
+
+                tr += '<td>';
+
+                /*            
+               0: Processing
+               1:Upload   
+               2:Done
+               3: finish
+    
+               -1: initial
+               -2:'Rejected
+               
+               - 3: Canceled           
+           */
+
+                switch (j.status) {
+                  case -1: tr += '<i class="text-info">Initial</i>'; break;
+                  case 0: tr += '<i class="text-primary">Processing</i>'; break;
+                  case 1: tr += '<i class="text-warning">Uploaded</i>'; break;
+                  case 2: tr += '<i class="text-warning">Done</i>'; break;
+                  case 3: tr += '<i class="text-success">Finish</i>'; break;
+                  case -2: tr += '<i class="text-danger">Rejected</i>'; break;
+                  case -3: tr += '<i class="text-danger">Canceled</i>'; break;
+                }
+
+                tr += '</td>';
+
+                tr += '<td class="text-right">';
+                tr += '<button class="btn btn-xs btn-info" name="btn-job-info"><i class="fa fa-info-circle" aria-hidden="true" ></i></button>';
+                if (isInit.length === 0) {
+                  tr += '<button class="btn btn-xs btn-warning ml-2" name="edit-job"><i class="fa fa-refresh" aria-hidden="true"></i></button>';
+                  tr += '<button class="btn btn-xs btn-danger ml-2" name="delete-job"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                }
+                tr += '<button class="btn btn-xs btn-warning ml-1" name="btnCC"><i class="fa fa-cc" aria-hidden="true"></i></button>'
+
+                tr += '</td>';
+
+                tr += '</tr> ';
+                $('#tblJobs').append(tr);
+
+              })
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
+            },
+          });
+        }
+
+
+      </script>
+
+      <style>
+        #contextMenu {
+          position: absolute;
+          display: none;
+        }
+
+        tr:hover {
+          background: #c9e8f7;
+          position: relative;
+        }
+      </style>

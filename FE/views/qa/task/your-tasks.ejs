@@ -72,6 +72,9 @@
             var taskId = '';
             $(document).ready(function () {
                 LoadTasks();
+                setInterval(function () {
+                    LoadTasks();
+                }, 10000);//run this thang every 10 seconds
             })
 
             $('#btnGetTask').click(function () {
@@ -160,7 +163,7 @@
                                 break;
                             case 1:
                                 mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Q.A ok</a></li>';
-                                mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';                               
+                                mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
                                 break;
 
                             default:
@@ -224,7 +227,7 @@
                             tr += '</td>';
                             tr += '<td>' + (idx++) + '</td>';
 
-                            tr += '<td class="font-weight-bold text-primary">' +getFirstLetters(t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname)+getLastLetters(t.basic.job.customer._id)+ '</td>';
+                            tr += '<td class="font-weight-bold text-primary">' + getFirstLetters(t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname) + getLastLetters(t.basic.job.customer._id) + '</td>';
                             tr += '<td class="font-weight-bold text-danger">' + t.basic.job.name + '</td>';
                             tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';
                             tr += '<td class="text-danger">';
@@ -253,7 +256,7 @@
 
 
                             tr += '<td>';
-                              
+
                             if (t.status !== -1) {
                                 tr += t.editor[t.editor.length - 1].staff.fullname;
                             }

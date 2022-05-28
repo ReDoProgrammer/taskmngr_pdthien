@@ -1,234 +1,237 @@
 <div class="row">
-    <div class="col-md-offset-6 col-sm-offset-6 col-md-2 col-sm-2 col-xs-4 mt-2">
-      <select name="" id="slStatus" class="form-control">
-        <option value="100">All</option>
-        <option value="1">Editor submited</option>
-        <option value="-1">Initial</option>
-        <option value="0">Editing</option>
-        <option value="2">Submited</option>
-        <option value="-2">Rejected</option>
-      </select>
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-8 mt-2">
-      <!-- Another variation with a button -->
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="Seach your job..." id="txtSearch" />
-        <div class="input-group-btn">
-          <button class="btn btn-info" type="submit" id="btnSearch">
-            <i class="fa fa-search" aria-hidden="true"></i>
-          </button>
-        </div>
+  <div class="col-md-offset-6 col-sm-offset-6 col-md-2 col-sm-2 col-xs-4 mt-2">
+    <select name="" id="slStatus" class="form-control">
+      <option value="100">All</option>
+      <option value="1">Editor submited</option>
+      <option value="-1">Initial</option>
+      <option value="0">Editing</option>
+      <option value="2">Submited</option>
+      <option value="-2">Rejected</option>
+    </select>
+  </div>
+  <div class="col-md-4 col-sm-4 col-xs-8 mt-2">
+    <!-- Another variation with a button -->
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="Seach your job..." id="txtSearch" />
+      <div class="input-group-btn">
+        <button class="btn btn-info" type="submit" id="btnSearch">
+          <i class="fa fa-search" aria-hidden="true"></i>
+        </button>
       </div>
     </div>
   </div>
-  <div class="col-md-6 col-dm-6 col-xs-12 mt-2"></div>
-  
-  <hr />
-  <div class="table-responsive mt-2">
-    <table class="table table-striped text-nowrap">
-      <thead class="thead-dark">
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Customer</th>
-          <th scope="col">Job</th>
-          <th scope="col">Level</th>
-          <th scope="col">Deadline</th>
-          <th scope="col">Remark</th>
-          <th scope="col" class="text-right">E-T</th>
-          <th scope="col" class="text-right">I-N</th>
-          <th scope="col">Editor</th>
-          <th scope="col">Q.A</th>
-          <th scope="col">DC</th>
-          <th scope="col">Status</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody id="tbdTasks">
-      </tbody>
-    </table>
-  </div>
-  
-  <div id="contextMenu" class="dropdown clearfix">
-    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu"
-      style="display:block;position:static;margin-bottom:5px;" id="funcMenu">
-    </ul>
-  </div>
-  
-  <%-include('task_detail')%>
+</div>
+<div class="col-md-6 col-dm-6 col-xs-12 mt-2"></div>
 
-  
-  
-  
-      <script src="/js/common.js"></script>
-      <script>
-        var page = 1;
-        var search = '';
-        var status = 100;
-        var taskId = '';
-  
-        $(document).ready(function () {
-          LoadTasks();
-        })
-  
+<hr />
+<div class="table-responsive mt-2">
+  <table class="table table-striped text-nowrap">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Customer</th>
+        <th scope="col">Job</th>
+        <th scope="col">Level</th>
+        <th scope="col">Deadline</th>
+        <th scope="col">Remark</th>
+        <th scope="col" class="text-right">E-T</th>
+        <th scope="col" class="text-right">I-N</th>
+        <th scope="col">Editor</th>
+        <th scope="col">Q.A</th>
+        <th scope="col">DC</th>
+        <th scope="col">Status</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody id="tbdTasks">
+    </tbody>
+  </table>
+</div>
 
-        $('#modalRejectTask').on('hidden.bs.modal', function () {
-          LoadTasks();
-        })
-  
-  
-        $('#slStatus').on('change', function () {
-          LoadTasks();
-        })
-  
-  
-        $(document).on("click", "button[name='btnTaskInfo']", function () {
-          taskId = $(this).closest("tr").attr("id");
-          $('#modalTaskDetail').modal();
-        })
-        function LoadTasks() {
-          $.ajax({
-            url: '/accountant/task/list',
-            type: 'get',
-            headers: {
-              authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-              search,
-              page,
-              status
-            },
-            success: function (data) {
-              $('#tbdTasks').empty();
-              let idx = 1;
-  
-              data.tasks.forEach(t => {
-  
-                let tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '">';
-  
-                if (typeof t.bp !== 'undefined' && t.bp !== null && t.bp.length > 0) {
-                  if (t.bp[0].is_bonus) {
-                    tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '" style="background-color: #E0F8E0">';
-                  } else {
-                    tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '" style="background-color:#FBEFEF">';
-                  }
-                }
-  
-                tr += '<td>' + (idx++) + '</td>';
-  
-                tr += '<td class="font-weight-bold text-primary">' + t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname + '</td>';
-                tr += '<td class="font-weight-bold text-danger">' + t.basic.job.name + '</td>';
-                tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';
-                tr += '<td class="text-danger">';
-                if (t.basic.deadline.end) {
-                  tr += convertISODateToTimeFormat(t.basic.deadline.end);
-                }
-                tr += '</td>';
-  
-                tr += '<td>';
-                if (typeof t.remarks[0] !== 'undefined') {
-                  tr += t.remarks[0].content;
-                }
-                tr += '</td>';
-  
-  
-                tr += '<td class="text-right">';
-                if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                  tr += t.editor[0].submited.length;
-                }
-                tr += '</td>';
-  
-                tr += '<td class="text-right">';
-                if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                  tr += t.editor[0].submited[(t.editor[0].submited.length - 1)].amount;
-                }
-                tr += '</td>'
-  
-  
-  
-                tr += '<td>';
-                if (t.editor.length > 0) {
-                  tr += t.editor[t.editor.length - 1].staff.fullname;
-                }
-                tr += '</td>';
-  
-                tr += '<td>';
-                if (t.qa.length > 0) {
-                  tr += t.qa[t.qa.length - 1].staff.fullname;
-                }
-                tr += '</td>';
-  
-                tr += '<td>';
-                if (t.dc.length > 0 && !t.dc[t.dc.length-1].unregisted) {
-                  tr += t.dc[t.dc.length - 1].staff.fullname;
-                }
-                tr += '</td>';
-  
-  
-                tr += '<td><i>';
-  
-                switch (t.status) {
-                  case -1: tr += '<span class="text-info">Initial</span>';
-                    break;
-                  case 0: tr += '<span class="text-info">Processing</span>';
-                    break;
-                  case 1:
-                    {
-                      if (t.editor[0].submited.length > 1) {
-                        tr += '<span class="text-primary">Fixed</span>';
-                      } else {
-                        tr += '<span class="text-primary">Edited</span>';
-                      }
-                      break;
-                    }
-                  case 2:
-                    tr += '<span class="text-success">Q.A ok!</span>';
-                    break;
-                  case 3:
-                    tr += '<span class="text-success">DC ok!</span>'
-                    break;
-                  case -2:
-                    tr += '<span class="text-danger">Q.A rejected</span>';
-                    break;
-                  case -3:
-                    tr += '<span class="text-danger">DC rejected</span>';
-                    break;
-                  case -4:
-                    tr += '<span class="text-danger">Sale rejected</span>';
-                    break;
-                  case -5:
-                    tr += '<span class="text-danger">Canceled</span>';
-                    break;
-                  case 4: tr += '<span class="text-success font-weight-bold">Upload</span>'; break;
-                  case 5: tr += '<span class="text-success font-weight-bold">Done</span>'; break;
-                  case 6: tr += '<span class="text-success font-weight-bold">Finish</span>'; break;
-  
-                }
-                tr += '</i></td>';
-  
-                tr += '<td class="text-right">';
-                tr += '<button class="btn btn-xs btn-info ml-2" name="btnTaskInfo">';
-                tr += '<i class="fa fa-info-circle" aria-hidden="true"></i>';
-                tr += '</button>';
-                tr += '</td>';
-  
-                tr += '</tr>';
-                $('#tbdTasks').append(tr);
-              })
+<div id="contextMenu" class="dropdown clearfix">
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu"
+    style="display:block;position:static;margin-bottom:5px;" id="funcMenu">
+  </ul>
+</div>
+
+<%-include('task_detail')%>
+
+
+
+
+  <script src="/js/common.js"></script>
+  <script>
+    var page = 1;
+    var search = '';
+    var status = 100;
+    var taskId = '';
+
+    $(document).ready(function () {
+      LoadTasks();
+      setInterval(function () {
+        LoadTasks();
+      }, 10000);//run this thang every 10 seconds
+    })
+
+
+    $('#modalRejectTask').on('hidden.bs.modal', function () {
+      LoadTasks();
+    })
+
+
+    $('#slStatus').on('change', function () {
+      LoadTasks();
+    })
+
+
+    $(document).on("click", "button[name='btnTaskInfo']", function () {
+      taskId = $(this).closest("tr").attr("id");
+      $('#modalTaskDetail').modal();
+    })
+    function LoadTasks() {
+      $.ajax({
+        url: '/accountant/task/list',
+        type: 'get',
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: {
+          search,
+          page,
+          status
+        },
+        success: function (data) {
+          $('#tbdTasks').empty();
+          let idx = 1;
+
+          data.tasks.forEach(t => {
+
+            let tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '">';
+
+            if (typeof t.bp !== 'undefined' && t.bp !== null && t.bp.length > 0) {
+              if (t.bp[0].is_bonus) {
+                tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '" style="background-color: #E0F8E0">';
+              } else {
+                tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '" style="background-color:#FBEFEF">';
+              }
             }
-  
+
+            tr += '<td>' + (idx++) + '</td>';
+
+            tr += '<td class="font-weight-bold text-primary">' + t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname + '</td>';
+            tr += '<td class="font-weight-bold text-danger">' + t.basic.job.name + '</td>';
+            tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';
+            tr += '<td class="text-danger">';
+            if (t.basic.deadline.end) {
+              tr += convertISODateToTimeFormat(t.basic.deadline.end);
+            }
+            tr += '</td>';
+
+            tr += '<td>';
+            if (typeof t.remarks[0] !== 'undefined') {
+              tr += t.remarks[0].content;
+            }
+            tr += '</td>';
+
+
+            tr += '<td class="text-right">';
+            if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+              tr += t.editor[0].submited.length;
+            }
+            tr += '</td>';
+
+            tr += '<td class="text-right">';
+            if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+              tr += t.editor[0].submited[(t.editor[0].submited.length - 1)].amount;
+            }
+            tr += '</td>'
+
+
+
+            tr += '<td>';
+            if (t.editor.length > 0) {
+              tr += t.editor[t.editor.length - 1].staff.fullname;
+            }
+            tr += '</td>';
+
+            tr += '<td>';
+            if (t.qa.length > 0) {
+              tr += t.qa[t.qa.length - 1].staff.fullname;
+            }
+            tr += '</td>';
+
+            tr += '<td>';
+            if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
+              tr += t.dc[t.dc.length - 1].staff.fullname;
+            }
+            tr += '</td>';
+
+
+            tr += '<td><i>';
+
+            switch (t.status) {
+              case -1: tr += '<span class="text-info">Initial</span>';
+                break;
+              case 0: tr += '<span class="text-info">Processing</span>';
+                break;
+              case 1:
+                {
+                  if (t.editor[0].submited.length > 1) {
+                    tr += '<span class="text-primary">Fixed</span>';
+                  } else {
+                    tr += '<span class="text-primary">Edited</span>';
+                  }
+                  break;
+                }
+              case 2:
+                tr += '<span class="text-success">Q.A ok!</span>';
+                break;
+              case 3:
+                tr += '<span class="text-success">DC ok!</span>'
+                break;
+              case -2:
+                tr += '<span class="text-danger">Q.A rejected</span>';
+                break;
+              case -3:
+                tr += '<span class="text-danger">DC rejected</span>';
+                break;
+              case -4:
+                tr += '<span class="text-danger">Sale rejected</span>';
+                break;
+              case -5:
+                tr += '<span class="text-danger">Canceled</span>';
+                break;
+              case 4: tr += '<span class="text-success font-weight-bold">Upload</span>'; break;
+              case 5: tr += '<span class="text-success font-weight-bold">Done</span>'; break;
+              case 6: tr += '<span class="text-success font-weight-bold">Finish</span>'; break;
+
+            }
+            tr += '</i></td>';
+
+            tr += '<td class="text-right">';
+            tr += '<button class="btn btn-xs btn-info ml-2" name="btnTaskInfo">';
+            tr += '<i class="fa fa-info-circle" aria-hidden="true"></i>';
+            tr += '</button>';
+            tr += '</td>';
+
+            tr += '</tr>';
+            $('#tbdTasks').append(tr);
           })
         }
-  
-      </script>
-  
-      <style>
-        #contextMenu {
-          position: absolute;
-          display: none;
-        }
-  
-        tr:hover {
-          background: #c9e8f7;
-          position: relative;
-        }
-      </style>
+
+      })
+    }
+
+  </script>
+
+  <style>
+    #contextMenu {
+      position: absolute;
+      display: none;
+    }
+
+    tr:hover {
+      background: #c9e8f7;
+      position: relative;
+    }
+  </style>
