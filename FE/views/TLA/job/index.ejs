@@ -191,7 +191,7 @@
                                             break;
                                         case 1:
                                             {
-                                                if (t.editor[t.editor.length-1].submited.length > 1) {
+                                                if (t.editor[t.editor.length - 1].submited.length > 1) {
                                                     newRow += '<span class="text-primary">Fixed</span>';
                                                 } else {
                                                     newRow += '<span class="text-primary">Edited</span>';
@@ -295,15 +295,23 @@
                                 tr += '</td>';
 
 
-                                tr += '<td class="text-info font-weight-bold">' +getFirstLetters(job.customer.firstname + ' ' + job.customer.lastname)+getLastLetters(job.customer._id)+ '</td>';
-                                tr += '<td class="text-warning">' + job.name + '</td>';
+                                tr += '<td class="text-info font-weight-bold">' + getFirstLetters(job.customer.firstname + ' ' + job.customer.lastname) + getLastLetters(job.customer._id) + '</td>';
+                                tr += '<td class="text-warning">';
+                                tr += job.name;
+                                if (job.cc.length > 0 && job.cc[job.cc.length-1].status ===-1) {
+                                    tr+='<span class="ml-2"><button class="btn btn-xs btn-danger" name="btnNewCC"><i class="fa fa-cc" aria-hidden="true"></i></button></span>'
+                                }
+                                tr += '</td>';
                                 tr += '<td class="font-weight-bold text-danger">';
 
                                 if (job.cb_ticked) {
                                     tr += job.cb.name;
+
                                 } else {
                                     tr += '';
                                 }
+
+
                                 tr += '</td>';
 
 
@@ -375,7 +383,7 @@
                         },
                         success: function (data, textStatus, xhr) {
 
-                            $('.lblCustomer').text(getFirstLetters(data.job.customer.firstname + ' ' + data.job.customer.lastname)+getLastLetters(data.job.customer._id));
+                            $('.lblCustomer').text(getFirstLetters(data.job.customer.firstname + ' ' + data.job.customer.lastname) + getLastLetters(data.job.customer._id));
                             $('.lblJobName').text(data.job.name);
                             $('.lblReceivedDate').text(convertISODateToTimeFormat(data.job.received_date));
                             $('.lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.delivery_date));

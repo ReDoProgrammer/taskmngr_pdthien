@@ -10,6 +10,7 @@ router.get('/list',authenticateTLAToken,(req,res)=>{
     Job.find({})
     .populate('customer','firstname lastname remark')
     .populate('cb')
+    .populate('cc')
     .exec()
     .then(jobs=>{
         
