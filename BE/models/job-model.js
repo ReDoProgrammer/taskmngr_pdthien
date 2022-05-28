@@ -69,8 +69,8 @@ const jobSchema = new Schema({
         ref:'task'
     }],
     cc:[{
-        type:String,
-        default:''
+        type:Schema.Types.ObjectId,
+        ref:'cc'
     }]
    
 });
