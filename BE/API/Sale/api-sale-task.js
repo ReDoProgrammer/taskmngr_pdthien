@@ -23,7 +23,7 @@ router.get('/list', authenticateSaleToken, (req, res) => {
             },
             {
                 path: 'editor.staff',
-                select: 'fullname'
+                select: 'fullname username'
             },
             {
                 path: 'qa.staff',

@@ -44,7 +44,7 @@ router.post('/', authenticateSaleToken, async (req, res) => {
 })
 
 router.put('/', authenticateSaleToken, async (req, res) => {
-    let { ccId, remark, ccType } = req.body;
+    let { ccId, remark, ccType,taskId } = req.body;
     let cc = await CC.findById(ccId);
     if (!cc) {
         return res.status(404).json({
@@ -52,10 +52,19 @@ router.put('/', authenticateSaleToken, async (req, res) => {
         })
     }
 
+    if(cc.status>0){
+        return res.status(403).json({
+            msg:`Can not update CC after submited by Editor`
+        })
+    }
+
     cc.remark = remark;
     cc.type = ccType;
     cc.updated.by = req.user._id;
     cc.updated.at = new Date();
+    if(taskId.length >0){
+        cc.fix_task = taskId;
+    }
     await cc.save()
         .then(_ => {
             return res.status(200).json({

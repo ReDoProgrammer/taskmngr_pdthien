@@ -68,26 +68,55 @@
 </div>
 
 <script>
-    var ccId ='';
+    var ccId = '';
 
     $('#modalCC').on('shown.bs.modal', function (e) {
         LoadTasks();
         LoadCC();
+        ResetComponents();
+    })
+
+    $('#btnCancelCC').click(function () {
+        ccId = '';
+        ResetComponents();
     })
 
     $(document).on("click", "button[name='btnUpdateCC']", function () {
         ccId = $(this).closest("tr").attr("id");
         $.ajax({
-            url:'/sale/cc/detail',
-            type:'get',
+            url: '/sale/cc/detail',
+            type: 'get',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
-            data:{
+            data: {
                 ccId
             },
-            success:function(data){
+            success: function (data) {
                 console.log(data.cc);
+                $('#txtRemark').val(data.cc.remark);
+
+                if (data.cc.type) {
+                    $('#rbtMoreTask').prop('checked', true);
+                    $('#rRefix').slideUp(200);
+                } else {
+                    $('#rbtRefix').prop('checked', true);
+                    $('#rRefix').slideDown(500);
+                    if (data.cc.fix_task) {
+                        $('#ckbChooseTask').prop('checked', true);
+                        $('#divTasksList').slideDown(500);
+                        $('#slTasks').val(data.cc.fix_task);
+                        if (data.cc.status == 0 || data.cc.status == -1) {
+                            $('#slTasks').attr("disabled", false);
+                        } else {
+                            $('#slTasks').attr("disabled", true);
+                        }
+                    } else {
+                        $('#ckbChooseTask').prop('checked', false);
+                        $('#divTasksList').slideUp(200);
+                    }
+
+                }
             }
         })
     })
@@ -103,23 +132,46 @@
             return;
         }
 
-        $.ajax({
-            url: '/sale/cc',
-            type: 'post',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-                jobId,
-                ccType,
-                taskId,
-                remark
-            },
-            success: function (data) {
-                alert(data.msg);
-                LoadCC();
-            }
-        })
+        console.log(ccId.length)
+        if (ccId.length === 0) {
+            $.ajax({
+                url: '/sale/cc',
+                type: 'post',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                    jobId,
+                    ccType,
+                    taskId,
+                    remark
+                },
+                success: function (data) {
+                    alert(data.msg);
+                    LoadCC();
+                }
+            })
+        }else{
+            $.ajax({
+                url: '/sale/cc',
+                type: 'put',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                    ccId,
+                    jobId,
+                    ccType,
+                    taskId,
+                    remark
+                },
+                success: function (data) {
+                    alert(data.msg);
+                    LoadCC();
+                   $('#btnCancelCC').click();
+                }
+            })
+        }
     })
 
     $("#ckbChooseTask").change(function () {
@@ -193,9 +245,9 @@
                     tr += '</td>';
 
                     tr += '<td>';
-                        tr+='<button class="btn btn-xs btn-warning" name="btnUpdateCC"><i class="fa fa-edit"></i></button>'
-                        tr+='<button class="btn btn-xs btn-danger" name="btnDelCC"><i class="fa fa-trash" aria-hidden="true"></i></button>'
-                        tr+='</td>';
+                    tr += '<button class="btn btn-xs btn-warning" name="btnUpdateCC"><i class="fa fa-edit"></i></button>'
+                    tr += '<button class="btn btn-xs btn-danger" name="btnDelCC"><i class="fa fa-trash" aria-hidden="true"></i></button>'
+                    tr += '</td>';
                     tr += '</tr>';
                     $('#tblCCList').append(tr);
                 })
@@ -213,11 +265,11 @@
             data: {
                 jobId
             },
-            success: function (data) {              
+            success: function (data) {
                 $('#slTasks').empty();
                 data.tasks.forEach(task => {
                     let opt = '<option value="' + task._id + '"';
-                    opt += '<span class="font-weight-bold text-danger">[ ' + task.basic.level.name + ' ]</span> - ' + task.editor[task.editor.length - 1].staff.fullname
+                    opt += '<span class="font-weight-bold text-danger">[ ' + task.basic.level.name + ' ]</span> - ' + task.editor[task.editor.length - 1].staff.fullname + ' (' + task.editor[task.editor.length - 1].staff.username + ' )'
                     opt += '</option>';
                     $('#slTasks').append(opt);
                 })
@@ -225,5 +277,12 @@
         })
     }
 
+    function ResetComponents() {
+        $('#rbtMoreTask').prop('checked', true);
+        $('#rRefix').slideUp(200);
+        $('#ckbChooseTask').prop('checked', false);
+        $('#slTasks').attr("disabled", false);
+        $('#txtRemark').val('');
+    }
 
 </script>
