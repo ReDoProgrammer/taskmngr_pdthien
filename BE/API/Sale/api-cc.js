@@ -111,6 +111,12 @@ router.get('/', authenticateSaleToken, async (req, res) => {
     await CC.find({ job: jobId })
         .populate('created.by', 'fullname')
         .populate('update.by', 'fullname')
+        .populate({
+            path : 'fix_task',
+            populate : {
+              path : 'basic.level'
+            }
+          })
         .exec()
         .then(ccList => {
             return res.status(200).json({
