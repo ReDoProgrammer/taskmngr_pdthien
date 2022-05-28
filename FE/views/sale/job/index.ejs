@@ -47,8 +47,11 @@
   </ul>
 </div>
 
+
+
 <%-include('edit-job')%>
   <%-include('job-detail-modal')%>
+  <%-include('modalCC')%>
 
 
     <script type='text/javascript'
@@ -102,7 +105,10 @@
 
       });
 
-
+      $(document).on("click", "button[name='btnCC']", function () {
+        jobId = $(this).closest("tr").attr("id");
+        $('#modalCC').modal();
+      })
 
       $(document).on("click", "button[name='btn-job-info']", function () {
         jobId = $(this).closest("tr").attr("id");
@@ -412,6 +418,7 @@
                 tr += '<button class="btn btn-xs btn-warning ml-2" name="edit-job"><i class="fa fa-refresh" aria-hidden="true"></i></button>';
                 tr += '<button class="btn btn-xs btn-danger ml-2" name="delete-job"><i class="fa fa-trash" aria-hidden="true"></i></button>';
               }
+              tr+='<button class="btn btn-xs btn-warning ml-1" name="btnCC"><i class="fa fa-cc" aria-hidden="true"></i></button>'
 
               tr += '</td>';
 
