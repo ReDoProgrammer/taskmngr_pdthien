@@ -257,6 +257,9 @@ app.use('/sale/task',saleTaskController);
 const apiSaleAuth = require('./BE/API/Sale/api-auth');
 app.use('/sale/auth',apiSaleAuth);
 
+const apiSaleCC = require('./BE/API/Sale/api-cc');
+app.use('/sale/cc',apiSaleCC);
+
 const apiSaleCombo = require('./BE/API/Sale/api-sale-combo');
 app.use('/sale/combo',apiSaleCombo);
 
