@@ -170,6 +170,7 @@ router.post('/cc', authenticateTLAToken, async (req, res) => {
                             await job.save()
                                 .then(async _ => {
                                    cc.status = 0;// trạng thái đang xử lý
+                                   if(cc.tasks)
                                    cc.tasks.push(task);//thêm taskid vào danh sách CC task tạo mới
                                     await cc.save()
                                     .then(_=>{
@@ -207,6 +208,31 @@ router.post('/cc', authenticateTLAToken, async (req, res) => {
         })
 
 
+})
+
+router.get('/cc',authenticateTLAToken,async (req,res)=>{
+    let { jobId } = req.query;
+    await CC.find({ job: jobId })
+        .populate('created.by', 'fullname')
+        .populate('update.by', 'fullname')
+        .populate({
+            path : 'fix_task',
+            populate : {
+              path : 'basic.level'
+            }
+          })
+        .exec()
+        .then(ccList => {
+            return res.status(200).json({
+                msg: 'Load CC list by job successfully!',
+                ccList
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not load CC list by job with error: ${new Error(err.message)}`
+            })
+        })
 })
 
 router.get('/list', authenticateTLAToken, (req, res) => {

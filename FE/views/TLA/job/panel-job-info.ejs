@@ -1,8 +1,10 @@
 <div class="panel-body job-info">
     <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href=".basic_tab">Basic</a></li>
-        <li><a data-toggle="tab" href=".style_tab">Style</a></li>
-        <li class="liCombo"><a data-toggle="tab" href=".combo_tab">Combo</a></li>
+        <li class="active"><a data-toggle="tab" href="#basic_tab">Basic</a></li>
+        <li><a data-toggle="tab" href="#style_tab">Style</a></li>
+        <li class="liCombo"><a data-toggle="tab" href="#combo_tab">Combo</a></li>
+        <li class="liCC"><a data-toggle="tab" href="#cc_tab">CC</a></li>
+        
     </ul>
 
     <div class="tab-content">
@@ -142,13 +144,25 @@
                 </div>
             </div>
         </div>
+        <div id="cc_tab" class="tab-pane fade cc">
+            <div class="panel panel-danger mt-2" id="panelCC">
+                <div class="panel-heading">CC list</div>
+                <div class="panel-body">
+                    <div class="table-responsive  table-responsive-sm table-responsive-xs mt-2">
+                        <table class="table mt-1 table-striped bg-white text-dark nowrap text-nowrap">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Task</th>
+                                    <th scope="col">Remark</th>
+                                    <th scope="col">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="tblCCList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-
-
-
-
-
-
-
 </div>
