@@ -50,7 +50,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-success" id="btnSubmitCC">Submit</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-default" id="btnCancelCC">Cancel</button>
                 <table class="table table-striped table-hover js-table mt-2">
                     <thead>
                         <th>#</th>
@@ -68,9 +68,28 @@
 </div>
 
 <script>
+    var ccId ='';
+
     $('#modalCC').on('shown.bs.modal', function (e) {
         LoadTasks();
         LoadCC();
+    })
+
+    $(document).on("click", "button[name='btnUpdateCC']", function () {
+        ccId = $(this).closest("tr").attr("id");
+        $.ajax({
+            url:'/sale/cc/detail',
+            type:'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data:{
+                ccId
+            },
+            success:function(data){
+                console.log(data.cc);
+            }
+        })
     })
 
     $('#btnSubmitCC').click(function () {
@@ -194,8 +213,7 @@
             data: {
                 jobId
             },
-            success: function (data) {
-                console.log(data)
+            success: function (data) {              
                 $('#slTasks').empty();
                 data.tasks.forEach(task => {
                     let opt = '<option value="' + task._id + '"';

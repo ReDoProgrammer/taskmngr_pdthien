@@ -131,4 +131,18 @@ router.get('/', authenticateSaleToken, async (req, res) => {
         })
 })
 
+router.get('/detail',authenticateSaleToken,async (req,res)=>{
+    let {ccId} = req.query;    
+    let cc = await CC.findById(ccId);
+    if(!cc){
+        return res.status(404).json({
+            msg:`CC not found!`
+        })
+    }
+    return res.status(200).json({
+        msg:`Load CC detail successfully!`,
+        cc
+    })
+})
+
 module.exports = router;
