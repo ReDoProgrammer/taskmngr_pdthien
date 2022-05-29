@@ -425,6 +425,7 @@
       success: function (data) {
         $('.tblCCList').empty();
         let idx = 1;
+        console.log(data.ccList)
         data.ccList.forEach(cc => {
           let tr = '<tr id="' + cc._id + '">';
           tr += '<td>' + (idx++) + '</td>';
@@ -466,6 +467,13 @@
               break;
           }
           tr += '</td>';
+          tr+='<td class="text-right">';
+            if(cc.type){
+              tr+='<button class="btn btn-xs btn-primary" name="btnCCAddTask"><i class="fa fa-plus" aria-hidden="true"></i></button>'
+            }else{
+              tr+='<button class="btn btn-xs btn-danger" name="btnCCEditTask"><i class="fa fa-edit"></i></button>'
+            }
+            tr+= '</td>'
           tr += '</tr>';
           $('.tblCCList').append(tr);
         })
@@ -484,7 +492,6 @@
         jobId
       },
       success: function (data) {
-        console.log(data);
         let idx = 1;
         $("#tblTasks").empty();
         data.tasks.forEach(t => {
