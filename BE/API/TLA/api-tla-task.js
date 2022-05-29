@@ -401,24 +401,31 @@ router.get('/list', authenticateTLAToken, (req, res) => {
             },
             {
                 path: 'qa.staff',
-                select: 'fullname'
+                select: 'fullname username'
             },
             {
                 path: 'dc.staff',
-                select: 'fullname'
+                select: 'fullname username'
             },
             {
                 path: 'tla.created.by',
-                select: 'fullname'
+                select: 'fullname username'
             },
             {
                 path: 'tla.uploaded.by',
-                select: 'fullname'
+                select: 'fullname username'
             },
             {
                 path: 'remarks',
                 options: { sort: { 'timestamp': -1 } }
-            }
+            },
+            {
+                path: 'fixible_task'              
+            },
+            {
+                path: 'additional_task'              
+            },
+
         ])
         .exec()
         .then(tasks => {

@@ -57,7 +57,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-success" id="btnSubmitCCRj">Submit</button>
-                <button type="button" class="btn btn-default" id="btnCancelCC">Cancel</button>                
+                <button type="button" class="btn btn-default" id="btnCancelCC">Cancel</button>
             </div>
         </div>
 
@@ -65,6 +65,8 @@
 </div>
 
 <script>
+    var editor = '';
+    var qa = '';
     $("#modalCCRejectTask").on('shown.bs.modal', function (e) {
         LoadCCRjTasks();
         $('#colCCRjEditor').hide();
@@ -77,29 +79,32 @@
     })
 
 
-    $('#btnSubmitCCRj').click(function(){
+    $('#btnSubmitCCRj').click(function () {
         let taskId = $('#slCCRjTasks option:selected').val();
         let remark = $('#txtCCRjRemark').val();
-        let editor =$('#ckbCCRjAssignEditor').is(':checked')?$('#slCCRjEditor option:selected').val():null;
-        let qa = $('#ckbCCRjAssignQA').is(':checked')?$('#slCCRjQA option:selected').val():null;
-        
+        let editor = $('#ckbCCRjAssignEditor').is(':checked') ? $('#slCCRjEditor option:selected').val() : null;
+        let qa = $('#ckbCCRjAssignQA').is(':checked') ? $('#slCCRjQA option:selected').val() : null;
+
         $.ajax({
-            url:'/tla/task/cc',
-            type:'put',
+            url: '/tla/task/cc',
+            type: 'put',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
-            data:{
+            data: {
                 taskId,
                 remark,
                 editor,
                 qa,
                 ccId
             },
-            success:function(data){
+            success: function (data) {
                 alert(data.msg);
                 $('#modalCCRejectTask').modal('hide');
                 LoadJobs();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $('#msgError').text(jqXHR.responseJSON.msg);
             }
         })
     })
@@ -133,11 +138,22 @@
             success: function (data) {
                 $('#slCCRjEditor').empty();
                 data.editors.forEach(e => {
-                    let opt = '<option value="' + e._id + '">' + e.fullname +'( '+e.username+' )</option>';
-                    $('#slCCRjEditor').append(opt);                    
+                    let opt = '<option value="' + e._id + '">' + e.fullname + '( ' + e.username + ' )</option>';
+                    $('#slCCRjEditor').append(opt);
                 })
                 $('#slCCRjEditor').selectpicker();
                 $('#slCCRjEditor').selectpicker('refresh');
+
+                if (typeof editor !== 'undefined') {
+                    $('#ckbCCRjAssignEditor').prop('checked', true);
+                    $('#colCCRjEditor').slideDown(200);
+                    $('#slCCRjEditor').val(editor);
+                } else {
+                    $('#ckbCCRjAssignEditor').prop('checked', false);
+                    $('#colCCRjEditor').slideUp(200);
+                    $('#slCCRjEditor').val(null);
+                }
+
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 $('#msgError').text(jqXHR.responseJSON.msg);
@@ -157,14 +173,24 @@
                 levelId
             },
             success: function (data) {
-                $('#slCCRjQA').empty();               
+                $('#slCCRjQA').empty();
                 data.qas.forEach(q => {
-                    let opt = '<option value="' + q._id + '">' + q.fullname +'( '+q.username+ ' )</option>';
-                    $('#slCCRjQA').append(opt);                    
+                    let opt = '<option value="' + q._id + '">' + q.fullname + '( ' + q.username + ' )</option>';
+                    $('#slCCRjQA').append(opt);
                 })
-                $('#slCCRjQA').selectpicker();             
+                $('#slCCRjQA').selectpicker();
                 $('#slCCRjQA').selectpicker('refresh');
-              
+
+                if (typeof qa !== 'undefined') {
+                    $('#ckbCCRjAssignQA').prop('checked', true);
+                    $('#slCCRjQA').slideDown(200);
+                    $('#slCCRjQA').val(qa);
+                } else {
+                    $('#ckbCCRjAssignQA').prop('checked', false);
+                    $('#slCCRjQA').slideUp(200);
+                    $('#slCCRjQA').val(null);
+                }
+
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 $('#msgError').text(jqXHR.responseJSON.msg);
@@ -175,7 +201,7 @@
 
 
 
-    function LoadCCRjTasks() {  
+    function LoadCCRjTasks() {
         $.ajax({
             url: '/tla/task/list',
             type: 'get',
@@ -185,11 +211,19 @@
             data: {
                 jobId
             },
-            success: function (data) {      
+            success: function (data) {
                 $('#slCCRjTasks').empty();
                 data.tasks.forEach(task => {
                     if (task.status > 0) {
-                        let opt = '<option value="' + task._id + '" data-level="'+task.basic.level._id+'"';
+                        let opt = '<option value="' + task._id;
+                        opt += '" data-level="' + task.basic.level._id + '"';
+
+                        opt += ' data-editor="' + task.editor[task.editor.length - 1].staff._id + '"'
+
+                        if (task.qa.length > 0) {
+                            opt += ' data-qa="' + task.qa[task.qa.length - 1].staff._id + '"';
+                        }
+
                         opt += '<span class="font-weight-bold text-danger">[ ' + task.basic.level.name + ' ]</span>';
                         if (task.editor.length > 0) {
                             opt += ' - ' + task.editor[task.editor.length - 1].staff.fullname + '( ' + task.editor[task.editor.length - 1].staff.username + ' )';
@@ -198,6 +232,10 @@
                         $('#slCCRjTasks').append(opt);
                     }
                 })
+
+                editor = $('#slCCRjTasks option:selected').data('editor');
+                qa = $('#slCCRjTasks option:selected').data('qa');
+
                 LoadCC();
                 LoadCCRjEditor($('#slCCRjTasks option:selected').data('level'));
                 LoadCCRjQA($('#slCCRjTasks option:selected').data('level'));
@@ -218,10 +256,11 @@
             success: function (data) {
                 if (data.cc.fixible_task) {
                     $('#slCCRjTasks').val(data.cc.fixible_task);
-                    $('#slCCRjTasks').attr('disabled', 'disabled');                    
-                }else{
+                    $('#slCCRjTasks').attr('disabled', 'disabled');
+                } else {
                     $('#slCCRjTasks').removeAttr('disabled');
                 }
+                $('#txtCCRjRemark').val(data.cc.remark);
 
             }
         })
