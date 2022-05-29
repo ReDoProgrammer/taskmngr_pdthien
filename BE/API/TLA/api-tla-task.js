@@ -27,7 +27,7 @@ const _QA = 'QA';
 //             msg: `Task not found!`
 //         })
 //     }
-    
+
 
 //     let rm = new Remark();
 //     rm.content = remark;
@@ -35,7 +35,7 @@ const _QA = 'QA';
 //     rm.user = req.user._id;
 //     await rm.save()
 //         .then(async _ => {
-            
+
 //             let cc = await CC.findById(ccId);
 //             if(!cc){
 //                 return res.status(404).json({
@@ -70,7 +70,7 @@ const _QA = 'QA';
 //                                     tla: req.user._id, //TLA gán task cho editor
 //                                     timestamp: new Date() //thời điểm được gán task
 //                                 };
-                            
+
 //                                 //xử lý liên quan tới timeline của editor hiện tại
 //                                 if (task.editor[task.editor.length - 1].timeline && task.editor[task.editor.length - 1].timeline.length > 0) {
 //                                     task.editor[task.editor.length - 1].timeline[task.editor[task.editor.length - 1].timeline.length - 1].unregisted = true;
@@ -120,7 +120,7 @@ const _QA = 'QA';
 //                                 }else{
 //                                     task.qa.push(q);//thêm q.a mới vào
 //                                 }
-                               
+
 //                             })
 //                             .catch(err => {
 //                                 console.log(err.msg);
@@ -1158,78 +1158,98 @@ router.put('/', authenticateTLAToken, async (req, res) => {
 
 
 
-router.delete('/', authenticateTLAToken, (req, res) => {
+router.delete('/', authenticateTLAToken, async (req, res) => {
     let { _id } = req.body;
-    Task.findByIdAndDelete(_id)
-        .exec()
-        .then(async task => {
-            if (!task) {
-                return res.status(404).json({
-                    msg: `Task not found!`
-                })
-            }
-            await Job
-                .findByIdAndUpdate(task.basic.job._id, {
-                    $pull: { tasks: _id }
-                }, async (err, job) => {
-                    if (err) {
-                        console.log(`Can not pull this task from parent job with error: ${new Error(err.message)}`)
-                        return res.status(500).json({
-                            msg: `Can not pull this task from parent job with error: ${new Error(err.message)}`
-                        })
-                    }
+
+    //Bước 1: kiểm tra task có tồn tại hay không
+    let task = await Task.findById(_id);
+    if (!task) {
+        return res.status(404).json({
+            msg: `Task not found!`
+        })
+    }
+
+
+
+    //Bước 2: Xóa task
+    await task.delete()
+        .then(async _ => {
+            //Bước 3: xóa các remark liên quan tới task bị xóa
+            let rm = Remark.find({ tid: _id });
+            rm.deleteMany()
+                .then(async _ => {
+                    //Bước 4: Xóa id task bị xóa ra khỏi job
+                    let job = await Job.findById(task.basic.job);
                     if (!job) {
                         return res.status(404).json({
-                            msg: `Parent job not found!`
+                            msg: `Can not find job which is parents of this task`
                         })
                     }
-
-                    await Remark
-                        .deleteMany({ tid: _id }, async err => {
-                            if (err) {
-                                console.log(`Can not delete remarks belong to this task with error: ${new Error(err.message)}`);
-                                return res.status(500).json({
-                                    msg: `Can not delete remarks belong to this task with error: ${new Error(err.message)}`
-                                })
-                            }
-
-
-
-                            await Job.findByIdAndUpdate(task.basic.job,
-                                {
-                                    $pull: { tasks: _id }
-                                }, { new: true }, (err, job) => {
-                                    if (err) {
-                                        return res.status(500).json({
-                                            msg: `Can not pull this task from parent job with error: ${new Error(err.message)}`
-                                        })
-                                    }
-                                    if (!job) {
-                                        console.log(`Can not find parent job of this task!`);
-                                        return res.status(404).json({
-                                            msg: `Can not find parent job of this task!`
-                                        })
-                                    }
-                                    return res.status(200).json({
-                                        msg: `The task has been deleted!`
+                    job.tasks.pull(task);
+                    await job.save()
+                        .then(async _ => {
+                            //Bước 5: loại trừ taskid ra khỏi cc nếu có
+                            if (task.additional_task) {
+                                let cc = await CC.findById(task.additional_task);
+                                if (!cc) {
+                                    return res.status(404).json({
+                                        msg: `Can not found CC that this task based on it!`
                                     })
-                                })
+                                }
+                                cc.additional_tasks.pull(task);
+                                await cc.save()
+                                    .then(_ => {
+                                        return res.status(200).json({
+                                            msg: `This task has been deleted!`
+                                        })
+                                    })
+                            } else
+                                if (task.fixible_task) {
+                                    let cc = await CC.findById(task.fixible_task);
+                                    if (!cc) {
+                                        return res.status(404).json({
+                                            msg: `Can not found CC that this task based on it!`
+                                        })
+                                    }
+                                    cc.delete()
+                                        .then(_ => {
+                                            return res.status(200).json({
+                                                msg: `This task has been deleted!`
+                                            })
+                                        })
+                                        .catch(err => {
+                                            return res.status(500).json({
+                                                msg: `Can not delete this task from cc with error: ${new Error(err.message)}`
+                                            })
+                                        })
+                                } else {
+                                    return res.status(200).json({
+                                        msg: `This task has been deleted!`
+                                    })
+                                }
 
                         })
-
-
+                        .catch(err => {
+                            console.log(`Can not update job tasklist with error:${new Error(err.message)}`)
+                            return res.status(500).json({
+                                msg: `Can not update job tasklist with error:${new Error(err.message)}`
+                            })
+                        })
                 })
-
-
-
-
+                .catch(err => {
+                    console.log(`Can not delete remarks based on this task with error: ${new Error(err.message)}`)
+                    return res.status(500).json({
+                        msg: `Can not delete remarks based on this task with error: ${new Error(err.message)}`
+                    })
+                })
         })
         .catch(err => {
+            console.log(`Can not delete this task with error: ${new Error(err.message)}`);
             return res.status(500).json({
-                msg: `Can not delete this task`,
-                error: `Error found: ${new Error(err.message)}`
+                msg: `Can not delete this task with error: ${new Error(err.message)}`
             })
         })
+
 })
 
 
