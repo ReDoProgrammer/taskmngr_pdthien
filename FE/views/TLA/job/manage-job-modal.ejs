@@ -193,6 +193,7 @@
   let idx = 1;
   var taskId = '';
   var levelId = '';
+  var ccId = '';
 
   $(document).ready(function () {
     LoadParentsLevel();
@@ -346,7 +347,28 @@
   });
 
 
-
+  $(document).on("click", "button[name='btnCC']", function () {
+    ccId = $(this).closest('tr').attr('id');
+    $.ajax({
+      url: '/tla/cc/detail',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        ccId
+      },
+      success: function (data) {
+        $('.btn-job-info').click();
+        $('#JobMngrModal').modal('hide');
+        if (data.cc.type) {
+          $('#modalCCNewTask').modal(200);
+        } else {
+          $('#modalCCRejectTask').modal(200);
+        }
+      }
+    })
+  })
 
 
 
@@ -425,16 +447,15 @@
       success: function (data) {
         $('.tblCCList').empty();
         let idx = 1;
-        console.log(data.ccList)
         data.ccList.forEach(cc => {
           let tr = '<tr id="' + cc._id + '">';
           tr += '<td>' + (idx++) + '</td>';
           tr += '<td class="font-weight-bold text-danger text-left">';
-          if (cc.fix_task) {
-            tr += cc.fix_task.basic.level.name;
+          if (cc.fixible_task) {
+            tr += cc.fixible_task.basic.level.name;
           }
-          if (cc.tasks.length > 0) {
-            tr += cc.tasks[cc.tasks.length - 1].basic.level.name;
+          if (cc.additional_tasks.length > 0) {
+            tr += cc.additional_tasks[cc.additional_tasks.length - 1].basic.level.name;
           }
           tr += '</td>';
 
@@ -467,13 +488,13 @@
               break;
           }
           tr += '</td>';
-          tr+='<td class="text-right">';
-            if(cc.type){
-              tr+='<button class="btn btn-xs btn-primary" name="btnCCAddTask"><i class="fa fa-plus" aria-hidden="true"></i></button>'
-            }else{
-              tr+='<button class="btn btn-xs btn-danger" name="btnCCEditTask"><i class="fa fa-edit"></i></button>'
-            }
-            tr+= '</td>'
+          tr += '<td class="text-right">';
+          if (cc.type) {
+            tr += '<button class="btn btn-xs btn-primary" name="btnCC"><i class="fa fa-plus" aria-hidden="true"></i></button>'
+          } else {
+            tr += '<button class="btn btn-xs btn-danger" name="btnCC"><i class="fa fa-edit"></i></button>'
+          }
+          tr += '</td>'
           tr += '</tr>';
           $('.tblCCList').append(tr);
         })
@@ -501,13 +522,13 @@
           tr += "<td>" + idx++ + "</td>";
 
 
-          tr += "<td class='font-weight-bold text-info'>";           
+          tr += "<td class='font-weight-bold text-info'>";
           tr += t.basic.level.name;
-          if(t.tasks_cc){
-              tr+=' <span class="text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>'; 
+          if (t.tasks_cc) {
+            tr += ' <span class="text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>';
           }
-          if(t.task_cc){
-              tr+=' <span class="text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>'; 
+          if (t.task_cc) {
+            tr += ' <span class="text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>';
           }
           tr += "</td>";
           tr += "<td>" + convertISODateToTimeFormat(t.basic.deadline.begin) + "</td>";
@@ -783,7 +804,7 @@
       success: function (data) {
         $('#slEditor').empty();
         data.editors.forEach(e => {
-          let opt = '<option value="' + e._id + '">' + e.fullname + ' ( '+e.username+' )</option>';
+          let opt = '<option value="' + e._id + '">' + e.fullname + ' ( ' + e.username + ' )</option>';
           $('#slEditor').append(opt);
           $('#slEditorInEditDiv').append(opt);
         })

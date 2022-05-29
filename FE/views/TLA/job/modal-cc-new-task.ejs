@@ -124,6 +124,11 @@
         $('#colCCQA').hide();
     });
 
+    $('#modalCCNewTask').on('hidden.bs.modal', function () {
+        $('#JobMngrModal').modal(200);
+    })
+
+
     $('#btnSubmitCC').click(function () {
         let level = $("#slCCJobLevels option:selected").val();
         let name = $("#slCCJobLevels option:selected").text();

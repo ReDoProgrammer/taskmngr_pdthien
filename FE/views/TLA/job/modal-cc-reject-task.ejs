@@ -71,6 +71,11 @@
         $('#colCCRjQA').hide();
     });
 
+    $('#modalCCRejectTask').on('hidden.bs.modal', function () {
+        $('#JobMngrModal').modal(200);
+    })
+
+
     $('#btnSubmitCCRj').click(function(){
         let taskId = $('#slCCRjTasks option:selected').val();
         let remark = $('#txtCCRjRemark').val();
