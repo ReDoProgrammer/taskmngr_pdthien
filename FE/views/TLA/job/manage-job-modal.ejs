@@ -234,24 +234,30 @@
 
         $('#ckbAssignQA').prop('checked', (data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla !== 'undefined') ? true : false);
 
-
-
-        if (data.task.status < 1 && data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla !== 'undefined') {
+        if (data.task.editor.length === 0) {
           $('#ckbAssignEditor').show();
-          $('#ckbAssignEditor').prop('checked', (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla !== 'undefined') ? true : false);
-          $('#colEditor').show();
-          $('#slEditor').val(data.task.editor[data.task.editor.length - 1].staff);
-          if (data.task.status > 1) {
-            $('#ckbAssignEditor').attr("disabled", true);
-            $('#slEditor').attr("disabled", true);
-          } else {
-            $('#ckbAssignEditor').attr("disabled", false);
-            $('#slEditor').attr("disabled", false);
-          }
+          $('#ckbAssignEditor').prop('checked', false);
+          $('#colEditor').slideUp();
         } else {
-          $('#colEditor').hide();
-          $('#ckbAssignEditor').hide();
+          if (data.task.status < 1 && data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].editor !== 'undefined') {
+            $('#ckbAssignEditor').show();
+            $('#ckbAssignEditor').prop('checked', (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].tla !== 'undefined') ? true : false);
+            $('#colEditor').show();
+            $('#slEditor').val(data.task.editor[data.task.editor.length - 1].staff);
+            if (data.task.status > 1) {
+              $('#ckbAssignEditor').attr("disabled", true);
+              $('#slEditor').attr("disabled", true);
+            } else {
+              $('#ckbAssignEditor').attr("disabled", false);
+              $('#slEditor').attr("disabled", false);
+            }
+          } else {
+            $('#colEditor').hide();
+            $('#ckbAssignEditor').hide();
+          }
         }
+
+
 
         if ((data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla !== 'undefined')) {
           $('#colQA').show();
@@ -368,7 +374,6 @@
     $('#divAssign').hide(100);
     $('#divLevel').hide(100);
     $('#divEditTask').slideDown(1000);
-
   })
 
   $(document).on("click", "button[name='btnAssignStaff']", function () {
@@ -654,17 +659,6 @@
     let editor = $("#ckbAssignEditor").is(':checked') ? $('#slEditor option:selected').val() : null;
     let qa = $("#ckbAssignQA").is(':checked') ? $('#slQA option:selected').val() : null;
 
-    // if (typeof editor === 'undefined') {
-    //   $('#msgError').text('(*) No editor is assigned!');
-    //   $('#msgError').show().delay(3000).fadeOut();
-    //   return;
-    // }
-
-    // if (typeof qa === 'undefined') {
-    //   $('#msgError').text('(*) No Q.A is assigned!');
-    //   $('#msgError').show().delay(3000).fadeOut();
-    //   return;
-    // }
 
     // validateion component inputs
 

@@ -18,7 +18,7 @@ const _EDITOR = 'EDITOR';
 const _QA = 'QA';
 
 router.put('/cc', authenticateTLAToken, async (req, res) => {
-    let { taskId, remark, editor, qa,ccId } = req.body;
+    let { taskId, remark, editor, qa, ccId } = req.body;
 
     let task = await Task.findById(taskId);
 
@@ -30,19 +30,19 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
 
 
     let rm = new Remark({
-        content:remark,
-        tid:taskid,
-        user:req.user._id
-    });  
+        content: remark,
+        tid: taskid,
+        user: req.user._id
+    });
     await rm.save()
         .then(async _ => {
 
             let cc = await CC.findById(ccId);
-            if(!cc){
+            if (!cc) {
                 return res.status(404).json({
-                    msg:`CC not found!`
+                    msg: `CC not found!`
                 })
-            }           
+            }
 
 
             task.remarks.push(rm);
@@ -113,12 +113,12 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
                                     timestamp: new Date()
                                 };
 
-                                if(task.qa.length>0){//nếu trước đó đã có Q.A xử lý
-                                    if(task.qa[task.qa.length-1].staff !==qa){//chỉ cần xử lý trường hợp Q.A được truyền vào khác Q.A hiện đang xử lý task
+                                if (task.qa.length > 0) {//nếu trước đó đã có Q.A xử lý
+                                    if (task.qa[task.qa.length - 1].staff !== qa) {//chỉ cần xử lý trường hợp Q.A được truyền vào khác Q.A hiện đang xử lý task
                                         task.qa[task.qa.length].unregisted = true;//cập nhật lại trạng thái hủy nhận task đối với Q.A hiện tại
                                         task.qa.push(q);//thêm q.a mới vào
                                     }
-                                }else{
+                                } else {
                                     task.qa.push(q);//thêm q.a mới vào
                                 }
 
@@ -140,19 +140,19 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
 
 
             await task.save()
-            .then(async _=>{
-                console.log(cc)
-                cc.status = 0;
-                await cc.save();
-                return res.status(200).json({
-                    msg:`CC reject task successfully!`
+                .then(async _ => {
+                    console.log(cc)
+                    cc.status = 0;
+                    await cc.save();
+                    return res.status(200).json({
+                        msg: `CC reject task successfully!`
+                    })
                 })
-            })
-            .catch(err=>{
-                return res.status(500).json({
-                    msg:`Can not CC reject task with error: ${new Error(err.message)}`
+                .catch(err => {
+                    return res.status(500).json({
+                        msg: `Can not CC reject task with error: ${new Error(err.message)}`
+                    })
                 })
-            })
         })
         .catch(err => {
             return res.status(500).json({
@@ -421,10 +421,10 @@ router.get('/list', authenticateTLAToken, (req, res) => {
                 options: { sort: { 'timestamp': -1 } }
             },
             {
-                path: 'fixible_task'              
+                path: 'fixible_task'
             },
             {
-                path: 'additional_task'              
+                path: 'additional_task'
             },
 
         ])
@@ -682,7 +682,7 @@ router.get('/detail-to-edit', authenticateTLAToken, (req, res) => {
 
 
 
-router.post('/', authenticateTLAToken, (req, res) => {
+router.post('/', authenticateTLAToken, async (req, res) => {
     let {
         job,
         level,
@@ -690,196 +690,174 @@ router.post('/', authenticateTLAToken, (req, res) => {
         deadline,
         input_link,
         remark,
-        qa_assigned,
         qa,
-        editor_assigned,
         editor
     } = req.body;
 
+    let j = await Job.findById(job).populate('customer');
+    if (!j) {
+        return res.status(404).json({
+            msg: `Job not found that this task based on`
+        })
+    }
 
 
-    Job
-        .findById(job)
-        .exec()
-        .then(j => {
+    await getCustomerLevelPrice(j.customer._id, level)
+        .then(async clp => {
+            
+            if (clp.price == 0) {
+                return res.status(403).json({
+                    msg: `Customer level price unit not available!`
+                })
+            }
 
-            getCustomerIdFromJob(job)
-                .then(async result => {
-                    await getCustomerLevelPrice(result.customerId, level)
-                        .then(async result => {
+            let task = new Task();
 
-                            if (result.cl.price == 0) {
-                                return res.status(403).json({
-                                    msg: `Customer level price unit not available!`
+            //THIẾT LẬP CÁC THÔNG TIN CƠ BẢN CỦA TASK
+            let bs = {
+                job: job,
+                level: level,
+                price: clp.price
+            };
+
+            //deadline
+            let dl = {};
+            dl.begin = assigned_date;
+            if (deadline.length !== 0) {
+                dl.end = deadline;
+            }
+            bs.deadline = dl;
+
+            let link = {};
+            link.input = input_link;
+            bs.link = link;
+
+            task.basic = bs;
+
+
+
+            //THÔNG TIN LIÊN QUAN TỚI TLA
+            let tla = {};
+            tla.created = {
+                at: new Date(),
+                by: req.user._id
+            };
+
+            task.tla = tla;
+
+
+
+
+            // THÔNG TIN LIÊN QUAN TỚI GÁN EDITOR
+            if (editor.length > 0) {
+                await getModule(_EDITOR)
+                    .then(async m => {
+                        await getWage(editor, level, m._id)
+                            .then(async w => {
+                                let ed = {
+                                    staff: editor,
+                                    wage: w.wage,
+                                    tla: req.user._id,
+                                    timestamp: new Date()
+                                };
+
+                                task.editor = ed;
+                                task.status = 0;
+
+                            })
+                            .catch(err => {
+                                return res.status(err.code).json({
+                                    msg: err.msg
                                 })
-                            }
+                            })
+                    })
+                    .catch(err => {
+                        return res.status(err.code).json({
+                            msg: err.msg
+                        })
+                    })
 
-                            let task = new Task();
+            }
 
+            //THÔNG TIN LIÊN QUAN TỚI GÁN Q.A
+            if (qa.length > 0) {
+                await getModule(_QA)
+                    .then(async m => {
+                        await getWage(qa, level, m._id)
+                            .then(async w => {
+                                let q = {
+                                    staff: qa,
+                                    wage: w.wage,
+                                    tla: req.user._id,
+                                    timestamp: new Date()
+                                };
+                                task.qa = q;
+                            })
+                            .catch(err => {
+                                return res.status(err.code).json({
+                                    msg: err.msg
+                                })
+                            })
+                    })
+                    .catch(err => {
+                        return res.status(err.code).json({
+                            msg: err.msg
+                        })
+                    })
 
-
-                            //THIẾT LẬP CÁC THÔNG TIN CƠ BẢN CỦA TASK
-                            let bs = {
-                                job: job,
-                                level: level,
-                                price: result.cl.price
-                            };
-
-                            //deadline
-                            let dl = {};
-                            dl.begin = assigned_date;
-                            if (deadline.length !== 0) {
-                                dl.end = deadline;
-                            }
-                            bs.deadline = dl;
-
-                            let link = {};
-                            link.input = input_link;
-                            bs.link = link;
-
-                            task.basic = bs;
-
-
-
-                            //THÔNG TIN LIÊN QUAN TỚI TLA
-                            let tla = {};
-                            tla.created = {
-                                at: new Date(),
-                                by: req.user._id
-                            };
-
-                            task.tla = tla;
-
-
+            }
 
 
 
+            let rm = new Remark({
+                user: req.user._id,
+                content: remark,
+                tid: task._id
+            });
 
+            await rm.save()
+                .then(async r => {
+                    task.remarks.push(r);
 
-
-
-                            // THÔNG TIN LIÊN QUAN TỚI GÁN EDITOR
-                            if (editor_assigned == 'true') {
-                                await getModule(_EDITOR)
-                                    .then(async m => {
-                                        await getWage(editor, level, m._id)
-                                            .then(async w => {
-                                                let ed = {
-                                                    staff: editor,
-                                                    wage: w.wage,
-                                                    tla: req.user._id,
-                                                    timestamp: new Date()
-                                                };
-
-                                                task.editor = ed;
-                                                task.status = 0;
-
-                                            })
-                                            .catch(err => {
-                                                return res.status(err.code).json({
-                                                    msg: err.msg
-                                                })
-                                            })
+                    await task.save()
+                        .then(async t => {
+                            j.tasks.push(t);
+                            await j.save()
+                                .then(_ => {
+                                    return res.status(201).json({
+                                        msg: `Task has been created successfully!`
                                     })
-                                    .catch(err => {
-                                        return res.status(err.code).json({
-                                            msg: err.msg
-                                        })
-                                    })
-
-                            }
-
-                            //THÔNG TIN LIÊN QUAN TỚI GÁN Q.A
-                            if (qa_assigned == 'true') {
-                                await getModule(_QA)
-                                    .then(async m => {
-                                        await getWage(qa, level, m._id)
-                                            .then(async w => {
-                                                let q = {
-                                                    staff: qa,
-                                                    wage: w.wage,
-                                                    tla: req.user._id,
-                                                    timestamp: new Date()
-                                                };
-                                                task.qa = q;
-                                            })
-                                            .catch(err => {
-                                                return res.status(err.code).json({
-                                                    msg: err.msg
-                                                })
-                                            })
-                                    })
-                                    .catch(err => {
-                                        return res.status(err.code).json({
-                                            msg: err.msg
-                                        })
-                                    })
-
-                            }
-
-
-
-                            let rm = new Remark({
-                                user: req.user._id,
-                                content: remark,
-                                tid: task._id
-                            });
-
-                            await rm.save()
-                                .then(async r => {
-                                    task.remarks.push(r);
-
-                                    await task.save()
-                                        .then(async t => {
-                                            j.tasks.push(t);
-                                            await j.save()
-                                                .then(_ => {
-                                                    return res.status(201).json({
-                                                        msg: `Task has been created successfully!`
-                                                    })
-                                                })
-                                                .catch(err => {
-                                                    console.log(`Can not update tasks list into job with error: ${new Error(err.message)}`)
-                                                    return res.status(500).json({
-                                                        msg: `Can not update tasks list into job with error: ${new Error(err.message)}`
-                                                    })
-                                                })
-                                        })
-                                        .catch(err => {
-                                            console.log(`Can not create task with error: ${new Error(err.message)}`)
-                                            return res.status(500).json({
-                                                msg: `Can not create task with error: ${new Error(err.message)}`
-                                            })
-                                        })
                                 })
                                 .catch(err => {
-                                    console.log(`Can not create remark with error: ${new Error(err.message)}`)
+                                    console.log(`Can not update tasks list into job with error: ${new Error(err.message)}`)
                                     return res.status(500).json({
-                                        msg: `Can not create remark with error: ${new Error(err.message)}`
+                                        msg: `Can not update tasks list into job with error: ${new Error(err.message)}`
                                     })
                                 })
                         })
                         .catch(err => {
-                            console.log(err);
-                            return res.status(err.code).json({
-                                msg: err.msg
+                            console.log(`Can not create task with error: ${new Error(err.message)}`)
+                            return res.status(500).json({
+                                msg: `Can not create task with error: ${new Error(err.message)}`
                             })
                         })
                 })
                 .catch(err => {
-                    console.log(err);
-                    return res.status(err.code).json({
-                        msg: err.msg
+                    console.log(`Can not create remark with error: ${new Error(err.message)}`)
+                    return res.status(500).json({
+                        msg: `Can not create remark with error: ${new Error(err.message)}`
                     })
                 })
-
         })
         .catch(err => {
-            return res.status(500).json({
-                msg: `Can not get job by id with error: ${new Error(err.message)}`
+            console.log(err);
+            return res.status(err.code).json({
+                msg: err.msg
             })
         })
 })
+
+
 
 router.put('/upload', authenticateTLAToken, async (req, res) => {
     let { taskId, uploaded_link, remark } = req.body;
@@ -975,7 +953,7 @@ router.put('/', authenticateTLAToken, async (req, res) => {
         taskId,
         deadline,
         input_link,
-        remark,     
+        remark,
         qa,
         editor
     } = req.body;
@@ -988,11 +966,11 @@ router.put('/', authenticateTLAToken, async (req, res) => {
         })
     }
     let rm = new Remark({
-        user:req.user_id,
-        content:remark,
-        tid:taskId
+        user: req.user_id,
+        content: remark,
+        tid: taskId
     });
-    
+
     await rm.save()
         .then(async _ => {
             task.remarks.push(rm);
@@ -1007,7 +985,7 @@ router.put('/', authenticateTLAToken, async (req, res) => {
 
             //cập nhật Editor
 
-            if (editor.length>0) {
+            if (editor.length > 0) {
                 task.status = 0;
                 if (task.editor.length == 0) {
                     await getModule(_EDITOR)
@@ -1076,27 +1054,27 @@ router.put('/', authenticateTLAToken, async (req, res) => {
                 task.editor = [];
                 task.status = -1;
 
-                if(task.fixible_task){
+                if (task.fixible_task) {
                     let cc = await CC.findById(task.fixible_task);
                     cc.status = -1;
                     await cc.save();
                 }
 
-                if(task.additional_task){
+                if (task.additional_task) {
                     let cc = await CC.findById(task.additional_task);
-                    if(cc.additional_task.length==0){
+                    if (cc.additional_task.length == 0) {
                         cc.status = -1;
                         await cc.save();
-                    }                   
+                    }
                 }
-               
+
             }
 
 
 
             //Cập nhật Q.A
 
-            if (qa.length>0) {
+            if (qa.length > 0) {
                 if (task.qa.length == 0) {
                     await getModule(_QA)
                         .then(async m => {
@@ -1311,28 +1289,15 @@ const getCustomerIdFromJob = (jobId) => {
 
 
 const getCustomerLevelPrice = (customerId, levelId) => {
-    return new Promise((resolve, reject) => {
-        CustomerLevel.findOne({ customer: customerId, level: levelId })
-            .exec()
-            .then(cl => {
-                if (!cl) {
-                    return reject({
-                        code: 404,
-                        msg: `Customer level not found`
-                    })
-                }
-                return resolve({
-                    code: 200,
-                    msg: `Customer level found`,
-                    cl
-                })
+    return new Promise(async (resolve, reject) => {
+        let clp =await CustomerLevel.findOne({ customer: customerId, level: levelId })
+        if(!clp){
+            return reject({
+                code:404,
+                msg:`Get customer level price failed with error: ${new Error(err.message)}`
             })
-            .catch(err => {
-                return reject({
-                    code: 500,
-                    msg: `Customer level can not found with error: ${new Error(err.message)}`
-                })
-            })
+        }  
+        return resolve(clp)  
     })
 }
 
