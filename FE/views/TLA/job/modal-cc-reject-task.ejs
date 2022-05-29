@@ -73,6 +73,7 @@
 
     $('#modalCCRejectTask').on('hidden.bs.modal', function () {
         $('#JobMngrModal').modal(200);
+        LoadTasks();
     })
 
 
@@ -215,8 +216,8 @@
                 ccId
             },
             success: function (data) {
-                if (data.cc.fix_task) {
-                    $('#slCCRjTasks').val(data.cc.fix_task);
+                if (data.cc.fixible_task) {
+                    $('#slCCRjTasks').val(data.cc.fixible_task);
                     $('#slCCRjTasks').attr('disabled', 'disabled');                    
                 }else{
                     $('#slCCRjTasks').removeAttr('disabled');
