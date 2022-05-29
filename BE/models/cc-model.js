@@ -59,7 +59,7 @@ const ccSchema = new Schema({
             type: Date
         }
     },
-    tasks: [
+    additional_tasks: [
         //danh sách tham chiếu tới task được tạo để giải quyết CC
         //danh sách này có thể rỗng vì cc chỉ yêu cầu sửa lại task cũ
         {
@@ -67,7 +67,7 @@ const ccSchema = new Schema({
             ref: 'task'
         }
     ],
-    fix_tasks: [
+    fixible_tasks: [
         {
             //lưu task id trong trường hợp cần fix 1 task nào đó - trường hợp CC refix
             type: Schema.Types.ObjectId,

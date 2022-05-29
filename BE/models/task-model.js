@@ -306,13 +306,13 @@ const taskSchema = new Schema({
         ref: 'remark'
     }],
 
-    task_cc:{
-        //thuộc tính tham chiếu tới cột fix_task trong cc model
+    fixible_task:{
+        //thuộc tính tham chiếu tới cột fixible_tasks trong cc model
         type:Schema.Types.ObjectId,
         ref:'cc'
     },
-    tasks_cc:{
-        //thuộc tính tham chiếu tới cột tasks trong cc model
+    additional_task:{
+        //thuộc tính tham chiếu tới cột additional_tasks trong cc model
         type:Schema.Types.ObjectId,
         ref:'cc'
     }
