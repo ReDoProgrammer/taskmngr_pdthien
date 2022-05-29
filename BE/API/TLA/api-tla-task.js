@@ -17,149 +17,149 @@ const { log } = require('npm');
 const _EDITOR = 'EDITOR';
 const _QA = 'QA';
 
-router.put('/cc', authenticateTLAToken, async (req, res) => {
-    let { taskId, remark, editor, qa,ccId } = req.body;
+// router.put('/cc', authenticateTLAToken, async (req, res) => {
+//     let { taskId, remark, editor, qa,ccId } = req.body;
 
-    let task = await Task.findById(taskId);
+//     let task = await Task.findById(taskId);
 
-    if (!task) {
-        return res.status(404).json({
-            msg: `Task not found!`
-        })
-    }
+//     if (!task) {
+//         return res.status(404).json({
+//             msg: `Task not found!`
+//         })
+//     }
     
 
-    let rm = new Remark();
-    rm.content = remark;
-    rm.tid = taskId;
-    rm.user = req.user._id;
-    await rm.save()
-        .then(async _ => {
+//     let rm = new Remark();
+//     rm.content = remark;
+//     rm.tid = taskId;
+//     rm.user = req.user._id;
+//     await rm.save()
+//         .then(async _ => {
             
-            let cc = await CC.findById(ccId);
-            if(!cc){
-                return res.status(404).json({
-                    msg:`CC not found!`
-                })
-            }           
+//             let cc = await CC.findById(ccId);
+//             if(!cc){
+//                 return res.status(404).json({
+//                     msg:`CC not found!`
+//                 })
+//             }           
 
 
-            task.remarks.push(rm);
-            task.status = -6;
-            task.tasks_cc = cc._id;
+//             task.remarks.push(rm);
+//             task.status = -6;
+//             task.tasks_cc = cc._id;
 
 
-            task.tla.updated.push({
-                at: new Date(),
-                by: req.user._id
-            });
+//             task.tla.updated.push({
+//                 at: new Date(),
+//                 by: req.user._id
+//             });
 
-            /*
-                Vì chức năng CC reject task chỉ áp dụng cho những task ít nhất đã được editor submit trước đó
-                -- nên chỉ cần quan tâm tới trường hợp có editor truyền vào
-                -- và khác editor hiện đang xử lý task đó
-            */
-            if (editor.length > 0 && task.editor[task.editor.length - 1].staff !== editor) {
-                await getModule(_EDITOR)
-                    .then(async m => {
-                        await getWage(editor, task.basic.level, m._id)
-                            .then(async w => {
-                                let ed = {
-                                    staff: editor,
-                                    wage: w.wage,
-                                    tla: req.user._id, //TLA gán task cho editor
-                                    timestamp: new Date() //thời điểm được gán task
-                                };
+//             /*
+//                 Vì chức năng CC reject task chỉ áp dụng cho những task ít nhất đã được editor submit trước đó
+//                 -- nên chỉ cần quan tâm tới trường hợp có editor truyền vào
+//                 -- và khác editor hiện đang xử lý task đó
+//             */
+//             if (editor.length > 0 && task.editor[task.editor.length - 1].staff !== editor) {
+//                 await getModule(_EDITOR)
+//                     .then(async m => {
+//                         await getWage(editor, task.basic.level, m._id)
+//                             .then(async w => {
+//                                 let ed = {
+//                                     staff: editor,
+//                                     wage: w.wage,
+//                                     tla: req.user._id, //TLA gán task cho editor
+//                                     timestamp: new Date() //thời điểm được gán task
+//                                 };
                             
-                                //xử lý liên quan tới timeline của editor hiện tại
-                                if (task.editor[task.editor.length - 1].timeline && task.editor[task.editor.length - 1].timeline.length > 0) {
-                                    task.editor[task.editor.length - 1].timeline[task.editor[task.editor.length - 1].timeline.length - 1].unregisted = true;
-                                }
+//                                 //xử lý liên quan tới timeline của editor hiện tại
+//                                 if (task.editor[task.editor.length - 1].timeline && task.editor[task.editor.length - 1].timeline.length > 0) {
+//                                     task.editor[task.editor.length - 1].timeline[task.editor[task.editor.length - 1].timeline.length - 1].unregisted = true;
+//                                 }
 
 
-                                task.editor.push(ed);//thêm editor mới vào
-                            })
-                            .catch(err => {
-                                console.log(err.msg);
-                                return res.status(err.code).json({
-                                    msg: err.msg
-                                })
-                            })
-                    })
-                    .catch(err => {
-                        console.log(err.msg);
-                        return res.status(err.code).json({
-                            msg: err.msg
-                        })
-                    })
-            }
+//                                 task.editor.push(ed);//thêm editor mới vào
+//                             })
+//                             .catch(err => {
+//                                 console.log(err.msg);
+//                                 return res.status(err.code).json({
+//                                     msg: err.msg
+//                                 })
+//                             })
+//                     })
+//                     .catch(err => {
+//                         console.log(err.msg);
+//                         return res.status(err.code).json({
+//                             msg: err.msg
+//                         })
+//                     })
+//             }
 
 
-            /*
-                gán Q.A cần quan tâm tới
-                1: qa được truyền vào phải là 1 id Q.A cụ thể
-                2: thiết lập các thông số  cần thiết đối với các Q.A đã xử lý trước đó(nếu có)
-            */
-            if (qa.length > 0) {
-                await getModule(_QA)
-                    .then(async m => {
-                        await getWage(qa, task.basic.level, m._id)
-                            .then(async w => {
-                                let q = {
-                                    staff: qa,
-                                    wage: w.wage,
-                                    tla: req.user._id,
-                                    timestamp: new Date()
-                                };
+//             /*
+//                 gán Q.A cần quan tâm tới
+//                 1: qa được truyền vào phải là 1 id Q.A cụ thể
+//                 2: thiết lập các thông số  cần thiết đối với các Q.A đã xử lý trước đó(nếu có)
+//             */
+//             if (qa.length > 0) {
+//                 await getModule(_QA)
+//                     .then(async m => {
+//                         await getWage(qa, task.basic.level, m._id)
+//                             .then(async w => {
+//                                 let q = {
+//                                     staff: qa,
+//                                     wage: w.wage,
+//                                     tla: req.user._id,
+//                                     timestamp: new Date()
+//                                 };
 
-                                if(task.qa.length>0){//nếu trước đó đã có Q.A xử lý
-                                    if(task.qa[task.qa.length-1].staff !==qa){//chỉ cần xử lý trường hợp Q.A được truyền vào khác Q.A hiện đang xử lý task
-                                        task.qa[task.qa.length].unregisted = true;//cập nhật lại trạng thái hủy nhận task đối với Q.A hiện tại
-                                        task.qa.push(q);//thêm q.a mới vào
-                                    }
-                                }else{
-                                    task.qa.push(q);//thêm q.a mới vào
-                                }
+//                                 if(task.qa.length>0){//nếu trước đó đã có Q.A xử lý
+//                                     if(task.qa[task.qa.length-1].staff !==qa){//chỉ cần xử lý trường hợp Q.A được truyền vào khác Q.A hiện đang xử lý task
+//                                         task.qa[task.qa.length].unregisted = true;//cập nhật lại trạng thái hủy nhận task đối với Q.A hiện tại
+//                                         task.qa.push(q);//thêm q.a mới vào
+//                                     }
+//                                 }else{
+//                                     task.qa.push(q);//thêm q.a mới vào
+//                                 }
                                
-                            })
-                            .catch(err => {
-                                console.log(err.msg);
-                                return res.status(err.code).json({
-                                    msg: err.msg
-                                })
-                            })
-                    })
-                    .catch(err => {
-                        console.log(err.msg);
-                        return res.status(err.code).json({
-                            msg: err.msg
-                        })
-                    })
-            }
+//                             })
+//                             .catch(err => {
+//                                 console.log(err.msg);
+//                                 return res.status(err.code).json({
+//                                     msg: err.msg
+//                                 })
+//                             })
+//                     })
+//                     .catch(err => {
+//                         console.log(err.msg);
+//                         return res.status(err.code).json({
+//                             msg: err.msg
+//                         })
+//                     })
+//             }
 
 
-            await task.save()
-            .then(async _=>{
-                console.log(cc)
-                cc.status = 0;
-                await cc.save();
-                return res.status(200).json({
-                    msg:`CC reject task successfully!`
-                })
-            })
-            .catch(err=>{
-                return res.status(500).json({
-                    msg:`Can not CC reject task with error: ${new Error(err.message)}`
-                })
-            })
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not create remark with error: ${new Error(err.message)}`
-            })
-        })
+//             await task.save()
+//             .then(async _=>{
+//                 console.log(cc)
+//                 cc.status = 0;
+//                 await cc.save();
+//                 return res.status(200).json({
+//                     msg:`CC reject task successfully!`
+//                 })
+//             })
+//             .catch(err=>{
+//                 return res.status(500).json({
+//                     msg:`Can not CC reject task with error: ${new Error(err.message)}`
+//                 })
+//             })
+//         })
+//         .catch(err => {
+//             return res.status(500).json({
+//                 msg: `Can not create remark with error: ${new Error(err.message)}`
+//             })
+//         })
 
-})
+// })
 
 
 router.post('/cc', authenticateTLAToken, async (req, res) => {
@@ -196,7 +196,7 @@ router.post('/cc', authenticateTLAToken, async (req, res) => {
             let task = new Task();
 
 
-            task.tasks_cc = ccId;//gán thông tin tham chiếu tới cc
+            task.additional_task = ccId;//gán thông tin tham chiếu tới cc
 
             //THIẾT LẬP CÁC THÔNG TIN CƠ BẢN CỦA TASK
             let bs = {
@@ -316,8 +316,7 @@ router.post('/cc', authenticateTLAToken, async (req, res) => {
                             await job.save()
                                 .then(async _ => {
                                     cc.status = 0;// trạng thái đang xử lý
-                                    if (cc.tasks)
-                                        cc.tasks.push(task);//thêm taskid vào danh sách CC task tạo mới
+                                    cc.additional_tasks.push(task);//thêm taskid vào danh sách CC task tạo mới
                                     await cc.save()
                                         .then(_ => {
                                             return res.status(201).json({

@@ -64,14 +64,8 @@
             </div>
           </div>
           <div class="panel-body">
-            <div class="row">
-              <div class="col-md-6 col-sm-12 col-xs-12">
-                <div class="form-group">
-                  <label for="">Job level</label>
-                  <select name="" id="slParentsLevel" class="form-control"></select>
-                </div>
-              </div>
-              <div class="col-md-6 col-sm-12 col-xs-12">
+            <div class="row">              
+              <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="form-group">
                   <label for="">Task level</label>
                   <select name="" id="slJobLevels" class="form-control"></select>
@@ -195,9 +189,7 @@
   var levelId = '';
   var ccId = '';
 
-  $(document).ready(function () {
-    LoadParentsLevel();
-  })
+
 
 
 
@@ -844,23 +836,6 @@
       error: function (jqXHR, textStatus, errorThrown) {
         $('#msgError').text(jqXHR.responseJSON.msg);
       },
-    })
-  }
-
-
-  function LoadParentsLevel() {
-    $.ajax({
-      url: '/tla/parents-level/list',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      success: function (data) {
-        $('#slParentsLevel').empty();
-        data.pls.forEach(p => {
-          $('#slParentsLevel').append('<option value="' + p._id + '">' + p.name + '</option>');
-        })
-      }
     })
   }
 
