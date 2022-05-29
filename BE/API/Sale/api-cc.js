@@ -35,26 +35,35 @@ router.post('/', authenticateSaleToken, async (req, res) => {
             job.cc.push(cc);
             await job.save()
                 .then(async _ => {
-                    task.task_cc = cc;
-                    await task.save()
-                        .then(_ => {
-                            return res.status(201).json({
-                                msg: `new CC has been created!`
+                    if (task) {
+                        task.task_cc = cc;
+                        await task.save()
+                            .then(_ => {
+                                return res.status(201).json({
+                                    msg: `new CC has been created!`
+                                })
                             })
-                        })
-                        .catch(err=>{
-                            return res.status(500).json({
-                                msg:`Can not set cc into task with error: ${new Error(err.message)}`
+                            .catch(err => {
+                                console.log(`Can not set cc into task with error: ${new Error(err.message)}`)
+                                return res.status(500).json({
+                                    msg: `Can not set cc into task with error: ${new Error(err.message)}`
+                                })
                             })
+                    } else {
+                        return res.status(201).json({
+                            msg: `new CC has been created!`
                         })
+                    }
                 })
                 .catch(err => {
+                    console.log(`Can not push cc into job with error: ${new Error(err.message)}`)
                     return res.status(500).json({
                         msg: `Can not push cc into job with error: ${new Error(err.message)}`
                     })
                 })
         })
         .catch(err => {
+            console.log(`Can not create cc with error: ${new Error(err.message)}`)
             return res.status(500).json({
                 msg: `Can not create cc with error: ${new Error(err.message)}`
             })

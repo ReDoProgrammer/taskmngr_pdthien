@@ -289,10 +289,16 @@
             success: function (data) {
                 $('#slTasks').empty();
                 data.tasks.forEach(task => {
-                    let opt = '<option value="' + task._id + '"';
-                    opt += '<span class="font-weight-bold text-danger">[ ' + task.basic.level.name + ' ]</span> - ' + task.editor[task.editor.length - 1].staff.fullname + ' (' + task.editor[task.editor.length - 1].staff.username + ' )'
-                    opt += '</option>';
-                    $('#slTasks').append(opt);
+                    if (task.status > 0) {
+                        let opt = '<option value="' + task._id + '"';
+                        opt += '<span class="font-weight-bold text-danger">[ ' + task.basic.level.name + ' ]</span>';
+                        if (task.editor.length > 0) {
+                            opt += ' - ' + task.editor[task.editor.length - 1].staff.fullname + ' (' + task.editor[task.editor.length - 1].staff.username + ' )';
+                        }
+                        opt += '</option>';
+                        $('#slTasks').append(opt);
+                    }
+
                 })
             }
         })

@@ -17,6 +17,11 @@ const { log } = require('npm');
 const _EDITOR = 'EDITOR';
 const _QA = 'QA';
 
+router.put('/cc',authenticateTLAToken,(req,res)=>{
+    
+})
+
+
 router.post('/cc', authenticateTLAToken, async (req, res) => {
     let { level, assigned_date, deadline, input_link, remark, editor, qa, jobId, customerId,ccId } = req.body;
 
@@ -274,7 +279,7 @@ router.get('/list', authenticateTLAToken, (req, res) => {
             {
                 path: 'remarks',
                 options: { sort: { 'timestamp': -1 } }
-            }
+            }           
         ])
         .exec()
         .then(tasks => {
