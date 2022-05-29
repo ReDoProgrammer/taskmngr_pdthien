@@ -135,8 +135,6 @@
         let editor = $("#ckbCCAssignEditor").is(':checked') ? $('#slCCEditor option:selected').val() : null;
         let qa = $("#ckbCCAssignQA").is(':checked') ? $('#slCCQA option:selected').val() : null;
 
-        console.log({ level, name, assigned_date, deadline, input_link, remark, editor, qa, jobId })
-
         // validateion component inputs
 
         if (isNaN(assigned_date) || assigned_date === null) {
@@ -210,6 +208,8 @@
                 },
             })
         }
+        $('#modalCCNewTask').modal('hide');
+        LoadJobs();
     })
 
     $("#ckbCCAssignEditor").change(function () {
