@@ -196,6 +196,7 @@
 
 $(document).ready(function(){
   LoadParentsLevel();
+  LoadCCList();
 })
 
 
@@ -411,7 +412,65 @@ $(document).ready(function(){
 
 
 
+  function LoadCCList() {
+        console.log(1234)
+        $.ajax({
+            url: '/tla/cc',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                jobId
+            },
+            success: function (data) {
+                $('#tblCCList').empty();
+                let idx = 1;
 
+                data.ccList.forEach(cc => {
+                    let tr = '<tr id="' + cc._id + '">';
+                    tr += '<td>' + (idx++) + '</td>';
+                    tr += '<td class="font-weight-bold text-danger text-left">';
+                    if (cc.fix_task) {
+                        tr += cc.fix_task.basic.level.name
+                    }
+                    tr += '</td>';
+
+                    tr += '<td class="text-left">' + cc.remark + '</td>';
+                    tr += '<td class="text-left font-italic">';
+                    switch (cc.status) {
+                        case -1:
+                            tr += '<span class="text-info">Initial</span>';
+                            break;
+                        case 0:
+                            tr += '<span class="text-info">Processing</span>';
+                            break;
+                        case 1:
+                            tr += '<span class="text-success">Edited</span>';
+                            break;
+                        case 2:
+                            tr += '<span class="text-primary">Q.A OK</span>';
+                            break;
+                        case 3:
+                            tr += '<span class="text-primary">DC OK</span>';
+                            break;
+                        case 4:
+                            tr += '<span class="text-primary">SALE OK</span>';
+                            break;
+                        case 5:
+                            tr += '<span class="text-primary">Uploaded</span>';
+                            break;
+                        case 6:
+                            tr += '<span class="text-warning">Paid</span>';
+                            break;
+                    }
+                    tr += '</td>';                   
+                    tr += '</tr>';
+                    $('#tblCCList').append(tr);
+                })
+            }
+        })
+    }
 
   function LoadTasks() {
     $.ajax({
