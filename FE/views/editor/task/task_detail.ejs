@@ -159,6 +159,7 @@
             },
             success: function (data) {
 
+                
                 $('#divNationalStyle').html(data.customer.nation.name)
                 $('#divColor').html(data.customer.color.name)
                 $('#divOutput').html(data.customer.output.name)
@@ -176,6 +177,7 @@
                 $('#lblIntruction').text(data.task.basic.job.intruction);
 
                 $('#remarks').empty();
+                console.log(data.task.remarks)
                 data.task.remarks.forEach(r => {
                     let item = '<div class="row mt-2">';
                     item += '<div class="col-md-4 col-sm-4 col-xs-12"><span class="font-weight-bold text-primary">' + r.user.fullname + '</span>(' + convertISODateToTimeFormat(r.timestamp) + '):</div>';

@@ -16,32 +16,33 @@ const _QA = 'QA';
     Chỉ load những nhân viên Editor có trạng thái hoạt động is_active:true
     và có staff-job-level tương ứng với joblevel id được truyền vào từ view
 */
-router.get('/list-editor', authenticateTLAToken, (req, res) => {
+router.get('/list-editor', authenticateTLAToken, async (req, res) => {
     let { levelId } = req.query;
-    StaffJobLevel
-    .find({job_lv:levelId})
-    .exec()
-    .then(sjl=>{
-        
-        let staffLevels = sjl.map(x=>{
-            return x.staff_lv
+
+    let sjl = await StaffJobLevel.find({ job_lv: levelId });
+    if (sjl.length == 0) {
+        return res.status(404).json({
+            msg: `No editor found based on this level`
         })
-        
-        getModuleId(_EDITOR)
-        .then(result => {
-            UserModule
-                .find({ module: result.m._id })
-                .exec()
-                .then(um => {
+    }
+
+    let staffLevels = sjl.map(x => {
+        return x.staff_lv
+    })
+
+    await getModuleId(_EDITOR)
+        .then(async result => {
+            await UserModule.find({ module: result.m._id })
+                .then(async um => {
+
                     let umList = um.map(x => {
                         return x.user._id
                     });
-
-                    User
-                        .find({ 
-                            _id: { $in: umList }, 
-                            user_level:{$in: staffLevels},
-                            is_active: true 
+                   await  User
+                        .find({
+                            _id: { $in: umList },
+                            user_level: { $in: staffLevels },
+                            is_active: true
                         })
                         .select('fullname username')
                         .exec()
@@ -58,19 +59,19 @@ router.get('/list-editor', authenticateTLAToken, (req, res) => {
                         })
                 })
                 .catch(err => {
-                    return res.status(500).json({
-                        msg: `Can not load user module with error: ${new Error(err.message)}`
+                    console.log(err.msg)
+                    return res.status(err.code).json({
+                        msg: err.msg
                     })
                 })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not load staff job level with job id: ${new Error(err.message)}`
-        })
-    })
+        .catch(err => {
+            console.log(err.msg);
+            return res.status(err.code).json({
+                msg: err.msg
+            })
+        })   
 
- 
 })
 
 /*
@@ -79,65 +80,65 @@ router.get('/list-editor', authenticateTLAToken, (req, res) => {
    
 */
 
-router.get('/list-qa', authenticateTLAToken, (req, res) => {  
+router.get('/list-qa', authenticateTLAToken, (req, res) => {
 
-    let { levelId } = req.query;    
+    let { levelId } = req.query;
 
     StaffJobLevel
-    .find({job_lv:levelId})
-    .exec()
-    .then(sjl=>{
-        
-        let staffLevels = sjl.map(x=>{
-            return x.staff_lv
-        })
+        .find({ job_lv: levelId })
+        .exec()
+        .then(sjl => {
 
-      
-        
-        getModuleId(_QA)
-        .then(result => {
-           
-            UserModule
-                .find({ module: result.m._id })
-                .exec()
-                .then(um => {
+            let staffLevels = sjl.map(x => {
+                return x.staff_lv
+            })
 
-                    let umList = um.map(x => {
-                        return x.user._id
-                    });
 
-                    User
-                        .find({ 
-                            _id: { $in: umList }, 
-                            user_level:{$in: staffLevels},
-                            is_active: true 
-                        })
-                        .select('fullname username')
+
+            getModuleId(_QA)
+                .then(result => {
+
+                    UserModule
+                        .find({ module: result.m._id })
                         .exec()
-                        .then(qas => {
-                            return res.status(200).json({
-                                msg: `Load Q.As list successfully!`,
-                                qas
-                            })
+                        .then(um => {
+
+                            let umList = um.map(x => {
+                                return x.user._id
+                            });
+
+                            User
+                                .find({
+                                    _id: { $in: umList },
+                                    user_level: { $in: staffLevels },
+                                    is_active: true
+                                })
+                                .select('fullname username')
+                                .exec()
+                                .then(qas => {
+                                    return res.status(200).json({
+                                        msg: `Load Q.As list successfully!`,
+                                        qas
+                                    })
+                                })
+                                .catch(err => {
+                                    return res.status(500).json({
+                                        msg: `Can not load Q.As list with error: ${new Error(err.message)}`
+                                    })
+                                })
                         })
                         .catch(err => {
                             return res.status(500).json({
-                                msg: `Can not load Q.As list with error: ${new Error(err.message)}`
+                                msg: `Can not load user module with error: ${new Error(err.message)}`
                             })
                         })
                 })
-                .catch(err => {
-                    return res.status(500).json({
-                        msg: `Can not load user module with error: ${new Error(err.message)}`
-                    })
-                })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not load staff job level with job id: ${new Error(err.message)}`
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not load staff job level with job id: ${new Error(err.message)}`
+            })
         })
-    })
 })
 
 

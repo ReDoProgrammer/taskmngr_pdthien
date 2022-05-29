@@ -29,10 +29,11 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
     }
 
 
-    let rm = new Remark();
-    rm.content = remark;
-    rm.tid = taskId;
-    rm.user = req.user._id;
+    let rm = new Remark({
+        content:remark,
+        tid:taskid,
+        user:req.user._id
+    });  
     await rm.save()
         .then(async _ => {
 
