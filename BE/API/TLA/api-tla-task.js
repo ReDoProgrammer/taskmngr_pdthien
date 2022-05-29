@@ -967,9 +967,7 @@ router.put('/', authenticateTLAToken, async (req, res) => {
         taskId,
         deadline,
         input_link,
-        remark,
-        editor_assigned,
-        qa_assigned,
+        remark,     
         qa,
         editor
     } = req.body;
@@ -981,10 +979,16 @@ router.put('/', authenticateTLAToken, async (req, res) => {
             msg: `Can not update task because it\'s not found!`
         })
     }
-    let rm = await Remark.findById(task.remarks[0]._id);
-    rm.content = remark;
+    let rm = new Remark({
+        user:req.user_id,
+        content:remark,
+        tid:taskId
+    });
+    
     await rm.save()
         .then(async _ => {
+            task.remarks.push(rm);
+
             task.basic.deadline.end = deadline;
             task.basic.link.input = input_link;
 
@@ -995,7 +999,7 @@ router.put('/', authenticateTLAToken, async (req, res) => {
 
             //cập nhật Editor
 
-            if (editor_assigned == 'true') {
+            if (editor.length>0) {
                 task.status = 0;
                 if (task.editor.length == 0) {
                     await getModule(_EDITOR)
@@ -1059,13 +1063,25 @@ router.put('/', authenticateTLAToken, async (req, res) => {
                     }
                 }
 
-
-
-
             } else {
                 //trường hợp không gán editor thì set về mặc định
                 task.editor = [];
                 task.status = -1;
+
+                if(task.fixible_task){
+                    let cc = await CC.findById(task.fixible_task);
+                    cc.status = -1;
+                    await cc.save();
+                }
+
+                if(task.additional_task){
+                    let cc = await CC.findById(task.additional_task);
+                    if(cc.additional_task.length==0){
+                        cc.status = -1;
+                        await cc.save();
+                    }                   
+                }
+               
             }
 
 
