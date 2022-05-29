@@ -504,7 +504,6 @@
       success: function (data) {
         let idx = 1;
         $("#tblTasks").empty();
-        console.log(data.tasks)
         data.tasks.forEach(t => {
 
           let tr = '<tr id="' + t._id + '">';

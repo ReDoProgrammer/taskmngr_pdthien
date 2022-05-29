@@ -175,7 +175,7 @@
 
 
 
-    function LoadCCRjTasks() {
+    function LoadCCRjTasks() {  
         $.ajax({
             url: '/tla/task/list',
             type: 'get',
@@ -185,7 +185,7 @@
             data: {
                 jobId
             },
-            success: function (data) {              
+            success: function (data) {      
                 $('#slCCRjTasks').empty();
                 data.tasks.forEach(task => {
                     if (task.status > 0) {
