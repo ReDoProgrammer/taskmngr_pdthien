@@ -5,12 +5,12 @@ const Schema = mongoose.Schema;
 
 
 const ccSchema = new Schema({
-    job:{
+    job: {
         //job mà CC tham chiếu tới
-        type:Schema.Types.ObjectId,
-        ref:'job'
+        type: Schema.Types.ObjectId,
+        ref: 'job'
     },
-    status:{
+    status: {
         /*
             Trạng thái CC:
             -1: được tạo từ sale/customer
@@ -22,59 +22,59 @@ const ccSchema = new Schema({
             5: TLA uploaded
             6: paid
         */
-        type:Number,
-        default:-1
-        
+        type: Number,
+        default: -1
+
     },
-    type:{
+    type: {
         /*
             Đánh dấu trạng thái của loại CC
             false: không tính tiền, chỉnh sửa task cũ do chưa đạt yêu cầu
             true: tính tiền, tạo task mới
         */
-        type:Boolean,
-        default:false
+        type: Boolean,
+        default: false
     },
-    remark:{
+    remark: {
         //ghi chú của CC
-        type:String,
-        default:''
+        type: String,
+        default: ''
     },
-    created:{
-        by:{
+    created: {
+        by: {
             type: Schema.Types.ObjectId,
-            ref:'user'
+            ref: 'user'
         },
-        at:{
+        at: {
             type: Date,
             default: new Date()
         }
     },
-    updated:{
-        by:{
-            type:Schema.Types.ObjectId,
-            ref:'user'
+    updated: {
+        by: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
         },
-        at:{
-            type:Date
+        at: {
+            type: Date
         }
     },
     tasks: [
         //danh sách tham chiếu tới task được tạo để giải quyết CC
         //danh sách này có thể rỗng vì cc chỉ yêu cầu sửa lại task cũ
         {
-            type:Schema.Types.ObjectId,
-            ref:'task'
+            type: Schema.Types.ObjectId,
+            ref: 'task'
         }
-    ],   
-   fix_task:{
-       //lưu task id trong trường hợp cần fix 1 task nào đó - trường hợp CC refix
-       type:Schema.Types.ObjectId,
-       ref:'task'
-   }
-    
+    ],
+    fix_task: {
+        //lưu task id trong trường hợp cần fix 1 task nào đó - trường hợp CC refix
+        type: Schema.Types.ObjectId,
+        ref: 'task'
+    }
+
 });
 
 
-module.exports = mongoose.model('cc',ccSchema);
+module.exports = mongoose.model('cc', ccSchema);
 

@@ -197,6 +197,7 @@ const taskSchema = new Schema({
               -3: DC reject
               -4: Sale reject
               -5: Cancel
+              -6: TLA CC reject
             */
 
     },
