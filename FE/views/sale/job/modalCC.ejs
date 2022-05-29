@@ -152,8 +152,6 @@
             $('#ccMsg').show().delay(2000).fadeOut();
             return;
         }
-
-        console.log(ccId.length)
         if (ccId.length === 0) {
             $.ajax({
                 url: '/sale/cc',
@@ -170,6 +168,7 @@
                 success: function (data) {
                     alert(data.msg);
                     LoadCC();
+                    $('#btnCancelCC').click();
                 }
             })
         } else {
@@ -310,6 +309,7 @@
         $('#ckbChooseTask').prop('checked', false);
         $('#slTasks').attr("disabled", false);
         $('#txtRemark').val('');
+        $('#divTasksList').slideUp(500);
     }
 
 </script>
