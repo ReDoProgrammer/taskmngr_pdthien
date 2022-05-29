@@ -20,7 +20,7 @@ router.post('/', authenticateSaleToken, async (req, res) => {
     }
 
     if (taskId.length > 0) {
-        cc.fix_task = taskId;
+        cc.fixible_tasks.push(taskId);
     }
     let task = taskId.length > 0 ? await Task.findById(taskId) : null;
 
@@ -36,7 +36,7 @@ router.post('/', authenticateSaleToken, async (req, res) => {
             await job.save()
                 .then(async _ => {
                     if (task) {
-                        task.task_cc = cc;
+                        task.fixible_task = cc;
                         await task.save()
                             .then(_ => {
                                 return res.status(201).json({
@@ -148,7 +148,7 @@ router.get('/', authenticateSaleToken, async (req, res) => {
         .populate('created.by', 'fullname')
         .populate('update.by', 'fullname')
         .populate({
-            path: 'fix_task',
+            path: 'fixible_tasks',
             populate: {
                 path: 'basic.level'
             }

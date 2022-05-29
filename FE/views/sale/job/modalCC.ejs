@@ -224,13 +224,12 @@
             success: function (data) {
                 $('#tblCCList').empty();
                 let idx = 1;
-
                 data.ccList.forEach(cc => {
                     let tr = '<tr id="' + cc._id + '">';
                     tr += '<td>' + (idx++) + '</td>';
                     tr += '<td class="font-weight-bold text-danger text-left">';
-                    if (cc.fix_task) {
-                        tr += cc.fix_task.basic.level.name
+                    if (cc.fixible_tasks.length>0) {
+                        tr += cc.fixible_tasks[cc.fixible_tasks.length-1].basic.level.name
                     }
                     tr += '</td>';
 
