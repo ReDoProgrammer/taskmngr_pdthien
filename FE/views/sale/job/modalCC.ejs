@@ -205,7 +205,7 @@
     $('input[type=radio][name=optradio]').change(function () {
 
         if ($('#rbtMoreTask').is(':checked')) {
-            $('#rRefix').slideUp(500);
+            ResetComponents();
         } else {
             $('#rRefix').slideDown(1000);
         }
