@@ -11,67 +11,52 @@ const _EDITOR = 'EDITOR';
 const _QA = 'QA';
 
 
-/*
-    Hàm load danh sách Editor dựa vào module đã set quyền nhân viên
-    Chỉ load những nhân viên Editor có trạng thái hoạt động is_active:true
-    và có staff-job-level tương ứng với joblevel id được truyền vào từ view
-*/
+
 router.get('/list-editor', authenticateTLAToken, async (req, res) => {
     let { levelId } = req.query;
 
+    //BƯỚC 1: lấy danh sách staff job levels dựa vào job level truyền vào
+    /*
+        Kết quả trả về là những staff level nào được quyền xử lý job level truyền vào
+    */
     let sjl = await StaffJobLevel.find({ job_lv: levelId });
     if (sjl.length == 0) {
         return res.status(404).json({
-            msg: `No editor found based on this level`
+            msg: `Can not get any staff job level based on this job level!`
         })
     }
 
-    let staffLevels = sjl.map(x => {
-        return x.staff_lv
-    })
+    let staffLevels = sjl.map(x => x.staff_lv);
 
-    await getModuleId(_EDITOR)
-        .then(async result => {
-            await UserModule.find({ module: result.m._id })
-                .then(async um => {
 
-                    let umList = um.map(x => {
-                        return x.user._id
-                    });
-                   await  User
-                        .find({
-                            _id: { $in: umList },
-                            user_level: { $in: staffLevels },
-                            is_active: true
-                        })
-                        .select('fullname username')
-                        .exec()
-                        .then(editors => {
-                            return res.status(200).json({
-                                msg: `Load editors list successfully!`,
-                                editors
-                            })
-                        })
-                        .catch(err => {
-                            return res.status(500).json({
-                                msg: `Can not load editors list with error: ${new Error(err.message)}`
-                            })
-                        })
+    //Bước 3: lấy module của editor để từ đó lấy thông tin user ở bước 2 tương ứng với module
+    getModuleByName(_EDITOR)
+        .then(async m => {
+
+            let wages = await Wage.find({
+                module: m._id,
+                job_lv: levelId,
+                staff_lv: { $in: staffLevels }
+            })
+            if(wages.length==0){
+                return res.status(403).json({
+                    msg:`Please set wage into editor to continue!`
                 })
-                .catch(err => {
-                    console.log(err.msg)
-                    return res.status(err.code).json({
-                        msg: err.msg
-                    })
-                })
+            }
+            console.log(wages)
+
+            let ugs = wages.map(x=>x.user_group);
+            let editors = await User.find({user_group:{$in:ugs}});
+            // console.log(editors)
+
+
         })
         .catch(err => {
-            console.log(err.msg);
+            console.log(err.msg)
             return res.status(err.code).json({
                 msg: err.msg
             })
-        })   
-
+        })
 })
 
 /*
@@ -95,11 +80,11 @@ router.get('/list-qa', authenticateTLAToken, (req, res) => {
 
 
 
-            getModuleId(_QA)
-                .then(result => {
+            getModuleByName(_QA)
+                .then(m => {
 
                     UserModule
-                        .find({ module: result.m._id })
+                        .find({ module: m._id })
                         .exec()
                         .then(um => {
 
@@ -146,10 +131,9 @@ router.get('/list-qa', authenticateTLAToken, (req, res) => {
 
 module.exports = router;
 
-const getModuleId = (moduleName) => {
-    return new Promise((resolve, reject) => {
-        Module.findOne({ name: moduleName })
-            .exec()
+const getModuleByName = (moduleName) => {
+    return new Promise(async (resolve, reject) => {
+        await Module.findOne({ name: moduleName })
             .then(m => {
                 if (!m) {
                     return reject({
@@ -157,15 +141,12 @@ const getModuleId = (moduleName) => {
                         msg: `Module not found`
                     })
                 }
-                return resolve({
-                    msg: `Module found!`,
-                    m
-                })
+                return resolve(m);
             })
             .catch(err => {
                 return reject({
                     code: 500,
-                    msg: `Can not get module with error: ${new Error(err.message)}`
+                    msg: `Can not find module with error: ${new Error(err.message)}`
                 })
             })
     })
