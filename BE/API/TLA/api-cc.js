@@ -9,6 +9,12 @@ router.get('/', authenticateTLAToken, async (req, res) => {
         .populate('created.by', 'fullname')
         .populate('update.by', 'fullname')
         .populate({
+            path : 'tasks',
+            populate : {
+              path : 'basic.level'
+            }
+          })
+        .populate({
             path: 'fix_task',
             populate: {
                 path: 'basic.level'

@@ -195,8 +195,7 @@
   var levelId = '';
 
 $(document).ready(function(){
-  LoadParentsLevel();
-  LoadCCList();
+  LoadParentsLevel();  
 })
 
 
@@ -335,6 +334,7 @@ $(document).ready(function(){
     LoadTasks();
     LoadJobLevels();
     LoadJob();
+    LoadCCList();
 
     $('.job-info').hide();
 
@@ -413,7 +413,6 @@ $(document).ready(function(){
 
 
   function LoadCCList() {
-        console.log(1234)
         $.ajax({
             url: '/tla/cc',
             type: 'get',
@@ -424,20 +423,23 @@ $(document).ready(function(){
                 jobId
             },
             success: function (data) {
-                $('#tblCCList').empty();
+                $('.tblCCList').empty();
+                console.log(data)
                 let idx = 1;
-
                 data.ccList.forEach(cc => {
                     let tr = '<tr id="' + cc._id + '">';
                     tr += '<td>' + (idx++) + '</td>';
                     tr += '<td class="font-weight-bold text-danger text-left">';
                     if (cc.fix_task) {
-                        tr += cc.fix_task.basic.level.name
+                        tr += cc.fix_task.basic.level.name;
+                    }
+                    if(cc.tasks.length>0){
+                      tr+=cc.tasks[cc.tasks.length-1].basic.level.name;
                     }
                     tr += '</td>';
 
                     tr += '<td class="text-left">' + cc.remark + '</td>';
-                    tr += '<td class="text-left font-italic">';
+                    tr += '<td class="text-left font-italic text-right">';
                     switch (cc.status) {
                         case -1:
                             tr += '<span class="text-info">Initial</span>';
@@ -466,7 +468,7 @@ $(document).ready(function(){
                     }
                     tr += '</td>';                   
                     tr += '</tr>';
-                    $('#tblCCList').append(tr);
+                    $('.tblCCList').append(tr);
                 })
             }
         })
