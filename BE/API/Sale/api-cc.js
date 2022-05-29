@@ -20,7 +20,7 @@ router.post('/', authenticateSaleToken, async (req, res) => {
     }
 
     if (taskId.length > 0) {
-        cc.fixible_tasks.push(taskId);
+        cc.fixible_task=taskId;
     }
     let task = taskId.length > 0 ? await Task.findById(taskId) : null;
 
@@ -148,7 +148,7 @@ router.get('/', authenticateSaleToken, async (req, res) => {
         .populate('created.by', 'fullname')
         .populate('update.by', 'fullname')
         .populate({
-            path: 'fixible_tasks',
+            path: 'fixible_task',
             populate: {
                 path: 'basic.level'
             }

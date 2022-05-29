@@ -67,14 +67,12 @@ const ccSchema = new Schema({
             ref: 'task'
         }
     ],
-    fixible_tasks: [
-        {
+    fixible_task:{
             //lưu task id trong trường hợp cần fix 1 task nào đó - trường hợp CC refix
             type: Schema.Types.ObjectId,
             ref: 'task'
-        }
+    }    
     
-    ]
 });
 
 
