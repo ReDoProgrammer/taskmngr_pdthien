@@ -445,10 +445,7 @@
           tr += '<td class="font-weight-bold text-danger text-left">';
           if (cc.fixible_task) {
             tr += cc.fixible_task.basic.level.name;
-          }
-          if (cc.additional_tasks.length > 0) {
-            tr += cc.additional_tasks[cc.additional_tasks.length - 1].basic.level.name;
-          }
+          }        
           tr += '</td>';
 
           tr += '<td class="text-left">' + cc.remark + '</td>';
@@ -507,6 +504,7 @@
       success: function (data) {
         let idx = 1;
         $("#tblTasks").empty();
+        console.log(data.tasks)
         data.tasks.forEach(t => {
 
           let tr = '<tr id="' + t._id + '">';
@@ -516,12 +514,10 @@
 
           tr += "<td class='font-weight-bold text-info'>";
           tr += t.basic.level.name;
-          if (t.tasks_cc) {
+          if (t.fixible_task || t.additional_task) {
             tr += ' <span class="text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>';
           }
-          if (t.task_cc) {
-            tr += ' <span class="text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>';
-          }
+         
           tr += "</td>";
           tr += "<td>" + convertISODateToTimeFormat(t.basic.deadline.begin) + "</td>";
 
@@ -576,6 +572,7 @@
             case -1: tr += '<span class="text-info">Initial</span>'; break;
             case -2: tr += '<span class="text-danger">Q.A reject</span>'; break;
             case -3: tr += '<span class="text-danger">DC reject</span>'; break;
+            case -6: tr += '<span class="text-danger">Customer Reject</span>'; break;
             case 4: tr += '<span class="text-success">Upload</span>'; break;
             case 5: tr += '<span class="text-success">Done</span>'; break;
             case 6: tr += '<span class="text-success">Finish</span>'; break;
