@@ -9,14 +9,8 @@
             </div>
             <div class="modal-body">
 
-                <div class="row">
-                    <div class="col-md-6 col-sm-12 col-xs-12">
-                        <div class="form-group">
-                            <label for="">Job level</label>
-                            <select name="" id="slCCParentsLevel" class="form-control"></select>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-sm-12 col-xs-12">
+                <div class="row">                    
+                    <div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="form-group">
                             <label for="">Job level</label>
                             <select name="" id="slCCJobLevels" class="form-control"></select>
@@ -127,6 +121,7 @@
     $('#modalCCNewTask').on('hidden.bs.modal', function () {
         $('#JobMngrModal').modal(200);
         LoadTasks();
+        ccId = '';
     })
 
 
@@ -149,6 +144,7 @@
             return;
         }
 
+      
 
 
         if (ccTaskId.trim().length == 0) {
@@ -173,49 +169,15 @@
                 success: function (data) {
                     alert(data.msg);
                     LoadTasks();
-                    $('#txtInputLink').val('');
-                    $('#txtRemark').val('');
-                    $('#divAddOrUpdateTask').slideUp(500);
+                    $('.close').click();
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
                     $('#msgError').show().delay(10000).fadeOut();
                 },
             })
-        } else {
-            $.ajax({
-                url: '/tla/task',
-                type: 'put',
-                headers: {
-                    authorization: "Bearer " + localStorage.getItem("accessToken"),
-                },
-                data: {
-                    taskId,
-                    assigned_date,
-                    deadline,
-                    input_link,
-                    remark,
-                    qa_assigned,
-                    editor_assigned,
-                    qa,
-                    editor
-                },
-                success: function (data) {
-                    alert(data.msg);
-                    LoadTasks();
-                    LoadJob();
-                    $('#txtInputLink').val('');
-                    $('#txtRemark').val('');
-                    $('#divAddOrUpdateTask').slideUp(500);
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
-                    $('#msgError').show().delay(3000).fadeOut();
-                },
-            })
-        }
-        $('#modalCCNewTask').modal('hide');
-        LoadJobs();
+        } 
+        
     })
 
     $("#ckbCCAssignEditor").change(function () {
@@ -245,7 +207,6 @@
     });
 
     $('#slCCJobLevels').on('change', function (e) {
-        console.log(1234);
         LoadCCEditor($('#slCCJobLevels option:selected').val());
         LoadCCQA($('#slCCJobLevels option:selected').val());
     });
@@ -332,24 +293,6 @@
             },
         })
     }
-
-
-    function LoadCCParentsLevel() {
-        $.ajax({
-            url: '/tla/parents-level/list',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            success: function (data) {
-                $('#slCCParentsLevel').empty();
-                data.pls.forEach(p => {
-                    $('#slCCParentsLevel').append('<option value="' + p._id + '">' + p.name + '</option>');
-                })
-            }
-        })
-    }
-
 
 
     $('.inputDate').inputmask("datetime", {
