@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { authenticateSaleToken } = require("../../../middlewares/sale-middleware");
 const CC = require('../../models/cc-model');
 const Job = require('../../models/job-model');
+const Task = require('../../models/task-model');
 router.post('/', authenticateSaleToken, async (req, res) => {
     let { jobId, ccType, remark, taskId } = req.body;
 
@@ -21,14 +22,31 @@ router.post('/', authenticateSaleToken, async (req, res) => {
     if (taskId.length > 0) {
         cc.fix_task = taskId;
     }
+    let task = taskId.length > 0 ? await Task.findById(taskId) : null;
+
+    if (taskId.length > 0 && !task) {
+        return res.status(404).json({
+            msg: `Task not found!`
+        })
+    }
+
     await cc.save()
         .then(async _ => {
             job.cc.push(cc);
             await job.save()
-                .then(_ => {
-                    return res.status(201).json({
-                        msg: `new CC has been created!`
-                    })
+                .then(async _ => {
+                    task.task_cc = cc;
+                    await task.save()
+                        .then(_ => {
+                            return res.status(201).json({
+                                msg: `new CC has been created!`
+                            })
+                        })
+                        .catch(err=>{
+                            return res.status(500).json({
+                                msg:`Can not set cc into task with error: ${new Error(err.message)}`
+                            })
+                        })
                 })
                 .catch(err => {
                     return res.status(500).json({
@@ -44,7 +62,7 @@ router.post('/', authenticateSaleToken, async (req, res) => {
 })
 
 router.put('/', authenticateSaleToken, async (req, res) => {
-    let { ccId, remark, ccType,taskId } = req.body;
+    let { ccId, remark, ccType, taskId } = req.body;
     let cc = await CC.findById(ccId);
     if (!cc) {
         return res.status(404).json({
@@ -52,9 +70,9 @@ router.put('/', authenticateSaleToken, async (req, res) => {
         })
     }
 
-    if(cc.status>0){
+    if (cc.status > 0) {
         return res.status(403).json({
-            msg:`Can not update CC after submited by Editor`
+            msg: `Can not update CC after submited by Editor`
         })
     }
 
@@ -62,7 +80,7 @@ router.put('/', authenticateSaleToken, async (req, res) => {
     cc.type = ccType;
     cc.updated.by = req.user._id;
     cc.updated.at = new Date();
-    if(taskId.length >0){
+    if (taskId.length > 0) {
         cc.fix_task = taskId;
     }
     await cc.save()
@@ -121,11 +139,11 @@ router.get('/', authenticateSaleToken, async (req, res) => {
         .populate('created.by', 'fullname')
         .populate('update.by', 'fullname')
         .populate({
-            path : 'fix_task',
-            populate : {
-              path : 'basic.level'
+            path: 'fix_task',
+            populate: {
+                path: 'basic.level'
             }
-          })
+        })
         .exec()
         .then(ccList => {
             return res.status(200).json({
@@ -140,16 +158,16 @@ router.get('/', authenticateSaleToken, async (req, res) => {
         })
 })
 
-router.get('/detail',authenticateSaleToken,async (req,res)=>{
-    let {ccId} = req.query;    
+router.get('/detail', authenticateSaleToken, async (req, res) => {
+    let { ccId } = req.query;
     let cc = await CC.findById(ccId);
-    if(!cc){
+    if (!cc) {
         return res.status(404).json({
-            msg:`CC not found!`
+            msg: `CC not found!`
         })
     }
     return res.status(200).json({
-        msg:`Load CC detail successfully!`,
+        msg: `Load CC detail successfully!`,
         cc
     })
 })

@@ -303,7 +303,18 @@ const taskSchema = new Schema({
         //cả tla, sale,admin,dc đều có thể can thiệp
         type: Schema.Types.ObjectId,
         ref: 'remark'
-    }]
+    }],
+
+    task_cc:{
+        //thuộc tính tham chiếu tới cột fix_task trong cc model
+        type:Schema.Types.ObjectId,
+        ref:'cc'
+    },
+    tasks_cc:{
+        //thuộc tính tham chiếu tới cột tasks trong cc model
+        type:Schema.Types.ObjectId,
+        ref:'cc'
+    }
 
 });
 
