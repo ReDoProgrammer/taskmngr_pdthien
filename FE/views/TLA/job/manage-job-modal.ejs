@@ -64,7 +64,7 @@
             </div>
           </div>
           <div class="panel-body">
-            <div class="row">              
+            <div class="row">
               <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="form-group">
                   <label for="">Task level</label>
@@ -445,7 +445,7 @@
           tr += '<td class="font-weight-bold text-danger text-left">';
           if (cc.fixible_task) {
             tr += cc.fixible_task.basic.level.name;
-          }        
+          }
           tr += '</td>';
 
           tr += '<td class="text-left">' + cc.remark + '</td>';
@@ -517,7 +517,7 @@
           if (t.fixible_task || t.additional_task) {
             tr += ' <span class="text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>';
           }
-         
+
           tr += "</td>";
           tr += "<td>" + convertISODateToTimeFormat(t.basic.deadline.begin) + "</td>";
 
@@ -652,20 +652,20 @@
     let deadline = strToDate($('#txtDeadline').val());
     let input_link = $('#txtInputLink').val();
     let remark = $('#txtRemark').val();
-    let editor =$("#ckbAssignEditor").is(':checked') ? $('#slEditor option:selected').val():null;
-    let qa = $("#ckbAssignQA").is(':checked') ?$('#slQA option:selected').val():null;
+    let editor = $("#ckbAssignEditor").is(':checked') ? $('#slEditor option:selected').val() : null;
+    let qa = $("#ckbAssignQA").is(':checked') ? $('#slQA option:selected').val() : null;
 
-    if (editor_assigned && typeof editor === 'undefined') {
-      $('#msgError').text('(*) No editor is assigned!');
-      $('#msgError').show().delay(3000).fadeOut();
-      return;
-    }
+    // if (typeof editor === 'undefined') {
+    //   $('#msgError').text('(*) No editor is assigned!');
+    //   $('#msgError').show().delay(3000).fadeOut();
+    //   return;
+    // }
 
-    if (qa_assigned && typeof qa === 'undefined') {
-      $('#msgError').text('(*) No Q.A is assigned!');
-      $('#msgError').show().delay(3000).fadeOut();
-      return;
-    }
+    // if (typeof qa === 'undefined') {
+    //   $('#msgError').text('(*) No Q.A is assigned!');
+    //   $('#msgError').show().delay(3000).fadeOut();
+    //   return;
+    // }
 
     // validateion component inputs
 
@@ -690,7 +690,7 @@
           assigned_date,
           deadline,
           input_link,
-          remark,        
+          remark,
           qa,
           editor
         },
@@ -718,7 +718,7 @@
           assigned_date,
           deadline,
           input_link,
-          remark,      
+          remark,
           qa,
           editor
         },
