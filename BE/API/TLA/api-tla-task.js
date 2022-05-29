@@ -1088,7 +1088,7 @@ router.put('/', authenticateTLAToken, async (req, res) => {
 
             //Cập nhật Q.A
 
-            if (qa_assigned == 'true') {
+            if (qa.length>0) {
                 if (task.qa.length == 0) {
                     await getModule(_QA)
                         .then(async m => {
