@@ -123,10 +123,10 @@
                 } else {
                     $('#rbtRefix').prop('checked', true);
                     $('#rRefix').slideDown(500);
-                    if (data.cc.fixible_tasks.length > 0) {
+                    if (data.cc.fixible_task) {
                         $('#ckbChooseTask').prop('checked', true);
                         $('#divTasksList').slideDown(500);
-                        $('#slTasks').val(data.cc.fix_task);
+                        $('#slTasks').val(data.cc.fixible_task);
                         if (data.cc.status == 0 || data.cc.status == -1) {
                             $('#slTasks').attr("disabled", false);
                         } else {

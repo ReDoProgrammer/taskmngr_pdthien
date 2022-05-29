@@ -90,7 +90,9 @@ router.put('/', authenticateSaleToken, async (req, res) => {
     cc.updated.by = req.user._id;
     cc.updated.at = new Date();
     if (taskId.length > 0) {
-        cc.fix_task = taskId;
+        cc.fixible_task = taskId;
+    }else{
+        cc.fixible_task=null;
     }
     await cc.save()
         .then(_ => {
@@ -106,8 +108,12 @@ router.put('/', authenticateSaleToken, async (req, res) => {
 
 })
 
-router.delete('/', authenticateSaleToken, (req, res) => {
+router.delete('/', authenticateSaleToken, async (req, res) => {
     let { ccId } = req.body;
+
+    
+
+
     CC.findByIdAndDelete(ccId)
         .then(async cc => {
             if (!cc) {
@@ -121,8 +127,14 @@ router.delete('/', authenticateSaleToken, (req, res) => {
                     msg: `Job not found!`
                 })
             }
+            if(cc.fixible_task){
+                let task = await Task.findById(cc.fixible_task);
+                task.fixible_task = null;
+                await task.save();
+            }
 
             job.cc.pull(ccId);
+           
             await job.save()
                 .then(_ => {
                     return res.status(200).json({
