@@ -51,6 +51,7 @@ router.post('/cc', authenticateTLAToken, async (req, res) => {
             let task = new Task();
 
 
+            task.tasks_cc = ccId;//gán thông tin tham chiếu tới cc
 
             //THIẾT LẬP CÁC THÔNG TIN CƠ BẢN CỦA TASK
             let bs = {
