@@ -776,7 +776,7 @@
       success: function (data) {
         $('#slEditor').empty();
         data.editors.forEach(e => {
-          let opt = '<option value="' + e._id + '">' + e.fullname + '</option>';
+          let opt = '<option value="' + e._id + '">' + e.fullname + ' ( '+e.username+' )</option>';
           $('#slEditor').append(opt);
           $('#slEditorInEditDiv').append(opt);
         })

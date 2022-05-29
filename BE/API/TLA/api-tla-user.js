@@ -43,7 +43,7 @@ router.get('/list-editor', authenticateTLAToken, (req, res) => {
                             user_level:{$in: staffLevels},
                             is_active: true 
                         })
-                        .select('fullname')
+                        .select('fullname username')
                         .exec()
                         .then(editors => {
                             return res.status(200).json({
@@ -112,7 +112,7 @@ router.get('/list-qa', authenticateTLAToken, (req, res) => {
                             user_level:{$in: staffLevels},
                             is_active: true 
                         })
-                        .select('fullname')
+                        .select('fullname username')
                         .exec()
                         .then(qas => {
                             return res.status(200).json({

@@ -5,47 +5,54 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">CC reject tasks</h4>
+                <h4 class="modal-title">CC reject tasks ( <i class="text-info">only submited tasks by Editor</i> )</h4>
             </div>
             <div class="modal-body">
-                <div class="form-group row">
-                    <div class="col-md-4">
-                        <label for="">CC type:</label>
-                    </div>
-                    <div class="col-md-8">
-                        <label class="radio-inline"><input type="radio" name="optradio" id="rbtMoreTask" checked>More
-                            task</label>
-                        <label class="radio-inline ml-2"><input type="radio" name="optradio" id="rbtRefix">Refix</label>
-                    </div>
+                <div class="form-group">
+                    <label for="">Tasks list:</label>
+                    <select name="" id="slCCRjTasks" class="form-control"></select>
+                </div>
+                <div class="form-group">
+                    <label for="">Remark:</label>
+                    <input type="text" name="" id="txtCCRjRemark" class="form-control">
                 </div>
 
-                <div class="row" id="rRefix" hidden>
-                    <div class="col-md-4 mt-1">
-                        <div class="form-check mt-1 pt-2">
-                            <input class="form-check-input" type="checkbox" value="" id="ckbChooseTask">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox" value="" id="ckbCCRjAssignEditor" />
                             <label class="form-check-label" for="defaultCheck1">
-                                Refix special task
+                                Assign Editor
                             </label>
                         </div>
                     </div>
-
-                    <div class="col-md-8">
-                        <div class="form-group" id="divTasksList" hidden>
-                            <label for="">Tasks list</label>
-                            <select name="" id="slTasks" class="form-control"></select>
+                    <div class="col-xs-6">
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox" value="" id="ckbCCRjAssignQA" />
+                            <label class="form-check-label" for="defaultCheck1">
+                                Assign Q.A
+                            </label>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-group mt-2">
-                    <label for="">Remark:</label>
-                    <input type="text" name="" id="txtRemark" class="form-control" placeholder="Input CC remark">
+                <div class="row mt-2">
+                    <div class="form-group mt-2 col-md-6 col-sm-6 col-xs-12">
+                        <div id="colCCRjEditor">
+                            <select name="" id="slCCRjEditor" class="form-control selectpicker"
+                                data-live-search="true"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-2 col-md-6 col-sm-6 col-xs-12">
+                        <div id="colCCRjQA">
+                            <select name="" id="slCCRjQA" class="form-control  selectpicker"
+                                data-live-search="true"></select>
+                        </div>
+                    </div>
                 </div>
-                <label class="font-weight-bold text-danger" id="ccMsg"></label>
 
-
-
-
+                <label class="font-weight-bold text-danger" id="ccRjMsg"></label>
 
             </div>
             <div class="modal-footer">
@@ -66,3 +73,134 @@
 
     </div>
 </div>
+
+<script>
+    $("#modalCCRejectTask").on('shown.bs.modal', function (e) {
+        LoadCCRjTasks();
+        $('#colCCRjEditor').hide();
+        $('#colCCRjQA').hide();
+    });
+
+    $("#ckbCCRjAssignEditor").change(function () {
+        if (this.checked) {
+            $('#colCCRjEditor').slideDown(500);
+        } else {
+            $('#colCCRjEditor').slideUp(500);
+        }
+    });
+    $("#ckbCCRjAssignQA").change(function () {
+        if (this.checked) {
+            $('#colCCRjQA').slideDown(500);
+        } else {
+            $('#colCCRjQA').slideUp(500);
+        }
+    });
+
+
+    function LoadCCRjEditor(levelId) {
+        $.ajax({
+            url: '/tla/user/list-editor',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                levelId
+            },
+            success: function (data) {
+                $('#slCCRjEditor').empty();
+                data.editors.forEach(e => {
+                    let opt = '<option value="' + e._id + '">' + e.fullname +'( '+e.username+' )</option>';
+                    $('#slCCRjEditor').append(opt);                    
+                })
+                $('#slCCRjEditor').selectpicker();
+                $('#slCCRjEditor').selectpicker('refresh');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $('#msgError').text(jqXHR.responseJSON.msg);
+            },
+        })
+    }
+
+
+    function LoadCCRjQA(levelId) {
+        $.ajax({
+            url: '/tla/user/list-qa',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                levelId
+            },
+            success: function (data) {
+                $('#slCCRjQA').empty();               
+                data.qas.forEach(q => {
+                    let opt = '<option value="' + q._id + '">' + q.fullname +'( '+q.username+ ' )</option>';
+                    $('#slCCRjQA').append(opt);                    
+                })
+                $('#slCCRjQA').selectpicker();             
+                $('#slCCRjQA').selectpicker('refresh');
+              
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $('#msgError').text(jqXHR.responseJSON.msg);
+            },
+        })
+    }
+
+
+
+
+    function LoadCCRjTasks() {
+        $.ajax({
+            url: '/tla/task/list',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                jobId
+            },
+            success: function (data) {              
+                $('#slCCRjTasks').empty();
+                data.tasks.forEach(task => {
+                    if (task.status > 0) {
+                        let opt = '<option value="' + task._id + '" data-level="'+task.basic.level._id+'"';
+                        opt += '<span class="font-weight-bold text-danger">[ ' + task.basic.level.name + ' ]</span>';
+                        if (task.editor.length > 0) {
+                            opt += ' - ' + task.editor[task.editor.length - 1].staff.fullname + '( ' + task.editor[task.editor.length - 1].staff.username + ' )';
+                        }
+                        opt += '</option>';
+                        $('#slCCRjTasks').append(opt);
+                    }
+                })
+                LoadCC();
+                LoadCCRjEditor($('#slCCRjTasks option:selected').data('level'));
+                LoadCCRjQA($('#slCCRjTasks option:selected').data('level'));
+            }
+        })
+    }
+
+    function LoadCC() {
+        $.ajax({
+            url: '/tla/cc/detail',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                ccId
+            },
+            success: function (data) {
+                if (data.cc.fix_task) {
+                    $('#slCCRjTasks').val(data.cc.fix_task);
+                    $("#slCCRjTasks").mousedown(function (e) {
+                        e.preventDefault();
+                    });
+                }
+
+            }
+        })
+    }
+</script>

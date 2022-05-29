@@ -18,7 +18,8 @@ const _EDITOR = 'EDITOR';
 const _QA = 'QA';
 
 router.put('/cc',authenticateTLAToken,(req,res)=>{
-    
+    let {taskId,remark} = req.body;
+    console.log({taskId,remark} )
 })
 
 
@@ -258,7 +259,7 @@ router.get('/list', authenticateTLAToken, (req, res) => {
             },
             {
                 path: 'editor.staff',
-                select: 'fullname'
+                select: 'fullname username'
             },
             {
                 path: 'qa.staff',
