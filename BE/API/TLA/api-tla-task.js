@@ -186,13 +186,15 @@ router.post('/cc', authenticateTLAToken, async (req, res) => {
 
 
     await getCustomerLevelPrice(customerId, level)
-        .then(async result => {
-
-            if (result.cl.price == 0) {
+        .then(async p => {
+           
+            if (p.price == 0) {
                 return res.status(403).json({
                     msg: `Customer level price unit not available!`
                 })
             }
+
+          
 
             let task = new Task();
 
@@ -203,7 +205,7 @@ router.post('/cc', authenticateTLAToken, async (req, res) => {
             let bs = {
                 job: job,
                 level: level,
-                price: result.cl.price
+                price: p.price
             };
 
             //deadline
