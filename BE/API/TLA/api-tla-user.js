@@ -14,49 +14,41 @@ const _QA = 'QA';
 
 router.get('/list-editor', authenticateTLAToken, async (req, res) => {
     let { levelId } = req.query;
-
-    //BƯỚC 1: lấy danh sách staff job levels dựa vào job level truyền vào
-    /*
-        Kết quả trả về là những staff level nào được quyền xử lý job level truyền vào
-    */
-    let sjl = await StaffJobLevel.find({ job_lv: levelId });
-    if (sjl.length == 0) {
-        return res.status(404).json({
-            msg: `Can not get any staff job level based on this job level!`
-        })
-    }
-
-    let staffLevels = sjl.map(x => x.staff_lv);
-
-
-    //Bước 3: lấy module của editor để từ đó lấy thông tin user ở bước 2 tương ứng với module
     getModuleByName(_EDITOR)
         .then(async m => {
-
             let wages = await Wage.find({
                 module: m._id,
-                job_lv: levelId,
-                staff_lv: { $in: staffLevels }
-            })
-            if(wages.length==0){
+                job_lv: levelId
+            });
+            if (wages.length == 0) {
                 return res.status(403).json({
-                    msg:`Please set wage into editor to continue!`
+                    msg: `Can not find any editor who can process this job level. Please set wage to continue!`
                 })
             }
-            console.log(wages)
 
-            let ugs = wages.map(x=>x.user_group);
-            let editors = await User.find({user_group:{$in:ugs}});
-            // console.log(editors)
-
-
+            let sls = wages.map(x => x.staff_lv);
+            let sgs = wages.map(x => x.user_group);
+            let editors = await User.find({
+                user_group: { $in: sgs },
+                user_level: { $in: sls }
+            }).select("fullname username");
+            if (editors.length == 0) {
+                return res.status(404).json({
+                    msg: `No editor found to acc this job level. Please set wage to continue!`
+                })
+            }
+            return res.status(200).json({
+                msg:`Load editors list successfully!`,
+                editors
+            })
         })
         .catch(err => {
-            console.log(err.msg)
             return res.status(err.code).json({
                 msg: err.msg
             })
         })
+
+
 })
 
 /*
