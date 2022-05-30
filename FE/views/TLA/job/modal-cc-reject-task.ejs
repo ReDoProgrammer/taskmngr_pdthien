@@ -83,8 +83,8 @@
         let taskId = $('#slCCRjTasks option:selected').val();
         let remark = $('#txtCCRjRemark').val();
         let editor = $('#ckbCCRjAssignEditor').is(':checked') ? $('#slCCRjEditor option:selected').val() : null;
-        let qa = $('#ckbCCRjAssignQA').is(':checked') ? $('#slCCRjQA option:selected').val() : null;
 
+        let qa = $('#ckbCCRjAssignQA').is(':checked') ? $('#slCCRjQA option:selected').val() : null;
         $.ajax({
             url: '/tla/task/cc',
             type: 'put',

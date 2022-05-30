@@ -20,6 +20,7 @@ const _QA = 'QA';
 router.put('/cc', authenticateTLAToken, async (req, res) => {
     let { taskId, remark, editor, qa, ccId } = req.body;
 
+
     let task = await Task.findById(taskId);
 
     if (!task) {
@@ -31,7 +32,7 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
 
     let rm = new Remark({
         content: remark,
-        tid: taskid,
+        tid: taskId,
         user: req.user._id
     });
     await rm.save()
@@ -60,11 +61,15 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
                 -- nên chỉ cần quan tâm tới trường hợp có editor truyền vào
                 -- và khác editor hiện đang xử lý task đó
             */
-            if (editor.length > 0 && task.editor[task.editor.length - 1].staff !== editor) {
+           
+            
+                if (editor.length > 0 && task.editor[task.editor.length - 1].staff !== editor) {
                 await getModule(_EDITOR)
                     .then(async m => {
+                       
                         await getWage(editor, task.basic.level, m._id)
                             .then(async w => {
+                               
                                 let ed = {
                                     staff: editor,
                                     wage: w.wage,
@@ -72,6 +77,7 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
                                     timestamp: new Date() //thời điểm được gán task
                                 };
 
+                               
                                 //xử lý liên quan tới timeline của editor hiện tại
                                 if (task.editor[task.editor.length - 1].timeline && task.editor[task.editor.length - 1].timeline.length > 0) {
                                     task.editor[task.editor.length - 1].timeline[task.editor[task.editor.length - 1].timeline.length - 1].unregisted = true;
@@ -101,7 +107,9 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
                 1: qa được truyền vào phải là 1 id Q.A cụ thể
                 2: thiết lập các thông số  cần thiết đối với các Q.A đã xử lý trước đó(nếu có)
             */
-            if (qa.length > 0) {
+         
+                console.log(qa)
+            if (qa && qa.length > 0) {
                 await getModule(_QA)
                     .then(async m => {
                         await getWage(qa, task.basic.level, m._id)
@@ -149,12 +157,14 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
                     })
                 })
                 .catch(err => {
+                    console.log(`Can not CC reject task with error: ${new Error(err.message)}`)
                     return res.status(500).json({
                         msg: `Can not CC reject task with error: ${new Error(err.message)}`
                     })
                 })
         })
         .catch(err => {
+            console.log(`Can not create remark with error: ${new Error(err.message)}`)
             return res.status(500).json({
                 msg: `Can not create remark with error: ${new Error(err.message)}`
             })
