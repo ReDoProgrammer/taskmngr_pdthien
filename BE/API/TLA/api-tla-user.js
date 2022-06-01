@@ -17,96 +17,68 @@ router.get('/list-editor', authenticateTLAToken, async (req, res) => {
 
     let { levelId } = req.query;
 
-    StaffJobLevel
-    .find({ job_lv: levelId })
-    .exec()
-    .then(sjl => {
-
-        let staffLevels = sjl.map(x => {
-            return x.staff_lv
+    let sjl = await StaffJobLevel.find({job_lv:levelId});
+    if(sjl.length == 0){
+        return res.status(403).json({
+            msg:`No editor can process this job level!`
         })
+    }
+//Buoc 1: lay ra cac staff level co the xu ly dc job level truyen vao
+   let sls = sjl.map(x=>x.staff_lv);
+
+
+   //Buoc 2: lay module cua editor
+   let m =await getModuleByName(_EDITOR);
+   if(!m){
+       return res.status(403).json({
+           msg:`Module Editor not found!`
+       })
+   }
+
+   //Buoc 3: lay cac user tuong ung voi module editor da lay dc o buoc 2
+   let ums = await UserModule.find({module:m._id});
+   if(ums.length == 0){
+       return res.status(404).json({
+           msg:`No editor found!`
+       })
+   }
+
+   //Buoc 4: lay cac thiet lap wage dua vao 3 tham so lay duoc o b1,b2 va job level truyen vao 
+   let wages =await  Wage.find({
+        module:m._id,
+        job_lv:levelId,
+        staff_lv:{$in:sls}
+   })
+
+   //Buoc 5: lay cac user thoa man co id thoa buoc 3 va group thoa buoc 5
+   let ugs = wages.map(x=>x.user_group);
+   let userIds = ums.map(x=>x.user);
+
+   let editors = await User.find({
+       _id:{$in:userIds},
+       user_group:{$in:ugs}
+   }).select('fullname username');
+
+   if(editors.length == 0){
+       return res.status(404).json({
+           msg:`No editor found. Please set wage to continue!`
+       })
+   }
+
+   return res.status(200).json({
+       msg:`Load editors by job level successfully!`,
+       editors
+   })
 
 
 
-        getModuleByName(_EDITOR)
-            .then(m => {
-
-                UserModule
-                    .find({ module: m._id })
-                    .exec()
-                    .then(um => {
-
-                        let umList = um.map(x => {
-                            return x.user._id
-                        });
-
-                        User
-                            .find({
-                                _id: { $in: umList },
-                                user_level: { $in: staffLevels },
-                                is_active: true
-                            })
-                            .select('fullname username')
-                            .exec()
-                            .then(editors => {
-                                return res.status(200).json({
-                                    msg: `Load editors list successfully!`,
-                                    editors
-                                })
-                            })
-                            .catch(err => {
-                                return res.status(500).json({
-                                    msg: `Can not load editors list with error: ${new Error(err.message)}`
-                                })
-                            })
-                    })
-                    .catch(err => {
-                        return res.status(500).json({
-                            msg: `Can not load user module with error: ${new Error(err.message)}`
-                        })
-                    })
-            })
-    })
-    .catch(err => {
-        return res.status(500).json({
-            msg: `Can not load staff job level with job id: ${new Error(err.message)}`
-        })
-    })
 
 
-    // getModuleByName(_EDITOR)
-    //     .then(async m => {
-    //         let wages = await Wage.find({
-    //             module: m._id,
-    //             job_lv: levelId
-    //         });
-    //         if (wages.length == 0) {
-    //             return res.status(403).json({
-    //                 msg: `Can not find any editor who can process this job level. Please set wage to continue!`
-    //             })
-    //         }
 
-    //         let sls = wages.map(x => x.staff_lv);
-    //         let sgs = wages.map(x => x.user_group);
-    //         let editors = await User.find({
-    //             user_group: { $in: sgs },
-    //             user_level: { $in: sls }
-    //         }).select("fullname username");
-    //         if (editors.length == 0) {
-    //             return res.status(404).json({
-    //                 msg: `No editor found to acc this job level. Please set wage to continue!`
-    //             })
-    //         }
-    //         return res.status(200).json({
-    //             msg:`Load editors list successfully!`,
-    //             editors
-    //         })
-    //     })
-    //     .catch(err => {
-    //         return res.status(err.code).json({
-    //             msg: err.msg
-    //         })
-    //     })
+
+
+
+    
 
 
 })
