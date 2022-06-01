@@ -217,7 +217,12 @@
             data.tasks.forEach(t => {
               newRow += '<tr>';
               newRow += '<td class="text-right">' + (idx++) + '</td>';
-              newRow += '<td class="font-weight-bold text-primary">' + t.basic.level.name + '</td>';
+              newRow += '<td class="font-weight-bold">';
+              newRow += t.basic.level.name
+              if (t.fixible_task || t.additional_task) {
+                newRow += '<span class="font-weight-bold text-danger ml-2"><i class="fa fa-cc" aria-hidden="true"></i></span>';
+              }
+              newRow += '</td>';
               newRow += '<td>';
               if (t.editor.length > 0 && !t.editor[t.editor.length - 1].unregisted) {
                 newRow += t.editor[t.editor.length - 1].staff.fullname;
@@ -321,6 +326,9 @@
                   break;
                 case -5:
                   newRow += '<span class="text-danger">Canceled</span>';
+                  break;
+                case -6:
+                  newRow += '<span class="text-danger font-weight-bold">CC reject</span>';
                   break;
                 case 4: newRow += '<span class="text-success font-weight-bold">Upload</span>'; break;
                 case 5: newRow += '<span class="text-success font-weight-bold">Done</span>'; break;
