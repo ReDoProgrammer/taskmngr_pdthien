@@ -19,6 +19,9 @@
       <script src="/js/common.js"></script>
 
       <script>
+        $(document).ready(function(){
+          $('#ckbStatus').attr('checked',true);
+        })
         $('#btnCancel').click(function () {
           $(location).attr("href", '/accountant/customer');
         })
