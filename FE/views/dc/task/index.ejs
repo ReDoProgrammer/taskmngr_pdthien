@@ -142,7 +142,12 @@
 
               tr += '<td class="font-weight-bold text-primary">' + getFirstLetters(t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname) + getLastLetters(t.basic.job.customer._id) + '</td>';
               tr += '<td class="font-weight-bold text-danger">' + t.basic.job.name + '</td>';
-              tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';
+              tr += '<td class="font-weight-bold">';
+              tr += t.basic.level.name
+              if (t.fixible_task || t.additional_task) {
+                tr += '<span class="font-weight-bold text-danger ml-2"><i class="fa fa-cc" aria-hidden="true"></i></span>';
+              }
+              tr += '</td>';
               tr += '<td class="text-danger">';
               if (t.basic.deadline.end) {
                 tr += convertISODateToTimeFormat(t.basic.deadline.end);
@@ -222,6 +227,9 @@
                   break;
                 case -5:
                   tr += '<span class="text-danger">Canceled</span>';
+                  break;
+                case -6:
+                  tr += '<span class="text-danger font-weight-bold">CC reject</span>';
                   break;
                 case 4: tr += '<span class="text-success font-weight-bold">Upload</span>'; break;
                 case 5: tr += '<span class="text-success font-weight-bold">Done</span>'; break;
