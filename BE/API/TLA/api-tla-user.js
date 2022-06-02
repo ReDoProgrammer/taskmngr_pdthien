@@ -5,7 +5,7 @@ const UserModule = require('../../models/user-module-model');
 const Module = require('../../models/module-model');
 const Wage = require('../../models/wage-model');
 const StaffJobLevel = require('../../models/staff-job-level-model');
-
+const { ObjectId } = require('mongodb');
 
 const _EDITOR = 'EDITOR';
 const _QA = 'QA';
@@ -18,67 +18,62 @@ router.get('/list-editor', authenticateTLAToken, async (req, res) => {
     let { levelId } = req.query;
 
     let sjl = await StaffJobLevel.find({job_lv:levelId});
+   
     if(sjl.length == 0){
-        return res.status(403).json({
-            msg:`No editor can process this job level!`
+        return res.status(404).json({
+            msg:`No staff level found based on this job level!`
         })
     }
-//Buoc 1: lay ra cac staff level co the xu ly dc job level truyen vao
-   let sls = sjl.map(x=>x.staff_lv);
-
-
-   //Buoc 2: lay module cua editor
-   let m =await getModuleByName(_EDITOR);
-   if(!m){
-       return res.status(403).json({
-           msg:`Module Editor not found!`
-       })
-   }
-
-   //Buoc 3: lay cac user tuong ung voi module editor da lay dc o buoc 2
-   let ums = await UserModule.find({module:m._id});
-   if(ums.length == 0){
-       return res.status(404).json({
-           msg:`No editor found!`
-       })
-   }
-
-   //Buoc 4: lay cac thiet lap wage dua vao 3 tham so lay duoc o b1,b2 va job level truyen vao 
-   let wages =await  Wage.find({
-        module:m._id,
-        job_lv:levelId,
-        staff_lv:{$in:sls}
-   })
-
-   //Buoc 5: lay cac user thoa man co id thoa buoc 3 va group thoa buoc 5
-   let ugs = wages.map(x=>x.user_group);
-   let userIds = ums.map(x=>x.user);
-
-   let editors = await User.find({
-       _id:{$in:userIds},
-       user_group:{$in:ugs}
-   }).select('fullname username');
-
-   if(editors.length == 0){
-       return res.status(404).json({
-           msg:`No editor found. Please set wage to continue!`
-       })
-   }
-
-   return res.status(200).json({
-       msg:`Load editors by job level successfully!`,
-       editors
-   })
-
-
-
-
-
-
-
-
-
     
+    let stlIds = sjl.map(x=>x.staff_lv);
+    
+
+    let m = await getModuleByName(_EDITOR);
+    if(!m){
+        return res.status(404).json({
+            msg:`Module editor not found!`
+        })
+    }
+
+    let ums = await UserModule.find({module:m._id});
+    if(ums.length == 0){
+        return res.status(404).json({
+            msg:`No editor found can access editor module!`
+        })
+    }
+    let userInModule = ums.map(x=>x.user);
+
+    let wages = await Wage.find({
+        module: m._id,
+        job_lv: levelId,
+        staff_lv: {$in:stlIds}
+
+    });
+
+    if(wages.length == 0){
+        return res.status(404).json({
+            msg:`Please set wage into editor to continue!`
+        })
+    }
+
+    let ugs = wages.map(x=>x.user_group);
+    
+    let editors = await User.find({
+        user_group: {$in:ugs},
+        user_level: {$in:stlIds},
+        _id: {$in:userInModule}
+    }).select('fullname username');
+
+    if(editors.length == 0){
+        return res.status(404).json({
+            msg:`No editors found!`
+        })
+    }
+
+    return res.status(200).json({
+        msg:`Load editors based on job level successfully!`,
+        editors
+    })
 
 
 })
