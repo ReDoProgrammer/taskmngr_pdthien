@@ -75,7 +75,20 @@ const jobSchema = new Schema({
 
 
     //phan lien quan toi nhan vien chup anh
-
+    captured:{
+        user:{
+            type:Schema.Types.ObjectId,
+            ref:'user'
+        },
+        price:{
+            type:Number,
+            default:0
+        },
+        quantity:{
+            type:Number,
+            default:0
+        }
+    }
    
 });
 
