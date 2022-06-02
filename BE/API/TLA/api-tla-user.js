@@ -84,65 +84,68 @@ router.get('/list-editor', authenticateTLAToken, async (req, res) => {
    
 */
 
-router.get('/list-qa', authenticateTLAToken, (req, res) => {
+router.get('/list-qa', authenticateTLAToken, async (req, res) => {
 
     let { levelId } = req.query;
 
-    StaffJobLevel
-        .find({ job_lv: levelId })
-        .exec()
-        .then(sjl => {
-
-            let staffLevels = sjl.map(x => {
-                return x.staff_lv
-            })
-
-
-
-            getModuleByName(_QA)
-                .then(m => {
-
-                    UserModule
-                        .find({ module: m._id })
-                        .exec()
-                        .then(um => {
-
-                            let umList = um.map(x => {
-                                return x.user._id
-                            });
-
-                            User
-                                .find({
-                                    _id: { $in: umList },
-                                    user_level: { $in: staffLevels },
-                                    is_active: true
-                                })
-                                .select('fullname username')
-                                .exec()
-                                .then(qas => {
-                                    return res.status(200).json({
-                                        msg: `Load Q.As list successfully!`,
-                                        qas
-                                    })
-                                })
-                                .catch(err => {
-                                    return res.status(500).json({
-                                        msg: `Can not load Q.As list with error: ${new Error(err.message)}`
-                                    })
-                                })
-                        })
-                        .catch(err => {
-                            return res.status(500).json({
-                                msg: `Can not load user module with error: ${new Error(err.message)}`
-                            })
-                        })
-                })
+    let sjl = await StaffJobLevel.find({job_lv:levelId});
+   
+    if(sjl.length == 0){
+        return res.status(404).json({
+            msg:`No Q.A staff level found based on this job level!`
         })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not load staff job level with job id: ${new Error(err.message)}`
-            })
+    }
+    
+    let stlIds = sjl.map(x=>x.staff_lv);
+    
+
+    let m = await getModuleByName(_QA);
+    if(!m){
+        return res.status(404).json({
+            msg:`Module QA not found!`
         })
+    }
+
+    let ums = await UserModule.find({module:m._id});
+    if(ums.length == 0){
+        return res.status(404).json({
+            msg:`No Q.A found can access Q.A module!`
+        })
+    }
+    let userInModule = ums.map(x=>x.user);
+
+    let wages = await Wage.find({
+        module: m._id,
+        job_lv: levelId,
+        staff_lv: {$in:stlIds}
+
+    });
+
+    if(wages.length == 0){
+        return res.status(404).json({
+            msg:`Please set wage into Q.A to continue!`
+        })
+    }
+
+    let ugs = wages.map(x=>x.user_group);
+    
+    let qas = await User.find({
+        user_group: {$in:ugs},
+        user_level: {$in:stlIds},
+        _id: {$in:userInModule}
+    }).select('fullname username');
+
+    if(qas.length == 0){
+        return res.status(404).json({
+            msg:`No Q.A found!`
+        })
+    }
+
+    return res.status(200).json({
+        msg:`Load Q.A based on job level successfully!`,
+        qas
+    })
+
 })
 
 
