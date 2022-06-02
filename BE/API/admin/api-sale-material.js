@@ -3,9 +3,17 @@ const { authenticateAdminToken } = require("../../../middlewares/middleware");
 const SaleMaterial = require('../../models/sale-material');
 
 router.delete('/', authenticateAdminToken, async (req, res) => {
-    let {id} = req.body.id;
-    SaleMaterial.findByIdAndDelete(id,(err)=>{
+    let {mId} = req.body;
+    SaleMaterial.findByIdAndDelete(mId,(err)=>{
+        if(err){
+            return res.status(500).json({
+                msg:`Can not delete this sale material with error: ${new Error(err.message)}`
+            })
+        }
 
+        return res.status(200).json({
+            msg:`The sale material has been deleted!`
+        })
     })
 })
 
@@ -20,8 +28,8 @@ router.get('/list',authenticateAdminToken, async (req, res) => {
 });
 
 router.get('/detail', authenticateAdminToken,async (req, res) => {
-    let { id } = req.query;
-    let m = await SaleMaterial.findById(id);
+    let { mId } = req.query;
+    let m = await SaleMaterial.findById(mId);
     if(!m){
         return res.status(404).json({
             msg:`Sale material not found!`
@@ -58,9 +66,9 @@ router.post('/', authenticateAdminToken, async (req, res) => {
 })
 
 router.put('/', authenticateAdminToken,async (req, res) => {
-    let { id, name, description, price } = req.body;
+    let { mId, name, description, price } = req.body;
 
-    let m = await SaleMaterial.findById(id);
+    let m = await SaleMaterial.findById(mId);
 
     if(!m){
         return res.status(404).json({
