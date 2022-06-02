@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
+/*
+    Model này dùng để quản lý thông tin các loại ảnh mà sale chụp
+    làm đầu vào cho job
+*/
 
 const saleMaterialSchema = new Schema({
     name:{
