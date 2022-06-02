@@ -174,7 +174,6 @@ const adminJobLevelController = require('./BE/controllers/Admin/job-leve-control
 const adminLevelController = require("./BE/controllers/Admin/level-controller");
 const adminModuleController = require('./BE/controllers/Admin/module-controller');
 const adminBonusPenaltyController = require('./BE/controllers/Admin/bonus-penalty-controller');
-const adminParentsLevelController = require('./BE/controllers/Admin/parents-level-controler');
 const adminStaffLevelController = require("./BE/controllers/Admin/staff-level-controller");
 
 const adminNationalStyleController = require('./BE/controllers/Admin/national-style-controller');
@@ -223,7 +222,6 @@ const apiAdminModule = require('./BE/API/admin/api-module');
 const apiAdminNationalStyle = require('./BE/API/admin/api-national-style');
 const apiAdminBonusPenalty = require('./BE/API/admin/api-bonus-penalty');
 const apiAdminSize = require('./BE/API/admin/api-size');
-const apiAdminParentsLevel = require('./BE/API/admin/api-parents-level');
 const apiAdminUser = require('./BE/API/admin/api-user');
 const apiAdminStatus = require('./BE/API/admin/api-status');
 const apiAdminStyle = require('./BE/API/admin/api-style');
@@ -326,8 +324,6 @@ app.use('/tla/job-level',apiTLAJobLevel);
 const apiTLALevel = require('./BE/API/TLA/api-tla-level');
 app.use('/tla/level',apiTLALevel);
 
-const apiTLAParentsLevel = require('./BE/API/TLA/api-parents-level');
-app.use('/tla/parents-level',apiTLAParentsLevel);
 
 const apiTLATask = require('./BE/API/TLA/api-tla-task');
 app.use('/tla/task',apiTLATask);
@@ -354,7 +350,6 @@ app.use('/admin/job-level',apiAdminJobLevel);//quản lý thông tin danh sách 
 app.use('/admin/bonus-penalty',apiAdminBonusPenalty);//quản lý các hình thức phạt đối với nhân viên
 app.use('/admin/module',apiAdminModule);// quản lý danh sách module của web
 app.use('/admin/national-style',apiAdminNationalStyle);//quản lý thông tin style của khách hàng theo quốc gia
-app.use('/admin/parents-level',apiAdminParentsLevel);
 app.use('/admin/size',apiAdminSize);//quản lý thông tin kích thước file hình ảnh 
 app.use('/admin/staff-level',apiAdminStaffLevel);//quản lý level của nhân viên, phân loại nhân viên: người mới, tập sự, học việc,...
 app.use('/admin/staff-job-level',apiAdminStaffJobLevel);//quản lý level của nhân viên tuơng ứng với các job level có thể làm
@@ -388,7 +383,6 @@ app.use("/admin/setting/level", adminLevelController);
 app.use('/admin/setting/module',adminModuleController);
 app.use('/admin/setting/national-style',adminNationalStyleController);
 app.use('/admin/setting/bonus-penalty',adminBonusPenaltyController);
-app.use('/admin/parents-level',adminParentsLevelController);//quan ly cac level cua khach hang
 app.use("/admin/setting/size", adminSizeController);
 app.use("/admin/setting/status", adminStatusController);
 app.use("/admin/setting/style", adminStyleController);
