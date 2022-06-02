@@ -232,6 +232,12 @@
     let cb_ticked = $("#ckbChooseCombo").is(':checked');
     let cb = $('#slCombo option:selected').val();
 
+    let material = $('#ckbMaterial').is(':checked')?$('#slMaterials option:selected').val():null;
+    let captureder = $('#ckbMaterial').is(':checked')?$('#slCaptureders option:selected').val():null;
+    let quantity = $('#txtQuantity').val();   
+
+  
+
 
     if (isNaN(delivery_date) || delivery_date === null || isNaN(received_date) || received_date == null) {
       $('#lblError').text('(*) Received date or delivery date is  invalid!');
@@ -260,7 +266,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { customer, name, input_link, received_date, delivery_date, intruction, cb_ticked, cb },
+      data: { customer, name, input_link, received_date, delivery_date, intruction, cb_ticked, cb ,material,captureder,quantity},
       success: function (data) {
         alert(data.msg);
         $('#addJobModal').modal('hide');
