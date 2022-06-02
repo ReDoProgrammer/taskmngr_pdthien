@@ -68,7 +68,7 @@
     })
 
     $(document).on("click", "button[name='delete']", function () {
-        if (confirm("Are you sure want to delete this sale material?")) {
+        if (confirm("Are you sure want to delete this material?")) {
             $.ajax({
                 url: '/admin/sale-material',
                 type: 'delete',

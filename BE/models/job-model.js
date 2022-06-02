@@ -71,7 +71,11 @@ const jobSchema = new Schema({
     cc:[{
         type:Schema.Types.ObjectId,
         ref:'cc'
-    }]
+    }],
+
+
+    //phan lien quan toi nhan vien chup anh
+
    
 });
 

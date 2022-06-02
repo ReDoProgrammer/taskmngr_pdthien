@@ -2,9 +2,9 @@ const router = require('express').Router();
 
 
 router.get('/',(req,res)=>{
-    res.render('admin/sale-material/index',{
+    res.render('admin/material/index',{
         layout:'layouts/admin-layout',
-        title: 'Sale material'
+        title: 'Material'
     });
 })
 

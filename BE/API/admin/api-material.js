@@ -1,43 +1,43 @@
 const router = require('express').Router();
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
-const SaleMaterial = require('../../models/sale-material');
+const Material = require('../../models/material');
 
 router.delete('/', authenticateAdminToken, async (req, res) => {
     let {mId} = req.body;
-    SaleMaterial.findByIdAndDelete(mId,(err)=>{
+    Material.findByIdAndDelete(mId,(err)=>{
         if(err){
             return res.status(500).json({
-                msg:`Can not delete this sale material with error: ${new Error(err.message)}`
+                msg:`Can not delete this material with error: ${new Error(err.message)}`
             })
         }
 
         return res.status(200).json({
-            msg:`The sale material has been deleted!`
+            msg:`The material has been deleted!`
         })
     })
 })
 
 router.get('/list',authenticateAdminToken, async (req, res) => {
     let {search} = req.query;
-   let ml = await SaleMaterial.find({ "name": { "$regex": search, "$options": "i" } });
+   let ml = await Material.find({ "name": { "$regex": search, "$options": "i" } });
 
    return res.status(200).json({
-       msg:`Load sale material list successfully!`,
+       msg:`Load material list successfully!`,
        ml
    })
 });
 
 router.get('/detail', authenticateAdminToken,async (req, res) => {
     let { mId } = req.query;
-    let m = await SaleMaterial.findById(mId);
+    let m = await Material.findById(mId);
     if(!m){
         return res.status(404).json({
-            msg:`Sale material not found!`
+            msg:`material not found!`
         })
     }
 
     return res.status(200).json({
-        msg:`Load Sale material successfully!`,
+        msg:`Load material successfully!`,
         m
     })
 })
@@ -46,7 +46,7 @@ router.get('/detail', authenticateAdminToken,async (req, res) => {
 router.post('/', authenticateAdminToken, async (req, res) => {
     let { name, description, price } = req.body;
    
-    let m = new SaleMaterial();
+    let m = new Material();
     m.name = name;
     m.description = description;
     m.price = price;
@@ -54,12 +54,12 @@ router.post('/', authenticateAdminToken, async (req, res) => {
     await m.save()
     .then(_=>{
         return res.status(201).json({
-            msg:`Sale material has been created!`
+            msg:`material has been created!`
         })
     })
     .catch(err=>{
         return res.status(500).json({
-            msg:`Can not create sale material with error: ${new Error(err.message)}`
+            msg:`Can not create material with error: ${new Error(err.message)}`
         })
     })
    
@@ -68,11 +68,11 @@ router.post('/', authenticateAdminToken, async (req, res) => {
 router.put('/', authenticateAdminToken,async (req, res) => {
     let { mId, name, description, price } = req.body;
 
-    let m = await SaleMaterial.findById(mId);
+    let m = await Material.findById(mId);
 
     if(!m){
         return res.status(404).json({
-            msg:`Sale material not found!`
+            msg:`material not found!`
         })
     }
 
@@ -83,7 +83,7 @@ router.put('/', authenticateAdminToken,async (req, res) => {
     await m.save()
     .then(_=>{
         return res.status(200).json({
-            msg:`The sale material has been updated!`
+            msg:`The material has been updated!`
         })
     })
     .catch(err=>{
