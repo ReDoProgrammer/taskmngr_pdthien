@@ -5,11 +5,11 @@ const SaleMaterial = require('../../models/sale-material');
 router.delete('/', authenticateAdminToken, async (req, res) => {
     let {id} = req.body.id;
     SaleMaterial.findByIdAndDelete(id,(err)=>{
-        
+
     })
 })
 
-router.get('/',authenticateAdminToken, async (req, res) => {
+router.get('/list',authenticateAdminToken, async (req, res) => {
     let {search} = req.query;
    let ml = await SaleMaterial.find({ "name": { "$regex": search, "$options": "i" } });
 
