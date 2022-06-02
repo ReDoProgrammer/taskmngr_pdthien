@@ -2,6 +2,8 @@
 <script type='text/javascript'
   src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
 
+<script src="/js/bootstrap-select.min.js"></script>
+<link href="/css/bootstrap-select.min.css" rel="stylesheet" />
 
 <div class="modal" tabindex="-1" role="dialog" id="addJobModal">
   <div class="modal-dialog" role="document">
@@ -70,14 +72,37 @@
               </div>
             </div>
             <div class="row" id="divCombo">
-             <div class="col-sm-12">
-              <select name="" id="slCombo" class="form-control"></select>
-             </div>
+              <div class="col-sm-12">
+                <select name="" id="slCombo" class="form-control"></select>
+              </div>
             </div>
             <div class="row">
               <div class="col-sm-12 form-group">
                 <label for="">Intruction:</label>
                 <textarea name="" id="txaIntruction" rows="2" class="form-control"></textarea>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12 form-group">
+                <div class="checkbox">
+                  <label><input type="checkbox" id="ckbMaterial">Material</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="row" id="rMaterial" hidden>
+              <div class="col-md-5 form-group">
+                <label for="">Material type:</label>
+                <select name="" id="slMaterials" class="form-control"></select>
+              </div>
+              <div class="col-md-5 form-group">
+                <label for="">Captureder</label>
+                <select name="" id="slCaptureders" class="form-control selectpicker" data-live-search="true"></select>
+              </div>
+              <div class="col-md-2 form-group">
+                <label for="">Quantity:</label>
+                <input type="text" name="" id="txtQuantity" class="form-control">
               </div>
             </div>
 
@@ -104,8 +129,9 @@
 
 <script>
 
-  $(document).ready(function(){
+  $(document).ready(function () {
     LoadCombo();
+    LoadCaptureders();
   })
 
   $('#txtDuration').keyup(function (e) {
@@ -119,37 +145,81 @@
     $('#txtDeliveryDate').val(convertISODateToTimeFormat(deadline));
   });
 
-  function LoadCombo(){
+  function LoadCombo() {
     $.ajax({
-      url:'/sale/combo',
-      type:'get',
+      url: '/sale/combo',
+      type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      success:function(data){
-        data.cbs.forEach(c=>{
-          let opt = '<option value="'+c._id+'">'+c.name+'</option>';
+      success: function (data) {
+        data.cbs.forEach(c => {
+          let opt = '<option value="' + c._id + '">' + c.name + '</option>';
           $('#slCombo').append(opt);
         })
       }
     })
   }
 
+  function LoadMaterials() {
+    $.ajax({
+      url: '/sale/material',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      success: function (data) {
+        $('#slMaterials').empty();
+        data.materials.forEach(m => {
+          $('#slMaterials').append('<option value = "' + m._id + '">' + m.name + '</option>');
+        })
+      }
+    })
+  }
+
+  function LoadCaptureders() {
+    $.ajax({
+      url: '/sale/user',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      success: function (data) {
+        $('#slCaptureders').empty();
+        data.captureders.forEach(u => {
+          $('#slCaptureders').append('<option value="' + u._id + '">' + u.fullname + ' (' + u.username + ') </option>');
+        })
+        $('#slCaptureders').selectpicker();
+        $('#slCaptureders').selectpicker('refresh');
+      }
+    })
+  }
+
+
   $("#addJobModal").on('shown.bs.modal', function (e) {
     $('#txtReceivedDate').val(getCurrentTime())
     $('#lblError').hide();
     $('#ckbChooseCombo').prop('checked', false);
     $('#divCombo').hide();
+    LoadMaterials();
 
   })
 
-  $("#ckbChooseCombo").change(function() {
-    if(this.checked) {
-     $('#divCombo').slideDown(600);
-   }else{
-    $('#divCombo').slideUp(600);
-   }
-});
+  $("#ckbChooseCombo").change(function () {
+    if (this.checked) {
+      $('#divCombo').slideDown(600);
+    } else {
+      $('#divCombo').slideUp(600);
+    }
+  });
+
+  $("#ckbMaterial").change(function () {
+    if (this.checked) {
+      $('#rMaterial').slideDown(600);
+    } else {
+      $('#rMaterial').slideUp(600);
+    }
+  });
 
 
   $('#btnSubmitJob').click(function () {
@@ -159,8 +229,8 @@
     let received_date = strToDate($('#txtReceivedDate').val());
     let delivery_date = strToDate($('#txtDeliveryDate').val());
     let intruction = $('#txaIntruction').val();
-    let cb_ticked =  $("#ckbChooseCombo").is(':checked');
-    let cb  = $('#slCombo option:selected').val();
+    let cb_ticked = $("#ckbChooseCombo").is(':checked');
+    let cb = $('#slCombo option:selected').val();
 
 
     if (isNaN(delivery_date) || delivery_date === null || isNaN(received_date) || received_date == null) {
@@ -190,7 +260,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { customer, name, input_link, received_date, delivery_date, intruction,cb_ticked,cb },
+      data: { customer, name, input_link, received_date, delivery_date, intruction, cb_ticked, cb },
       success: function (data) {
         alert(data.msg);
         $('#addJobModal').modal('hide');

@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
-const Material = require('../../models/material');
+const Material = require('../../models/material-model');
 
 router.delete('/', authenticateAdminToken, async (req, res) => {
     let {mId} = req.body;

@@ -270,8 +270,15 @@ const apiSaleJob = require('./BE/API/Sale/api-sale-job');
 app.use('/sale/job',apiSaleJob);
 
 
+const apiSaleMaterial = require('./BE/API/Sale/api-material');
+app.use('/sale/material',apiSaleMaterial);
+
+
 const apiSaleTask = require('./BE/API/Sale/api-sale-task');
 app.use('/sale/task',apiSaleTask);
+
+const apiSaleUser = require('./BE/API/Sale/api-user');
+app.use('/sale/user',apiSaleUser);
 
 // // /*
 // //   TLA Controllers
