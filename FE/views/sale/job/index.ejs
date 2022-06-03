@@ -23,6 +23,7 @@
     <th>Job</th>
     <th>Receive date</th>
     <th>Delivery date</th>
+    <th>Combo</th>
     <th>Status</th>
     <th></th>
   </thead>
@@ -385,23 +386,21 @@
                 tr += '<td>' + (idx++) + '</td>';
                 tr += '<td class="font-weight-bold text-primary">' + j.customer.firstname + ' ' + j.customer.lastname + '</td>';
                 tr += '<td class="font-weight-bold text-danger">' + getFirstLetters(j.customer.firstname + ' ' + j.customer.lastname) + getLastLetters(j.customer._id) + '</td>';
-                tr += '<td class="font-weight-bold text-warning">' + j.name + '</td>';
+                tr += '<td class="font-weight-bold text-warning">';
+                tr += j.name;
+                if (j.captured.user) {
+                  tr += '<i class="fa fa-camera text-primary ml-2" aria-hidden="true"></i>'
+                }
+                tr += '</td>';
                 tr += '<td>' + convertISODateToTimeFormat(j.deadline.begin) + '</td>';
                 tr += '<td>' + convertISODateToTimeFormat(j.deadline.end) + '</td>';
+                tr += '<td class="font-weight-bold text-primary">';
+                if (j.cb) {
+                  tr += j.cb.name;
+                }
+                tr += '</td>';
 
                 tr += '<td>';
-
-                /*            
-               0: Processing
-               1:Upload   
-               2:Done
-               3: finish
-    
-               -1: initial
-               -2:'Rejected
-               
-               - 3: Canceled           
-           */
 
                 switch (j.status) {
                   case -1: tr += '<i class="text-info">Initial</i>'; break;

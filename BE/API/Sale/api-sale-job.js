@@ -54,6 +54,7 @@ router.get("/list", authenticateSaleToken, (req, res) => {
     })
     .populate('cb')
     .populate('tasks')
+    .populate('captured.user')
     .exec()
     .then((jobs) => {
       let result = jobs.slice(process.env.PAGE_SIZE * (page - 1), process.env.PAGE_SIZE);
@@ -84,6 +85,7 @@ router.get('/list-by-customer', authenticateSaleToken, async (req, res) => {
   let jobs = await Job.find({ customer: custId })
     .populate('cb')
     .populate('created.by')
+    .populate('captured.user')
     .sort({ _id: -1 })
     .limit(10);
   return res.status(200).json({
