@@ -2,7 +2,10 @@
 <script type='text/javascript'
   src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
 
+  <script src="/js/bootstrap-select.min.js"></script>
+  <link href="/css/bootstrap-select.min.css" rel="stylesheet" />
 
+  
 <div class="modal" tabindex="-1" role="dialog" id="updateJobModal">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -72,6 +75,28 @@
                 <textarea name="" id="txaIntruction" rows="2" class="form-control"></textarea>
               </div>
             </div>
+            <div class="row">
+              <div class="col-md-12 form-group">
+                <div class="checkbox">
+                  <label><input type="checkbox" id="ckbMaterial">Material</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="row" id="rMaterial" hidden>
+              <div class="col-md-5 form-group">
+                <label for="">Material type:</label>
+                <select name="" id="slMaterials" class="form-control"></select>
+              </div>
+              <div class="col-md-5 form-group">
+                <label for="">Captureder</label>
+                <select name="" id="slCaptureders" class="form-control selectpicker" data-live-search="true"></select>
+              </div>
+              <div class="col-md-2 form-group">
+                <label for="">Quantity:</label>
+                <input type="text" name="" id="txtQuantity" class="form-control">
+              </div>
+            </div>
 
             <div class="row">
               <div class="col-md-12 col-sm-12 col-xs12">
@@ -97,6 +122,8 @@
 <script>
   $(document).ready(function () {
     LoadCombo()
+    LoadMaterials();
+    LoadCaptureders();
   })
   function LoadCombo() {
     $.ajax({
@@ -124,6 +151,7 @@
   });
 
   $("#updateJobModal").on('shown.bs.modal', function (e) {
+   
     $.ajax({
       url: '/sale/job/detail',
       type: 'get',
@@ -134,21 +162,36 @@
         jobId
       },
       success: function (data) {
+        console.log(data.job)
         $('#lblCustomerFullname').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
         $('#lblCustomerPhone').text(data.job.customer.phone);
         $('#lblCustomerEmail').text(data.job.customer.email);
         $('#txtName').val(data.job.name);
-        $('#txtLinkSource').val(data.job.input_link);
-        $('#txtReceivedDate').val(convertISODateToTimeFormat(data.job.received_date));
-        $('#txtDeliveryDate').val(convertISODateToTimeFormat(data.job.delivery_date));
+        $('#txtLinkSource').val(data.job.link.input);
+        $('#txtReceivedDate').val(convertISODateToTimeFormat(data.job.deadline.begin));
+        $('#txtDeliveryDate').val(convertISODateToTimeFormat(data.job.deadline.end));
         $('#txaIntruction').val(data.job.intruction);
-        $('#ckbChooseCombo').prop('checked', data.job.cb_ticked);
-        if ($('#ckbChooseCombo').is(':checked')) {
-          $('#divCombo').show();
+        if (data.job.cb) {
+          $('#ckbChooseCombo').prop('checked', true);
+          $('#divCombo').slideDown();
           $('#slCombo').val(data.job.cb)
+
         } else {
-          $('#divCombo').hide();
+          $('#ckbChooseCombo').prop('checked', false);
+          $('#divCombo').slideUp();
         }
+
+        if(data.job.captured.user){
+          $('#ckbMaterial').prop('checked', true);
+          $('#rMaterial').slideDown();
+          console.log(data.job.captured)
+          $('#slMaterials').val(data.job.captured.material);
+          $('#txtQuantity').val(data.job.captured.quantiry)
+        }else{
+          $('#ckbMaterial').prop('checked', false);
+          $('#rMaterial').slideUp();
+        }
+
 
 
       },
@@ -205,6 +248,39 @@
     })
   })
 
+  function LoadMaterials() {
+    $.ajax({
+      url: '/sale/material',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      success: function (data) {
+        $('#slMaterials').empty();
+        data.materials.forEach(m => {
+          $('#slMaterials').append('<option value = "' + m._id + '">' + m.name + '</option>');
+        })
+      }
+    })
+  }
+
+  function LoadCaptureders() {
+    $.ajax({
+      url: '/sale/user',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      success: function (data) {
+        $('#slCaptureders').empty();
+        data.captureders.forEach(u => {
+          $('#slCaptureders').append('<option value="' + u._id + '">' + u.fullname + ' (' + u.username + ') </option>');
+        })
+        $('#slCaptureders').selectpicker();
+        $('#slCaptureders').selectpicker('refresh');
+      }
+    })
+  }
 
 
   $('.inputDate').inputmask("datetime", {

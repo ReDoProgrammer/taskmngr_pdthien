@@ -204,6 +204,10 @@
     LoadMaterials();
 
   })
+  $('#addJobModal').on('hidden.bs.modal', function () {
+    LoadCustomers(search, page);  
+  })
+
 
   $("#ckbChooseCombo").change(function () {
     if (this.checked) {
@@ -222,6 +226,7 @@
   });
 
 
+
   $('#btnSubmitJob').click(function () {
     let customer = customerId;
     let name = $('#txtName').val();
@@ -234,7 +239,6 @@
     let material = $('#ckbMaterial').is(':checked') ? $('#slMaterials option:selected').val() : null;
     let captureder = $('#ckbMaterial').is(':checked') ? $('#slCaptureders option:selected').val() : null;
     let quantity = $('#txtQuantity').val();
-
 
 
 

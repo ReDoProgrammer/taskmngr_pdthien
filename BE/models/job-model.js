@@ -93,6 +93,10 @@ const jobSchema = new Schema({
 
     //phan lien quan toi nhan vien chup anh
     captured: {
+        material:{
+            type:Schema.Types.ObjectId,
+            ref:'material'
+        },
         user: {
             type: Schema.Types.ObjectId,
             ref: 'user'

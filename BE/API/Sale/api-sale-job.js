@@ -238,6 +238,7 @@ router.post("/", authenticateSaleToken, async (req, res) => {
       })
     }
     job.captured = {
+      material,
       user: captureder,
       price: m.price,
       quantity: quantity.length == 0 ? 0 : parseInt(quantity)
