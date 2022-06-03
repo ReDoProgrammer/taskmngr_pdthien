@@ -1,12 +1,11 @@
 const router = require("express").Router();
 const Job = require("../../models/job-model");
 const Task = require('../../models/task-model');
-const Remark = require('../../models/remark-model');
 const { authenticateSaleToken } = require("../../../middlewares/sale-middleware");
 const Material = require('../../models/material-model');
 const Combo = require('../../models/combo-model');
 const Customer = require('../../models/customer-model');
-
+const { ObjectId } = require('mongodb');
 
 router.get('/detail', authenticateSaleToken, (req, res) => {
   let { jobId } = req.query;
@@ -95,50 +94,50 @@ router.get('/list-by-customer', authenticateSaleToken, async (req, res) => {
 
 })
 
-router.delete('/', authenticateSaleToken,async (req, res) => {
+router.delete('/', authenticateSaleToken, async (req, res) => {
   let { jobId } = req.body;
-  let countTask = await Task.countDocuments({'basic.job':jobId});
-  if(countTask>0){
+  let countTask = await Task.countDocuments({ 'basic.job': jobId });
+  if (countTask > 0) {
     return res.status(403).json({
-      msg:`Can not delete this job when having tasks based on it!`
+      msg: `Can not delete this job when having tasks based on it!`
     })
   }
 
   let job = await Job.findById(jobId);
-  if(!job){
+  if (!job) {
     return res.status(500).json({
-      msg:`Job not found!`
+      msg: `Job not found!`
     })
   }
 
   let customer = await Customer.findById(job.customer);
-  if(!customer){
+  if (!customer) {
     return res.status(404).json({
-      msg:`Can not found customer that this job belongs to`
+      msg: `Can not found customer that this job belongs to`
     })
   }
 
   await job.delete()
-  .then(async _=>{
-    customer.jobs.pull(job);
-    await customer.save()
-    .then(_=>{
-      return res.status(200).json({
-        msg:`Job has been deleted!`
-      })
+    .then(async _ => {
+      customer.jobs.pull(job);
+      await customer.save()
+        .then(_ => {
+          return res.status(200).json({
+            msg: `Job has been deleted!`
+          })
+        })
+        .catch(err => {
+          return res.status(500).json({
+            msg: `Can not pull job from jobs list of customer with error: ${new Error(err.message)}`
+          })
+        })
+
     })
-    .catch(err=>{
+    .catch(err => {
       return res.status(500).json({
-        msg:`Can not pull job from jobs list of customer with error: ${new Error(err.message)}`
+        msg: `Can not delete this job with error: ${new Error(err.message)}`
       })
     })
-    
-  })
-  .catch(err=>{
-    return res.status(500).json({
-      msg:`Can not delete this job with error: ${new Error(err.message)}`
-    })
-  })
 })
 
 router.put("/", authenticateSaleToken, async (req, res) => {
@@ -201,21 +200,21 @@ router.put("/", authenticateSaleToken, async (req, res) => {
       user: captureder,
       price: mat.price,
       quantity: quantity.length > 0 ? parseInt(quantity) : 0
-    }  
+    }
   }
 
   await job.save()
-  .then(_ => {
-    return res.status(200).json({
-      msg: `The job has been updated!`
+    .then(_ => {
+      return res.status(200).json({
+        msg: `The job has been updated!`
+      })
     })
-  })
-  .catch(err => {
-    console.log(`Can not update this job with error: ${new Error(err.message)}`)
-    return res.status(500).json({
-      msg: `Can not update this job with error: ${new Error(err.message)}`
+    .catch(err => {
+      console.log(`Can not update this job with error: ${new Error(err.message)}`)
+      return res.status(500).json({
+        msg: `Can not update this job with error: ${new Error(err.message)}`
+      })
     })
-  })
 });
 
 
@@ -230,7 +229,8 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     cb,
     material,
     captureder,
-    quantity
+    quantity,
+    templates
   } = req.body;
 
   let cust = await Customer.findById(customer);
@@ -251,6 +251,15 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     begin: received_date,
     end: delivery_date
   };
+
+  if (templates.length > 0) {
+    let arrTemps = templates.split(',');
+    if (arrTemps.length > 0) {
+      console.log(arrTemps)
+      job.templates = arrTemps.map(x=>ObjectId(x));
+    }
+  }
+
 
 
   if (cb.length > 0) {
