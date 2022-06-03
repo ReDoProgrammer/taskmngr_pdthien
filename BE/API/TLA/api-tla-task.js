@@ -504,7 +504,7 @@ router.get('/all', authenticateTLAToken, (req, res) => {
             ])
 
             .exec()
-            .then(tasks => {
+            .then(tasks => {               
                 return res.status(200).json({
                     msg: 'Load tasks list successfully!',
                     tasks
@@ -629,6 +629,7 @@ router.get('/detail', authenticateTLAToken, (req, res) => {
         .then(async task => {
             await getCustomer(task.basic.job.customer)
                 .then(customer => {
+                
                     return res.status(200).json({
                         msg: `Load task detail successfully!`,
                         task,

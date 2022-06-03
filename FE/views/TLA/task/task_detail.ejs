@@ -51,7 +51,17 @@
                         <hr />
                         <div class="row mt-2">
                             <div class="col-md-2 col-sm-2 col-xs-4">Source:</div>
-                            <div class="col-md-10 col-sm-10 col-xs-8" id="lblInputLink"></div>
+
+                            <div class="col-md-10 col-sm-10 col-xs-8" id="divInputLink">
+                                <div class="input-group" id="divFolder">
+                                    <input type="text" class="form-control" id="inputLink" value="1234">
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-info" type="submit" id="btnCopyToClipboard">
+                                            <i class="fa fa-clipboard" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="row mt-2">
                             <div class="col-md-2 col-sm-2 col-xs-4">Output:</div>
@@ -101,14 +111,15 @@
 
                             </div>
                         </div>
+                       
+
 
                     </div>
                     <div class="panel panel-warning mt-2">
                         <div class="panel-heading font-weight-bold">Remark:</div>
-                        <div class="panel-body" id="remarks">
-
-                        </div>
+                        <div class="panel-body" id="remarks"></div>
                     </div>
+
                     <div class="panel-footer">
                         <div class="form-group text-right">
                             <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
@@ -147,7 +158,6 @@
                 taskId
             },
             success: function (data) {
-                console.log(data.task);
                 $('#divNationalStyle').html(data.customer.nation.name)
                 $('#divColor').html(data.customer.color.name)
 
@@ -159,14 +169,14 @@
                 $('#lblJobName').text(data.task.basic.job.name);
                 $('#lblLevelName').text(data.task.basic.level.name);
                 $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.basic.deadline.begin));
-                if(!data.task.basic.deadline.end){
+                if (!data.task.basic.deadline.end) {
                     $('#lblDeadline').text(convertISODateToTimeFormat(data.task.basic.deadline.end));
-                }else{
+                } else {
                     $('#lblDeadline').text('');
                 }
-               
+
                 $('#lblIntruction').text(data.task.basic.job.intruction);
-              
+
 
                 $('#remarks').empty();
                 data.task.remarks.forEach(r => {
@@ -178,17 +188,20 @@
                     $('#remarks').append(item);
                 })
 
-
+               
+              
                 if (isValidHttpUrl(data.task.basic.link.input)) {
+                    $('#divFolder').slideUp();
                     $('#lblInputLink').html('<a href="' + data.task.basic.link.input + '" target="_blank" rel="noopener noreferrer">Link</a>')
-                } else {
-                    $('#lblInputLink').html('<span class="font-weight-bold font-italic">' + data.task.basic.link.input + '</span>');
+                } else {                  
+                    $('#divFolder').slideDown(200);
+                    $('#inputLink').val(data.task.basic.link.input);
                 }
-                if (data.task.editor.length>0 && data.task.editor[data.task.editor.length-1].submited.length>0) {
-                    if (isValidHttpUrl(data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link)) {
-                        $('#lblOutputLink').html('<a href="' + data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                if (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].submited.length > 0) {
+                    if (isValidHttpUrl(data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link)) {
+                        $('#lblOutputLink').html('<a href="' + data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
                     } else {
-                        $('#lblOutputLink').html('<span class="font-weight-bold font-italic">' + data.task.editor[data.task.editor.length-1].submited[data.task.editor[data.task.editor.length-1].submited.length-1].link + '</span>');
+                        $('#lblOutputLink').html('<span class="font-weight-bold font-italic">' + data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link + '</span>');
                     }
                 }
 
@@ -225,4 +238,14 @@
             }
         })
     });
+
+    $('#btnCopyToClipboard').click(function () {
+        $("#inputLink").select();
+        document.execCommand('copy');
+        Swal.fire(
+            'Great!!',
+            'Local url copied to clipboard',
+            'success'
+        )
+    })
 </script>
