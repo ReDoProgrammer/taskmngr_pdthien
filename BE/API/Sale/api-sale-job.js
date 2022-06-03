@@ -72,6 +72,27 @@ router.get("/list", authenticateSaleToken, (req, res) => {
     });
 });
 
+router.get('/list-by-customer',authenticateSaleToken,async (req,res)=>{
+  let {custId} = req.query;
+  let customer = await Customer.findById(custId);
+  if(!customer){
+    return res.status(404).json({
+      msg:`Customer not found!`
+    })
+  }
+
+  let jobs = await Job.find({customer:custId})
+  .populate('cb')
+  .populate('created.by')
+  .sort({_id: -1})
+  .limit(10);
+  return res.status(200).json({
+    msg:`Load jobs list by customer successfully!`,
+    jobs
+  })
+  
+})
+
 router.delete('/', authenticateSaleToken, (req, res) => {
   let { jobId } = req.body;
   Task

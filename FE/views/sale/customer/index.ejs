@@ -20,6 +20,7 @@
     <table class="table mt-1 table-striped">
         <thead class="thead-dark">
             <tr>
+                <th scope="col"></th>
                 <th scope="col">#</th>
                 <th scope="col">Customer</th>
                 <th scope="col">Short name</th>
@@ -60,7 +61,7 @@
             $('#txtReceivedDate').val('');
             $('#txtDeliveryDate').val('');
             $('#txaIntruction').val('');
-            $('#ckbMaterial').prop('checked',false);
+            $('#ckbMaterial').prop('checked', false);
             $('#txtQuantity').val('');
             $('#rMaterial').hide();
 
@@ -73,7 +74,7 @@
                 data: {
                     id: $(this).closest("tr").attr("id")
                 },
-                success: function (data) {                    
+                success: function (data) {
                     $('#lblCustomerFullname').text(data.customer.firstname + ' ' + data.customer.lastname);
                     $('#lblCustomerPhone').text(data.customer.phone);
                     $('#lblCustomerEmail').text(data.customer.email);
@@ -95,14 +96,21 @@
                     page
                 },
                 success: function (data) {
-                    console.log(data.customers)
+
                     $('#tblData').empty();
                     let idx = 1;
                     data.customers.forEach(cus => {
                         let tr = '<tr id = "' + cus._id + '">';
+                        tr += '<td>';
+                        if (cus.jobs.length > 0) {
+                            tr += '<button class="btn btn-xs parents js-view-parents " name="js-view-parents"><i class="fa fa-plus"></i>'
+                            tr += '</button>';
+                        }
+
+                        tr += '</td>';
                         tr += '<td>' + (idx++) + '</td>';
                         tr += '<td class="font-weight-bold text-info">' + cus.firstname + ' ' + cus.lastname + '</td>';
-                        tr+= '<td class="font-weight-bold text-danger">'+getFirstLetters(cus.firstname + ' ' + cus.lastname)+getLastLetters(cus._id)+'</td>';
+                        tr += '<td class="font-weight-bold text-danger">' + getFirstLetters(cus.firstname + ' ' + cus.lastname) + getLastLetters(cus._id) + '</td>';
                         tr += '<td>' + cus.phone + '</td>';
                         tr += '<td>' + cus.email + '</td>';
                         tr += '<td class="text-right"><button class="btn-sm btn-primary" name="btnAddJob"><i class="fa fa-plus" aria-hidden="true"></i> Add job</button></td>'
@@ -118,5 +126,80 @@
             })
         }
 
+
+        $(document).on("click", "button[name='js-view-parents']", async function (e) {
+
+            var $btn = $(e.target), 
+            $row = $btn.closest('tr'), 
+            $nextRow = $row.next('tr.expand-child');
+
+
+            if ($nextRow.length) {
+                $nextRow.toggle($btn.hasClass('fa-minus'));
+            } else {
+                var newRow = '<tr class="expand-child" id="collapse' + $btn.data('id') + '">' +
+                    '<td colspan="9">' +
+                    '<table class="table table-condensed table-bordered table-striped" width=100% >' +
+                    '<thead>' +
+                    '<tr>' +
+                    '<th class="text-right  ">#</th>' +
+                    '<th>Name</th>' +
+                    '<th>Begin</th>' +
+                    '<th>End</th>' +
+                    '<th>Created at by</th>' +
+                    '<th>Created by</th>' +
+                    '<th>Combo</th>' +
+                    '<th>Status</th>' +
+                    '</tr>' +
+                    '</thead>' +
+                    '<tbody>';
+
+
+                custId = $(this).closest('tr').attr('id');
+
+                $.ajax({
+                    url: '/sale/job/list-by-customer',
+                    type: 'get',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                    data: {
+                        custId
+                    },
+                    success: function (data) {
+                        let idx = 1;
+                        data.jobs.forEach(j => {
+                            newRow += '<tr id = "' + j._id + '">';
+                            newRow += '<td>' + (idx++) + '</td>';
+                            newRow += '<td>' + j.name + '</td>';
+                            newRow += '<td>' + convertISODateToTimeFormat(j.deadline.begin) + '</td>';
+                            newRow += '<td>' + convertISODateToTimeFormat(j.deadline.end) + '</td>';
+                            newRow += '<td>' + convertISODateToTimeFormat(j.created.at) + '</td>';
+                            newRow += '<td>' + j.created.by.fullname + '</td>';
+                            newRow+= '<td>';
+                            switch (j.status) {
+                                case -1: newRow += '<i class="text-info">Initial</i>'; break;
+                                case 0: newRow += '<i class="text-primary">Processing</i>'; break;
+                                case 1: newRow += '<i class="text-warning">Uploaded</i>'; break;
+                                case 2: newRow += '<i class="text-warning">Done</i>'; break;
+                                case 3: newRow += '<i class="text-success">Finish</i>'; break;
+                                case -2: newRow += '<i class="text-danger">Rejected</i>'; break;
+                                case -3: newRow += '<i class="text-danger">Canceled</i>'; break;
+                            }
+                            newRow+= '</td>';
+
+                            newRow += '</tr>';                            
+                        })
+                    }
+                })
+                newRow += '</tbody></table></td></tr>';
+                // set next row
+                $nextRow = $(newRow).insertAfter($row);
+
+
+                /*}
+                    });*/
+            }
+        });
 
     </script>
