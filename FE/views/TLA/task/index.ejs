@@ -307,8 +307,7 @@
                                                
                                                 let tr = '<tr id="' + t._id + '"  data-level="' + t.basic.level._id + '">';
                                                 if (t.bp.length > 0) {
-                                                    console.log(t.bp.length)
-                                                    if (t.bp[t.pb.length - 1].is_bonus) {
+                                                    if (t.bp[t.bp.length - 1].is_bonus) {
                                                         tr = '<tr id="' + t._id + '" data-customer = "' + t.job.customer + '" data-level="' + t.level._id + '" style="background-color: #A9F5F2">';
                                                     } else {
                                                         tr = '<tr id="' + t._id + '" data-customer = "' + t.job.customer + '" data-level="' + t.level._id + '" style="background-color: #F6E3CE">';
@@ -318,7 +317,7 @@
 
                                                 tr += '<td>';
                                                 if (t.bp.length > 0) {
-                                                    if (t.bp[t.pb.length - 1].is_bonus) {
+                                                    if (t.bp[t.bp.length - 1].is_bonus) {
                                                         tr += '<span class="text-success"><i class="fa fa-trophy" aria-hidden="true"></i></span>'
 
                                                     } else {
