@@ -301,7 +301,10 @@
                                         success: function (data) {
                                             let idx = 1;
 
+
+
                                             data.tasks.forEach(t => {
+                                                console.log(t)
                                                 let tr = '<tr id="' + t._id + '"  data-level="' + t.basic.level._id + '">';
                                                 if (typeof t.bp !== 'undefined' && t.bp !== null && t.bp.length > 0) {
                                                     if (t.bp[data.task.pb.length - 1].is_bonus) {
@@ -313,8 +316,8 @@
                                                 tr += '<td>' + (idx++) + '</td>';
 
                                                 tr += '<td>';
-                                                if (t.bp !== null && t.bp.length > 0) {
-                                                    if (t.bp[data.task.pb.length - 1].is_bonus) {
+                                                if (t.bp.length > 0) {
+                                                    if (t.bp[t.pb.length - 1].is_bonus) {
                                                         tr += '<span class="text-success"><i class="fa fa-trophy" aria-hidden="true"></i></span>'
 
                                                     } else {
