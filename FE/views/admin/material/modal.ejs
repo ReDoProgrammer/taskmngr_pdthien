@@ -61,7 +61,7 @@
 
         if (mId.length == 0) {
             $.ajax({
-                url: '/admin/sale-material',
+                url: '/admin/material',
                 type: 'post',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem('accessToken'),
@@ -82,7 +82,7 @@
             })
         } else {
             $.ajax({
-                url: '/admin/sale-material',
+                url: '/admin/material',
                 type: 'put',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem('accessToken'),

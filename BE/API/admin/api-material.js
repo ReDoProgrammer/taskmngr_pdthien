@@ -32,7 +32,7 @@ router.get('/detail', authenticateAdminToken,async (req, res) => {
     let m = await Material.findById(mId);
     if(!m){
         return res.status(404).json({
-            msg:`material not found!`
+            msg:`Material not found!`
         })
     }
 
@@ -54,7 +54,7 @@ router.post('/', authenticateAdminToken, async (req, res) => {
     await m.save()
     .then(_=>{
         return res.status(201).json({
-            msg:`material has been created!`
+            msg:`Material has been created!`
         })
     })
     .catch(err=>{
@@ -72,7 +72,7 @@ router.put('/', authenticateAdminToken,async (req, res) => {
 
     if(!m){
         return res.status(404).json({
-            msg:`material not found!`
+            msg:`Material not found!`
         })
     }
 

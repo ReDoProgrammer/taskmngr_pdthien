@@ -359,7 +359,7 @@ app.use('/admin/job-level',apiAdminJobLevel);//quản lý thông tin danh sách 
 app.use('/admin/bonus-penalty',apiAdminBonusPenalty);//quản lý các hình thức phạt đối với nhân viên
 app.use('/admin/module',apiAdminModule);// quản lý danh sách module của web
 app.use('/admin/national-style',apiAdminNationalStyle);//quản lý thông tin style của khách hàng theo quốc gia
-app.use('/admin/sale-material',apiMaterial);//quan ly don gia hinh anh dau vao duoc chup boi sale
+app.use('/admin/material',apiMaterial);//quan ly don gia hinh anh dau vao duoc chup boi sale
 app.use('/admin/size',apiAdminSize);//quản lý thông tin kích thước file hình ảnh 
 app.use('/admin/staff-level',apiAdminStaffLevel);//quản lý level của nhân viên, phân loại nhân viên: người mới, tập sự, học việc,...
 app.use('/admin/staff-job-level',apiAdminStaffJobLevel);//quản lý level của nhân viên tuơng ứng với các job level có thể làm

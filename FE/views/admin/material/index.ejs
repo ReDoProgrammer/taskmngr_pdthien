@@ -30,7 +30,7 @@
 
     function LoadMaterialList() {
         $.ajax({
-            url: '/admin/sale-material/list',
+            url: '/admin/material/list',
             type: 'get',
             headers: {
                 authorization: "Bearer " + localStorage.getItem('accessToken'),
@@ -59,18 +59,37 @@
 
     $('#btnAddNew').click(function () {
         mId = '';
+        $('#txtName').val('');
+        $('#txtPrice').val('0');
+        $('#txaDescription').val('');
         $('#materialModal').modal();
     })
 
     $(document).on("click", "button[name='update']", function () {
         mId = $(this).closest("tr").attr("id");
-        $('#materialModal').modal();
+        $.ajax({
+            url: '/admin/material/detail',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem('accessToken'),
+            },
+            data: {
+                mId
+            },
+            success: function (data) {
+                $('#txtName').val(data.m.name);
+                $('#txtPrice').val(data.m.price);
+                $('#txaDescription').val(data.m.description);
+                $('#materialModal').modal();
+            }
+        })
+
     })
 
     $(document).on("click", "button[name='delete']", function () {
         if (confirm("Are you sure want to delete this material?")) {
             $.ajax({
-                url: '/admin/sale-material',
+                url: '/admin/material',
                 type: 'delete',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem('accessToken'),
