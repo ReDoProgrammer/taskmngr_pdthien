@@ -86,6 +86,7 @@ router.get('/list-by-customer',authenticateSaleToken,async (req,res)=>{
   .populate('created.by')
   .sort({_id: -1})
   .limit(10);
+  console.log(jobs)
   return res.status(200).json({
     msg:`Load jobs list by customer successfully!`,
     jobs

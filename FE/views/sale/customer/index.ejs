@@ -129,10 +129,10 @@
 
         $(document).on("click", "button[name='js-view-parents']", async function (e) {
 
-            var $btn = $(e.target), 
-            $row = $btn.closest('tr'), 
-            $nextRow = $row.next('tr.expand-child');
-
+            var $btn = $(e.target),
+                $row = $btn.closest('tr'),
+                $nextRow = $row.next('tr.expand-child');
+            $btn.toggleClass('fa-minus');
 
             if ($nextRow.length) {
                 $nextRow.toggle($btn.hasClass('fa-minus'));
@@ -157,7 +157,7 @@
 
                 custId = $(this).closest('tr').attr('id');
 
-                $.ajax({
+                await $.ajax({
                     url: '/sale/job/list-by-customer',
                     type: 'get',
                     headers: {
@@ -176,7 +176,12 @@
                             newRow += '<td>' + convertISODateToTimeFormat(j.deadline.end) + '</td>';
                             newRow += '<td>' + convertISODateToTimeFormat(j.created.at) + '</td>';
                             newRow += '<td>' + j.created.by.fullname + '</td>';
-                            newRow+= '<td>';
+                            newRow += '<td>';
+                            if (j.cb) {
+                                newRow += j.cb.name;
+                            }
+                            newRow += '</td>';
+                            newRow += '<td>';
                             switch (j.status) {
                                 case -1: newRow += '<i class="text-info">Initial</i>'; break;
                                 case 0: newRow += '<i class="text-primary">Processing</i>'; break;
@@ -186,19 +191,15 @@
                                 case -2: newRow += '<i class="text-danger">Rejected</i>'; break;
                                 case -3: newRow += '<i class="text-danger">Canceled</i>'; break;
                             }
-                            newRow+= '</td>';
+                            newRow += '</td>';
 
-                            newRow += '</tr>';                            
+                            newRow += '</tr>';
                         })
                     }
                 })
                 newRow += '</tbody></table></td></tr>';
                 // set next row
                 $nextRow = $(newRow).insertAfter($row);
-
-
-                /*}
-                    });*/
             }
         });
 
