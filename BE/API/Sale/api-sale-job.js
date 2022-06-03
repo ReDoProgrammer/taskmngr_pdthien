@@ -93,52 +93,26 @@ router.get('/list-by-customer', authenticateSaleToken, async (req, res) => {
 
 })
 
-router.delete('/', authenticateSaleToken, (req, res) => {
+router.delete('/', authenticateSaleToken,async (req, res) => {
   let { jobId } = req.body;
-  Task
-    .countDocuments({
-      'basic.job': jobId,
-      status: {
-        $nin: [0, -1, -2, -3, -4, -5]//và không bị cancel,reject
-      }
-    }, async (err, count) => {
-      if (err) {
-        return res.status(500).json({
-          msg: `Can not check tasks belong to this job with error: ${new Error(err.message)}`
-        })
-      }
-      if (count > 0) {
-        return res.status(403).json({
-          msg: `Can not delete this job after processing!`
-        })
-      }
-      let job = await Job.findById(jobId);
-      if (!job) {
-        return res.status(404).json({
-          msg: `Job not found!`
-        })
-      }
-
-      await Promise.all([DeleteTasksBasedJob(jobId), DeleteRemarks(job.tasks)])
-        .then(async _ => {
-          Job.findByIdAndDelete(jobId, (err) => {
-            if (err) {
-              return res.status(500).json({
-                msg: `Can not delete this job with error: ${new Error(err.message)}`
-              })
-            }
-            return res.status(200).json({
-              msg: `This job has been deleted!`
-            })
-          })
-        })
-        .catch(err => {
-          return res.status(err.code).json({
-            msg: err.msg
-          })
-        })
-
+  let countTask = await Task.countDocuments({'basic.job':jobId});
+  if(countTask>0){
+    return res.status(403).json({
+      msg:`Can not delete this job when having tasks based on it!`
     })
+  }
+
+  Job.findByIdAndDelete(jobId,err=>{
+    if(err){
+      return res.status(500).json({
+        msg:`Can not delete this job with error: ${new Error(err.message)}`
+      })
+    }
+
+    return res.status(200).json({
+      msg:`Job has been deleted!`
+    })
+  })
 })
 
 router.put("/", authenticateSaleToken, async (req, res) => {
