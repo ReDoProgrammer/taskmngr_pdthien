@@ -229,8 +229,7 @@
     let received_date = strToDate($('#txtReceivedDate').val());
     let delivery_date = strToDate($('#txtDeliveryDate').val());
     let intruction = $('#txaIntruction').val();
-    let cb_ticked = $("#ckbChooseCombo").is(':checked');
-    let cb = $('#slCombo option:selected').val();
+    let cb = $("#ckbChooseCombo").is(':checked') ? $('#slCombo option:selected').val() : null;
 
     let material = $('#ckbMaterial').is(':checked') ? $('#slMaterials option:selected').val() : null;
     let captureder = $('#ckbMaterial').is(':checked') ? $('#slCaptureders option:selected').val() : null;
@@ -260,6 +259,12 @@
       return;
     }
 
+    if ($("#ckbChooseCombo").is(':checked') && typeof cb === 'undefined') {
+      $('#lblError').text('(*) Please set combo to continue!');
+      $('#lblError').show().delay(3000).fadeOut();
+      return;
+    }
+
     if ($('#ckbMaterial').is(':checked') && typeof material === 'undefined') {
       $('#lblError').text('(*) Please set material to continue!');
       $('#lblError').show().delay(3000).fadeOut();
@@ -273,7 +278,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { customer, name, input_link, received_date, delivery_date, intruction, cb_ticked, cb, material, captureder, quantity },
+      data: { customer, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity },
       success: function (data) {
         alert(data.msg);
         $('#addJobModal').modal('hide');

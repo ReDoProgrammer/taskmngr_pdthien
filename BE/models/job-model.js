@@ -13,17 +13,15 @@ const jobSchema = new Schema({
         type: String,
         default: ''
     },
-    source_link: {
-        type: String,
-        require: [true, 'Source link can not be blank']
-    },
-    received_date: {
-        type: Date,
-        require: true
-    },
-    delivery_date: {
-        type: Date,
-        require: true
+    deadline: {
+        begin: {
+            type: Date,
+            require: true
+        },
+        end: {
+            type: Date,
+            require: true
+        }
     },
     intruction: {
         type: String,
@@ -45,51 +43,50 @@ const jobSchema = new Schema({
         default: -1
     },
 
-    input_link:{
-        //link này chứa hình ảnh source khi sale tạo mới job
-        type:String,
-        default:''
-    },    
-    output_link:{
-        type:String,
-        default:''
+    link: {
+        input: {
+            //link này chứa hình ảnh source khi sale tạo mới job
+            type: String,
+            default: ''
+        },
+        output: {
+            type: String,
+            default: ''
+        }
     },
-    cb_ticked:{
-        //đánh dấu có lựa chọn combo hay không
-        type:Boolean,
-        default:false
-    },
-    cb:{
+
+
+    cb: {
         //lưu mã combo được chọn
-        type:Schema.Types.ObjectId,
-        ref:'combo'
-    },
-    tasks:[{
         type: Schema.Types.ObjectId,
-        ref:'task'
+        ref: 'combo'
+    },
+    tasks: [{
+        type: Schema.Types.ObjectId,
+        ref: 'task'
     }],
-    cc:[{
-        type:Schema.Types.ObjectId,
-        ref:'cc'
+    cc: [{
+        type: Schema.Types.ObjectId,
+        ref: 'cc'
     }],
 
 
     //phan lien quan toi nhan vien chup anh
-    captured:{
-        user:{
-            type:Schema.Types.ObjectId,
-            ref:'user'
+    captured: {
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
         },
-        price:{
-            type:Number,
-            default:0
+        price: {
+            type: Number,
+            default: 0
         },
-        quantity:{
-            type:Number,
-            default:0
+        quantity: {
+            type: Number,
+            default: 0
         }
     }
-   
+
 });
 
 

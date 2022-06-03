@@ -162,44 +162,35 @@ router.put("/", authenticateSaleToken, (req, res) => {
 });
 
 
-router.post("/", authenticateSaleToken, (req, res) => {
+router.post("/", authenticateSaleToken, async (req, res) => {
   let {
     customer,
     name,
     input_link,
     received_date,
     delivery_date,
-    intruction,
-    cb_ticked,
-    cb
+    intruction,   
+    cb,
+    material,
+    captureder,
+    quantity
   } = req.body;
 
-
-  let job = new Job({
-    name,
+  console.log({
     customer,
+    name,
     input_link,
     received_date,
     delivery_date,
-    intruction,
-    cb_ticked,
-    cb
-  });
-  job
-    .save()
-    .then((j) => {
-      return res.status(201).json({
-        msg: "Create a new job successfully",
-        j
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-      return res.status(500).json({
-        msg: "Cannot create new job",
-        error: new Error(err.message),
-      });
-    });
+    intruction,   
+    cb,
+    material,
+    captureder,
+    quantity
+  })
+
+
+  
 
 });
 

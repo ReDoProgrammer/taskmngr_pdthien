@@ -60,6 +60,9 @@
             $('#txtReceivedDate').val('');
             $('#txtDeliveryDate').val('');
             $('#txaIntruction').val('');
+            $('#ckbMaterial').prop('checked',false);
+            $('#txtQuantity').val('');
+            $('#rMaterial').hide();
 
             $.ajax({
                 url: '/sale/customer/detail',
