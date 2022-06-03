@@ -5,6 +5,7 @@ const Remark = require('../../models/remark-model');
 const { authenticateSaleToken } = require("../../../middlewares/sale-middleware");
 const Material = require('../../models/material-model');
 const Combo = require('../../models/combo-model');
+const Customer = require('../../models/customer-model');
 
 
 router.get('/detail', authenticateSaleToken, (req, res) => {
@@ -178,6 +179,13 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     quantity
   } = req.body;
 
+  let cust = await Customer.findById(customer);
+  if (!cust) {
+    return res.status(404).json({
+      msg: `Customer not found!`
+    })
+  }
+
   let job = new Job();
   job.customer = customer;
   job.name = name;
@@ -221,10 +229,19 @@ router.post("/", authenticateSaleToken, async (req, res) => {
   }
 
   await job.save()
-    .then(_ => {
-      return res.status(201).json({
-        msg: `Job has been created!`
-      })
+    .then(async _ => {
+      cust.jobs.push(job);
+      await cust.save()
+        .then(_ => {
+          return res.status(201).json({
+            msg: `Job has been created!`
+          })
+        })
+        .catch(err => {
+          return res.status(500).json({
+            msg:`Can not push this job into customer with error: ${new Error(err.message)}`
+          })
+        })
     })
     .catch(err => {
       return res.status(500).json({
