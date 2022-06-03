@@ -72,25 +72,25 @@ router.get("/list", authenticateSaleToken, (req, res) => {
     });
 });
 
-router.get('/list-by-customer',authenticateSaleToken,async (req,res)=>{
-  let {custId} = req.query;
+router.get('/list-by-customer', authenticateSaleToken, async (req, res) => {
+  let { custId } = req.query;
   let customer = await Customer.findById(custId);
-  if(!customer){
+  if (!customer) {
     return res.status(404).json({
-      msg:`Customer not found!`
+      msg: `Customer not found!`
     })
   }
 
-  let jobs = await Job.find({customer:custId})
-  .populate('cb')
-  .populate('created.by')
-  .sort({_id: -1})
-  .limit(10);
+  let jobs = await Job.find({ customer: custId })
+    .populate('cb')
+    .populate('created.by')
+    .sort({ _id: -1 })
+    .limit(10);
   return res.status(200).json({
-    msg:`Load jobs list by customer successfully!`,
+    msg: `Load jobs list by customer successfully!`,
     jobs
   })
-  
+
 })
 
 router.delete('/', authenticateSaleToken, (req, res) => {
@@ -141,7 +141,7 @@ router.delete('/', authenticateSaleToken, (req, res) => {
     })
 })
 
-router.put("/", authenticateSaleToken, (req, res) => {
+router.put("/", authenticateSaleToken, async (req, res) => {
   let {
     jobId,
     name,
@@ -149,40 +149,73 @@ router.put("/", authenticateSaleToken, (req, res) => {
     received_date,
     delivery_date,
     intruction,
-    cb_ticked,
-    cb
+    cb,
+    material,
+    captureder,
+    quantity
   } = req.body;
 
-  Job
-    .findByIdAndUpdate(jobId,
-      {
-        name,
-        input_link,
-        received_date,
-        delivery_date,
-        intruction,
-        cb_ticked,
-        cb
-      }, { new: true }, (err, job) => {
-        if (err) {
-          return res.status(500).json({
-            msg: `Can not update job by id with error: ${new Error(err.message)}`
-          })
-        }
 
-        if (!job) {
-          return res.status(404).json({
-            msg: `Job not found!!`
-          })
-        }
+  let job = await Job.findById(jobId);
+  if (!job) {
+    console.log(`Job not found`)
+    return res.status(404).json({
+      msg: `Job not found`
+    })
+  }
 
-        return res.status(200).json({
-          msg: `Update job successfully!`,
-          job
-        })
+  job.name = name;
+  job.deadline = {
+    begin: received_date,
+    end: delivery_date
+  }
+  job.intruction = intruction;
+  job.link.input = input_link;
+
+  if (cb.length > 0) {
+    let combo = await Combo.findById(cb);
+    if (!combo) {
+      console.log(`Combo not found!`)
+      return res.status(404).json({
+        msg: `Combo not found!`
       })
+    }
+    job.cb = cb;
+  }
 
+  job.udpated = {
+    at: new Date(),
+    by: req.user._id
+  }
 
+  if (material.length > 0) {
+    let mat = await Material.findById(material);
+    if (!mat) {
+      console.log(`Material not found!`)
+      return res.status(404).json({
+        msg: `Material not found!`
+      })
+    }
+    job.captured = {
+      material,
+      user: captureder,
+      price: mat.price,
+      quantity: quantity.length > 0 ? parseInt(quantity) : 0
+    }  
+  }
+
+  await job.save()
+  .then(_ => {
+    return res.status(200).json({
+      msg: `The job has been updated!`
+    })
+  })
+  .catch(err => {
+    console.log(`Can not update this job with error: ${new Error(err.message)}`)
+    return res.status(500).json({
+      msg: `Can not update this job with error: ${new Error(err.message)}`
+    })
+  })
 });
 
 
@@ -261,7 +294,7 @@ router.post("/", authenticateSaleToken, async (req, res) => {
         })
         .catch(err => {
           return res.status(500).json({
-            msg:`Can not push this job into customer with error: ${new Error(err.message)}`
+            msg: `Can not push this job into customer with error: ${new Error(err.message)}`
           })
         })
     })

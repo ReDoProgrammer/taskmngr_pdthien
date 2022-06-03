@@ -150,7 +150,6 @@
                 jobId
             },
             success: function (data) {
-console.log(data.job)
                 $('#lblStyleNote').text(data.job.customer.remark);
                 $('#lblJobName').text(data.job.name);
                 $('#lblCustomer').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);

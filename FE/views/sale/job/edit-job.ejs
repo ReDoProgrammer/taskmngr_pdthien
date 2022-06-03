@@ -184,9 +184,8 @@
         if(data.job.captured.user){
           $('#ckbMaterial').prop('checked', true);
           $('#rMaterial').slideDown();
-          console.log(data.job.captured)
           $('#slMaterials').val(data.job.captured.material);
-          $('#txtQuantity').val(data.job.captured.quantiry)
+          $('#txtQuantity').val(data.job.captured.quantity)
         }else{
           $('#ckbMaterial').prop('checked', false);
           $('#rMaterial').slideUp();
@@ -206,8 +205,10 @@
     let received_date = strToDate($('#txtReceivedDate').val());
     let delivery_date = strToDate($('#txtDeliveryDate').val());
     let intruction = $('#txaIntruction').val();
-    let cb_ticked = $("#ckbChooseCombo").is(':checked');
-    let cb = $('#slCombo option:selected').val();
+    let cb = $("#ckbChooseCombo").is(':checked')?$('#slCombo option:selected').val():null;
+    let material = $('#ckbMaterial').is(':checked')?$('#slMaterials option:selected').val():null;
+    let captureder = $('#ckbMaterial').is(':checked')?$('#slCaptureders option:selected').val():null;
+    let quantity = $('#ckbMaterial').is(':checked')?$('#txtQuantity').val():0;
 
 
     if (isNaN(delivery_date) || delivery_date === null || isNaN(received_date) || received_date == null) {
@@ -229,6 +230,18 @@
       return;
     }
 
+    if($("#ckbChooseCombo").is(':checked') && (typeof cb === 'undefined'|| cb === null)){
+      $('#lblError').text('(*) Please set combo when it has choosen to continue');
+      $('#lblError').show().delay(3000).fadeOut();
+      return;
+    }
+
+    if($('#ckbMaterial').is(':checked') &&(typeof material === 'undefined' || material === null)){
+      $('#lblError').text('(*) Please set material when it has choosen to continue');
+      $('#lblError').show().delay(3000).fadeOut();
+      return;
+    }
+
 
 
     $.ajax({
@@ -237,15 +250,17 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { jobId, name, input_link, received_date, delivery_date, intruction, cb_ticked, cb },
+      data: { jobId, name, input_link, received_date, delivery_date, intruction,cb,material,captureder,quantity },
       success: function (data) {
         alert(data.msg);
         $('#updateJobModal').modal('hide');
+        LoadJobs();
       },
       error: function (jqXHR, textStatus, errorThrown) {
         alert(jqXHR.responseJSON.msg);
-      },
+      }
     })
+  
   })
 
   function LoadMaterials() {
@@ -282,6 +297,24 @@
     })
   }
 
+  $("#ckbMaterial").change(function () {
+    if (this.checked) {
+      $('#rMaterial').slideDown(600);
+    } else {
+      $('#rMaterial').slideUp(600);
+    }
+  });
+
+  $('#txtDuration').keyup(function (e) {
+    if (/\D/g.test(this.value)) {
+      // Filter non-digits from input value.
+      this.value = this.value.replace(/\D/g, '');
+    }
+    let duration = parseInt($('#txtDuration').val());
+    let assigned_date = strToDate($('#txtReceivedDate').val());
+    let deadline = assigned_date.addHours(duration);
+    $('#txtDeliveryDate').val(convertISODateToTimeFormat(deadline));
+  });
 
   $('.inputDate').inputmask("datetime", {
     mask: "1/2/y h:s",
