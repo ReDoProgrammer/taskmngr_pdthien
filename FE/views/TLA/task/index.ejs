@@ -304,10 +304,10 @@
 
 
                                             data.tasks.forEach(t => {
-                                                console.log(t.bp)
+                                               
                                                 let tr = '<tr id="' + t._id + '"  data-level="' + t.basic.level._id + '">';
                                                 if (t.bp.length > 0) {
-                                                   
+                                                    console.log(t.bp.length)
                                                     if (t.bp[t.pb.length - 1].is_bonus) {
                                                         tr = '<tr id="' + t._id + '" data-customer = "' + t.job.customer + '" data-level="' + t.level._id + '" style="background-color: #A9F5F2">';
                                                     } else {
