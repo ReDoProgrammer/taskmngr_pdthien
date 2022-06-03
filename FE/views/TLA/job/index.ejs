@@ -335,8 +335,8 @@
                                             tr += '</td>';
 
 
-                                            tr += "<td>" + convertISODateToTimeFormat(job.received_date) + "</td>";
-                                            tr += "<td>" + convertISODateToTimeFormat(job.delivery_date) + "</td>";
+                                            tr += "<td>" + convertISODateToTimeFormat(job.deadline.begin) + "</td>";
+                                            tr += "<td>" + convertISODateToTimeFormat(job.deadline.end) + "</td>";
                                             tr += '<td><i>';
                                             switch (job.status) {
                                                 case -1:
