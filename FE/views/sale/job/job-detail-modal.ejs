@@ -43,7 +43,7 @@
                         <div class="row ">
                             <div class="form-group col-md-12 col-sm-12 col-xs-12">
                                 <label class="text-warning font-weight-bold">Intruction:</label>
-                                <div id="lblIntruction" style="margin-left: 10px; margin-top: 5px;"></div>
+                                <div id="lblIntruction ml-2 mt-2 font-weight-bold text-danger"></div>
                             </div>
                         </div>
 
@@ -154,10 +154,10 @@
                 $('#lblStyleNote').text(data.job.customer.remark);
                 $('#lblJobName').text(data.job.name);
                 $('#lblCustomer').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
-                $('#lblReceivedDate').text(convertISODateToTimeFormat(data.job.received_date));
-                $('#lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.delivery_date));
+                $('#lblReceivedDate').text(convertISODateToTimeFormat(data.job.deadline.begin));
+                $('#lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.deadline.end));
                 $('#lblIntruction').text(data.job.intruction);
-                $('#lblInputLink').html('<a href="' + data.job.input_link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                $('#lblInputLink').html('<a href="' + data.job.link.input + '" target="_blank" rel="noopener noreferrer">Link</a>')
 
             },
             error: function (jqXHR, textStatus, errorThrown) {
