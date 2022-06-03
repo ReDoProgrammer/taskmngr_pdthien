@@ -171,7 +171,12 @@
                         data.jobs.forEach(j => {
                             newRow += '<tr id = "' + j._id + '">';
                             newRow += '<td>' + (idx++) + '</td>';
-                            newRow += '<td>' + j.name + '</td>';
+                            newRow+='<td>';
+                            newRow += j.name;
+                            if (j.captured.user) {
+                                newRow += '<i class="fa fa-camera text-primary ml-2" aria-hidden="true"></i>'
+                            }
+                            newRow += '</td>';
                             newRow += '<td>' + convertISODateToTimeFormat(j.deadline.begin) + '</td>';
                             newRow += '<td>' + convertISODateToTimeFormat(j.deadline.end) + '</td>';
                             newRow += '<td>' + convertISODateToTimeFormat(j.created.at) + '</td>';
