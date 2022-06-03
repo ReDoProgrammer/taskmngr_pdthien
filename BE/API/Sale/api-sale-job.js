@@ -3,6 +3,8 @@ const Job = require("../../models/job-model");
 const Task = require('../../models/task-model');
 const Remark = require('../../models/remark-model');
 const { authenticateSaleToken } = require("../../../middlewares/sale-middleware");
+const Material = require('../../models/material-model');
+const Combo = require('../../models/combo-model');
 
 
 router.get('/detail', authenticateSaleToken, (req, res) => {
@@ -176,17 +178,55 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     quantity
   } = req.body;
 
-  console.log({
-    customer,
-    name,
-    input_link,
-    received_date,
-    delivery_date,
-    intruction,   
-    cb,
-    material,
-    captureder,
-    quantity
+  let job = new Job();
+  job.customer = customer;
+  job.name = name;
+  job.link = {
+    input: input_link
+  };
+  job.deadline = {
+    begin: received_date,
+    end: delivery_date 
+  };
+
+  if(cb.length > 0){
+    let c = await Combo.findById(cb);
+    if(!c){
+      return res.status(404).json({
+        msg:`Combo not found!`
+      })
+    }
+    job.cb = cb;
+  }
+
+  if(material.length > 0){
+    let m = await Material.findById(material);
+    if(!m){
+      return res.status(404).json({
+        msg:`Material not found!`
+      })
+    }
+    job.captured = {
+      user: captureder,
+      price:m.price,
+      quantity: quantity.length == 0?0:parseInt(quantity)
+    }
+  }
+
+  job.created = {
+    by:req.user._id
+  }
+
+  await job.save()
+  .then(_=>{
+   return res.status(201).json({
+     msg:`Job has been created!`
+   })
+  })
+  .catch(err=>{
+    return res.status(500).json({
+      msg:`Can not created job with error: ${new Error(err.message)}`
+    })
   })
 
 

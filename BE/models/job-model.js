@@ -35,8 +35,8 @@ const jobSchema = new Schema({
             3: finish
 
             -1: initial
-            -2:'Rejected
-            
+            -2:cancel
+                        
             - 3: Canceled           
         */
         type: Number,
@@ -69,6 +69,26 @@ const jobSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'cc'
     }],
+
+    created:{
+        by:{
+            type:Schema.Types.ObjectId,
+            ref:'user'
+        },
+        at:{
+            type:Date,
+            default: new Date()
+        }
+    },
+    updated:{
+        by:{
+            type:Schema.Types.ObjectId,
+            ref:'user'
+        },
+        at:{
+            type:Date
+        }
+    },
 
 
     //phan lien quan toi nhan vien chup anh
