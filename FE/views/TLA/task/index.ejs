@@ -304,13 +304,13 @@
 
 
                                             data.tasks.forEach(t => {
-                                               
+                                               console.log(t)
                                                 let tr = '<tr id="' + t._id + '"  data-level="' + t.basic.level._id + '">';
                                                 if (t.bp.length > 0) {
                                                     if (t.bp[t.bp.length - 1].is_bonus) {
-                                                        tr = '<tr id="' + t._id + '" data-customer = "' + t.job.customer + '" data-level="' + t.level._id + '" style="background-color: #A9F5F2">';
+                                                        tr = '<tr id="' + t._id + '" data-customer = "' + t.basic.job.customer + '" data-level="' + t.basic.level._id + '" style="background-color: #A9F5F2">';
                                                     } else {
-                                                        tr = '<tr id="' + t._id + '" data-customer = "' + t.job.customer + '" data-level="' + t.level._id + '" style="background-color: #F6E3CE">';
+                                                        tr = '<tr id="' + t._id + '" data-customer = "' + t.basic.job.customer + '" data-level="' + t.level._id + '" style="background-color: #F6E3CE">';
                                                     }
                                                 }
                                                 tr += '<td>' + (idx++) + '</td>';
