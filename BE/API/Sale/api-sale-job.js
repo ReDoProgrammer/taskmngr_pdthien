@@ -12,7 +12,7 @@ router.get('/detail', authenticateSaleToken, (req, res) => {
   Job
     .findById(jobId)
     .populate('customer')
-    .populate({path:'links',populate:({path:'created_by',select:'fullname'})})  
+    .populate({ path: 'links', populate: ({ path: 'created_by', select: 'fullname' }) })
     .exec()
     .then(job => {
       if (!job) {
@@ -52,7 +52,7 @@ router.get("/list", authenticateSaleToken, (req, res) => {
 
     })
     .populate('cb')
-    .populate('tasks')  
+    .populate('tasks')
     .exec()
     .then((jobs) => {
       let result = jobs.slice(process.env.PAGE_SIZE * (page - 1), process.env.PAGE_SIZE);
@@ -71,57 +71,57 @@ router.get("/list", authenticateSaleToken, (req, res) => {
     });
 });
 
-router.delete('/',authenticateSaleToken,(req,res)=>{
-  let {jobId} = req.body;
+router.delete('/', authenticateSaleToken, (req, res) => {
+  let { jobId } = req.body;
   Task
-  .countDocuments({
-    'basic.job':jobId,
-    status: {   
-      $nin:[0,-1,-2,-3,-4,-5]//và không bị cancel,reject
-    }
-  },async (err,count)=>{   
-    if(err){
-      return res.status(500).json({
-        msg:`Can not check tasks belong to this job with error: ${new Error(err.message)}`
-      })
-    }
-    if(count>0){
-      return res.status(403).json({
-        msg:`Can not delete this job after processing!`
-      })
-    }
-    let job = await Job.findById(jobId);
-    if(!job){
-      return res.status(404).json({
-        msg:`Job not found!`
-      })
-    }
-
-    await Promise.all([DeleteTasksBasedJob(jobId),DeleteRemarks(job.tasks)])
-    .then(async _=>{
-      Job.findByIdAndDelete(jobId,(err)=>{
-        if(err){
-          return res.status(500).json({
-            msg:`Can not delete this job with error: ${new Error(err.message)}`
-          })
-        }
-        return res.status(200).json({
-          msg:`This job has been deleted!`
+    .countDocuments({
+      'basic.job': jobId,
+      status: {
+        $nin: [0, -1, -2, -3, -4, -5]//và không bị cancel,reject
+      }
+    }, async (err, count) => {
+      if (err) {
+        return res.status(500).json({
+          msg: `Can not check tasks belong to this job with error: ${new Error(err.message)}`
         })
-      })
+      }
+      if (count > 0) {
+        return res.status(403).json({
+          msg: `Can not delete this job after processing!`
+        })
+      }
+      let job = await Job.findById(jobId);
+      if (!job) {
+        return res.status(404).json({
+          msg: `Job not found!`
+        })
+      }
+
+      await Promise.all([DeleteTasksBasedJob(jobId), DeleteRemarks(job.tasks)])
+        .then(async _ => {
+          Job.findByIdAndDelete(jobId, (err) => {
+            if (err) {
+              return res.status(500).json({
+                msg: `Can not delete this job with error: ${new Error(err.message)}`
+              })
+            }
+            return res.status(200).json({
+              msg: `This job has been deleted!`
+            })
+          })
+        })
+        .catch(err => {
+          return res.status(err.code).json({
+            msg: err.msg
+          })
+        })
+
     })
-    .catch(err=>{
-      return res.status(err.code).json({
-        msg:err.msg
-      })
-    })
-    
-  })
 })
 
 router.put("/", authenticateSaleToken, (req, res) => {
   let {
-    jobId,   
+    jobId,
     name,
     input_link,
     received_date,
@@ -132,35 +132,35 @@ router.put("/", authenticateSaleToken, (req, res) => {
   } = req.body;
 
   Job
-  .findByIdAndUpdate(jobId,
-    {
-      name,
-      input_link,
-      received_date,
-      delivery_date,
-      intruction,
-      cb_ticked,
-      cb
-    },{new:true},(err,job)=>{
-      if(err){
-        return res.status(500).json({
-          msg:`Can not update job by id with error: ${new Error(err.message)}`
-        })
-      }
+    .findByIdAndUpdate(jobId,
+      {
+        name,
+        input_link,
+        received_date,
+        delivery_date,
+        intruction,
+        cb_ticked,
+        cb
+      }, { new: true }, (err, job) => {
+        if (err) {
+          return res.status(500).json({
+            msg: `Can not update job by id with error: ${new Error(err.message)}`
+          })
+        }
 
-      if(!job){
-        return res.status(404).json({
-          msg:`Job not found!!`
-        })
-      }
+        if (!job) {
+          return res.status(404).json({
+            msg: `Job not found!!`
+          })
+        }
 
-      return res.status(200).json({
-        msg:`Update job successfully!`,
-        job
+        return res.status(200).json({
+          msg: `Update job successfully!`,
+          job
+        })
       })
-    })
- 
-  
+
+
 });
 
 
@@ -171,7 +171,7 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     input_link,
     received_date,
     delivery_date,
-    intruction,   
+    intruction,
     cb,
     material,
     captureder,
@@ -181,88 +181,91 @@ router.post("/", authenticateSaleToken, async (req, res) => {
   let job = new Job();
   job.customer = customer;
   job.name = name;
+  job.intruction = intruction;
   job.link = {
     input: input_link
   };
   job.deadline = {
     begin: received_date,
-    end: delivery_date 
+    end: delivery_date
   };
 
-  if(cb.length > 0){
+
+  if (cb.length > 0) {
     let c = await Combo.findById(cb);
-    if(!c){
+    if (!c) {
       return res.status(404).json({
-        msg:`Combo not found!`
+        msg: `Combo not found!`
       })
     }
     job.cb = cb;
   }
 
-  if(material.length > 0){
+  if (material.length > 0) {
     let m = await Material.findById(material);
-    if(!m){
+    if (!m) {
       return res.status(404).json({
-        msg:`Material not found!`
+        msg: `Material not found!`
       })
     }
     job.captured = {
       user: captureder,
-      price:m.price,
-      quantity: quantity.length == 0?0:parseInt(quantity)
+      price: m.price,
+      quantity: quantity.length == 0 ? 0 : parseInt(quantity)
     }
   }
 
   job.created = {
-    by:req.user._id
+    by: req.user._id,
+    at: new Date()
   }
 
   await job.save()
-  .then(_=>{
-   return res.status(201).json({
-     msg:`Job has been created!`
-   })
-  })
-  .catch(err=>{
-    return res.status(500).json({
-      msg:`Can not created job with error: ${new Error(err.message)}`
+    .then(_ => {
+      return res.status(201).json({
+        msg: `Job has been created!`
+      })
     })
-  })
+    .catch(err => {
+      return res.status(500).json({
+        msg: `Can not created job with error: ${new Error(err.message)}`
+      })
+    })
 
 
-  
+
 
 });
 
 module.exports = router;
 
-const DeleteTasksBasedJob = (jobId)=>{
-  return new Promise((resolve,reject)=>{
+const DeleteTasksBasedJob = (jobId) => {
+  return new Promise((resolve, reject) => {
     Task
-    .deleteMany({'basic.job':jobId},err=>{
-      if(err){
-        return reject({
-          code:500,
-          msg:`Can not delete tasks belongs to this job with error: ${new Error(err.message)}`
-        })
-      }
-      return resolve();
-    })
+      .deleteMany({ 'basic.job': jobId }, err => {
+        if (err) {
+          return reject({
+            code: 500,
+            msg: `Can not delete tasks belongs to this job with error: ${new Error(err.message)}`
+          })
+        }
+        return resolve();
+      })
   })
 }
 
-const DeleteRemarks = (taskIds)=>{
-  return new Promise((resolve,reject)=>{
+const DeleteRemarks = (taskIds) => {
+  return new Promise((resolve, reject) => {
     Remark
-    .deleteMany({ids:{$in: taskIds}},(err)=>{
-      if(err){
-        return reject({
-          code:500,
-          msg:`Can not delete remarks belong to this job with error: ${new Error(err.message)}`
-        })
-      }
-      return resolve();
-    })
+      .deleteMany({ ids: { $in: taskIds } }, (err) => {
+        if (err) {
+          return reject({
+            code: 500,
+            msg: `Can not delete remarks belong to this job with error: ${new Error(err.message)}`
+          })
+        }
+        return resolve();
+      })
   })
 }
 
