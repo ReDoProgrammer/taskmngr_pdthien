@@ -497,6 +497,9 @@ router.get('/all', authenticateTLAToken, (req, res) => {
                 {
                     path: 'remarks',
                     options: { sort: { 'timestamp': -1 } }
+                },
+                {
+                    path: 'bp'                   
                 }
             ])
 
