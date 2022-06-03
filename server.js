@@ -181,6 +181,7 @@ const adminNationalStyleController = require('./BE/controllers/Admin/national-st
 const adminSizeController = require('./BE/controllers/Admin/size-controller');
 const adminStatusController = require("./BE/controllers/Admin/status-controller");
 const adminStaffController = require("./BE/controllers/Admin/staff-controller");
+const adminTemplateController = require('./BE/controllers/Admin/template-controller');
 const adminUserGroupController = require('./BE/controllers/Admin/user-group-controller');
 
 
@@ -227,6 +228,7 @@ const apiAdminSize = require('./BE/API/admin/api-size');
 const apiAdminUser = require('./BE/API/admin/api-user');
 const apiAdminStatus = require('./BE/API/admin/api-status');
 const apiAdminStyle = require('./BE/API/admin/api-style');
+const apiAdminTemplate = require('./BE/API/admin/api-template');
 const apiAdminUserGroup = require('./BE/API/admin/api-user-group');
 const apiAdminUserGroupWage = require('./BE/API/admin/api-user-group-wage');
 const apiAdminUserModuleRole = require('./BE/API/admin/api-user-module');
@@ -365,6 +367,7 @@ app.use('/admin/staff-level',apiAdminStaffLevel);//quản lý level của nhân 
 app.use('/admin/staff-job-level',apiAdminStaffJobLevel);//quản lý level của nhân viên tuơng ứng với các job level có thể làm
 app.use('/admin/status',apiAdminStatus);//trạng thái của đơn hàng, tạm thời không sử dụng tới
 app.use('/admin/style',apiAdminStyle);//style này tạm thời chưa sử dụng tới
+app.use('/admin/template',apiAdminTemplate);
 app.use('/admin/user-group',apiAdminUserGroup);//quản lý nhóm nhân viên: người nhà, người dưng,....
 app.use('/admin/user-group-wage',apiAdminUserGroupWage);//quản lý tiền công của từng nhóm nhân viên dựa theo kĩ năng làm việc: editor, Q.A
 app.use('/admin/user-module',apiAdminUserModuleRole);//quản lý quyền truy cập module của từng user
@@ -397,7 +400,7 @@ app.use('/admin/setting/material',adminMaterialController);
 app.use("/admin/setting/size", adminSizeController);
 app.use("/admin/setting/status", adminStatusController);
 app.use("/admin/setting/style", adminStyleController);
-
+app.use('/admin/setting/template',adminTemplateController);
 
 app.use('/admin/setting/user-group',adminUserGroupController);
 
