@@ -104,15 +104,39 @@ router.delete('/', authenticateSaleToken,async (req, res) => {
     })
   }
 
-  Job.findByIdAndDelete(jobId,err=>{
-    if(err){
-      return res.status(500).json({
-        msg:`Can not delete this job with error: ${new Error(err.message)}`
-      })
-    }
+  let job = await Job.findById(jobId);
+  if(!job){
+    return res.status(500).json({
+      msg:`Job not found!`
+    })
+  }
 
-    return res.status(200).json({
-      msg:`Job has been deleted!`
+  let customer = await Customer.findById(job.customer);
+  if(!customer){
+    return res.status(404).json({
+      msg:`Can not found customer that this job belongs to`
+    })
+  }
+
+  await job.delete()
+  .then(async _=>{
+    customer.jobs.pull(job);
+    await customer.save()
+    .then(_=>{
+      return res.status(200).json({
+        msg:`Job has been deleted!`
+      })
+    })
+    .catch(err=>{
+      return res.status(500).json({
+        msg:`Can not pull job from jobs list of customer with error: ${new Error(err.message)}`
+      })
+    })
+    
+  })
+  .catch(err=>{
+    return res.status(500).json({
+      msg:`Can not delete this job with error: ${new Error(err.message)}`
     })
   })
 })
@@ -287,35 +311,6 @@ router.post("/", authenticateSaleToken, async (req, res) => {
 
 module.exports = router;
 
-const DeleteTasksBasedJob = (jobId) => {
-  return new Promise((resolve, reject) => {
-    Task
-      .deleteMany({ 'basic.job': jobId }, err => {
-        if (err) {
-          return reject({
-            code: 500,
-            msg: `Can not delete tasks belongs to this job with error: ${new Error(err.message)}`
-          })
-        }
-        return resolve();
-      })
-  })
-}
-
-const DeleteRemarks = (taskIds) => {
-  return new Promise((resolve, reject) => {
-    Remark
-      .deleteMany({ ids: { $in: taskIds } }, (err) => {
-        if (err) {
-          return reject({
-            code: 500,
-            msg: `Can not delete remarks belong to this job with error: ${new Error(err.message)}`
-          })
-        }
-        return resolve();
-      })
-  })
-}
 
 
 

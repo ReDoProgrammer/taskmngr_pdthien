@@ -316,12 +316,18 @@
 
 
                                             tr += '<td class="text-info font-weight-bold">' + getFirstLetters(job.customer.firstname + ' ' + job.customer.lastname) + getLastLetters(job.customer._id) + '</td>';
-                                            tr += '<td class="text-warning">';
+
+                                            tr += '<td class="font-weight-bold text-warning">';
                                             tr += job.name;
+                                            if (job.captured.user) {
+                                                tr += '<i class="fa fa-camera text-primary ml-2" aria-hidden="true"></i>'
+                                            }
                                             if (cc.length > 0) {
                                                 tr += '<span class="ml-2 text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>'
                                             }
                                             tr += '</td>';
+
+
                                             tr += '<td class="font-weight-bold text-danger">';
 
                                             if (job.cb_ticked) {

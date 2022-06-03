@@ -138,7 +138,7 @@
                 $nextRow.toggle($btn.hasClass('fa-minus'));
             } else {
                 var newRow = '<tr class="expand-child" id="collapse' + $btn.data('id') + '">' +
-                    '<td colspan="9">' +
+                    '<td colspan="10">' +
                     '<table class="table table-condensed table-bordered table-striped" width=100% >' +
                     '<thead>' +
                     '<tr>' +
@@ -175,6 +175,9 @@
                             newRow += j.name;
                             if (j.captured.user) {
                                 newRow += '<i class="fa fa-camera text-primary ml-2" aria-hidden="true"></i>'
+                            }
+                            if(j.cc.length>0){
+                                newRow += '<span class="ml-2 text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>'
                             }
                             newRow += '</td>';
                             newRow += '<td>' + convertISODateToTimeFormat(j.deadline.begin) + '</td>';
