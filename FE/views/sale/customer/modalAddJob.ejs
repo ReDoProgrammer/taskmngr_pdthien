@@ -232,11 +232,13 @@
     let cb_ticked = $("#ckbChooseCombo").is(':checked');
     let cb = $('#slCombo option:selected').val();
 
-    let material = $('#ckbMaterial').is(':checked')?$('#slMaterials option:selected').val():null;
-    let captureder = $('#ckbMaterial').is(':checked')?$('#slCaptureders option:selected').val():null;
-    let quantity = $('#txtQuantity').val();   
+    let material = $('#ckbMaterial').is(':checked') ? $('#slMaterials option:selected').val() : null;
+    let captureder = $('#ckbMaterial').is(':checked') ? $('#slCaptureders option:selected').val() : null;
+    let quantity = $('#txtQuantity').val();
 
-  
+
+
+
 
 
     if (isNaN(delivery_date) || delivery_date === null || isNaN(received_date) || received_date == null) {
@@ -258,6 +260,11 @@
       return;
     }
 
+    if ($('#ckbMaterial').is(':checked') && typeof material === 'undefined') {
+      $('#lblError').text('(*) Please set material to continue!');
+      $('#lblError').show().delay(3000).fadeOut();
+      return;
+    }
 
 
     $.ajax({
@@ -266,7 +273,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { customer, name, input_link, received_date, delivery_date, intruction, cb_ticked, cb ,material,captureder,quantity},
+      data: { customer, name, input_link, received_date, delivery_date, intruction, cb_ticked, cb, material, captureder, quantity },
       success: function (data) {
         alert(data.msg);
         $('#addJobModal').modal('hide');
