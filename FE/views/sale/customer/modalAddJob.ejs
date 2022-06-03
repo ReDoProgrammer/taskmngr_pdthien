@@ -76,6 +76,14 @@
                 <select name="" id="slCombo" class="form-control"></select>
               </div>
             </div>
+
+            <div class="form-group">
+              <label for="">Template</label>
+              <select id="slTemplates" class="selectpicker form-control" multiple title="Choose one of the following..."></select>
+            </div>
+           
+            
+
             <div class="row">
               <div class="col-sm-12 form-group">
                 <label for="">Intruction:</label>
@@ -132,18 +140,29 @@
   $(document).ready(function () {
     LoadCombo();
     LoadCaptureders();
+    LoadTemplates();    
   })
 
-  $('#txtDuration').keyup(function (e) {
-    if (/\D/g.test(this.value)) {
-      // Filter non-digits from input value.
-      this.value = this.value.replace(/\D/g, '');
-    }
-    let duration = parseInt($('#txtDuration').val());
-    let assigned_date = strToDate($('#txtReceivedDate').val());
-    let deadline = assigned_date.addHours(duration);
-    $('#txtDeliveryDate').val(convertISODateToTimeFormat(deadline));
-  });
+  function LoadTemplates(){
+    $.ajax({
+      url:'/sale/template',
+      type:'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      success:function(data){
+        console.log(data)
+        $('#slTemplates').empty();
+        data.templates.forEach(temp=>{
+          $('#slTemplates').append('<option value="'+temp._id+'">'+temp.name+'</option>')
+        })
+        $('#slTemplates').selectpicker();
+        $('#slTemplates').selectpicker('refresh');
+      }
+    })
+  }
+
+
 
   function LoadCombo() {
     $.ajax({
@@ -240,7 +259,8 @@
     let captureder = $('#ckbMaterial').is(':checked') ? $('#slCaptureders option:selected').val() : null;
     let quantity = $('#txtQuantity').val();
 
-
+    var templates = ($("#slTemplates").val() || []).join(', ');
+  
 
 
 
@@ -282,7 +302,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { customer, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity },
+      data: { customer, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity,templates },
       success: function (data) {
         alert(data.msg);
         $('#addJobModal').modal('hide');
@@ -303,4 +323,14 @@
     separator: "/",
     alias: "dd/mm/yyyy hh:mm"
   })
+  $('#txtDuration').keyup(function (e) {
+    if (/\D/g.test(this.value)) {
+      // Filter non-digits from input value.
+      this.value = this.value.replace(/\D/g, '');
+    }
+    let duration = parseInt($('#txtDuration').val());
+    let assigned_date = strToDate($('#txtReceivedDate').val());
+    let deadline = assigned_date.addHours(duration);
+    $('#txtDeliveryDate').val(convertISODateToTimeFormat(deadline));
+  });
 </script>
