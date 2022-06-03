@@ -386,8 +386,8 @@
                 tr += '<td class="font-weight-bold text-primary">' + j.customer.firstname + ' ' + j.customer.lastname + '</td>';
                 tr += '<td class="font-weight-bold text-danger">' + getFirstLetters(j.customer.firstname + ' ' + j.customer.lastname) + getLastLetters(j.customer._id) + '</td>';
                 tr += '<td class="font-weight-bold text-warning">' + j.name + '</td>';
-                tr += '<td>' + convertISODateToTimeFormat(j.received_date) + '</td>';
-                tr += '<td>' + convertISODateToTimeFormat(j.delivery_date) + '</td>';
+                tr += '<td>' + convertISODateToTimeFormat(j.deadline.begin) + '</td>';
+                tr += '<td>' + convertISODateToTimeFormat(j.deadline.end) + '</td>';
 
                 tr += '<td>';
 

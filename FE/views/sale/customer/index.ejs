@@ -95,6 +95,7 @@
                     page
                 },
                 success: function (data) {
+                    console.log(data.customers)
                     $('#tblData').empty();
                     let idx = 1;
                     data.customers.forEach(cus => {

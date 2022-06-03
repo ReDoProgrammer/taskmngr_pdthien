@@ -98,7 +98,14 @@ const customerSchema = new Schema({
     status:{//trạng thái hoạt động của khách hàng
         type:Boolean,
         default:true
-    }    
+    }, 
+
+    jobs:[
+        {
+            type:Schema.Types.ObjectId,
+            ref:'job'
+        }
+    ]  
 });
 
 customerSchema.pre("save", function (next) {
