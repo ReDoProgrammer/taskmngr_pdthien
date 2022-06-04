@@ -7,7 +7,7 @@ const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 
 router.get('/list', authenticateAdminToken, async (req, res) => {
-    let parentsList = await ParentsLevel.find({});
+    let parentsList = await ParentsLevel.find({}).populate('job_levels');
     return res.status(200).json({
         msg: `Load parents list successfully!`,
         parentsList

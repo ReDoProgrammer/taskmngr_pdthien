@@ -29,4 +29,4 @@ const parentsLevelSchema = new Schema({
     
 });
 
-module.exports = mongoose.model('parents-level',parentsLevelSchema);
+module.exports = mongoose.model('parents_level',parentsLevelSchema);

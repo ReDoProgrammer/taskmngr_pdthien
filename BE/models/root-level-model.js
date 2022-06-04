@@ -31,4 +31,4 @@ const rootLevelSchema = new Schema({
     
 });
 
-module.exports = mongoose.model('root-level',rootLevelSchema);
+module.exports = mongoose.model('root_level',rootLevelSchema);
