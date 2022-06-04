@@ -8,14 +8,12 @@
   <thead class="thead-dark">
     <tr>
       <th scope="col">#</th>
-      <th scope="col">Level</th>
+      <th scope="col">Name</th>
+      <th scope="col">Description</th>
       <th scope="col"></th>
     </tr>
   </thead>
-  <tbody id="tblData">
-
-
-  </tbody>
+  <tbody id="tblParents"></tbody>
 </table>
 
 
@@ -23,27 +21,32 @@
 
 <script>
 
-  var plId = '';
+  var pId = '';
+  $(document).ready(function () {
+    LoadData();
+  });
 
   function LoadData() {
-    $('#tblData').empty();
+    $('#tblParents').empty();
     $.ajax({
       url: '/admin/parents-level/list',
       type: 'get',
-      data: {
+      headers: {
+        authorization: "Bearer " + localStorage.getItem('accessToken'),
       },
-      success: function (data, textStatus, xhr) {
+      success: function (data) {
         let idx = 1;
-        data.pls.forEach(pl => {
+        data.parentsList.forEach(pl => {
           let tr = '<tr id=' + pl._id + ' data-name = ' + pl.name + '>';
           tr += '<th scope="row">' + (idx++) + '</th>';
           tr += '<td class="font-weight-bold text-info">' + pl.name + '</td>';
+          tr += '<td>' + pl.description + '</td>';
 
           tr += '<td class="text-right"><button class="btn btn-xs btn-info" name="list"><i class="fa fa-list" aria-hidden="true"></i></button>';
           tr += '<button class="btn btn-xs btn-warning ml-2" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
           tr += '<button class="btn btn-xs btn-danger ml-1" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
           tr += '</tr>';
-          $('#tblData').append(tr);
+          $('#tblParents').append(tr);
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
@@ -52,18 +55,14 @@
     })
   }
 
-  $(document).ready(function () {
-    $('#btnAddNew').click(function () {
-      cloudId = '';
-      $('#modalParentsLevel').modal();
-    });
-    LoadData();
+
+  $('#btnAddNew').click(function () {
+    pId = '';
+    $('#txtName').val('');
+    $('#txaDescription').val('');
+    $('#modalParentsLevel').modal();
   });
 
-  //sự kiện modal shown --> set các giá trị mặc định cho component trên form
-  $(document).on('show.bs.modal', '.modal', function () {
-    $('#txtName').val('');
-  });
 
   //sự kiện load lại hàm ds level khi modal đc đóng lại
   $(document).on('hidden.bs.modal', '#modalParentsLevel', function () {
@@ -72,40 +71,76 @@
 
 
   $(document).on("click", "button[name='delete']", function () {
-
-    var r = confirm("Are you sure want to delete " + $(this).closest("tr").data('name') + "?");
-    if (r == true) {
-      $.ajax({
-        url: '/admin/parents-level',
-        type: 'delete',
-        headers: {
-          authorization: "Bearer " + localStorage.getItem('accessToken'),
-        },
-        data: {
-          id: $(this).closest("tr").attr("id")
-        },
-        success: function (data, textStatus, xhr) {
-          alert(data.msg);
-          LoadData();
-        }, error: function (jqXHR, textStatus, errorThrown) {
-          alert(jqXHR.responseJSON.msg);
-        }
-      })
-    }
-
+    pId = $(this).closest("tr").attr("id");
+    Swal.fire({
+            icon: 'question',
+            title: 'Do you want to delete this parents level?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            denyButtonText: `No`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/admin/parents-level',
+                    type: 'delete',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem('accessToken'),
+                    },
+                    data: {
+                        pId
+                    },
+                    success: function (data) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Congratulation',
+                            text: data.msg
+                        });
+                        LoadData();
+                    }
+                    , error: function (jqXHR, textStatus, errorThrown) {                     
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Opp..',
+                            text: jqXHR.responseJSON.msg
+                        });
+                    }
+                })
+            }
+        })
 
   });
 
   $(document).on("click", "button[name='list']", function () {
-    plId = $(this).closest("tr").attr("id");
+    pId = $(this).closest("tr").attr("id");
     $('#modalList').modal();
   });
 
 
   $(document).on("click", "button[name='update']", function () {
-    plId = $(this).closest("tr").attr("id");
-    $('#txtName').val($(this).closest("tr").data("name"));
-    $('#modalParentsLevel').modal();
+    pId = $(this).closest("tr").attr("id");
+    $.ajax({
+      url: '/admin/parents-level/detail',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem('accessToken'),
+      },
+      data: { pId },
+      success: function (data) {
+        $('#txtName').val(data.parents.name);
+        $('#txaDescription').val(data.parents.description);
+        $('#modalParentsLevel').modal();
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Opp..',
+          text: jqXHR.responseJSON.msg
+        });
+      }
+
+    })
+   
   });
 </script>
 

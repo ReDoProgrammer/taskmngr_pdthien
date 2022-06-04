@@ -22,11 +22,7 @@ const jobLevel = new Schema({
     parents:{
         type:Schema.Types.ObjectId,
         ref:'parents-level'
-    },
-    parents:{
-        type:Schema.Types.ObjectId,
-        ref:'parents-level'
-    },
+    },   
     root:{
         type:Schema.Types.ObjectId,
         ref:'root-level'

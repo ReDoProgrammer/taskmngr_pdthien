@@ -1,5 +1,5 @@
 <div id="modalMapping" class="modal fade" role="dialog">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
 
         <!-- Modal content-->
         <div class="modal-content">
@@ -8,34 +8,64 @@
                 <h4 class="modal-title">Mapping job level</h4>
             </div>
             <div class="modal-body">
+                <div>
+                    <label class="radio-inline"><input type="radio" name="optradio" checked
+                            id="rbtParents">Parents</label>
+                    <label class="radio-inline"><input type="radio" name="optradio" id="rbtChildren">Children</label>
+                </div>
+                <hr>
+                <div class="form-group mt-2">
+                    <label for="">Sub levels</label>
+                    <div class="input-group mt-2">
+                        <select name="" id="slParentsList" class="form-control"></select>
+                        <div class="input-group-btn">
+                            <button class="btn btn-info" type="submit" id="btnAddParents">
+                                <i class="fa fa-plus" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 <table class="table table-striped mt-2">
                     <thead class="thead-dark">
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Name</th>
-                            <th scope="col">Description</th>                           
+                            <th scope="col">Description</th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody id="tblParents"></tbody>
                 </table>
-                
 
-            </div>           
+
+            </div>
         </div>
 
     </div>
 </div>
 
 <script>
-  
-    $(document).ready(function(){
+
+    $(document).ready(function () {
         LoadParents();
     })
 
     $('#modalMapping').on('show.bs.modal', function () {
-        
+
     })
-   
+
+    function LoadParents() {
+        $.ajax({
+            url: '/admin/parents-level',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem('accessToken'),
+            },
+            success: function (data) {
+                console.log(data)
+            }
+        })
+    }
+
 
 </script>

@@ -174,6 +174,7 @@ const adminMappingController = require('./BE/controllers/Admin/mapping-controlle
 const adminMaterialController = require('./BE/controllers/Admin/material-controller');
 const adminModuleController = require('./BE/controllers/Admin/module-controller');
 const adminNationalStyleController = require('./BE/controllers/Admin/national-style-controller');
+const adminParentsLevelController = require('./BE/controllers/Admin/parents-level-controller');
 const adminStaffLevelController = require("./BE/controllers/Admin/staff-level-controller");
 const adminSizeController = require('./BE/controllers/Admin/size-controller');
 const adminStatusController = require("./BE/controllers/Admin/status-controller");
@@ -391,17 +392,18 @@ app.use("/admin/customer-style", adminCustomerStyleController);
 
 
 app.use('/admin/setting/bank',adminBankController);
+app.use('/admin/setting/bonus-penalty',adminBonusPenaltyController);
 app.use('/admin/setting/color-mode',adminColorModeController);
 app.use('/admin/setting/cloud',adminCloudController);
 app.use('/admin/setting/combo',adminComboController);
 app.use("/admin/setting/file-format", adminFileFormatController);
 app.use('/admin/setting/job-level',adminJobLevelController);
 app.use("/admin/setting/level", adminLevelController);
-app.use('/admin/setting/module',adminModuleController);
-app.use('/admin/setting/national-style',adminNationalStyleController);
-app.use('/admin/setting/bonus-penalty',adminBonusPenaltyController);
 app.use('/admin/setting/mapping',adminMappingController);
 app.use('/admin/setting/material',adminMaterialController);
+app.use('/admin/setting/module',adminModuleController);
+app.use('/admin/setting/national-style',adminNationalStyleController);
+app.use('/admin/setting/parents-level',adminParentsLevelController);
 app.use("/admin/setting/size", adminSizeController);
 app.use("/admin/setting/status", adminStatusController);
 app.use("/admin/setting/style", adminStyleController);
