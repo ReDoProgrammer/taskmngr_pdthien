@@ -1,31 +1,25 @@
-<div id="materialModal" class="modal fade" role="dialog">
+<div id="modalRootLevel" class="modal fade" role="dialog">
     <div class="modal-dialog">
 
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Add or update material</h4>
+                <h4 class="modal-title">Add or update root level</h4>
             </div>
             <div class="modal-body">
-                <div class="form-group row">
-                    <div class="col-md-10">
-                        <label for="">Name:</label>
-                        <input type="text" placeholder="material name" id="txtName" class="form-control">
-                    </div>
-                    <div class="col-md-2">
-                        <label for="">Price:</label>
-                        <input type="text" value="0" id="txtPrice" class="form-control">
-                    </div>
+                <div class="form-group">
+                    <label for="">Name:</label>
+                    <input type="text" placeholder="Root level name" id="txtName" class="form-control">
                 </div>
 
                 <div class="form-group">
                     <label for="">Description:</label>
-                    <textarea placeholder="material description" id="txaDescription" rows="3"
+                    <textarea placeholder="Root level description" id="txaDescription" rows="3"
                         class="form-control"></textarea>
                 </div>
 
-                <label id="materialMsg" class="font-weight-bold"></label>
+                <label id="errMsg" class="font-weight-bold"></label>
 
             </div>
             <div class="modal-footer">
@@ -43,96 +37,72 @@
 <script>
     $('#btnSubmit').click(function () {
         let name = $('#txtName').val();
-
         let description = $('#txaDescription').val();
-        let price = parseFloat($('#txtPrice').val());
 
         if (name.length == 0) {
-            $('#materialMsg').removeClass('text-success').addClass('text-danger');
-            $('#materialMsg').text('(!) Please input material name').fadeIn().delay(3000).fadeOut();
+            $('#errMsg').removeClass('text-success').addClass('text-danger');
+            $('#errMsg').text('(!) Please input material name').fadeIn().delay(3000).fadeOut();
             return;
         }
 
-        if (isNaN(price)) {
-            $('#materialMsg').removeClass('text-success').addClass('text-danger');
-            $('#materialMsg').text('(!) Price value is invalid!').fadeIn().delay(3000).fadeOut();
-            return;
-        }
 
-        if (mId.length == 0) {
+
+        if (rootId.length == 0) {
             $.ajax({
-                url: '/admin/material',
+                url: '/admin/root-level',
                 type: 'post',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem('accessToken'),
                 },
                 data: {
                     name,
-                    description,
-                    price
+                    description
                 },
                 success: function (data) {
-                    alert(data.msg);
-                    $('#materialModal').modal('hide');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Congratulation',
+                        text: data.msg
+                    });
+                    $('#modalRootLevel').modal('hide');
                 }
                 , error: function (jqXHR, textStatus, errorThrown) {
-                    $('#materialMsg').removeClass('text-success').addClass('text-danger');
-                    $('#materialMsg').text(jqXHR.responseJSON.msg).fadeIn().delay(3000).fadeOut();
+                    $('#errMsg').removeClass('text-success').addClass('text-danger');
+                    $('#errMsg').text(jqXHR.responseJSON.msg).fadeIn().delay(3000).fadeOut();
                 }
             })
         } else {
             $.ajax({
-                url: '/admin/material',
+                url: '/admin/root-level',
                 type: 'put',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem('accessToken'),
                 },
                 data: {
-                    mId,
+                    rootId,
                     name,
-                    description,
-                    price
+                    description
                 },
                 success: function (data) {
-                    alert(data.msg);
-                    $('#materialModal').modal('hide');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Congratulation',
+                        text: data.msg
+                    });
+                    $('#modalRootLevel').modal('hide');
                 }
                 , error: function (jqXHR, textStatus, errorThrown) {
-                    $('#materialMsg').removeClass('text-success').addClass('text-danger');
-                    $('#materialMsg').text(jqXHR.responseJSON.msg).fadeIn().delay(3000).fadeOut();
+                    $('#errMsg').removeClass('text-success').addClass('text-danger');
+                    $('#errMsg').text(jqXHR.responseJSON.msg).fadeIn().delay(3000).fadeOut();
                 }
             })
         }
     })
 
 
-    $('#materialModal').on('hidden.bs.modal', function () {
-        LoadMaterialList();
+    $('#modalRootLevel').on('hidden.bs.modal', function () {
+        LoadRootsList();
     })
-
-
-    $(function () {
-        $("input[id*='txtPrice']").keydown(function (event) {
-
-
-            if (event.shiftKey == true) {
-                event.preventDefault();
-            }
-
-            if ((event.keyCode >= 48 && event.keyCode <= 57) ||
-                (event.keyCode >= 96 && event.keyCode <= 105) ||
-                event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 37 ||
-                event.keyCode == 39 || event.keyCode == 46 || event.keyCode == 190) {
-
-            } else {
-                event.preventDefault();
-            }
-
-            if ($(this).val().indexOf('.') !== -1 && event.keyCode == 190)
-                event.preventDefault();
-            //if a decimal has been added, disable the "."-button
-
-        });
-    })
+   
 
 </script>

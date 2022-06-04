@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const RootLevel = require('../../models/national-style-model');
+const RootLevel = require('../../models/root-level-model');
 const ParentsLevel = require('../../models/parents-level-model');
 const JobLevel = require('../../models/job-level-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
@@ -14,7 +14,7 @@ router.get('/',authenticateAdminToken,async (req,res)=>{
     })
 })
 
-router.get('/',authenticateAdminToken,async (req,res)=>{
+router.get('/detail',authenticateAdminToken,async (req,res)=>{
     let {rootId} = req.query;
     let root = await RootLevel.findById(rootId);
     if(!root){
