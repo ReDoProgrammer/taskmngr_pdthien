@@ -63,7 +63,7 @@
                 headers: {
                     authorization: "Bearer " + localStorage.getItem('accessToken'),
                 },
-                data: {pId, name, description },
+                data: { pId, name, description },
                 success: function (data) {
                     Swal.fire({
                         icon: 'success',
