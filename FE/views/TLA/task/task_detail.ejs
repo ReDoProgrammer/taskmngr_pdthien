@@ -54,7 +54,8 @@
 
                             <div class="col-md-10 col-sm-10 col-xs-8" id="divInputLink">
                                 <div class="input-group" id="divFolder">
-                                    <input type="text" class="form-control" id="inputLink" value="" readonly style="background-color: white;">
+                                    <input type="text" class="form-control" id="inputLink" value="" readonly
+                                        style="background-color: white;">
                                     <div class="input-group-btn">
                                         <button class="btn btn-info" type="submit" id="btnCopyToClipboard">
                                             <i class="fa fa-clipboard" aria-hidden="true"></i>
@@ -63,9 +64,21 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="row mt-2">
                             <div class="col-md-2 col-sm-2 col-xs-4">Output:</div>
-                            <div class="col-md-10 col-sm-10 col-xs-8" id="lblOutputLink"></div>
+
+                            <div class="col-md-10 col-sm-10 col-xs-8" id="divOutputLink">
+                                <div class="input-group" id="divFolderOutput">
+                                    <input type="text" class="form-control" id="outputLink" value="" readonly
+                                        style="background-color: white;">
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-info" type="submit" id="btnCopyToClipboardOutput">
+                                            <i class="fa fa-clipboard" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
 
@@ -111,7 +124,7 @@
 
                             </div>
                         </div>
-                       
+
 
 
                     </div>
@@ -146,9 +159,23 @@
         }
     })
 
-    $("#modalTaskDetail").on('shown.bs.modal', function (e) {
+    $("#modalTaskDetail").on('shown.bs.modal',async function (e) {
         $('#job-info').hide();
-        $.ajax({
+       await LoadTaskDetail();
+    });
+
+    $('#btnCopyToClipboard').click(function () {
+        $("#inputLink").select();
+        document.execCommand('copy');
+        Swal.fire(
+            'Great!!',
+            'Local url copied to clipboard',
+            'success'
+        )
+    })
+
+    function LoadTaskDetail(){
+       return $.ajax({
             url: '/tla/task/detail',
             type: 'get',
             headers: {
@@ -188,22 +215,32 @@
                     $('#remarks').append(item);
                 })
 
-               
-              
+
+
                 if (isValidHttpUrl(data.task.basic.link.input)) {
                     $('#divFolder').slideUp();
-                    $('#lblInputLink').html('<a href="' + data.task.basic.link.input + '" target="_blank" rel="noopener noreferrer">Link</a>')
-                } else {                  
+                    $('#divInputLink').html('<a href="' + data.task.basic.link.input + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                } else {
                     $('#divFolder').slideDown(200);
                     $('#inputLink').val(data.task.basic.link.input);
                 }
-                if (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].submited.length > 0) {
-                    if (isValidHttpUrl(data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link)) {
-                        $('#lblOutputLink').html('<a href="' + data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
-                    } else {
-                        $('#lblOutputLink').html('<span class="font-weight-bold font-italic">' + data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link + '</span>');
+
+                if (data.task.status === 4) {//uploaded
+                    $('#divOutputLink').html('<a href="' + data.task.tla.uploaded[data.task.tla.uploaded.length-1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                } else {
+                    if (data.task.editor && data.task.editor.length > 0) {
+                        if (data.task.editor[data.task.editor.length - 1].submited.length > 0 && data.task.editor[data.task.editor.length - 1].submited) {
+                            if (isValidHttpUrl(data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link)) {
+                                $('#divFolderOutput').slideUp();
+                                $('#divOutputLink').html('<a href="' + data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                            } else {
+                                $('#divFolderOutput').slideDown(200);
+                                $('#outputLink').val(data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link);
+                            }
+                        }
                     }
                 }
+
 
 
 
@@ -237,15 +274,5 @@
                 alert(request.responseJSON.msg)
             }
         })
-    });
-
-    $('#btnCopyToClipboard').click(function () {
-        $("#inputLink").select();
-        document.execCommand('copy');
-        Swal.fire(
-            'Great!!',
-            'Local url copied to clipboard',
-            'success'
-        )
-    })
+    }
 </script>
