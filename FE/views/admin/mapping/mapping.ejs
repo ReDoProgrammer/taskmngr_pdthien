@@ -8,6 +8,17 @@
                 <h4 class="modal-title">Mapping job level</h4>
             </div>
             <div class="modal-body">
+                <table class="table table-striped mt-2">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Description</th>                           
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblParents"></tbody>
+                </table>
                 
 
             </div>           
@@ -18,7 +29,9 @@
 
 <script>
   
-
+    $(document).ready(function(){
+        LoadParents();
+    })
 
     $('#modalMapping').on('show.bs.modal', function () {
         

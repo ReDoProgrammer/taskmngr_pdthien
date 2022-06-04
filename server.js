@@ -220,6 +220,7 @@ const apiAdminJobLevel = require('./BE/API/admin/api-job-level');
 const apiMaterial = require('./BE/API/admin/api-material');
 const apiAdminModule = require('./BE/API/admin/api-module');
 const apiAdminNationalStyle = require('./BE/API/admin/api-national-style');
+const apiAdminParentsLevel  = require('./BE/API/admin/api-parents');
 const apiAdminRootLevel = require('./BE/API/admin/api-root-level');
 const apiAdminSize = require('./BE/API/admin/api-size');
 const apiAdminStaffLevel = require('./BE/API/admin/api-staff-level');
@@ -360,9 +361,10 @@ app.use('/admin/customer-level',apiAdminCustomerLevel);//quản lý thông tin c
 app.use('/admin/file-format',apiAdminFileFormat);//quản lý thông tin định dạng file hình ảnh xuất cho khách
 app.use('/admin/job-level',apiAdminJobLevel);//quản lý thông tin danh sách level, khác với apiAdminCustomerLevel
 app.use('/admin/bonus-penalty',apiAdminBonusPenalty);//quản lý các hình thức phạt đối với nhân viên
+app.use('/admin/material',apiMaterial);//quan ly don gia hinh anh dau vao duoc chup boi sale
 app.use('/admin/module',apiAdminModule);// quản lý danh sách module của web
 app.use('/admin/national-style',apiAdminNationalStyle);//quản lý thông tin style của khách hàng theo quốc gia
-app.use('/admin/material',apiMaterial);//quan ly don gia hinh anh dau vao duoc chup boi sale
+app.use('/admin/parents-level',apiAdminParentsLevel);
 app.use('/admin/root-level',apiAdminRootLevel);
 app.use('/admin/size',apiAdminSize);//quản lý thông tin kích thước file hình ảnh 
 app.use('/admin/staff-level',apiAdminStaffLevel);//quản lý level của nhân viên, phân loại nhân viên: người mới, tập sự, học việc,...
