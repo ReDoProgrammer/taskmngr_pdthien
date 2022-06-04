@@ -153,7 +153,8 @@ router.put("/", authenticateSaleToken, async (req, res) => {
     cb,
     material,
     captureder,
-    quantity
+    quantity,
+    templates
   } = req.body;
 
 
@@ -205,6 +206,15 @@ router.put("/", authenticateSaleToken, async (req, res) => {
     }
   }
 
+  if (templates.length == 0) {
+    job.templates = [];
+  } else {
+    let arr = templates.split(',');
+    arr = arr.map(x => x.trim());
+    job.templates = arr;
+  }
+
+
   await job.save()
     .then(_ => {
       return res.status(200).json({
@@ -236,11 +246,11 @@ router.post("/", authenticateSaleToken, async (req, res) => {
   } = req.body;
 
 
-  
+
   let arr = templates.split(',');
-  arr = arr.map(x=>x.trim())
-  
- 
+  arr = arr.map(x => x.trim())
+
+
   let cust = await Customer.findById(customer);
   if (!cust) {
     return res.status(404).json({
@@ -260,8 +270,8 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     end: delivery_date
   };
 
-  if (arr.length > 0) {    
-      job.templates =arr;   
+  if (arr.length > 0) {
+    job.templates = arr;
   }
 
 

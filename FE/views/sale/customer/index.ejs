@@ -171,8 +171,7 @@
                         let idx = 1;
 
                         data.jobs.forEach(j => {
-                            let templates = (j.templates.map(x => x.name)).toString();
-
+                            let templates = (j.templates && j.templates.length > 0)?(j.templates.map(x => x.name)).toString():'';
 
                             newRow += '<tr id = "' + j._id + '">';
                             newRow += '<td>' + (idx++) + '</td>';

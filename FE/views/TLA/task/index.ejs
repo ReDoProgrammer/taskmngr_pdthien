@@ -300,11 +300,7 @@
             },
             success: function (data) {
                 let idx = 1;
-
-
-
                 data.tasks.forEach(t => {
-                    console.log(t)
                     let tr = '<tr id="' + t._id + '"  data-level="' + t.basic.level._id + '">';
                     if (t.bp.length > 0) {
                         if (t.bp[t.bp.length - 1].is_bonus) {

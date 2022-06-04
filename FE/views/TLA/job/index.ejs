@@ -289,7 +289,7 @@
                                         let idx = 1;
                                         $('#tblData').empty();
                                         data.jobs.forEach(job => {
-                                            let templates = (job.templates.map(x => x.name)).toString();
+                                            let templates = (job.templates && job.templates.length > 0)?(job.templates.map(x => x.name)).toString():'';
                                             let cc = job.cc.filter(x => x.status == -1);
 
                                             let tr = '<tr id = "' + job._id + '" data-customer="' + job.customer._id + '"';

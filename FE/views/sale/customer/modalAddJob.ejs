@@ -151,7 +151,6 @@
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       success:function(data){
-        console.log(data)
         $('#slTemplates').empty();
         data.templates.forEach(temp=>{
           $('#slTemplates').append('<option value="'+temp._id+'">'+temp.name+'</option>')

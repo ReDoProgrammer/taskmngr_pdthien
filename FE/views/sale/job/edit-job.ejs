@@ -69,6 +69,12 @@
               </div>
             </div>
 
+            <div class="form-group">
+              <label for="">Template</label>
+              <select id="slTemplates" class="selectpicker form-control" multiple title="Choose one of the following..."></select>
+            </div>
+           
+
             <div class="row">
               <div class="col-sm-12 form-group">
                 <label for="">Intruction:</label>
@@ -124,6 +130,7 @@
     LoadCombo()
     LoadMaterials();
     LoadCaptureders();
+    LoadTemplates();
   })
   function LoadCombo() {
     $.ajax({
@@ -162,7 +169,6 @@
         jobId
       },
       success: function (data) {
-        console.log(data.job)
         $('#lblCustomerFullname').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
         $('#lblCustomerPhone').text(data.job.customer.phone);
         $('#lblCustomerEmail').text(data.job.customer.email);
@@ -171,6 +177,10 @@
         $('#txtReceivedDate').val(convertISODateToTimeFormat(data.job.deadline.begin));
         $('#txtDeliveryDate').val(convertISODateToTimeFormat(data.job.deadline.end));
         $('#txaIntruction').val(data.job.intruction);
+
+        $('#slTemplates').val(data.job.templates);
+        $('#slTemplates').selectpicker('refresh')
+
         if (data.job.cb) {
           $('#ckbChooseCombo').prop('checked', true);
           $('#divCombo').slideDown();
@@ -209,7 +219,7 @@
     let material = $('#ckbMaterial').is(':checked')?$('#slMaterials option:selected').val():null;
     let captureder = $('#ckbMaterial').is(':checked')?$('#slCaptureders option:selected').val():null;
     let quantity = $('#ckbMaterial').is(':checked')?$('#txtQuantity').val():0;
-
+    var templates = ($("#slTemplates").val() || []).join(', ');
 
     if (isNaN(delivery_date) || delivery_date === null || isNaN(received_date) || received_date == null) {
       $('#lblError').text('(*) Received date or delivery date is  invalid!');
@@ -250,7 +260,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { jobId, name, input_link, received_date, delivery_date, intruction,cb,material,captureder,quantity },
+      data: { jobId, name, input_link, received_date, delivery_date, intruction,cb,material,captureder,quantity,templates },
       success: function (data) {
         alert(data.msg);
         $('#updateJobModal').modal('hide');
@@ -296,6 +306,25 @@
       }
     })
   }
+  function LoadTemplates(){
+    $.ajax({
+      url:'/sale/template',
+      type:'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      success:function(data){
+        $('#slTemplates').empty();
+        data.templates.forEach(temp=>{
+          $('#slTemplates').append('<option value="'+temp._id+'">'+temp.name+'</option>')
+        })
+        $('#slTemplates').selectpicker();
+        $('#slTemplates').selectpicker('refresh');
+      }
+    })
+  }
+
+
 
   $("#ckbMaterial").change(function () {
     if (this.checked) {

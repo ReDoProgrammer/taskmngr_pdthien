@@ -373,7 +373,8 @@
               $('#tblJobs').empty();
               let idx = 1;
               data.jobs.forEach(j => {
-                let templates = (j.templates.map(x => x.name)).toString();
+                console.log(j.templates)
+                let templates = (j.templates && j.templates.length > 0)?(j.templates.map(x => x.name)).toString():'';
                 let isInit = j.tasks.filter(x => x.status !== 0);
 
                 let tr = '<tr id="' + j._id + '" data-customer="' + j.customer._id + '">';
