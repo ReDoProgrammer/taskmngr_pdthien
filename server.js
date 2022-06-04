@@ -160,27 +160,25 @@ app.use('/editor/task',editorTaskAPI);
 //ADMIN CONTROLLERS
 const adminAccountController = require("./BE/controllers/Admin/account-controller");
 const adminBankController = require('./BE/controllers/Admin/bank-controller');
+const adminBonusPenaltyController = require('./BE/controllers/Admin/bonus-penalty-controller');
 const adminCloudController = require('./BE/controllers/Admin/cloud-controller');
 const adminColorModeController = require('./BE/controllers/Admin/color-mode-controller');
 const adminComboController = require('./BE/controllers/Admin/combo-controller');
-const adminStyleController = require("./BE/controllers/Admin/style-controller");
 const adminCustomerController = require("./BE/controllers/Admin/customer-controller");
 const adminCustomerStyleController = require("./BE/controllers/Admin/customer-style-controller");
 const adminFileFormatController = require("./BE/controllers/Admin/file-format-controller");
 const adminHomeController = require("./BE/controllers/Admin/home-controller");
-
 const adminJobLevelController = require('./BE/controllers/Admin/job-leve-controller');
-
 const adminLevelController = require("./BE/controllers/Admin/level-controller");
-const adminModuleController = require('./BE/controllers/Admin/module-controller');
-const adminBonusPenaltyController = require('./BE/controllers/Admin/bonus-penalty-controller');
+const adminMappingController = require('./BE/controllers/Admin/mapping-controller');
 const adminMaterialController = require('./BE/controllers/Admin/material-controller');
-const adminStaffLevelController = require("./BE/controllers/Admin/staff-level-controller");
-
+const adminModuleController = require('./BE/controllers/Admin/module-controller');
 const adminNationalStyleController = require('./BE/controllers/Admin/national-style-controller');
+const adminStaffLevelController = require("./BE/controllers/Admin/staff-level-controller");
 const adminSizeController = require('./BE/controllers/Admin/size-controller');
 const adminStatusController = require("./BE/controllers/Admin/status-controller");
 const adminStaffController = require("./BE/controllers/Admin/staff-controller");
+const adminStyleController = require("./BE/controllers/Admin/style-controller");
 const adminTemplateController = require('./BE/controllers/Admin/template-controller');
 const adminUserGroupController = require('./BE/controllers/Admin/user-group-controller');
 
@@ -210,6 +208,7 @@ const saleHomeController = require('./BE/controllers/Sale/sale-home-controller')
 //  * 
 //  */
 const apiAdminBank = require('./BE/API/admin/api-bank');
+const apiAdminBonusPenalty = require('./BE/API/admin/api-bonus-penalty');
 const apiAdminCloud = require('./BE/API/admin/api-cloud');
 const apiAdminColorMode = require('./BE/API/admin/api-color-mode');
 const apiCombo = require('./BE/API/admin/api-combo');
@@ -219,20 +218,19 @@ const apiAdminCustomerLevel = require('./BE/API/admin/api-customer-level');
 const apiAdminFileFormat = require('./BE/API/admin/api-file-format');
 const apiAdminJobLevel = require('./BE/API/admin/api-job-level');
 const apiMaterial = require('./BE/API/admin/api-material');
-const apiAdminStaffLevel = require('./BE/API/admin/api-staff-level');
-const apiAdminStaffJobLevel = require('./BE/API/admin/api-staff-job-level');
 const apiAdminModule = require('./BE/API/admin/api-module');
 const apiAdminNationalStyle = require('./BE/API/admin/api-national-style');
-const apiAdminBonusPenalty = require('./BE/API/admin/api-bonus-penalty');
+const apiAdminRootLevel = require('./BE/API/admin/api-root-level');
 const apiAdminSize = require('./BE/API/admin/api-size');
-const apiAdminUser = require('./BE/API/admin/api-user');
+const apiAdminStaffLevel = require('./BE/API/admin/api-staff-level');
 const apiAdminStatus = require('./BE/API/admin/api-status');
+const apiAdminStaffJobLevel = require('./BE/API/admin/api-staff-job-level');
 const apiAdminStyle = require('./BE/API/admin/api-style');
 const apiAdminTemplate = require('./BE/API/admin/api-template');
 const apiAdminUserGroup = require('./BE/API/admin/api-user-group');
 const apiAdminUserGroupWage = require('./BE/API/admin/api-user-group-wage');
 const apiAdminUserModuleRole = require('./BE/API/admin/api-user-module');
-
+const apiAdminUser = require('./BE/API/admin/api-user');
 
 
 
@@ -365,6 +363,7 @@ app.use('/admin/bonus-penalty',apiAdminBonusPenalty);//quản lý các hình th�
 app.use('/admin/module',apiAdminModule);// quản lý danh sách module của web
 app.use('/admin/national-style',apiAdminNationalStyle);//quản lý thông tin style của khách hàng theo quốc gia
 app.use('/admin/material',apiMaterial);//quan ly don gia hinh anh dau vao duoc chup boi sale
+app.use('/admin/root-level',apiAdminRootLevel);
 app.use('/admin/size',apiAdminSize);//quản lý thông tin kích thước file hình ảnh 
 app.use('/admin/staff-level',apiAdminStaffLevel);//quản lý level của nhân viên, phân loại nhân viên: người mới, tập sự, học việc,...
 app.use('/admin/staff-job-level',apiAdminStaffJobLevel);//quản lý level của nhân viên tuơng ứng với các job level có thể làm
@@ -399,15 +398,13 @@ app.use("/admin/setting/level", adminLevelController);
 app.use('/admin/setting/module',adminModuleController);
 app.use('/admin/setting/national-style',adminNationalStyleController);
 app.use('/admin/setting/bonus-penalty',adminBonusPenaltyController);
+app.use('/admin/setting/mapping',adminMappingController);
 app.use('/admin/setting/material',adminMaterialController);
 app.use("/admin/setting/size", adminSizeController);
 app.use("/admin/setting/status", adminStatusController);
 app.use("/admin/setting/style", adminStyleController);
 app.use('/admin/setting/template',adminTemplateController);
-
 app.use('/admin/setting/user-group',adminUserGroupController);
-
-
 app.use("/admin/staff", adminStaffController);
 app.use("/admin/setting/staff-level", adminStaffLevelController);
 
