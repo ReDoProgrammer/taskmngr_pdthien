@@ -233,6 +233,12 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     templates
   } = req.body;
 
+
+  
+  let arr = templates.split(',');
+  arr = arr.map(x=>x.trim())
+  
+ 
   let cust = await Customer.findById(customer);
   if (!cust) {
     return res.status(404).json({
@@ -252,12 +258,8 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     end: delivery_date
   };
 
-  if (templates.length > 0) {
-    let arrTemps = templates.split(',');
-    if (arrTemps.length > 0) {
-      console.log(arrTemps)
-      job.templates = arrTemps.map(x=>ObjectId(x));
-    }
+  if (arr.length > 0) {    
+      job.templates =arr;   
   }
 
 
