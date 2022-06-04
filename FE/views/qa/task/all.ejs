@@ -83,10 +83,18 @@
           },
           data: { taskId },
           success: function (data) {
-            alert(data.msg);
+            Swal.fire({
+              icon: 'Warning',
+              title: 'Oops...',
+              text: request.responseJSON.msg
+            })
             LoadTasks();
-          }, error: function (request, status, error) {
-            alert(request.responseJSON.msg);
+          }, error: function (request, status, error) {           
+            Swal.fire({
+              icon: 'Warning',
+              title: 'Oops...',
+              text: request.responseJSON.msg
+            })
           }
         })
       })
@@ -124,7 +132,7 @@
 
               tr += '<td>' + (idx++) + '</td>';
 
-              tr += '<td class="font-weight-bold text-primary">' +getFirstLetters(t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname)+getLastLetters(t.basic.job.customer._id)+ '</td>';
+              tr += '<td class="font-weight-bold text-primary">' + getFirstLetters(t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname) + getLastLetters(t.basic.job.customer._id) + '</td>';
               tr += '<td class="font-weight-bold text-danger">' + t.basic.job.name + '</td>';
               tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';
               tr += '<td class="text-danger">';
@@ -142,32 +150,32 @@
 
 
               tr += '<td class="text-right">';
-              if (t.editor.length>0 && t.editor[t.editor.length-1].submited.length>0) {
-                tr += t.editor[t.editor.length -1].submited[(t.editor[t.editor.length -1].submited.length - 1)].amount;
+              if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                tr += t.editor[t.editor.length - 1].submited[(t.editor[t.editor.length - 1].submited.length - 1)].amount;
               }
               tr += '</td>';
               tr += '<td class="text-right">';
-              if (t.editor.length>0 && t.editor[t.editor.length-1].submited.length>0) {
-                tr += t.editor[t.editor.length -1].submited.length;
+              if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                tr += t.editor[t.editor.length - 1].submited.length;
               }
               tr += '</td>';
 
 
               tr += '<td>';
-              if (t.editor.length>0) {
+              if (t.editor.length > 0) {
                 tr += t.editor[t.editor.length - 1].staff.fullname;
               }
               tr += '</td>';
 
 
               tr += '<td>';
-              if (t.qa.length >0 && !t.qa[t.qa.length-1].unregisted) {
+              if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
                 tr += t.qa[t.qa.length - 1].staff.fullname;
               }
               tr += '</td>';
 
               tr += '<td>';
-                if (t.dc.length>0 && !t.dc[t.dc.length-1].unregisted) {
+              if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
                 tr += t.dc[t.dc.length - 1].staff.fullname;
               }
               tr += '</td>';
@@ -182,7 +190,7 @@
                   break;
                 case 1:
                   {
-                    if (t.editor[t.editor.length-1].submited.length > 1) {
+                    if (t.editor[t.editor.length - 1].submited.length > 1) {
                       tr += '<span class="text-primary">Fixed</span>';
                     } else {
                       tr += '<span class="text-primary">Edited</span>';
@@ -215,7 +223,7 @@
               tr += '</i></td>';
 
               tr += '<td class="text-right">';
-              if ((t.status === -1 || t.status === 0 || t.status === 1) && ((t.qa.length==0) && (t.dc.length==0) || (t.qa.length>0 && t.qa[t.qa.length-1].unregisted))) {
+              if ((t.status === -1 || t.status === 0 || t.status === 1) && ((t.qa.length == 0) && (t.dc.length == 0) || (t.qa.length > 0 && t.qa[t.qa.length - 1].unregisted))) {
                 tr += '<button class="btn btn-xs btn-success ml-2" name="get-task"><i class="fa fa-plus" aria-hidden="true"></i></button>';
               }
               tr += '<button class="btn btn-xs btn-info ml-2" name="btnTaskInfo">';
