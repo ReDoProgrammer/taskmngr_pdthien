@@ -5,7 +5,7 @@ const { authenticateSaleToken } = require("../../../middlewares/sale-middleware"
 const Material = require('../../models/material-model');
 const Combo = require('../../models/combo-model');
 const Customer = require('../../models/customer-model');
-const { ObjectId } = require('mongodb');
+
 
 router.get('/detail', authenticateSaleToken, (req, res) => {
   let { jobId } = req.query;
@@ -54,6 +54,7 @@ router.get("/list", authenticateSaleToken, (req, res) => {
     .populate('cb')
     .populate('tasks')
     .populate('captured.user')
+    .populate('templates')
     .exec()
     .then((jobs) => {
       let result = jobs.slice(process.env.PAGE_SIZE * (page - 1), process.env.PAGE_SIZE);
@@ -85,6 +86,7 @@ router.get('/list-by-customer', authenticateSaleToken, async (req, res) => {
     .populate('cb')
     .populate('created.by')
     .populate('captured.user')
+    .populate('templates')
     .sort({ _id: -1 })
     .limit(10);
   return res.status(200).json({

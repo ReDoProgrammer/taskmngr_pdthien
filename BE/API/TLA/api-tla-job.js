@@ -11,6 +11,7 @@ router.get('/list',authenticateTLAToken,(req,res)=>{
     .populate('customer','firstname lastname remark')
     .populate('cb')
     .populate('cc')
+    .populate('templates')
     .exec()
     .then(jobs=>{
         

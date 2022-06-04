@@ -32,6 +32,7 @@
                 <th scope="col">Customer</th>
                 <th scope="col">Job name</th>
                 <th scope="col">Combo</th>
+                <th scope="col">Templates</th>
                 <th scope="col">Received date</th>
                 <th scope="col">Delivery date</th>
                 <th scope="col" colspan="2">Status</th>
@@ -288,6 +289,7 @@
                                         let idx = 1;
                                         $('#tblData').empty();
                                         data.jobs.forEach(job => {
+                                            let templates = (job.templates.map(x => x.name)).toString();
                                             let cc = job.cc.filter(x => x.status == -1);
 
                                             let tr = '<tr id = "' + job._id + '" data-customer="' + job.customer._id + '"';
@@ -329,15 +331,13 @@
 
 
                                             tr += '<td class="font-weight-bold text-danger">';
-
                                             if (job.cb_ticked) {
                                                 tr += job.cb.name;
-
-                                            } else {
-                                                tr += '';
                                             }
+                                            tr += '</td>';
 
-
+                                            tr += '<td class="font-weight-bold text-danger">';
+                                            tr += templates;
                                             tr += '</td>';
 
 

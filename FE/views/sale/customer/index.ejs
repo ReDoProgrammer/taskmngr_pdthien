@@ -149,6 +149,7 @@
                     '<th>Created at by</th>' +
                     '<th>Created by</th>' +
                     '<th>Combo</th>' +
+                    '<th>Templates</th>' +
                     '<th>Status</th>' +
                     '</tr>' +
                     '</thead>' +
@@ -168,15 +169,19 @@
                     },
                     success: function (data) {
                         let idx = 1;
+
                         data.jobs.forEach(j => {
+                            let templates = (j.templates.map(x => x.name)).toString();
+
+
                             newRow += '<tr id = "' + j._id + '">';
                             newRow += '<td>' + (idx++) + '</td>';
-                            newRow+='<td>';
+                            newRow += '<td>';
                             newRow += j.name;
                             if (j.captured.user) {
                                 newRow += '<i class="fa fa-camera text-primary ml-2" aria-hidden="true"></i>'
                             }
-                            if(j.cc.length>0){
+                            if (j.cc.length > 0) {
                                 newRow += '<span class="ml-2 text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>'
                             }
                             newRow += '</td>';
@@ -188,6 +193,9 @@
                             if (j.cb) {
                                 newRow += j.cb.name;
                             }
+                            newRow += '</td>';
+                            newRow += '<td class="font-weight-bold text-danger">';
+                            newRow += templates;
                             newRow += '</td>';
                             newRow += '<td>';
                             switch (j.status) {

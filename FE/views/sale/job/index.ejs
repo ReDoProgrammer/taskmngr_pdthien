@@ -24,6 +24,7 @@
     <th>Receive date</th>
     <th>Delivery date</th>
     <th>Combo</th>
+    <th>Templates</th>
     <th>Status</th>
     <th></th>
   </thead>
@@ -372,6 +373,7 @@
               $('#tblJobs').empty();
               let idx = 1;
               data.jobs.forEach(j => {
+                let templates = (j.templates.map(x => x.name)).toString();
                 let isInit = j.tasks.filter(x => x.status !== 0);
 
                 let tr = '<tr id="' + j._id + '" data-customer="' + j.customer._id + '">';
@@ -391,7 +393,7 @@
                 if (j.captured.user) {
                   tr += '<i class="fa fa-camera text-primary ml-2" aria-hidden="true"></i>'
                 }
-                if (j.cc.length >0) {
+                if (j.cc.length > 0) {
                   tr += '<span class="ml-2 text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>'
                 }
                 tr += '</td>';
@@ -402,6 +404,11 @@
                   tr += j.cb.name;
                 }
                 tr += '</td>';
+
+                tr += '<td class="font-weight-bold text-danger">';
+                tr += templates;
+                tr += '</td>';
+
 
                 tr += '<td>';
 
