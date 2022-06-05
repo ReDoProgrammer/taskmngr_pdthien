@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const { authenticateAccountantToken } = require("../../../middlewares/accountant-middleware");
 const Customer = require("../../models/customer-model");
-const CustomerLevel = require('../../models/customer-level-model');
 const Job = require('../../models/job-model');
 
 router.delete("/", authenticateAccountantToken, (req, res) => {

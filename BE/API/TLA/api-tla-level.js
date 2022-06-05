@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
-const CustomerLevel = require('../../models/customer-level-model');
+
 
 
 router.get('/',authenticateTLAToken,(req,res)=>{    

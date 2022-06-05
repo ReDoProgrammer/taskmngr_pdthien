@@ -79,8 +79,6 @@ app.use('/accountant/customer',accountantCustomerController);
 const accountantCustomerAPI = require('./BE/API/accountant/api-customer');
 app.use('/accountant/customer',accountantCustomerAPI);
 
-const accountantCustomerLevelAPI = require('./BE/API/accountant/api-customer-level');
-app.use('/accountant/customer-level',accountantCustomerLevelAPI);
 
 const accountantFFAPI = require('./BE/API/accountant/api-file-format');
 app.use('/accountant/file-format',accountantFFAPI);
@@ -215,7 +213,6 @@ const apiAdminColorMode = require('./BE/API/admin/api-color-mode');
 const apiCombo = require('./BE/API/admin/api-combo');
 const apiComboLine = require('./BE/API/admin/api-combo-line');
 const apiAdminCustomer = require('./BE/API/admin/api-customer');
-const apiAdminCustomerLevel = require('./BE/API/admin/api-customer-level');
 const apiAdminFileFormat = require('./BE/API/admin/api-file-format');
 const apiAdminJobLevel = require('./BE/API/admin/api-job-level');
 const apiMaterial = require('./BE/API/admin/api-material');
@@ -358,7 +355,6 @@ app.use('/admin/color-mode',apiAdminColorMode);//quảnlý hệ màu của hình
 app.use('/admin/combo',apiCombo);//quan ly combo
 app.use('/admin/combo-line',apiComboLine);//quan ly comboline
 app.use('/admin/customer',apiAdminCustomer);//quản lý thông tin khách hàng
-app.use('/admin/customer-level',apiAdminCustomerLevel);//quản lý thông tin các level mặt hàng của khách, liên quan tới thông tin hợp đồng của từng khách hàng
 app.use('/admin/file-format',apiAdminFileFormat);//quản lý thông tin định dạng file hình ảnh xuất cho khách
 app.use('/admin/job-level',apiAdminJobLevel);//quản lý thông tin danh sách level, khác với apiAdminCustomerLevel
 app.use('/admin/bonus-penalty',apiAdminBonusPenalty);//quản lý các hình thức phạt đối với nhân viên

@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const Customer = require("../../models/customer-model");
-const CustomerLevel = require('../../models/customer-level-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 require("dotenv").config();
 
