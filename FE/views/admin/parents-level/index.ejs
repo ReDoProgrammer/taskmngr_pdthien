@@ -42,7 +42,13 @@
           tr += '<th scope="row">' + (idx++) + '</th>';
           tr += '<td class="font-weight-bold text-info">' + pl.name + '</td>';
           tr += '<td>' + pl.description + '</td>';
-          console.log(pl.job_levles)
+          tr += '<td>';
+          if (pl.job_levels.length > 0) {
+            let subs = (pl.job_levels.map(x => x.name)).toString();
+            tr += subs;
+          }
+          tr += '</td>';
+
           tr += '<td class="text-right"><button class="btn btn-xs btn-info" name="list"><i class="fa fa-list" aria-hidden="true"></i></button>';
           tr += '<button class="btn btn-xs btn-warning ml-2" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
           tr += '<button class="btn btn-xs btn-danger ml-1" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
@@ -69,6 +75,10 @@
   $(document).on('hidden.bs.modal', '#modalParentsLevel', function () {
     LoadData();
   });
+  $(document).on('hidden.bs.modal', '#modalList', function () {
+    LoadData();
+  });
+
 
 
   $(document).on("click", "button[name='delete']", function () {
