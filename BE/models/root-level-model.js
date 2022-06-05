@@ -19,13 +19,13 @@ const rootLevelSchema = new Schema({
       parents:[
           {
             type:Schema.Types.ObjectId,
-            ref:'parents-level'
+            ref:'parents_level'
           }
       ],
       job_levels:[
         {
           type:Schema.Types.ObjectId,
-          ref:'job-level'
+          ref:'job_level'
         }
     ],
     

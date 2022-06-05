@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const JobLevel = require('../../models/job-level-model');
+const ParentsLevel = require('../../models/parents-level-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 
@@ -8,10 +9,19 @@ const { authenticateAdminToken } = require("../../../middlewares/middleware");
     api này dùng để quản trị các joblevel ( loại mặt hàng của khác)
 */
 
-router.get('/list-by-parents',authenticateAdminToken,(req,res)=>{
-    let {levelId} = req.query;
+router.get('/list-by-parents',authenticateAdminToken,async (req,res)=>{
+    let {pId} = req.query;
+    
+    let parents = await ParentsLevel.findById(pId);
+    if(!parents){
+        return res.status(404).json({
+            msg:`Parents level not found!`
+        })
+    }
+
+
     JobLevel
-    .find({parents:levelId})
+    .find({_id: {$in:parents.job_levels}})
     .then(levels =>{
         return res.status(200).json({
             msg:`Load job levels by parents level successfully!`,

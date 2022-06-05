@@ -16,7 +16,7 @@ router.get('/list', authenticateAdminToken, async (req, res) => {
 
 router.get('/list-by-root', authenticateAdminToken, async (req, res) => {
     let { rootId } = req.query;
-    let parentsList = await ParentsLevel.find({ root: rootId });
+    let parentsList = await ParentsLevel.find({ root: rootId }).populate('job_levels');
     return res.status(200).json({
         msg: `Load parents list by root successfully!`,
         parentsList
@@ -91,8 +91,8 @@ router.put('/push-child', authenticateAdminToken, async (req, res) => {
         })
     }
 
-    var chk = parents.job_levels.filter(x => x == levelId);
-    if (chk.length > 0) {
+    var chk = parents.job_levels.indexOf(levelId);
+    if (chk > -1) {
         return res.status(303).json({
             msg: `This job level already has set in this parents!`
         })
@@ -105,68 +105,54 @@ router.put('/push-child', authenticateAdminToken, async (req, res) => {
         })
     }
 
-    jl.parents = pId;
-    await jl.save()
-        .then(async _ => {
-            parents.job_levels.push(jl);
-            await parents.save()
-                .then(_ => {
-                    return res.status(200).json({
-                        msg: `Add job level into parents successfully!`
-                    })
-                })
-                .catch(err => {
-                    return res.status(500).json({
-                        msg: `Can not add job level into parents level with error: ${new Error(err.message)}`
-                    })
-                })
+
+    parents.job_levels.push(jl);
+    await parents.save()
+        .then(_ => {
+            return res.status(200).json({
+                msg: `Add job level into parents successfully!`
+            })
         })
         .catch(err => {
             return res.status(500).json({
-                msg: `Can not set parents into job level with error: ${new Error(err.message)}`
+                msg: `Can not add job level into parents level with error: ${new Error(err.message)}`
             })
         })
 
+
 })
 
-router.put('/pull-child',authenticateAdminToken,async (req,res)=>{
-    let {pId,levelId} = req.body;
+router.put('/pull-child', authenticateAdminToken, async (req, res) => {
+    let { pId, levelId } = req.body;
 
     let jl = await JobLevel.findById(levelId);
-    if(!jl){
+    if (!jl) {
         return res.status(404).json({
-            msg:`Job level not found!`
+            msg: `Job level not found!`
         })
     }
 
     let parents = await ParentsLevel.findById(pId);
-    if(!parents){
+    if (!parents) {
         return res.status(404).json({
-            msg:`Parents level not found!`
+            msg: `Parents level not found!`
         })
     }
 
-    jl.parents  = null;
-    await jl.save()
-    .then(async _=>{
-        parents.job_levels.pull(jl);
-        await parents.save()
-        .then(_=>{
+
+    parents.job_levels.pull(jl);
+    await parents.save()
+        .then(_ => {
             return res.status(200).json({
-                msg:`Job level has been removed from this parents level!`
+                msg: `Job level has been removed from this parents level!`
             })
         })
-        .catch(err=>{
+        .catch(err => {
             return res.status(500).json({
-                msg:`Can not remove this job level from parents level with error: ${new Error(err.message)}`
+                msg: `Can not remove this job level from parents level with error: ${new Error(err.message)}`
             })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not reset parents of this job level with error: ${new Error(err.message)}`
-        })
-    })
+
 
 })
 

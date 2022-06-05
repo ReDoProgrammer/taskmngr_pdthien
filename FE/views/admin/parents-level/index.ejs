@@ -42,7 +42,7 @@
           tr += '<th scope="row">' + (idx++) + '</th>';
           tr += '<td class="font-weight-bold text-info">' + pl.name + '</td>';
           tr += '<td>' + pl.description + '</td>';
-          tr += '<td>';
+          tr += '<td class="font-weight-bold text-danger">';
           if (pl.job_levels.length > 0) {
             let subs = (pl.job_levels.map(x => x.name)).toString();
             tr += subs;

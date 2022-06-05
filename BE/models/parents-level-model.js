@@ -21,11 +21,7 @@ const parentsLevelSchema = new Schema({
             type:Schema.Types.ObjectId,
             ref:'job_level'
           }
-      ],
-      root:{
-          type: Schema.Types.ObjectId,
-          ref:'root-level'
-      }
+      ]   
     
 });
 

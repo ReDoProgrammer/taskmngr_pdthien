@@ -8,14 +8,8 @@
                 <h4 class="modal-title">Mapping job level</h4>
             </div>
             <div class="modal-body">
-                <div>
-                    <label class="radio-inline"><input type="radio" name="optradio" checked
-                            id="rbtParents">Parents</label>
-                    <label class="radio-inline"><input type="radio" name="optradio" id="rbtChildren">Children</label>
-                </div>
-                <hr>
                 <div class="form-group mt-2">
-                    <label for="">Sub levels</label>
+                    <label for="">Parents levels</label>
                     <div class="input-group mt-2">
                         <select name="" id="slParentsList" class="form-control"></select>
                         <div class="input-group-btn">
@@ -30,6 +24,7 @@
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Name</th>
+                            <th scope="col">Children</th>
                             <th scope="col">Description</th>
                             <th scope="col"></th>
                         </tr>
@@ -50,19 +45,131 @@
         LoadParents();
     })
 
-    $('#modalMapping').on('show.bs.modal', function () {
-
+    $('#btnAddParents').click(function () {
+        $.ajax({
+            url: '/admin/root-level/push-parents',
+            type: 'put',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem('accessToken'),
+            },
+            data: {
+                rootId,
+                parentsId: $('#slParentsList option:selected').val()
+            },
+            success: function (data) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Congratulation',
+                    text: data.msg
+                });
+                LoadParentsByRoot();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Opp..',
+                    text: jqXHR.responseJSON.msg
+                });
+            }
+        })
     })
+
+    $('#modalMapping').on('show.bs.modal', function () {
+        LoadParentsByRoot();
+    })
+    $(document).on("click", "button[name='pull']", function () {
+        parentsId = $(this).closest("tr").attr("id");
+        Swal.fire({
+            icon: 'question',
+            title: 'Do you want to remove this parents level from root?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            denyButtonText: `No`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/admin/root-level/pull-parents',
+                    type: 'put',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem('accessToken'),
+                    },
+                    data: {
+                        rootId,
+                        parentsId
+                    },
+                    success: function (data) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Congratulation',
+                            text: data.msg
+                        });
+                        LoadParentsByRoot();
+                    }
+                    , error: function (jqXHR, textStatus, errorThrown) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Opp..',
+                            text: jqXHR.responseJSON.msg
+                        });
+                    }
+                })
+            }
+        })
+    })
+
+    function LoadParentsByRoot() {
+        $.ajax({
+            url: '/admin/parents-level/list-by-root',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem('accessToken'),
+            },
+            data: { rootId },
+            success: function (data) {
+                $('#tblParents').empty();
+                let idx = 1;
+                data.parentsList.forEach(p => {
+                    let tr = '<tr id = "' + p._id + '">';
+                    tr += '<td>' + (idx++) + '</td>';
+                    tr += '<td class="font-weight-bold text-primary">' + p.name + '</td>';
+                    tr += '<td>';
+                    if (p.job_levels.length > 0) {
+                        tr += (p.job_levels.map(x => x.name)).toString();
+                    }
+                    tr += '</td>';
+                    tr += '<td>' + p.description + '</td>';
+                    tr += '<td class="text-right">';
+                    tr += '<button class="btn btn-xs btn-danger ml-2" name="pull"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                    tr += '</td>';
+                    tr += '</tr>';
+                    $('#tblParents').append(tr);
+                })
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Opp..',
+                    text: jqXHR.responseJSON.msg
+                });
+            }
+        })
+    }
 
     function LoadParents() {
         $.ajax({
-            url: '/admin/parents-level',
+            url: '/admin/parents-level/list',
             type: 'get',
             headers: {
                 authorization: "Bearer " + localStorage.getItem('accessToken'),
             },
             success: function (data) {
-                console.log(data)
+                $('#slParentsList').empty();
+                data.parentsList.forEach(p => {
+                    let children = p.job_levels.length > 0 ? p.job_levels.map(x => x.name) : '';
+                    let name = p.name + (children.length > 0 ? ' - [ ' + children.toString() + ' ]' : '');
+                    $('#slParentsList').append('<option value = "' + p._id + '">' + name + '</option>');
+                })
             }
         })
     }
