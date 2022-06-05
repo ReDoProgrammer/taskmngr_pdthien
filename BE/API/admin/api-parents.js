@@ -16,7 +16,16 @@ router.get('/list', authenticateAdminToken, async (req, res) => {
 
 router.get('/list-by-root', authenticateAdminToken, async (req, res) => {
     let { rootId } = req.query;
-    let parentsList = await ParentsLevel.find({ root: rootId }).populate('job_levels');
+
+    let root = await RootLevel.findById(rootId);
+    if(!root){
+        return res.status(404).json({
+            msg:`Root level not found!`
+        })
+    }
+
+    let parentsList = await ParentsLevel.find({ _id: {$in:root.parents} }).populate('job_levels');
+    console.log(parentsList)
     return res.status(200).json({
         msg: `Load parents list by root successfully!`,
         parentsList

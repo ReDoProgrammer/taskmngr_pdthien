@@ -110,7 +110,7 @@
                     let tr = '<tr id = "' + root._id + '">';
                     tr += '<td>' + (idx++) + '</td>';
                     tr += '<td class="font-weight-bold text-primary">' + root.name + '</td>';
-                    tr += '<td>';
+                    tr += '<td class="text-info font-weight-bold">';
                     if (root.parents.length > 0) {
                         tr += (root.parents.map(x => x.name)).toString();
                     }

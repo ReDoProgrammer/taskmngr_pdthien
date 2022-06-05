@@ -77,6 +77,10 @@
     $('#modalMapping').on('show.bs.modal', function () {
         LoadParentsByRoot();
     })
+    $('#modalMapping').on('hidden.bs.modal', function () {
+        LoadRootsList();
+    })
+   
     $(document).on("click", "button[name='pull']", function () {
         parentsId = $(this).closest("tr").attr("id");
         Swal.fire({
@@ -133,7 +137,7 @@
                     let tr = '<tr id = "' + p._id + '">';
                     tr += '<td>' + (idx++) + '</td>';
                     tr += '<td class="font-weight-bold text-primary">' + p.name + '</td>';
-                    tr += '<td>';
+                    tr += '<td class="text-danger font-weight-bold">';
                     if (p.job_levels.length > 0) {
                         tr += (p.job_levels.map(x => x.name)).toString();
                     }
