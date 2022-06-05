@@ -7,9 +7,24 @@
     <div class="row">
       <div class="col-md-4 col-sm-6 col-xs-12">
         <div class="row">
-          <div class="col-md-12 col-sm-12 col-xs-12 form-group">
-            <label for="">Job level</label>
-            <select name="" id="slLevel" class="form-control"></select>
+          <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="form-group">
+              <label for="">Root level:</label>
+
+              <div class="input-group">
+                <select name="" id="slRoots" class="form-control"></select>
+                <div class="input-group-btn">
+                  <div class="checkbox ml-2">
+                    <label><input type="checkbox" id="ckbApplyParents">Apply parents</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" id="divParents" hidden>
+              <label for="">Parents level:</label>
+              <select name="" id="slParents" class="form-control"></select>
+            </div>
           </div>
         </div>
         <div class="row">
@@ -55,42 +70,69 @@
 
 <script>
   $(document).ready(function () {
-    LoadLevel();
+    LoadRoots();
   });
 
-  function LoadLevel() {
+  $('#ckbApplyParents').change(function () {
+    if (this.checked) {
+      $('#divParents').slideDown(300);
+      LoadParentsByRoot();
+    } else {
+      $('#divParents').slideUp(200);
+    }
+
+  });
+
+  function LoadParentsByRoot(){
     $.ajax({
-      url: "/accountant/job-level",
-      type: "get",
+      url:'/accountant/parents-level',
+      type:'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      success: function (data, textStatus, xhr) {
-        $("#slLevel").empty();
-        data.jl.forEach((lv) => {
-          let opt = '<option value="' + lv._id + '">' + lv.name + "</option>";
-          $("#slLevel").append(opt);
-        });
+      data:{rootId:$('#slRoots option:selected').val()},
+      success:function(data){
+        $('#slParents').empty();
+        data.parentsList.forEach(p=>{
+          let name = p.name + (p.job_levels.length>0?' [ '+(p.job_levels.map(x=>p.name)).toString()+' ]':'');
+          console.log(name)
+          $('#slParents').append('<option value = "'+p._id+'">'+name+'</option>');
+        })
+
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        alert(jqXHR.responseJSON.msg);
-      },
-    });
+        Swal.fire({
+          icon: 'error',
+          title: 'Error found',
+          text: jqXHR.responseJSON.msg
+        });
+      }
+    })
   }
 
-  //ràng buộc nhập dữ liệu, chỉ cho nhập kiểu số thực
-  $("#txtPrice").on("keypress keyup blur", function (event) {
-    //this.value = this.value.replace(/[^0-9\.]/g,'');
-    $(this).val(
-      $(this)
-        .val()
-        .replace(/[^0-9\.]/g, "")
-    );
-    if (
-      (event.which != 46 || $(this).val().indexOf(".") != -1) &&
-      (event.which < 48 || event.which > 57)
-    ) {
-      event.preventDefault();
-    }
-  });
+  function LoadRoots() {
+    $.ajax({
+      url: '/accountant/root-level',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      success: function (data) {
+        console.log(data)
+        $('#slRoots').empty();
+        data.roots.forEach(root => {
+          $('#slRoots').append('<option value="' + root._id + '">' + root.name + '</option>');
+        })
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error found',
+          text: jqXHR.responseJSON.msg
+        });
+      }
+    })
+  }
+
+
 </script>

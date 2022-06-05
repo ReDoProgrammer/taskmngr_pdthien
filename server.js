@@ -92,7 +92,11 @@ app.use('/accountant/job-level',accountantJobLevelAPI);
 const accountantNationalStyleAPI = require('./BE/API/accountant/api-national-style');
 app.use('/accountant/national-style',accountantNationalStyleAPI);
 
+const accountantParentsLevelAPI = require('./BE/API/accountant/api-parents-level');
+app.use('/accountant/parents-level',accountantParentsLevelAPI);
 
+const accountantRootLevelAPI = require('./BE/API/accountant/api-root-level');
+app.use('/accountant/root-level',accountantRootLevelAPI);
 
 const accountantSizeAPI = require('./BE/API/accountant/api-size');
 app.use('/accountant/size',accountantSizeAPI);
