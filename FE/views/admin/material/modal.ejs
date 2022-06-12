@@ -72,7 +72,11 @@
                     price
                 },
                 success: function (data) {
-                    alert(data.msg);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
                     $('#materialModal').modal('hide');
                 }
                 , error: function (jqXHR, textStatus, errorThrown) {
@@ -94,7 +98,11 @@
                     price
                 },
                 success: function (data) {
-                    alert(data.msg);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
                     $('#materialModal').modal('hide');
                 }
                 , error: function (jqXHR, textStatus, errorThrown) {
