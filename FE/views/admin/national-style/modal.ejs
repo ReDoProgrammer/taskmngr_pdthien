@@ -11,14 +11,15 @@
                 <div class="form-row">
                     <div class="form-group col-md-4">
                         <label for="">Style</label>
-                        <input type="text" name="txtName" id="txtName" class="form-control" placeholder="National style">
+                        <input type="text" name="txtName" id="txtName" class="form-control"
+                            placeholder="National style">
                     </div>
                     <div class="form-group col-md-8">
                         <label for="">Description</label>
                         <input type="text" name="txtDescription" id="txtDescription" class="form-control"
                             placeholder="Description">
                     </div>
-                </div>               
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -35,8 +36,8 @@
 
     $('#btnSubmit').click(function () {
         let name = $('#txtName').val().trim();
-        let description = $('#txtDescription').val().trim();        
-       
+        let description = $('#txtDescription').val().trim();
+
         if (nsId.length > 0) {
             $.ajax({
                 url: '/admin/national-style',
@@ -45,12 +46,16 @@
                     authorization: "Bearer " + localStorage.getItem('accessToken'),
                 },
                 data: {
-                    id:nsId,
+                    id: nsId,
                     name,
-                    description                   
+                    description
                 },
                 success: function (data, textStatus, xhr) {
-                    alert(data.msg);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
                     $('#modalNationalStyle').modal('hide');
                     nsId = '';
                 }, error: function (jqXHR, textStatus, errorThrown) {
@@ -66,10 +71,14 @@
                 },
                 data: {
                     name,
-                    description                
+                    description
                 },
                 success: function (data, textStatus, xhr) {
-                    alert(data.msg);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
                     $('#modalNationalStyle').modal('hide');
                     levelId = '';
                 }, error: function (jqXHR, textStatus, errorThrown) {
