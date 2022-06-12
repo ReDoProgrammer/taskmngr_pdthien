@@ -28,6 +28,7 @@
   <table class="table table-striped mt-1">
     <thead class="thead-dark">
       <tr>
+        <th scope="col"></th>
         <th scope="col">#</th>
         <th scope="col">Customer</th>
         <th scope="col">Phone</th>
@@ -71,6 +72,37 @@
 
     $("#btnAddNew").click(function () {
       customerId = '';
+      $('#txtFirstname').val('');
+      $('#txtLastname').val('');
+      $('#txtEmail').val('');
+      $('#txtPhone').val('');
+      $('#txtAddress').val('');
+      $('#ckbCustomerStatus').prop('checked', true);
+
+
+
+      $('#ckbAlign').prop('checked', false);
+      $('#txtAlign').val('');
+      $('#txtAlign').prop('readonly', true);
+
+      $('#ckbTV').prop('checked', false);
+      $('#txtTV').val('');
+      $('#txtTV').prop('readonly', true);
+
+      $('#ckbGrass').prop('checked', false);
+      $('#txtGrass').val('');
+      $('#txtGrass').prop('readonly', true);
+
+      $('#ckbSky').prop('checked', false);
+      $('#txtSky').val('');
+      $('#txtSky').prop('readonly', true);
+
+      $('#ckbFire').prop('checked', false);
+      $('#txtFire').val('');
+      $('#txtFire').prop('readonly', true);
+
+      $('#txtStyleNote').val('');
+      $('#btnSubmit').show();
       $("#modalCustomer").modal();
     });
 
@@ -117,13 +149,14 @@
 
     $(document).on("click", "button[name='view']", function () {
       customerId = $(this).closest("tr").attr("id");
-      LoadCustomer(customerId);
-      LoadCustomerLevels(customerId);
+      LoadCustomer();
+      $('#btnSubmit').hide();
     });
 
     $(document).on("click", "button[name='update']", function () {
       customerId = $(this).closest("tr").attr("id");
-      window.location.href = "/accountant/customer/update?id=" + customerId;
+      LoadCustomer();
+      $('#btnSubmit').show();
     });
 
     $(document).on("click", ".pagination li", function () {
@@ -132,7 +165,7 @@
     })
 
 
-    function LoadCustomer(customerId) {
+    function LoadCustomer() {
       $.ajax({
         url: "/accountant/customer/detail",
         type: "get",
@@ -142,108 +175,77 @@
         data: {
           customerId
         },
-        success: function (data, textStatus, xhr) {
+        success: function (data) {
+          $('#txtFirstname').val(data.customer.name.firstname);
+          $('#txtLastname').val(data.customer.name.lastname);
+          $('#txtEmail').val(data.customer.contact.email);
+          $('#txtPhone').val(data.customer.contact.phone);
+          $('#txtAddress').val(data.customer.contact.address);
+          $('#ckbCustomerStatus').prop('checked', data.customer.status);
 
-          $('#modalCustomerDetail').modal();
-          $('#fullname').text(data.customer.firstname + ' ' + data.customer.lastname);
-          $('#phone').text(data.customer.phone);
-          $('#email').text(data.customer.email);
-          $('#address').text(data.customer.address);
+          $('#slNationalStyle').val(data.customer.style.nation);
+          $('#slOutput').val(data.customer.style.output);
+          $('#slSize').val(data.customer.style.size);
+          $('#slColorMode').val(data.customer.style.color);
+          $('#slCloud').val(data.customer.style.cloud);
 
+          $('#ckbAlign').prop('checked', data.customer.style.align.checked);
 
-
-
-          $('#output').text(data.customer.output.name);
-          $('#size').text(data.customer.size.name);
-          $('#color_mode').text(data.customer.color.name);
-
-          if (data.customer.is_align) {
-            if (data.customer.align_note.length > 0) {
-              $('#align').text(data.customer.align_note);
-            } else {
-              $('#align').html('<i class="fa fa-check-square-o" aria-hidden="true"></i>');
-            }
+          if (data.customer.style.align.checked) {
+            $('#txtAlign').val(data.customer.style.align.note);
+            $('#txtAlign').prop('readonly', false);
           } else {
-            $('#align').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+            $('#txtAlign').val('');
+            $('#txtAlign').prop('readonly', true);
+          }
+
+          $('#ckbTV').prop('checked', data.customer.style.tv.checked);
+          if (data.customer.style.tv.checked) {
+            $('#txtTV').val(data.customer.style.tv.note);
+            $('#txtTV').prop('readonly', false);
+          } else {
+            $('#txtTV').val('');
+            $('#txtTV').prop('readonly', true);
+          }
+
+          $('#ckbGrass').prop('checked', data.customer.style.grass.checked);
+          if (data.customer.style.grass.checked) {
+            $('#txtGrass').val(data.customer.style.grass.note);
+            $('#txtGrass').prop('readonly', false);
+          } else {
+            $('#txtGrass').val('');
+            $('#txtGrass').prop('readonly', true);
+          }
+
+          $('#ckbSky').prop('checked', data.customer.style.sky.checked);
+          if (data.customer.style.sky.checked) {
+            $('#txtSky').val(data.customer.style.sky.note);
+            $('#txtSky').prop('readonly', false);
+          } else {
+            $('#txtSky').val('');
+            $('#txtSky').prop('readonly', true);
           }
 
 
-
-
-
-          $('#cloud').text(data.customer.cloud.name);
-
-          $('#national_style').text(data.customer.nation.name);
-          $('#remark').text(data.customer.remark);
-
-
-          //special requests
-          if (data.customer.has_TV) {
-            $('#tv').html('<i class="fa fa-check-square-o"></i>  ' + data.customer.TV_note);
+          $('#ckbFire').prop('checked', data.customer.style.fire.checked);
+          if (data.customer.style.fire.checked) {
+            $('#txtFire').val(data.customer.style.fire.note);
+            $('#txtFire').prop('readonly', false);
           } else {
-            $('#tv').html('<i class="fa fa-square-o text-warning" aria-hidden="true"></i>');
-          }
-
-          if (data.customer.has_grass) {
-            $('#grass').html('<i class="fa fa-check-square-o"></i> ' + data.customer.grass_note);
-          } else {
-            $('#grass').html('<i class="fa fa-square-o text-warning" aria-hidden="true"></i>');
-          }
-
-          if (data.customer.has_sky) {
-            $('#sky').html('<i class="fa fa-check-square-o"></i> ' + data.customer.sky_note);
-          } else {
-            $('#sky').html('<i class="fa fa-square-o text-warning" aria-hidden="true"></i>');
+            $('#txtFire').val('');
+            $('#txtFire').prop('readonly', true);
           }
 
 
-          if (data.customer.has_fire) {
-            $('#fire').html('<i class="fa fa-check-square-o"></i> ' + data.customer.fire_note);
-          } else {
-            $('#fire').html('<i class="fa fa-square-o text-warning" aria-hidden="true"></i>');
-          }
+          $('#txtStyleNote').val(data.customer.style.style_note);
 
-
-          LoadCustomerLevels(customerId);
-
-
-
+          $('#modalCustomer').modal();
 
         },
         error: function (jqXHR, textStatus, errorThrown) {
           alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
         }
       })
-    }
-
-    function LoadCustomerLevels(customerId) {
-      $.ajax({
-        url: "/accountant/customer-level",
-        type: "get",
-        headers: {
-          authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-        data: {
-          customerId
-        },
-        success: function (data, textStatus, xhr) {
-          $('#tblLevelList').empty();
-          let idx = 1;
-          data.cl.forEach(i => {
-
-            let tr = '<tr>';
-            tr += '<td>' + (idx++) + '</td>';
-            tr += '<td class="font-weight-bold text-danger">' + i.level.name + '</td>';
-            tr += '<td class="text-warning text-right">' + i.price + '</td>';
-            tr += '</tr>';
-            $('#tblLevelList').append(tr);
-          })
-
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          alert(jqXHR.responseJSON.msg);
-        },
-      });
     }
 
     function LoadCustomers() {
@@ -264,7 +266,10 @@
           let idx = (page - 1) * data.pageSize;
           data.customers.forEach((customer) => {
             let tr = "  <tr id='" + customer._id + "'>";
-            tr += '<th scope="row">' + (++idx) + '</th>';
+            tr += '<td>';
+            tr += '<button class="btn btn-success btn-xs" name="contract"><i class="fa fa-file" aria-hidden="true"></i> Contract</button>'
+            tr += '</td>';
+            tr += '<td scope="row">' + (++idx) + '</td>';
             tr += " <td class='font-weight-bold text-info'>" + customer.name.firstname + " " + customer.name.lastname + "</td>";
             tr += "<td>" + customer.contact.phone + "</td>";
             tr += "<td>" + customer.contact.email + "</td>";

@@ -6,6 +6,26 @@ const SALT_WORK_FACTOR = 10;
 
 
 const customerSchema = new Schema({
+    created:{
+        by:{
+            type:Schema.Types.ObjectId,
+            ref:'user'
+        },
+        at:{
+            type:Date,
+            default:new Date()
+        }
+    },
+    updated:{
+        by:{
+            type:Schema.Types.ObjectId,
+            ref:'user'
+        },
+        at:{
+            type:Date
+        }
+    },
+   
     name: {
         firstname: {
             type: String
@@ -57,52 +77,52 @@ const customerSchema = new Schema({
             ref: 'national_style'
         },
         align: {
-            is_align: {
+            checked: {
                 type: Boolean,
                 default: false
             },
-            align_note: {
+            note: {
                 type: String,
                 default: ''
             },
         },
 
         tv: {
-            has_TV: {
+            checked: {
                 type: Boolean,
                 default: false
             },
-            TV_note: {
+            note: {
                 type: String,
                 default: ''
             }
         },
         grass: {
-            has_grass: {
+            checked: {
                 type: Boolean,
                 default: false
             },
-            grass_note: {
+            note: {
                 type: String,
                 default: ''
             }
         },
         sky: {
-            has_sky: {
+            checked: {
                 type: Boolean,
                 default: false
             },
-            sky_note: {
+            note: {
                 type: String,
                 default: ''
             }
         },
         fire: {
-            has_fire: {
+            checked: {
                 type: Boolean,
                 default: false
             },
-            fire_note: {
+            note: {
                 type: String,
                 default: ''
             }

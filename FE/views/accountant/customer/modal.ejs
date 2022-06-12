@@ -6,12 +6,12 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Add or update customer</h4>
+                <h4 class="modal-title">Customer information</h4>
             </div>
             <div class="modal-body">
 
                 <div class="panel panel-info">
-                    <div class="panel-heading">Basic infomation</div>
+                    <div class="panel-heading">Basic information</div>
                     <div class="panel-body">
                         <div class="form-row">
                             <div class="form-group col-md-2 col-sm-6 col-xs-6">
@@ -50,7 +50,7 @@
                             <div class="form-group col-md-2 col-sm-2 col-xs-6">
                                 <label for="">Status:</label>
                                 <div class="form-check mt-1">
-                                    <input class="form-check-input" type="checkbox" value="" id="ckbStatus" />
+                                    <input class="form-check-input" type="checkbox" value="" id="ckbCustomerStatus" />
                                     <label class="form-check-label" for="defaultCheck1">
                                         Active
                                     </label>
@@ -190,6 +190,54 @@
         LoadSize();
     })
 
+    $(document).on('show.bs.modal', '#modalCustomer', function () {
+        
+    })
+
+    $('#ckbAlign').change(function() {
+        if(this.checked) {
+            $('#txtAlign').prop('readonly',false);
+        }else{
+            $('#txtAlign').val('');
+            $('#txtAlign').prop('readonly',true);
+        }             
+    });
+    $('#ckbTV').change(function() {
+        if(this.checked) {
+            $('#txtTV').prop('readonly',false);
+        }else{
+            $('#txtTV').val('');
+            $('#txtTV').prop('readonly',true);
+        }             
+    });
+
+    $('#ckbGrass').change(function() {
+        if(this.checked) {
+            $('#txtGrass').prop('readonly',false);
+        }else{
+            $('#txtGrass').val('');
+            $('#txtGrass').prop('readonly',true);
+        }             
+    });
+
+    $('#ckbSky').change(function() {
+        if(this.checked) {
+            $('#txtSky').prop('readonly',false);
+        }else{
+            $('#txtSky').val('');
+            $('#txtSky').prop('readonly',true);
+        }             
+    });
+
+    $('#ckbFire').change(function() {
+        if(this.checked) {
+            $('#txtFire').prop('readonly',false);
+        }else{
+            $('#txtFire').val('');
+            $('#txtFire').prop('readonly',true);
+        }             
+    });
+
 
     $("#btnSubmit").click(function () {
         let firstname = $("#txtFirstname").val().trim();
@@ -254,7 +302,7 @@
         let sky_note = $("#txtSky").val().trim();
         let has_fire = $("#ckbFire").is(":checked") ? true : false;
         let fire_note = $("#txtFire").val().trim();
-
+        let status = $('#ckbCustomerStatus').is(':checked') ? true : false;
 
         //validate as if option selected
         if (typeof nation === 'undefined') {
@@ -319,7 +367,55 @@
                     has_sky,
                     sky_note,
                     has_fire,
-                    fire_note
+                    fire_note,
+                    status
+                },
+                success: function (data) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    })
+                    $(location).attr("href", data.url);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('#msgError').text(jqXHR.responseJSON.msg);
+                    $('#msgError').show().delay(5000).fadeOut();
+
+                }
+            });
+        }else{
+            $.ajax({
+                url: "/accountant/customer",
+                type: "put",
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                    customerId,
+                    firstname,
+                    lastname,
+                    email,
+                    password,
+                    phone,
+                    address,
+                    output,
+                    size,
+                    color,
+                    is_align,
+                    align_note,
+                    cloud,
+                    nation,
+                    style_note,
+                    has_TV,
+                    TV_note,
+                    has_grass,
+                    grass_note,
+                    has_sky,
+                    sky_note,
+                    has_fire,
+                    fire_note,
+                    status
                 },
                 success: function (data) {
                     Swal.fire({
@@ -415,7 +511,7 @@
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
             success: function (data, textStatus, xhr) {
-                $("#slCloud").empty();               
+                $("#slCloud").empty();
                 data.clouds.forEach((cl) => {
                     let opt = '<option value="' + cl._id + '">' + cl.name + "</option>";
                     $("#slCloud").append(opt);

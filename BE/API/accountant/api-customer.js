@@ -80,11 +80,84 @@ router.post('/', authenticateAccountantToken, async (req, res) => {
         has_sky,
         sky_note,
         has_fire,
-        fire_note
-
+        fire_note,
+        status
     } = req.body;
 
-    console.log({
+  
+
+    let chk = await Customer.countDocuments({ 'contact.email': email });
+    if (chk > 0) {
+        return res.status(303).json({
+            msg: `This email already exist in database!`
+        })
+    }
+
+
+    let customer = new Customer();
+
+    customer.created = {
+        by:req.user._id,
+        at: new Date()
+    }
+
+    customer.name = {
+        firstname,
+        lastname
+    };
+    customer.contact = {
+        email: email,
+        phone: phone,
+        address: address
+    };
+    customer.password = password;
+
+    customer.style = {
+        style_note: style_note,
+        output: output,
+        size: size,
+        color: color,
+        cloud: cloud,
+        nation: nation,
+        align: {
+            checked: is_align,
+            note: align_note
+        },
+        tv: {
+            checked: has_TV,
+            note: TV_note
+        },
+        grass: {
+            checked: has_grass,
+            note: grass_note
+        },
+        sky: {
+            checked: has_sky,
+            note: sky_note
+        },
+        fire: {
+            checked: has_fire,
+            note: fire_note
+        }
+    };
+    customer.status = status;
+    await customer.save()
+        .then(_ => {
+            return res.status(201).json({
+                msg: `Customer has been added!`,
+                url: '/accountant/customer'
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not add new customer with error: ${new Error(err.message)}`
+            })
+        })
+})
+
+router.put('/',authenticateAccountantToken, async (req,res)=>{
+    let {
+        customerId,
         firstname,
         lastname,
         email,
@@ -106,19 +179,23 @@ router.post('/', authenticateAccountantToken, async (req, res) => {
         has_sky,
         sky_note,
         has_fire,
-        fire_note
+        fire_note,
+        status
+    } = req.body;
 
-    })
+    let customer = await Customer.findById(customerId);
 
-    let chk = await Customer.countDocuments({ 'contact.email': email });
-    if (chk > 0) {
-        return res.status(303).json({
-            msg: `This email already exist in database!`
+    if(!customer){
+        return res.status(404).json({
+            msg:`Customer not found!`
         })
     }
 
+    customer.updated = {
+        by:req.user._id,
+        at: new Date()
+    }
 
-    let customer = new Customer();
     customer.name = {
         firstname,
         lastname
@@ -138,26 +215,27 @@ router.post('/', authenticateAccountantToken, async (req, res) => {
         cloud: cloud,
         nation: nation,
         align: {
-            is_align: is_align,
-            align_note: align_note
+            checked: is_align,
+            note: align_note
         },
         tv: {
-            has_TV: has_TV,
-            TV_note: TV_note
+            checked: has_TV,
+            note: TV_note
         },
         grass: {
-            has_grass: has_grass,
-            grass_note: grass_note
+            checked: has_grass,
+            note: grass_note
         },
         sky: {
-            has_sky: has_sky,
-            sky_note: sky_note
+            checked: has_sky,
+            note: sky_note
         },
         fire: {
-            has_fire: has_fire,
-            fire_note: fire_note
+            checked: has_fire,
+            note: fire_note
         }
     };
+    customer.status = status;
     await customer.save()
         .then(_ => {
             return res.status(201).json({
@@ -170,7 +248,9 @@ router.post('/', authenticateAccountantToken, async (req, res) => {
                 msg: `Can not add new customer with error: ${new Error(err.message)}`
             })
         })
+
 })
+
 
 router.put('/change-state',authenticateAccountantToken,async (req,res)=>{
     let {customerId} = req.body;
