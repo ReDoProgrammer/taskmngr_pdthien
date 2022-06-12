@@ -1,123 +1,135 @@
 <button type="button" class="btn btn-primary" id="btnAddNew">
-    <span>
-        <i class="fa fa-plus" aria-hidden="true"></i>
-      </span>
-      Add New
-  </button>
-  <table class="table table-striped mt-2">
-      <thead class="thead-dark">
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Format</th>
-          <th scope="col">Description</th>
-          <th scope="col">Is input</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody id="tblData">        
-        
-      </tbody>
-    </table>
-    
-  
-    <script>
+  <span>
+    <i class="fa fa-plus" aria-hidden="true"></i>
+  </span>
+  Add New
+</button>
+<table class="table table-striped mt-2">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Format</th>
+      <th scope="col">Description</th>
+      <th scope="col">Is input</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody id="tblData">
 
-      var cmId = '';
-    
-      function LoadData() {
-        $('#tblData').empty();
+  </tbody>
+</table>
+
+
+<script>
+
+  var cmId = '';
+
+  function LoadData() {
+    $('#tblData').empty();
+    $.ajax({
+      url: '/admin/color-mode',
+      type: 'get',
+      success: function (data, textStatus, xhr) {
+        let idx = 1;
+        data.cms.forEach(cm => {
+          let tr = '<tr id=' + cm._id + ' data-name = ' + cm.name + '>';
+          tr += '<th scope="row">' + (idx++) + '</th>';
+          tr += '<td>' + cm.name + '</td>';
+          tr += '<td>' + cm.description + '</td>';
+
+
+          tr += '<td class="text-right"><button class="btn btn-xs btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+          tr += '<button class="btn btn-xs btn-danger ml-1" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
+          tr += '</tr>';
+          $('#tblData').append(tr);
+        });
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      }
+    })
+  }
+
+  $(document).ready(function () {
+    $('#btnAddNew').click(function () {
+      cmId = '';
+      $('#modalColorMode').modal();
+    });
+    LoadData();
+  });
+
+  //sự kiện modal shown --> set các giá trị mặc định cho component trên form
+  $(document).on('show.bs.modal', '.modal', function () {
+    $('#txtName').val('');
+    $('#txtDescription').val('');
+  });
+
+  //sự kiện load lại hàm ds level khi modal đc đóng lại
+  $(document).on('hidden.bs.modal', '#modalColorMode', function () {
+    LoadData();
+  });
+
+
+  $(document).on("click", "button[name='delete']", function () {
+
+    Swal.fire({
+      title: 'Are you sure want to delete this color mode?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
         $.ajax({
           url: '/admin/color-mode',
-          type: 'get',        
-          success: function (data, textStatus, xhr) {
-            let idx = 1;
-            data.cms.forEach(cm => {
-              let tr = '<tr id=' + cm._id + ' data-name = '+cm.name+'>';
-              tr += '<th scope="row">' + (idx++) + '</th>';
-              tr += '<td>' + cm.name + '</td>';
-              tr += '<td>' + cm.description + '</td>';
-             
-    
-              tr += '<td class="text-right"><button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
-              tr += '<button class="btn btn-sm btn-danger ml-1" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
-              tr += '</tr>';
-              $('#tblData').append(tr);
-            });
-          },
-          error: function (jqXHR, textStatus, errorThrown) {
-            alert(jqXHR.responseJSON.msg);
-          }
-        })
-      }
-    
-      $(document).ready(function () {
-        $('#btnAddNew').click(function () {
-            cmId = '';
-          $('#modalColorMode').modal();
-        });
-        LoadData();
-      });
-    
-      //sự kiện modal shown --> set các giá trị mặc định cho component trên form
-      $(document).on('show.bs.modal', '.modal', function () {
-        $('#txtName').val('');
-        $('#txtDescription').val('');
-      });
-    
-      //sự kiện load lại hàm ds level khi modal đc đóng lại
-      $(document).on('hidden.bs.modal', '#modalColorMode', function () {
-        LoadData();
-      });
-    
-    
-      $(document).on("click", "button[name='delete']", function () {
-    
-        var r = confirm("Vui lòng xác nhận xóa color mode " + $(this).closest("tr").data('name') + "?");
-        if (r == true) {
-          $.ajax({
-            url: '/admin/color-mode',
-            type: 'delete',
-            headers: {
-              authorization: "Bearer " + localStorage.getItem('accessToken'),
-            },
-            data: {
-              id: $(this).closest("tr").attr("id")
-            },
-            success: function (data, textStatus, xhr) {
-              alert(data.msg);
-              LoadData();
-            }, error: function (jqXHR, textStatus, errorThrown) {
-              alert(jqXHR.responseJSON.msg);
-            }
-          })
-        }
-    
-    
-      });
-    
-      $(document).on("click", "button[name='update']", function () {
-    
-        cmId = $(this).closest("tr").attr("id");
-    
-        $.ajax({
-          url: "/admin/color-mode/detail",
-          type: "get",
+          type: 'delete',
           headers: {
             authorization: "Bearer " + localStorage.getItem('accessToken'),
           },
           data: {
-            id: cmId
+            id: $(this).closest("tr").attr("id")
           },
-          success: function (data, textStatus, xhr) {          
-            $('#modalColorMode').modal();
-            $('#txtName').val(data.cm.name);
-            $('#txtDescription').val(data.cm.description);            
+          success: function (data, textStatus, xhr) {
+            Swal.fire(
+              'Deleted!',
+              data.msg,
+              'success'
+            )
+            LoadData();
           }, error: function (jqXHR, textStatus, errorThrown) {
             alert(jqXHR.responseJSON.msg);
           }
-        });
-    
-      });
-    </script>
-    
-    <%-include('modal')%>
+        })
+
+      }
+    })
+  });
+
+  $(document).on("click", "button[name='update']", function () {
+
+    cmId = $(this).closest("tr").attr("id");
+
+    $.ajax({
+      url: "/admin/color-mode/detail",
+      type: "get",
+      headers: {
+        authorization: "Bearer " + localStorage.getItem('accessToken'),
+      },
+      data: {
+        id: cmId
+      },
+      success: function (data, textStatus, xhr) {
+        $('#modalColorMode').modal();
+        $('#txtName').val(data.cm.name);
+        $('#txtDescription').val(data.cm.description);
+      }, error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      }
+    });
+
+  });
+</script>
+
+<%-include('modal')%>
