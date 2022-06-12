@@ -150,9 +150,9 @@
                 jobId
             },
             success: function (data) {
-                $('#lblStyleNote').text(data.job.customer.remark);
+                $('#lblStyleNote').text(data.job.customer.style.style_note);
                 $('#lblJobName').text(data.job.name);
-                $('#lblCustomer').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
+                $('#lblCustomer').text(data.job.customer.name.firstname + ' ' + data.job.customer.name.lastname);
                 $('#lblReceivedDate').text(convertISODateToTimeFormat(data.job.deadline.begin));
                 $('#lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.deadline.end));
                 $('#lblIntruction').text(data.job.intruction);
@@ -176,35 +176,35 @@
                 id: customerId
             },
             success: function (data) {
-                $('#divNationalStyle').html(data.customer.nation.name);
-                $('#divColor').html(data.customer.color.name);
-                $('#divOutput').html(data.customer.output.name);
-                $('#divSize').html(data.customer.size.name);
-                $('#lblStyleNote').text(data.customer.remark);
+                $('#divNationalStyle').html(data.customer.style.nation.name);
+                $('#divColor').html(data.customer.style.color.name);
+                $('#divOutput').html(data.customer.style.output.name);
+                $('#divSize').html(data.customer.style.size.name);
+                $('#lblStyleNote').text(data.customer.style.style_note);
 
-                if (data.customer.is_align) {
-                    $('#divAlign').html('<i class="fa fa-check-square-o"></i>  <span class="text-warning">' + data.customer.align_note + '</span>');
+                if (data.customer.style.align.checked) {
+                    $('#divAlign').html('<i class="fa fa-check-square-o"></i>  <span class="text-warning">' + data.customer.style.align.note + '</span>');
                 } else {
                     $('#divAlign').html('<i class="fa fa-square-o"></i>');
                 }
 
 
-                if (data.customer.has_sky) {
-                    $('#divSky').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.sky_note + '</span>');
+                if (data.customer.style.sky.checked) {
+                    $('#divSky').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.style.sky.note + '</span>');
                 } else {
                     $('#divSky').html('<i class="fa fa-square-o"></i>');
                 }
 
 
-                if (data.customer.has_TV) {
-                    $('#divTV').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.TV_note + '</span>');
+                if (data.customer.style.tv.checked) {
+                    $('#divTV').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.style.tv.note + '</span>');
                 } else {
                     $('#divTV').html('<i class="fa fa-square-o"></i>');
                 }
 
 
-                if (data.customer.has_fire) {
-                    $('#divFire').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.fire_note + '</span>');
+                if (data.customer.style.fire.checked) {
+                    $('#divFire').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.style.fire.note + '</span>');
                 } else {
                     $('#divFire').html('<i class="fa fa-square-o"></i>');
                 }

@@ -387,8 +387,8 @@
 
                 tr += '</td>';
                 tr += '<td>' + (idx++) + '</td>';
-                tr += '<td class="font-weight-bold text-primary">' + j.customer.firstname + ' ' + j.customer.lastname + '</td>';
-                tr += '<td class="font-weight-bold text-danger">' + getFirstLetters(j.customer.firstname + ' ' + j.customer.lastname) + getLastLetters(j.customer._id) + '</td>';
+                tr += '<td class="font-weight-bold text-primary">' + j.customer.name.firstname + ' ' + j.customer.name.lastname + '</td>';
+                tr += '<td class="font-weight-bold text-danger">' + getFirstLetters(j.customer.name.firstname + ' ' + j.customer.name.lastname) + getLastLetters(j.customer._id) + '</td>';
                 tr += '<td class="font-weight-bold text-warning">';
                 tr += j.name;
                 if (j.captured.user) {
