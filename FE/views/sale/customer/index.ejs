@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-md-9 col-sm-6 col-xs-6">
         <nav aria-label="Page navigation example" class="mt-2">
-            <ul class="pagination" id="pagination"></ul>
+            <ul class="pagination pagination-sm" id="pagination"></ul>
         </nav>
     </div>
     <div class="col-md-3 text-right col-sm-6 col-xs-6">
@@ -9,7 +9,7 @@
         <div class="input-group">
             <input type="text" class="form-control" placeholder="Seach customer" id="txtSearch" />
             <div class="input-group-btn">
-                <button class="btn btn-info" type="submit" id="btnSearch">
+                <button class="btn btn-info" id="btnSearch">
                     <i class="fa fa-search" aria-hidden="true"></i>
                 </button>
             </div>
@@ -50,9 +50,19 @@
         var page = 1;
         var customerId = "";
         $(document).ready(() => {
-            LoadCustomers(search, page);
+            LoadCustomers();
         });
 
+        $('#btnSearch').click(function(){
+            search = $('#txtSearch').val();
+            LoadCustomers();
+        })
+
+        $(document).on("click", ".pagination li", function (e) {
+            e.preventDefault();
+            page = $(this).find('a').text();
+            LoadCustomers();
+        })
 
         $(document).on("click", "button[name='btnAddJob']", function () {
             customerId = $(this).closest("tr").attr("id");
@@ -78,13 +88,20 @@
                     $('#lblCustomerFullname').text(data.customer.firstname + ' ' + data.customer.lastname);
                     $('#lblCustomerPhone').text(data.customer.phone);
                     $('#lblCustomerEmail').text(data.customer.email);
+                },
+                error: function (request, status, error) {                   
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: request.responseJSON.msg
+                    })
                 }
             })
             $('#addJobModal').modal();
         })
 
 
-        function LoadCustomers(search, page) {
+        function LoadCustomers(rs) {
             $.ajax({
                 url: '/sale/customer/list',
                 type: 'get',
@@ -98,7 +115,8 @@
                 success: function (data) {
 
                     $('#tblData').empty();
-                    let idx = 1;
+                    $('.pagination').empty();
+                    let idx = (page - 1) * data.pageSize;
                     data.customers.forEach(cus => {
                         let tr = '<tr id = "' + cus._id + '">';
                         tr += '<td>';
@@ -108,20 +126,27 @@
                         }
 
                         tr += '</td>';
-                        tr += '<td>' + (idx++) + '</td>';
-                        tr += '<td class="font-weight-bold text-info">' + cus.firstname + ' ' + cus.lastname + '</td>';
-                        tr += '<td class="font-weight-bold text-danger">' + getFirstLetters(cus.firstname + ' ' + cus.lastname) + getLastLetters(cus._id) + '</td>';
-                        tr += '<td>' + cus.phone + '</td>';
-                        tr += '<td>' + cus.email + '</td>';
+                        tr += '<td>' + (++idx) + '</td>';
+                        tr += '<td class="font-weight-bold text-info">' + cus.name.firstname + ' ' + cus.name.lastname + '</td>';
+                        tr += '<td class="font-weight-bold text-danger">' + getFirstLetters(cus.name.firstname + ' ' + cus.name.lastname) + getLastLetters(cus._id) + '</td>';
+                        tr += '<td>' + cus.contact.phone + '</td>';
+                        tr += '<td>' + cus.contact.email + '</td>';
                         tr += '<td class="text-right"><button class="btn-sm btn-primary" name="btnAddJob"><i class="fa fa-plus" aria-hidden="true"></i> Add job</button></td>'
                         tr += '</tr>';
                         $('#tblData').append(tr);
                     });
+                    for (let i = 1; i <= data.pages; i++) {
+                        let li = '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>';
+                        $('.pagination').append(li);
+                    }
 
                 },
-                error: function (request, status, error) {
-                    alert(request.responseJSON.msg);
-                    window.location.href = '/sale/login';
+                error: function (request, status, error) {                   
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: request.responseJSON.msg
+                    })
                 }
             })
         }
@@ -171,7 +196,7 @@
                         let idx = 1;
 
                         data.jobs.forEach(j => {
-                            let templates = (j.templates && j.templates.length > 0)?(j.templates.map(x => x.name)).toString():'';
+                            let templates = (j.templates && j.templates.length > 0) ? (j.templates.map(x => x.name)).toString() : '';
 
                             newRow += '<tr id = "' + j._id + '">';
                             newRow += '<td>' + (idx++) + '</td>';

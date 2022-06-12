@@ -184,7 +184,8 @@
         $('#btnSubmit').show();
       });
 
-      $(document).on("click", ".pagination li", function () {
+      $(document).on("click", ".pagination li", function (e) {
+        e.preventDefault();
         page = $(this).find('a').text();
         LoadCustomers();
       })
