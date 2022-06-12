@@ -46,7 +46,7 @@
 
 <script>
 
-    $(document).ready(function(){
+    $(document).ready(function () {
         $('#msgError').hide();
     })
 
@@ -54,7 +54,7 @@
         let name = $('#txtName').val().trim();
         let description = $('#txtDescription').val().trim();
 
-        if(name.trim().length == 0){
+        if (name.trim().length == 0) {
             $('#msgError').text('Module name can not be blank!');
             $('#msgError').show();
             return;
@@ -72,10 +72,14 @@
                     moduleId,
                     name,
                     description,
-                    status:$('#ckbStatus').is(':checked')
+                    status: $('#ckbStatus').is(':checked')
                 },
                 success: function (data, textStatus, xhr) {
-                    alert(data.msg);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
                     $('#modalModule').modal('hide');
                     moduleId = '';
                 }, error: function (jqXHR, textStatus, errorThrown) {
@@ -94,7 +98,11 @@
                     description
                 },
                 success: function (data, textStatus, xhr) {
-                    alert(data.msg);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
                     $('#modalModule').modal('hide');
                     moduleId = '';
                 }, error: function (jqXHR, textStatus, errorThrown) {
@@ -116,7 +124,7 @@
         $('#txtDescription').val('');
     })
 
-    
+
     //sự kiện load lại hàm ds level khi modal đc đóng lại
     $(document).on('hidden.bs.modal', '#modalModule', function () {
         LoadData();

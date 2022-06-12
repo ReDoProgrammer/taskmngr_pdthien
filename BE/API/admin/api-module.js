@@ -21,6 +21,19 @@ router.get('/detail',authenticateAdminToken,(req,res)=>{
     })
 })
 
+router.get('/list-staff',authenticateAdminToken,async (req,res)=>{
+    let {moduleId} = req.query;
+    let module = await Module.findById(moduleId).populate('users');
+    if(!module){
+        return res.status(404).json({
+            msg:`Module not found!`
+        })
+    }
+    return res.status(200).json({
+        msg:`Load staffs list that access this module successfully!`,
+        staffs: module.users
+    })
+})
 
 router.get('/list',authenticateAdminToken, (req, res) => {
     Module
@@ -108,6 +121,57 @@ router.put('/', authenticateAdminToken, (req, res) => {
                 })
             }
         )
+})
+
+router.put('/push-staff',authenticateAdminToken,async (req,res)=>{
+    let { moduleId, userId} = req.body;
+    let module = await Module.findById(moduleId);
+    if(!module){
+        return res.status(404).json({
+            msg:`Module not found!`
+        })
+    }
+
+    if(!module.users.includes(userId)){
+        module.users.push(userId);
+        await module.save()
+        .then(_=>{
+            return res.status(200).json({
+                msg:`Staff has been add into this module`
+            })
+        })
+        .catch(err=>{
+            return res.status(500).json({
+                msg:`Can not add staff into module with error: ${new Error(err.message)}`
+            })
+        })
+    }else{
+        return res.status(303).json({
+            msg:`This staff already access this module!`
+        })
+    }
+})
+
+router.put('/pull-staff',authenticateAdminToken, async (req,res)=>{
+    let { moduleId, staffId} = req.body;
+    let module = await Module.findById(moduleId);
+    if(!module){
+        return res.status(404).json({
+            msg:`Module not found!`
+        })
+    }
+    module.users.pull(staffId);
+    await module.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`Staff has been removed from module!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not remove staff from module with error: ${new Error(err.message)}`
+        })
+    })
 })
 
 module.exports = router;
