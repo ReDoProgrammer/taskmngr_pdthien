@@ -8,27 +8,26 @@ const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 
 
-router.delete('/', authenticateAdminToken, (req, res) => {
+router.delete('/', authenticateAdminToken, async (req, res) => {
     let id = req.body.id;
-    StaffLevel.findOneAndDelete({ _id: id }, (err, level) => {
-        if (err) {
-            return res.status(500).json({
-                msg: 'Xóa level thất bại!',
-                error: new Error(err.message)
-            });
-        }
+    let sl = await StaffLevel.findById(id);
+    if (!sl) {
+        return res.status(404).json({
+            msg: `Staff level not found!`
+        })
+    }
 
-        if (level) {
+    await sl.delete()
+        .then(_ => {
             return res.status(200).json({
-                msg: 'Xóa level thành công!'
-            });
-        } else {
-            return res.status(404).json({
-                msg: 'Lỗi không tìm thấy level tương ứng!'
-            });
-        }
-
-    })
+                msg: `Staff level has been deleted!`
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not delete this staff level with error: ${new Error(err.message)}`
+            })
+        })
 })
 
 router.get('/', authenticateAdminToken, async (req, res) => {
@@ -108,13 +107,13 @@ router.get('/get-jobs', authenticateAdminToken, async (req, res) => {
 
 })
 
-router.post('/', authenticateAdminToken, (req, res) => {
+router.post('/', authenticateAdminToken, async (req, res) => {
     let { name, description, status } = req.body;
 
     //ràng buộc dữ liệu cho đầu vào tên level
     if (name.length == 0) {
         return res.status(403).json({
-            msg: 'Vui lòng nhập tên level'
+            msg: 'Staff level name can not be blank!'
         });
     }
 
@@ -123,56 +122,54 @@ router.post('/', authenticateAdminToken, (req, res) => {
         description: description,
         status: status
     });
-    level.save()
+    await level.save()
         .then(level => {
             return res.status(201).json({
-                msg: 'Thêm mới level thành công!',
+                msg: 'Staff level has been created!',
                 level: level
             });
         })
         .catch(err => {
             return res.status(500).json({
-                msg: 'Thêm mới level thất bại!',
+                msg: `Can not created new staff level with error: ${new Error(err.message)}`,
                 error: new Error(err.message)
             });
         })
 })
 
-router.put('/', authenticateAdminToken, (req, res) => {
+router.put('/', authenticateAdminToken, async (req, res) => {
     let { id, name, description, status } = req.body;
 
     //ràng buộc dữ liệu cho đầu vào tên level
     if (name.length == 0) {
         return res.status(403).json({
-            msg: 'Vui lòng nhập tên level'
+            msg: `Staff level name can not be blank!`
         });
     }
 
+    let sl = await StaffLevel.findById(id);
+    if (!sl) {
+        return res.status(404).json({
+            msg: `Staff level not found!`
+        })
+    }
 
-
-    StaffLevel.findOneAndUpdate({ _id: id }, {
-        name,
-        description,
-        status
-    }, { new: true }, (err, level) => {
-        if (err) {
-            return res.status(500).json({
-                msg: 'Cập nhật thông tin level thất bại!',
-                error: new Error(err.message)
-            });
-        }
-
-        if (level) {
+    sl.name = name;
+    sl.description = description;
+    sl.status = status;
+    await sl.save()
+        .then(_ => {
             return res.status(200).json({
-                msg: 'Cập nhật thông tin level thành công!',
-                level: level
-            });
-        } else {
+                msg: `Staff level has been updated!`
+            })
+        })
+        .catch(err => {
             return res.status(500).json({
-                msg: 'Cập nhật thông tin level thất bại!'
-            });
-        }
-    })
+                msg: `Can not update staff level with error: ${new Error(err.message)}`
+            })
+        })
+
+
 })
 
 router.put('/push-level', authenticateAdminToken, async (req, res) => {
@@ -208,7 +205,7 @@ router.put('/push-level', authenticateAdminToken, async (req, res) => {
 
 
 router.delete('/pull-level', authenticateAdminToken, async (req, res) => {
-    let { id ,levelId} = req.body;
+    let { id, levelId } = req.body;
     let sl = await StaffLevel.findById(levelId);
     if (!sl) {
         return res.status(404).json({
