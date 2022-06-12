@@ -13,8 +13,26 @@ const UserGroupSchema = new Schema({
         default: ''
     },   
     wages: [{
-        type: Schema.Types.ObjectId,
-        ref: 'wage'
+        module:{
+            type:Schema.Types.ObjectId,
+            required:true,
+            ref:'module'
+        },
+        staff_lv:{
+            type:Schema.Types.ObjectId,
+            required:true,
+            ref:'staff_level'
+        },
+        job_lv:{
+            type:Schema.Types.ObjectId,
+            required:true,
+            ref:'job_level'
+        },        
+        wage:{
+            type:Number,
+            default:0
+        } 
+        
     }]
 });
 

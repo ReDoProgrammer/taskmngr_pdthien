@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const UserGroup = require('../../models/user-group-model');
-const Wage = require('../../models/wage-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 router.delete('/', authenticateAdminToken, (req, res) => {

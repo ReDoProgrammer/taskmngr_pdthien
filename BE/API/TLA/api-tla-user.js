@@ -3,7 +3,6 @@ const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const User = require('../../models/user-model');
 const UserModule = require('../../models/user-module-model');
 const Module = require('../../models/module-model');
-const Wage = require('../../models/wage-model');
 const { ObjectId } = require('mongodb');
 
 const _EDITOR = 'EDITOR';

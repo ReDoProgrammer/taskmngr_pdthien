@@ -1,42 +1,13 @@
 const router = require('express').Router();
-const Wage = require('../../models/wage-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 
-router.delete('/delete-many', authenticateAdminToken, (req, res) => {
-    let { ugId } = req.body;
-    Wage
-        .deleteMany({ user_group: ugId })
-        .exec()
-        .then(_ => {
-            return res.status(200).json({
-                msg: `Delete wages successfully!`
-            })
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not delete these wages with error: ${new Error(err.message)}`
-            })
-        })
-})
 
 
 
 router.delete('/', authenticateAdminToken, (req, res) => {
     let { _id } = req.body;
-    Wage.findByIdAndDelete(_id)
-        .exec()
-        .then(_ => {
-            return res.status(200).json({
-                msg: `Delete user group wage successfully!`
-            })
-        })
-        .catch(err => {
-            console.log(`Can not delete user group wages with error: ${new Error(err.message)}`);
-            return res.status(500).json({
-                msg: `Can not delete user group wages with error: ${new Error(err.message)}`
-            })
-        })
+  
 })
 
 router.post('/', authenticateAdminToken, (req, res) => {
@@ -155,20 +126,7 @@ router.get('/', authenticateAdminToken, (req, res) => {
 
 router.get('/detail', authenticateAdminToken, (req, res) => {
     let { _id } = req.query;
-    Wage
-        .findById(_id)
-        .exec()
-        .then(w => {
-            return res.status(200).json({
-                msg: `Get wage detail successfully!`,
-                w
-            })
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not get wage detail with error: ${new Error(err.message)}`
-            })
-        })
+    
 })
 
 module.exports = router;
