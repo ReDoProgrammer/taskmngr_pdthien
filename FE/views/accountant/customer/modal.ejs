@@ -191,51 +191,57 @@
     })
 
     $(document).on('show.bs.modal', '#modalCustomer', function () {
-        
+
     })
 
-    $('#ckbAlign').change(function() {
-        if(this.checked) {
-            $('#txtAlign').prop('readonly',false);
-        }else{
+
+    $('#modalCustomer').on('hidden.bs.modal', function () {
+        LoadCustomers();
+    })
+
+
+    $('#ckbAlign').change(function () {
+        if (this.checked) {
+            $('#txtAlign').prop('readonly', false);
+        } else {
             $('#txtAlign').val('');
-            $('#txtAlign').prop('readonly',true);
-        }             
+            $('#txtAlign').prop('readonly', true);
+        }
     });
-    $('#ckbTV').change(function() {
-        if(this.checked) {
-            $('#txtTV').prop('readonly',false);
-        }else{
+    $('#ckbTV').change(function () {
+        if (this.checked) {
+            $('#txtTV').prop('readonly', false);
+        } else {
             $('#txtTV').val('');
-            $('#txtTV').prop('readonly',true);
-        }             
+            $('#txtTV').prop('readonly', true);
+        }
     });
 
-    $('#ckbGrass').change(function() {
-        if(this.checked) {
-            $('#txtGrass').prop('readonly',false);
-        }else{
+    $('#ckbGrass').change(function () {
+        if (this.checked) {
+            $('#txtGrass').prop('readonly', false);
+        } else {
             $('#txtGrass').val('');
-            $('#txtGrass').prop('readonly',true);
-        }             
+            $('#txtGrass').prop('readonly', true);
+        }
     });
 
-    $('#ckbSky').change(function() {
-        if(this.checked) {
-            $('#txtSky').prop('readonly',false);
-        }else{
+    $('#ckbSky').change(function () {
+        if (this.checked) {
+            $('#txtSky').prop('readonly', false);
+        } else {
             $('#txtSky').val('');
-            $('#txtSky').prop('readonly',true);
-        }             
+            $('#txtSky').prop('readonly', true);
+        }
     });
 
-    $('#ckbFire').change(function() {
-        if(this.checked) {
-            $('#txtFire').prop('readonly',false);
-        }else{
+    $('#ckbFire').change(function () {
+        if (this.checked) {
+            $('#txtFire').prop('readonly', false);
+        } else {
             $('#txtFire').val('');
-            $('#txtFire').prop('readonly',true);
-        }             
+            $('#txtFire').prop('readonly', true);
+        }
     });
 
 
@@ -376,7 +382,6 @@
                         title: 'Successfully!',
                         text: data.msg
                     })
-                    $(location).attr("href", data.url);
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     $('#msgError').text(jqXHR.responseJSON.msg);
@@ -384,7 +389,7 @@
 
                 }
             });
-        }else{
+        } else {
             $.ajax({
                 url: "/accountant/customer",
                 type: "put",
@@ -423,7 +428,6 @@
                         title: 'Successfully!',
                         text: data.msg
                     })
-                    $(location).attr("href", data.url);
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     $('#msgError').text(jqXHR.responseJSON.msg);
@@ -433,11 +437,8 @@
             });
         }
 
-
-
+        $('#modalCustomer').modal('hide');
     });
-
-
 
     function LoadOutput() {
         $.ajax({

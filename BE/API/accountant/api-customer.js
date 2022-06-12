@@ -5,6 +5,26 @@ const Job = require('../../models/job-model');
 
 const pageSize = 20;
 
+router.get('/contracts', authenticateAccountantToken, async (req, res) => {
+    let { customerId } = req.query;
+    let contracts = await Customer.findById(customerId)
+        .sort({ 'contracts.line.created.at': -1 })
+        .populate('contracts.lines.created.by')
+        .populate('contracts.lines.updated.by');
+
+    if (!contracts) {
+        return res.status(404).json({
+            msg: `Customer contracts list not found!`
+        })
+    }
+
+    return res.status(200).json({
+        msg: `Load contracts list of customer successfully!`,
+        contracts
+    })
+
+
+})
 
 router.get('/detail', authenticateAccountantToken, async (req, res) => {
     let { customerId } = req.query;
@@ -15,13 +35,13 @@ router.get('/detail', authenticateAccountantToken, async (req, res) => {
         })
     }
     return res.status(200).json({
-        msg:`Load customer detail successfully!`,
+        msg: `Load customer detail successfully!`,
         customer
     })
 })
 
 router.get('/list', authenticateAccountantToken, async (req, res) => {
-    let { search, page,status } = req.query;
+    let { search, page, status } = req.query;
 
     let customers = await Customer.find({
         $or: [
@@ -50,7 +70,7 @@ router.get('/list', authenticateAccountantToken, async (req, res) => {
     return res.status(200).json({
         msg: `Load customers list successfully!`,
         customers,
-        pages: count%pageSize==0?count/pageSize:Math.floor(count/pageSize)+1,
+        pages: count % pageSize == 0 ? count / pageSize : Math.floor(count / pageSize) + 1,
         pageSize
     });
 
@@ -84,7 +104,7 @@ router.post('/', authenticateAccountantToken, async (req, res) => {
         status
     } = req.body;
 
-  
+
 
     let chk = await Customer.countDocuments({ 'contact.email': email });
     if (chk > 0) {
@@ -97,7 +117,7 @@ router.post('/', authenticateAccountantToken, async (req, res) => {
     let customer = new Customer();
 
     customer.created = {
-        by:req.user._id,
+        by: req.user._id,
         at: new Date()
     }
 
@@ -155,7 +175,7 @@ router.post('/', authenticateAccountantToken, async (req, res) => {
         })
 })
 
-router.put('/',authenticateAccountantToken, async (req,res)=>{
+router.put('/', authenticateAccountantToken, async (req, res) => {
     let {
         customerId,
         firstname,
@@ -185,14 +205,14 @@ router.put('/',authenticateAccountantToken, async (req,res)=>{
 
     let customer = await Customer.findById(customerId);
 
-    if(!customer){
+    if (!customer) {
         return res.status(404).json({
-            msg:`Customer not found!`
+            msg: `Customer not found!`
         })
     }
 
     customer.updated = {
-        by:req.user._id,
+        by: req.user._id,
         at: new Date()
     }
 
@@ -239,68 +259,107 @@ router.put('/',authenticateAccountantToken, async (req,res)=>{
     await customer.save()
         .then(_ => {
             return res.status(201).json({
-                msg: `Customer has been added!`,
+                msg: `Customer has been updated!`,
                 url: '/accountant/customer'
             })
         })
         .catch(err => {
             return res.status(500).json({
-                msg: `Can not add new customer with error: ${new Error(err.message)}`
+                msg: `Can not update customer with error: ${new Error(err.message)}`
             })
         })
 
 })
 
 
-router.put('/change-state',authenticateAccountantToken,async (req,res)=>{
-    let {customerId} = req.body;
+router.put('/change-state', authenticateAccountantToken, async (req, res) => {
+    let { customerId } = req.body;
     let customer = await Customer.findById(customerId);
-    if(!customer){
+    if (!customer) {
         return res.status(404).json({
-            msg:`Customer not found!`
+            msg: `Customer not found!`
         })
     }
 
     customer.status = !customer.status;
     await customer.save()
+        .then(_ => {
+            return res.status(200).json({
+                msg: `Change customer status successfully!`
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not change customer status with error: ${new Error(err.message)}`
+            })
+        })
+})
+
+router.put('/contract', authenticateAccountantToken, async (req, res) => {
+    let { contract } = req.body;
+
+    let customer = await Customer.findById(contract.customer);
+    if (!customer) {
+        return res.status(404).json({
+            msg: `Customer not found!`
+        })
+    }
+    let desContract = {};
+    desContract.title = contract.title;
+    var lines = contract.lines.map(x => {        
+        let obj = {};
+        let basic  = {};
+        if (x.child =='true') {
+            basic.parents = x.value;
+        } else {
+            basic.root = x.value;
+        }
+        basic.price = x.price;
+        obj.basic = basic;      
+        console.log(obj)
+        return obj;
+    })
+    desContract.lines = lines;
+    customer.contracts.push(desContract);
+    await customer.save()
     .then(_=>{
         return res.status(200).json({
-            msg:`Change customer status successfully!`
+            msg:`Contract has been added!`
         })
     })
     .catch(err=>{
         return res.status(500).json({
-            msg:`Can not change customer status with error: ${new Error(err.message)}`
+            msg:`Can not add contract with error: ${new Error(err.message)}`
         })
     })
 })
 
-router.delete('/',authenticateAccountantToken, async (req,res)=>{
-    let {customerId} = req.body;
+router.delete('/', authenticateAccountantToken, async (req, res) => {
+    let { customerId } = req.body;
     let customer = await Customer.findById(customerId);
-    if(!customer){
+    if (!customer) {
         return res.status(404).json({
-            msg:`Customer not found!`
+            msg: `Customer not found!`
         })
     }
 
-    if(customer.jobs.length>0){
+    if (customer.jobs.length > 0) {
         return res.status(303).json({
-            msg:`Can not delete this customer when having jobs depend on it!`
+            msg: `Can not delete this customer when having jobs depend on it!`
         })
     }
 
     customer.delete()
-    .then(_=>{
-        return res.status(200).json({
-            msg:`The customer has been deleted!`
+        .then(_ => {
+            return res.status(200).json({
+                msg: `The customer has been deleted!`
+            })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not delete this customer with error: ${new Error(err.message)}`
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not delete this customer with error: ${new Error(err.message)}`
+            })
         })
-    })
 })
 
 module.exports = router;

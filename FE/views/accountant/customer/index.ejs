@@ -55,15 +55,22 @@
 
 
 <%-include('modal')%>
+<%-include('modal_contract')%>
 
   <script>
     var search = "";
     var page = 1;
     var customerId = '';
-    $(document).ready(() => {
-      $("#direction").val("Quản lý khách hàng");
+    $(document).ready(() => {     
       LoadCustomers();
     });
+
+    $(document).on("click", "button[name='contract']", function () {
+      customerId = $(this).closest("tr").attr("id");    
+      $('#modalContract').modal();
+    });
+
+
 
     $('#btnSearch').click(function () {
       search = $('#txtSearch').val();

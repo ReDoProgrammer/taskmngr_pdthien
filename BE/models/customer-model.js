@@ -143,6 +143,9 @@ const customerSchema = new Schema({
         {
             lines: [
                 {
+                    title:{
+                        type:String
+                    },
                     basic: {
                         root: {
                             type: Schema.Types.ObjectId,
