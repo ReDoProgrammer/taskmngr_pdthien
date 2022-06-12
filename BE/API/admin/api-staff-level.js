@@ -31,117 +31,119 @@ router.delete('/', authenticateAdminToken, (req, res) => {
     })
 })
 
-router.get('/', (req, res) => {
-    StaffLevel.find({}, (err, levels) => {
-        if (err) {
-            return res.status(500).json({
-                msg: 'load levels list failed'
-            });
-        }
+router.get('/', authenticateAdminToken, async (req, res) => {
+    let levels = await StaffLevel.find({})
+        .populate('levels');
 
-        return res.status(200).json({
-            msg: 'Load levels list successfully!',
-            levels: levels
-        });
-    });
+    return res.status(200).json({
+        msg: `Load staff levels list successfully!`,
+        levels
+    })
 });
 
-router.get('/list-by-job-level',authenticateAdminToken,(req,res)=>{
-    let {jobLevelId} = req.query;
+router.get('/list-by-job-level', authenticateAdminToken, (req, res) => {
+    let { jobLevelId } = req.query;
     StaffJobLevel
-    .find({
-        job_lv:jobLevelId
-    })
-    .exec()
-    .then(sjl=>{
-        let staffLevelIds = sjl.map(e=>{
-            return e.staff_lv
-        })
-
-        StaffLevel
         .find({
-            _id:{$in: staffLevelIds}
+            job_lv: jobLevelId
         })
         .exec()
-        .then(sl=>{
-            console.log(sl);
-            return res.status(200).json({
-                msg:`Load staff level with job level successfully!`,
-                sl
+        .then(sjl => {
+            let staffLevelIds = sjl.map(e => {
+                return e.staff_lv
             })
+
+            StaffLevel
+                .find({
+                    _id: { $in: staffLevelIds }
+                })
+                .exec()
+                .then(sl => {
+                    console.log(sl);
+                    return res.status(200).json({
+                        msg: `Load staff level with job level successfully!`,
+                        sl
+                    })
+                })
+                .catch(err => {
+                    console.log(`Can not load staff level with job level id in caught error: ${new Error(err.message)}`);
+                    return res.status(500).json({
+                        msg: `Can not load staff level with job level id in caught error: ${new Error(err.message)}`
+                    })
+                })
         })
-        .catch(err=>{
-            console.log(`Can not load staff level with job level id in caught error: ${new Error(err.message)}`);
+        .catch(err => {
+            console.log(`Can not load staff job level with joblevelid caught error: ${new Error(err.message)} `);
             return res.status(500).json({
-                msg:`Can not load staff level with job level id in caught error: ${new Error(err.message)}`
+                msg: `Can not load staff job level with joblevelid caught error: ${new Error(err.message)} `
             })
         })
-    })
-    .catch(err=>{
-        console.log(`Can not load staff job level with joblevelid caught error: ${new Error(err.message)} `);
-        return res.status(500).json({
-            msg:`Can not load staff job level with joblevelid caught error: ${new Error(err.message)} `
-        })
-    })
 })
 
-router.get('/list-by-user-group',authenticateAdminToken, (req, res) => {
-    let {groupId} = req.query;
+router.get('/list-by-user-group', authenticateAdminToken, (req, res) => {
+    let { groupId } = req.query;
     UserGroup
-    .findById(groupId)
-    .then(g=>{
-        if(!g){
-            return res.status(404).json({
-                msg:`User group not fond`
-            })
-        }
-
-        console.log(g);
-
-        StaffLevel.find({}, (err, levels) => {
-            if (err) {
-                return res.status(500).json({
-                    msg: 'load levels list failed'
-                });
+        .findById(groupId)
+        .then(g => {
+            if (!g) {
+                return res.status(404).json({
+                    msg: `User group not fond`
+                })
             }
-    
-            return res.status(200).json({
-                msg: 'Load levels list successfully!',
-                levels: levels
+
+            console.log(g);
+
+            StaffLevel.find({}, (err, levels) => {
+                if (err) {
+                    return res.status(500).json({
+                        msg: 'load levels list failed'
+                    });
+                }
+
+                return res.status(200).json({
+                    msg: 'Load levels list successfully!',
+                    levels: levels
+                });
             });
-        });
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not get user group by id with error: ${new Error(err.message)}`
         })
-    })
-    
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not get user group by id with error: ${new Error(err.message)}`
+            })
+        })
+
 });
 
 
-router.get('/detail', authenticateAdminToken, (req, res) => {
+router.get('/detail', authenticateAdminToken, async (req, res) => {
     let { id } = req.query;
-    StaffLevel.findById(id, (err, level) => {
-        if (err) {
-            return res.status(500).json({
-                msg: 'Lấy thông tin level thất bại!',
-                error: new Error(err.message)
-            });
-        }
-        if (level) {
-            return res.status(200).json({
-                msg: 'Lấy thông tin level thành công!',
-                level: level
-            })
-        } else {
-            return res.status(404).json({
-                msg: 'Không tìm thấy level tương ứng!'
-            });
-        }
+    let sl = await StaffLevel.findById(id);
+    if (!sl) {
+        return res.status(404).json({
+            msg: `Staff level not found!`
+        })
+    }
+    return res.status(200).json({
+        msg: `Load staff level detail successfully!`,
+        sl
     })
 })
 
+router.get('/get-jobs', authenticateAdminToken, async (req, res) => {
+    let { levelId } = req.query;
+    let staffLv = await StaffLevel.findById(levelId).populate('levels');
+    if (!staffLv) {
+        return res.status(404).json({
+            msg: `Staff level not found!`
+        })
+    }
+
+    return res.status(200).json({
+        msg: `Load job levels based on staff level successfully!`,
+        levels: staffLv.levels
+    })
+
+})
 
 router.post('/', authenticateAdminToken, (req, res) => {
     let { name, description, status } = req.body;
@@ -208,6 +210,59 @@ router.put('/', authenticateAdminToken, (req, res) => {
             });
         }
     })
+})
+
+router.put('/push-level', authenticateAdminToken, async (req, res) => {
+    let { jobLevel, staffLevel } = req.body;
+
+    let sl = await StaffLevel.findById(staffLevel);
+    if (!sl) {
+        return res.status(404).json({
+            msg: `Staff level not found!`
+        })
+    }
+    let check = sl.levels.indexOf(jobLevel);
+    if (check > -1) {
+        return res.status(303).json({
+            msg: `This job level already added into this staff level!`
+        })
+    }
+
+    sl.levels.push(jobLevel);
+    await sl.save()
+        .then(_ => {
+            return res.status(200).json({
+                msg: `Job level has been added into this staff level`
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not add  job level into this staff level with error: ${new Error(err.message)}`
+            })
+        })
+})
+
+router.delete('/pull-level', authenticateAdminToken, async (req, res) => {
+    let { id ,levelId} = req.body;
+    let sl = await StaffLevel.findById(levelId);
+    if (!sl) {
+        return res.status(404).json({
+            msg: `Staff level not found!`
+        })
+    }
+
+    sl.levels.pull(id);
+    await sl.save()
+        .then(_ => {
+            return res.status(200).json({
+                msg: `Job level has been removed from this staff level`
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not remove job level from this staff level with error: ${new Error(err.message)}`
+            })
+        })
 })
 
 module.exports = router;

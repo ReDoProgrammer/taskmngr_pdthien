@@ -31,9 +31,7 @@
 <script>
     //sự kiện modal shown --> set các giá trị mặc định cho component trên form
     $('#modalLocalLevel').on('shown.bs.modal', function (e) {
-        $('#txtLevel').val('');
-        $('#txtDescription').val('');
-        $('#ckbStatus').prop('checked', true);
+       
     });
 
     $('#btnSubmit').click(function () {
@@ -55,11 +53,20 @@
                     status
                 },
                 success: function (data, textStatus, xhr) {
-                    alert(data.msg);
-                    $('#modalLocalLevel').modal('hide');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
+
                     levelId = '';
+                    $('#modalLocalLevel').modal('hide');
                 }, error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.responseJSON.msg);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Opp....!',
+                        text: jqXHR.responseJSON.msg
+                    });
                 }
             })
         } else {
@@ -75,11 +82,20 @@
                     status
                 },
                 success: function (data, textStatus, xhr) {
-                    alert(data.msg);
-                    $('#modalLocalLevel').modal('hide');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
+
                     levelId = '';
+                    $('#modalLocalLevel').modal('hide');
                 }, error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.responseJSON.msg);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Opp....!',
+                        text: jqXHR.responseJSON.msg
+                    });
                 }
             })
         }
