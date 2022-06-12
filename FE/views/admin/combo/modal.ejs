@@ -25,7 +25,8 @@
                         <div class="row">
                             <div class="col-md-12 col-sm-12 col-xs-12 form-group">
                                 <label for="">Combo description:</label>
-                                <textarea name="" id="txaDescription" rows="3" class="form-control" placeholder="Combo description...."></textarea>
+                                <textarea name="" id="txaDescription" rows="3" class="form-control"
+                                    placeholder="Combo description...."></textarea>
                             </div>
                         </div>
 
@@ -55,11 +56,11 @@
         $('#txtName').val('');
         $('#txtPrice').val(0);
         $('#txaDescription').val('');
-        _id ='';
+        _id = '';
         LoadCombo();
     });
 
-    $('#btnCancel').click(function(){
+    $('#btnCancel').click(function () {
         $('#modalCombo').modal('hide');
     })
 
@@ -93,7 +94,11 @@
                     description
                 },
                 success: function (data) {
-                    alert(data.msg);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
                     $('#modalCombo').modal('hide');
                     LoadCombo();
                 }, error: function (jqXHR, textStatus, errorThrown) {
@@ -116,7 +121,11 @@
                     description
                 },
                 success: function (data) {
-                    alert(data.msg);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
                     $('#modalCombo').modal('hide');
                     LoadCombo();
                 }, error: function (jqXHR, textStatus, errorThrown) {
