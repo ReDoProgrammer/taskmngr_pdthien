@@ -71,7 +71,7 @@
               </div>
               <div class="col-md-5 col-sm-6 col-xs-6 form-group">
                 <label for="">Local level</label>
-                <select name="" id="slLocalLevel" class="form-control"></select>
+                <select name="" id="slLocalLevels" class="form-control"></select>
               </div>
             </div>
 
@@ -192,6 +192,40 @@
   var ccId = '';
 
 
+  $("#slCustomerLevles").change(function () {
+    console.log(12345)
+  });
+
+  $("#slLocalLevels").change(function () {
+    LoadQA();
+    LoadEditor();
+  });
+
+
+
+  function LoadLocalLevel() {
+    $.ajax({
+      url: '/tla/job/local-level',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        customer_level: $('#slCustomerLevles option:selected').val(),
+        is_root: $('#slCustomerLevles option:selected').data('root') == '1' ? true : false
+      },
+      success: function (data) {
+        data.local_levels.forEach(l => {
+          let opt = '<option value="' + l._id + '">' + l.name + '</option>';
+          $('#slLocalLevels').append(opt);
+        })
+
+        LoadQA($('#slLocalLevels option:selected').val());
+        LoadEditor($('#slLocalLevels option:selected').val());
+      }
+
+    })
+  }
 
 
 
@@ -395,7 +429,7 @@
     }
 
 
- 
+
 
     $('#divAssign').slideDown(1000);
     $('#divLevel').slideUp(500);
@@ -619,12 +653,13 @@
         customerId
       },
 
-      success: function (data) {       
+      success: function (data) {
         $('#slCustomerLevles').empty();
         data.contract.lines.forEach(l => {
-          let opt = '<option value="' + (l.root ? l.root._id : l.parents._id) + '">' + (l.root ? l.root.name : l.parents.name )+ '</option>';
+          let opt = '<option value="' + (l.root ? l.root._id : l.parents._id) + '" data-root="' + (l.root ? 1 : 0) + '">' + (l.root ? l.root.name : l.parents.name) + '</option>';
           $('#slCustomerLevles').append(opt);
         })
+        LoadLocalLevel();
       },
       error: function (jqXHR, textStatus, errorThrown) {
         $('#msgError').text(jqXHR.responseJSON.msg);
@@ -742,7 +777,7 @@
     // LoadQA(levelId);
   });
 
-  function LoadEditor(levelId) {
+  function LoadEditor() {
     $.ajax({
       url: '/tla/user/list-editor',
       type: 'get',
@@ -750,26 +785,26 @@
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       data: {
-        levelId
+        levelId: $('#slLocalLevels option:selected').val()
       },
       success: function (data) {
         $('#slEditor').empty();
         data.editors.forEach(e => {
           let opt = '<option value="' + e._id + '">' + e.fullname + ' ( ' + e.username + ' )</option>';
           $('#slEditor').append(opt);
-          $('#slEditorInEditDiv').append(opt);
         })
         $('#slEditor').selectpicker();
         $('#slEditor').selectpicker('refresh');
       },
       error: function (jqXHR, textStatus, errorThrown) {
         $('#msgError').text(jqXHR.responseJSON.msg);
+        $('#msgError').fadeIn().delay(3000).fadeOut();
       },
     })
   }
 
 
-  function LoadQA(levelId) {
+  function LoadQA() {
     $.ajax({
       url: '/tla/user/list-qa',
       type: 'get',
@@ -777,7 +812,7 @@
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       data: {
-        levelId
+        levelId:$('#slLocalLevels option:selected').val()
       },
       success: function (data) {
         $('#slQA').empty();
@@ -785,15 +820,13 @@
         data.qas.forEach(q => {
           let opt = '<option value="' + q._id + '">' + q.fullname + '</option>';
           $('#slQA').append(opt);
-          $('#slQAInEditDiv').append(opt);
         })
         $('#slQA').selectpicker();
-        $('#slQAInEditDiv').selectpicker();
         $('#slQA').selectpicker('refresh');
-        $('#slQAInEditDiv').selectpicker('refresh');
       },
       error: function (jqXHR, textStatus, errorThrown) {
         $('#msgError').text(jqXHR.responseJSON.msg);
+        $('#msgError').fadeIn().delay(3000).fadeOut();
       },
     })
   }
