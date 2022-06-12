@@ -9,11 +9,11 @@ let refershTokens = [];
 
 const _MODULE = 'ADMIN';
 
+const pageSize = 20;
 
-
-router.get('/', authenticateAdminToken, (req, res) => {
+router.get('/', authenticateAdminToken, async (req, res) => {
   let { search, page } = req.query;
-  User.find({
+  let users = await User.find({
     username: { $ne: 'admin' },
     $or: [
       { fullname: { "$regex": search, "$options": "i" } },
@@ -22,22 +22,29 @@ router.get('/', authenticateAdminToken, (req, res) => {
       { username: { "$regex": search, "$options": "i" } },
     ]
   })
+    .populate('user_group')
+    .populate('user_level')
+    .skip((page - 1) * pageSize)
+    .limit(pageSize);
 
-    .exec()
-    .then(users => {
-      let result = users.slice(process.env.PAGE_SIZE * (page - 1), process.env.PAGE_SIZE);
-      return res.status(200).json({
-        msg: 'Load users list successfully!',
-        pages: users.length % process.env.PAGE_SIZE == 0 ? users.length / process.env.PAGE_SIZE : Math.floor(users.length / process.env.PAGE_SIZE) + 1,
-        users: result
-      })
-    })
-    .catch(err => {
-      return res.status(500).json({
-        msg: 'Can not load users list',
-        error: new Error(err.message)
-      })
-    })
+  let count = await User.countDocuments({
+    username: { $ne: 'admin' },
+    $or: [
+      { fullname: { "$regex": search, "$options": "i" } },
+      { email: { "$regex": search, "$options": "i" } },
+      { phone: { "$regex": search, "$options": "i" } },
+      { username: { "$regex": search, "$options": "i" } },
+    ]
+  });
+
+  return res.status(200).json({
+    msg:`Load users list successfully!`,
+    pageSize,
+    users,
+    pages:count%pageSize == 0? count/pageSize: Math.floor(count/pageSize)+1
+  })
+
+
 })
 
 router.get('/list', authenticateAdminToken, (req, res) => {
@@ -246,7 +253,7 @@ router.post("/login", (req, res) => {
       if (chk > -1) {
 
         let u = {
-          _id: user._id               
+          _id: user._id
         };
 
         const accessToken = generateAccessToken(u);

@@ -34,6 +34,8 @@
           <th scope="col">Phone</th>
           <th scope="col">Email</th>
           <th scope="col">Address</th>
+          <th scope="col">Level</th>
+          <th scope="col">Group</th>
           <th scope="col">Status</th>
           <th></th>
         </tr>
@@ -43,6 +45,9 @@
   </div>
 
 </div>
+<ul class="pagination pagination-sm" id="pagination">
+
+</ul>
 
 
 
@@ -158,15 +163,18 @@
         },
         success: function (data, textStatus, xhr) {
           $('#tblUsers').empty();
-          let idx = 1;
+          let idx = (page - 1) * data.pageSize;
           Pagination(data.pages);
+
           data.users.forEach(user => {
             let tr = '<tr id="' + user._id + '">';
-            tr += '<td>' + (idx++) + '</td>';
+            tr += '<td>' + (++idx) + '</td>';
             tr += '<td class = "font-weight-bold text-info">' + user.fullname + '</td>';
             tr += '<td>' + user.phone + '</td>';
             tr += '<td>' + user.email + '</td>';
             tr += '<td>' + user.address + '</td>';
+            tr += '<td class="font-weight-bold text-primary">' + user.user_level.name + '</td>';
+            tr += '<td class="font-weight-bold text-warning">' + user.user_group.name + '</td>';
 
 
             if (user.is_active) {
@@ -176,10 +184,10 @@
             }
 
             tr += '<td class="text-right">';
-            tr += '<button class="btn btn-sm btn-info" name="btnUserInfo"><i class="fa fa-info-circle" aria-hidden="true"></i></button>';
+            tr += '<button class="btn btn-xs btn-info" name="btnUserInfo"><i class="fa fa-info-circle" aria-hidden="true"></i></button>';
             if (!user.is_admin) {
-              tr += '<button class="btn btn-sm btn-warning ml-1" name="btnEditUser"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
-              tr += '<button class="btn btn-sm btn-danger ml-1" name="btnDelUser"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+              tr += '<button class="btn btn-xs btn-warning ml-1" name="btnEditUser"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+              tr += '<button class="btn btn-xs btn-danger ml-1" name="btnDelUser"><i class="fa fa-trash" aria-hidden="true"></i></button>';
             }
             tr += '</td>';
 
@@ -202,15 +210,20 @@
       })
       $('#tblUsers tr').click(function (e) {
         userId = $(this).find('a').attr('href');
-        console.log(userId);
       })
     })
 
     function Pagination(pages) {
       $('#pagination').empty();
       for (i = 1; i <= pages; i++) {
-        let li = '<li class="page-item"><a class="page-link" href="#">1</a></li>';
+        let li = '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>';
         $('#pagination').append(li);
       }
     }
+
+    $(document).on("click", "#pagination li", function (e) {
+        e.preventDefault();
+        page = $(this).find('a').text();
+        LoadUsers();
+      })
   </script>
