@@ -94,7 +94,11 @@
                     ccId
                 },
                 success: function (data) {
-                    alert(data.msg);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    })
                     LoadCC();
                     $('#btnCancelCC').click();
                 }
@@ -165,7 +169,11 @@
                     remark
                 },
                 success: function (data) {
-                    alert(data.msg);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    })
                     LoadCC();
                     $('#btnCancelCC').click();
                 },
@@ -188,7 +196,11 @@
                     remark
                 },
                 success: function (data) {
-                    alert(data.msg);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    })
                     LoadCC();
                     $('#btnCancelCC').click();
                 },
