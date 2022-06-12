@@ -169,9 +169,9 @@
         jobId
       },
       success: function (data) {
-        $('#lblCustomerFullname').text(data.job.customer.firstname + ' ' + data.job.customer.lastname);
-        $('#lblCustomerPhone').text(data.job.customer.phone);
-        $('#lblCustomerEmail').text(data.job.customer.email);
+        $('#lblCustomerFullname').text(data.job.customer.name.firstname + ' ' + data.job.customer.name.lastname);
+        $('#lblCustomerPhone').text(data.job.customer.contact.phone);
+        $('#lblCustomerEmail').text(data.job.customer.contact.email);
         $('#txtName').val(data.job.name);
         $('#txtLinkSource').val(data.job.link.input);
         $('#txtReceivedDate').val(convertISODateToTimeFormat(data.job.deadline.begin));
@@ -262,12 +262,20 @@
       },
       data: { jobId, name, input_link, received_date, delivery_date, intruction,cb,material,captureder,quantity,templates },
       success: function (data) {
-        alert(data.msg);
+        Swal.fire({
+          icon: 'success',
+          title: 'Successfully!',
+          text: data.msg
+        })
         $('#updateJobModal').modal('hide');
         LoadJobs();
       },
-      error: function (jqXHR, textStatus, errorThrown) {
-        alert(jqXHR.responseJSON.msg);
+      error: function (jqXHR, textStatus, errorThrown) {      
+        Swal.fire({
+          icon: 'error',
+          title: 'Opp.....!',
+          text: jqXHR.responseJSON.msg
+        })
       }
     })
   
