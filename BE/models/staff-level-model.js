@@ -16,7 +16,13 @@ const StaffLevelSchema = new Schema({
     users:[{
         type:Schema.Types.ObjectId,
         ref:'user'
-    }]   
+    }],
+    levels:[
+        {
+            type:Schema.Types.ObjectId,
+            ref:'job_level'
+        }
+    ]   
     
 });
 

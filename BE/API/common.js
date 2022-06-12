@@ -5,7 +5,6 @@ const User = require('../models/user-model');
 const jwt = require("jsonwebtoken");
 const Job = require('../models/job-model');
 const Task = require('../models/task-model');
-const StaffJobLevel = require('../models/staff-job-level-model');
 const Customer = require('../models/customer-model');
 
 

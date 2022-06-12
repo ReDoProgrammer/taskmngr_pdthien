@@ -1,6 +1,5 @@
 const Job = require('../../models/job-model');
 const Task = require('../../models/task-model');
-const StaffJobLevel = require('../../models/staff-job-level-model');
 const ObjectId = require('mongodb').ObjectId;
 const _MODULE = 'EDITOR';
 const {

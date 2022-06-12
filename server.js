@@ -227,7 +227,6 @@ const apiAdminRootLevel = require('./BE/API/admin/api-root-level');
 const apiAdminSize = require('./BE/API/admin/api-size');
 const apiAdminStaffLevel = require('./BE/API/admin/api-staff-level');
 const apiAdminStatus = require('./BE/API/admin/api-status');
-const apiAdminStaffJobLevel = require('./BE/API/admin/api-staff-job-level');
 const apiAdminStyle = require('./BE/API/admin/api-style');
 const apiAdminTemplate = require('./BE/API/admin/api-template');
 const apiAdminUserGroup = require('./BE/API/admin/api-user-group');
@@ -368,7 +367,6 @@ app.use('/admin/parents-level',apiAdminParentsLevel);
 app.use('/admin/root-level',apiAdminRootLevel);
 app.use('/admin/size',apiAdminSize);//quản lý thông tin kích thước file hình ảnh 
 app.use('/admin/staff-level',apiAdminStaffLevel);//quản lý level của nhân viên, phân loại nhân viên: người mới, tập sự, học việc,...
-app.use('/admin/staff-job-level',apiAdminStaffJobLevel);//quản lý level của nhân viên tuơng ứng với các job level có thể làm
 app.use('/admin/status',apiAdminStatus);//trạng thái của đơn hàng, tạm thời không sử dụng tới
 app.use('/admin/style',apiAdminStyle);//style này tạm thời chưa sử dụng tới
 app.use('/admin/template',apiAdminTemplate);

@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const StaffLevel = require('../../models/staff-level-model');
 const UserGroup = require('../../models/user-group-model');
-const StaffJobLevel = require('../../models/staff-job-level-model');
+
 
 
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
