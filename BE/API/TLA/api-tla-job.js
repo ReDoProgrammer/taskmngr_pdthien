@@ -32,12 +32,12 @@ router.get('/detail',authenticateTLAToken,(req,res)=>{
 
     let {id} = req.query;
     Job.findById(id)
-    .populate({path:'customer',populate:({path:'cloud', select:'name -_id'})})   
-    .populate({path:'customer',populate:({path:'color',select:'name -_id'})})       
-    .populate({path:'customer',populate:({path:'nation',select:'name -_id'})})       
-    .populate({path:'customer',populate:({path:'output',select:'name -_id'})})       
-    .populate({path:'customer',populate:({path:'size',select:'name -_id'})})      
-    .populate({path:'links',populate:({path:'created_by',select:'fullname'})})  
+    .populate({path:'customer',populate:({path:'style.cloud', select:'name -_id'})})   
+    .populate({path:'customer',populate:({path:'style.color',select:'name -_id'})})       
+    .populate({path:'customer',populate:({path:'style.nation',select:'name -_id'})})       
+    .populate({path:'customer',populate:({path:'style.output',select:'name -_id'})})       
+    .populate({path:'customer',populate:({path:'style.size',select:'name -_id'})})      
+    .populate({path:'links',populate:({path:'created.by',select:'fullname'})})  
     .exec()
     .then(job=>{
         if(!job){
