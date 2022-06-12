@@ -53,7 +53,7 @@
             LoadCustomers();
         });
 
-        $('#btnSearch').click(function(){
+        $('#btnSearch').click(function () {
             search = $('#txtSearch').val();
             LoadCustomers();
         })
@@ -66,30 +66,31 @@
 
         $(document).on("click", "button[name='btnAddJob']", function () {
             customerId = $(this).closest("tr").attr("id");
-            $('#txtName').val('');
-            $('#txtLinkSource').val('');
-            $('#txtReceivedDate').val('');
-            $('#txtDeliveryDate').val('');
-            $('#txaIntruction').val('');
-            $('#ckbMaterial').prop('checked', false);
-            $('#txtQuantity').val('');
-            $('#rMaterial').hide();
-
             $.ajax({
-                url: '/sale/customer/detail',
+                url: '/sale/job/check-contract',
                 type: 'get',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem("accessToken"),
                 },
-                data: {
-                    id: $(this).closest("tr").attr("id")
-                },
+                data: { customerId },
                 success: function (data) {
-                    $('#lblCustomerFullname').text(data.customer.firstname + ' ' + data.customer.lastname);
-                    $('#lblCustomerPhone').text(data.customer.phone);
-                    $('#lblCustomerEmail').text(data.customer.email);
+                    $('#txtName').val('');
+                    $('#txtLinkSource').val('');
+                    $('#txtReceivedDate').val('');
+                    $('#txtDeliveryDate').val('');
+                    $('#txaIntruction').val('');
+                    $('#ckbMaterial').prop('checked', false);
+                    $('#txtQuantity').val('');
+                    $('#rMaterial').hide();
+
+                    $('#lblCustomerFullname').text(data.customer.name.firstname + ' ' + data.customer.name.lastname);
+                    $('#lblCustomerPhone').text(data.customer.contact.phone);
+                    $('#lblCustomerEmail').text(data.customer.contact.email);
+
+                    $('#addJobModal').modal();
+
                 },
-                error: function (request, status, error) {                   
+                error: function (request, status, error) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
@@ -97,7 +98,6 @@
                     })
                 }
             })
-            $('#addJobModal').modal();
         })
 
 
@@ -141,7 +141,7 @@
                     }
 
                 },
-                error: function (request, status, error) {                   
+                error: function (request, status, error) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',

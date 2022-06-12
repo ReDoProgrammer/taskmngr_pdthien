@@ -6,7 +6,24 @@ const Material = require('../../models/material-model');
 const Combo = require('../../models/combo-model');
 const Customer = require('../../models/customer-model');
 
-
+router.get('/check-contract',authenticateSaleToken,async (req,res)=>{
+  let {customerId} = req.query;
+  let customer = await Customer.findById(customerId);
+  if(!customer){
+    return res.status(404).json({
+      msg:`Customer not found!`
+    })
+  }
+  if(customer.contracts.length == 0){
+    return res.status(303).json({
+      msg:`Can not add job into this customer when contract has been not initialized. Please contact your administrator or accountant to set it!`
+    })
+  }
+  return res.status(200).json({
+    msg:`Available to add job into this customer!`,
+    customer
+  })
+})
 router.get('/detail', authenticateSaleToken, (req, res) => {
   let { jobId } = req.query;
   Job
