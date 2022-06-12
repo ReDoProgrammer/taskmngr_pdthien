@@ -2,151 +2,127 @@ const router = require('express').Router();
 const FileFormat = require('../../models/file-format-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
-router.delete('/', authenticateAdminToken, (req, res) => {
+router.delete('/', authenticateAdminToken, async (req, res) => {
     let id = req.body.id;
-    FileFormat.findOneAndDelete({ _id: id }, (err, ff) => {
-        if (err) {
-            return res.status(500).json({
-                msg: 'Xóa định dạng file thất bại!',
-                error: new Error(err.message)
-            });
-        }
+    let ff = await FileFormat.findById(id);
+    if (!ff) {
+        return res.status(404).json({
+            msg: `File format not found!`
+        });
+    }
 
-        if (ff) {
+    await ff.delete()
+        .then(_ => {
             return res.status(200).json({
-                msg: 'Xóa định dạng file thành công!'
-            });
-        } else {
-            return res.status(404).json({
-                msg: 'Lỗi không tìm thấy định dạng tương ứng!'
-            });
-        }
-
-    })
+                msg: `The file format has been deleted!`
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not delete this file format with error: ${new Error(err.message)}`
+            })
+        })
 })
 
-router.get('/', (req, res) => {
-    FileFormat.find({}, (err, ffs) => {
-        if (err) {
-            return res.status(500).json({
-                msg: 'load danh sách định dạng file thất bại!'
-            });
-        }
-
-        return res.status(200).json({
-            msg: 'Lấy danh sách định dạng file thành công!',
-            ffs: ffs
-        });
+router.get('/', async (req, res) => {
+    let ffs = await FileFormat.find({});
+    return res.status(200).json({
+        msg: 'Load file format list successfully!',
+        ffs: ffs
     });
 });
 
-router.get('/type',(req,res)=>{
-    let {is_input} = req.query;
+router.get('/type', async (req, res) => {
+    let { is_input } = req.query;
 
-    FileFormat.find({}, (err, ffs) => {
-        if (err) {
-            return res.status(500).json({
-                msg: `Lấy danh sách định dạng file ${is_input==true?'đầu vào':'đầu ra'} thất bại!`
-            });
-        }
-
-        return res.status(200).json({
-            msg: `Lấy danh sách định dạng file ${is_input==true?'đầu vào':'đầu ra'} thành công!`,
-            ffs: ffs
-        });
-    });
+    let ffs = await FileFormat.find({ is_input })
+    return res.status(200).json({
+        msg: `Load file format list based on type successfully!`,
+        ffs
+    })
 })
 
-router.get('/detail', authenticateAdminToken, (req, res) => {
+router.get('/detail', authenticateAdminToken, async (req, res) => {
     let { id } = req.query;
-    FileFormat.findById(id, (err, ff) => {        
-        if (err) {
-            return res.status(500).json({
-                msg: 'Lấy thông tin định dạng file thất bại!',
-                error: new Error(err.message)
-            });
-        }
-        if (ff) {
-            return res.status(200).json({
-                msg: 'Lấy thông tin định dạng file thành công!',
-                ff: ff
-            })
-        } else {
-            return res.status(404).json({
-                msg: 'Không tìm thấy định dạng file tương ứng!'
-            });
-        }
+    let ff = await FileFormat.findById(id);
+    if (!ff) {
+        return res.status(404).json({
+            msg: `File format not found!`
+        })
+    }
+    return res.status(200).json({
+        msg: `Load file format detail successfully!`,
+        ff
     })
 })
 
 
-router.post('/', authenticateAdminToken, (req, res) => {
-    let { name, description,is_input } = req.body;
+router.post('/', authenticateAdminToken, async (req, res) => {
+    let { name, description, is_input } = req.body;
 
 
     //ràng buộc dữ liệu cho đầu vào tên level
     if (name.length == 0) {
         return res.status(403).json({
-            msg: 'Vui lòng nhập tên định dạng file'
+            msg: 'File format name can not be blank'
         });
     }
 
     let ff = new FileFormat({
         name: name,
         description,
-        is_input        
+        is_input
     });
-    ff.save()
+    await ff.save()
         .then(ff => {
             return res.status(201).json({
-                msg: 'Thêm mới định dạng file thành công!',
+                msg: 'File format has been created!',
                 ff: ff
             });
         })
         .catch(err => {
             return res.status(500).json({
-                msg: 'Thêm mới định dạng file thất bại!',
+                msg: `Can not add new file format with error: ${new Error(err.message)}`,
                 error: new Error(err.message)
             });
         })
 })
 
-router.put('/', authenticateAdminToken, (req, res) => {
-    let { id, name, description,is_input } = req.body;
+router.put('/', authenticateAdminToken, async (req, res) => {
+    let { id, name, description, is_input } = req.body;
 
-  
+
     //ràng buộc dữ liệu cho đầu vào tên level
     if (name.length == 0) {
         return res.status(403).json({
-            msg: 'Vui lòng nhập tên định dạng file'
+            msg: `File format name can not be blank!`
         });
     }
 
+    let ff = await FileFormat.findById(id);
+    if (!ff) {
+        return res.status(404).json({
+            msg: `File format not found!`
+        })
+    }
+    ff.name = name;
+    ff.description = description;
+    ff.is_input = is_input;
 
-
-    FileFormat.findOneAndUpdate({ _id: id }, {
-        name,
-        description,
-        is_input     
-    }, { new: true }, (err, ff) => {
-        if (err) {
-            return res.status(500).json({
-                msg: 'Cập nhật thông tin định dạng file thất bại!',
-                error: new Error(err.message)
-            });
-        }
-
-        if (ff) {
+    await ff.save()
+        .then(_ => {
             return res.status(200).json({
-                msg: 'Cập nhật thông tin định dạng file thành công!',
-                ff: ff
-            });
-        } else {
+                msg: `File format has been updated!`
+            })
+        })
+        .catch(err => {
             return res.status(500).json({
-                msg: 'Cập nhật thông tin định dạng file thất bại!'
-            });
-        }
-    })
+                msg: `Can not update file format with error: ${new Error(err.message)}`
+            })
+        })
+
+
+
 })
 
 module.exports = router;

@@ -17,8 +17,10 @@
                     <div class="form-group col-md-6">
                         <label for="">Type</label>
                         <div class="form-check mt-1">
-                            <input class="form-check-input" type="checkbox" id="ckbInputFileFormat" value="option2" checked>
-                            <label class="form-check-label text-success font-weight-bold" for="inlineCheckbox2">Input file format</label>
+                            <input class="form-check-input" type="checkbox" id="ckbInputFileFormat" value="option2"
+                                checked>
+                            <label class="form-check-label text-success font-weight-bold" for="inlineCheckbox2">Input
+                                file format</label>
                         </div>
                     </div>
                 </div>
@@ -27,7 +29,7 @@
                         <label for="Description">Description</label>
                         <input type="text" name="" id="txtDescription" class="form-control">
                     </div>
-                </div>               
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -52,13 +54,17 @@
                     authorization: "Bearer " + localStorage.getItem('accessToken'),
                 },
                 data: {
-                    id:ffId,
+                    id: ffId,
                     name,
                     description,
                     is_input
                 },
                 success: function (data, textStatus, xhr) {
-                    alert(data.msg);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
                     $('#modalFileFormat').modal('hide');
                     ffId = '';
                 }, error: function (jqXHR, textStatus, errorThrown) {
@@ -78,7 +84,11 @@
                     is_input
                 },
                 success: function (data, textStatus, xhr) {
-                    alert(data.msg);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
                     $('#modalFileFormat').modal('hide');
                     ffId = '';
                 }, error: function (jqXHR, textStatus, errorThrown) {
