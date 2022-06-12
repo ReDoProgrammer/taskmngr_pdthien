@@ -101,36 +101,6 @@ const checkAccount = (username, password) => {
 
 
 
-//hàm lấy quyền truy cập module
-
-const getRole = (moduleId, userId) => {
-    return new Promise((resolve, reject) => {
-
-        UserModule.countDocuments({ user: userId, module: moduleId }, (err, count) => {
-            if (err) {
-                return reject({
-                    code: 500,
-                    msg: `Can not check user module role with error: ${new Error(err.message)}`
-                })
-            }
-            if (count == 0) {
-                return reject({
-                    code: 403,
-                    msg: `You can not access this module`
-                })
-            }
-            return resolve({
-                code: 200,
-                msg: `You can access this module`
-            })
-        })
-
-
-
-    })
-}
-
-
 //hàm trả về module từ tên module
 const getModule = (_module) => {
     return new Promise((resolve, reject) => {
@@ -376,7 +346,6 @@ const GetJobLevelsByStaffLevel = (staffLevel) => {
 
 module.exports = {
     generateAccessToken,
-    getRole,
     getModule,
     getWage,
     checkAccount,

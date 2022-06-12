@@ -239,38 +239,28 @@ router.post("/login", (req, res) => {
   let { username, password } = req.body;
 
   Promise.all([getModule(_MODULE), checkAccount(username, password)])
-    .then(result => {
+    .then(async rs => {
+      let m = rs[0];
+      let user = rs[1];
+      let chk = m.users.indexOf(user._id);
+      if (chk > -1) {
 
-      getRole(result[0]._id, result[1]._id)
-        .then(chk => {
-          console.log(chk);
-          if (chk) {
-            let user = result[1];
-            let u = {
-              _id: user._id,
-              is_admin: true
-            };
+        let u = {
+          _id: user._id        
+        };
 
-            const accessToken = generateAccessToken(u);
-            const refreshToken = jwt.sign(u, process.env.REFRESH_TOKEN_SECRET);
+        const accessToken = generateAccessToken(u);
+        const refreshToken = jwt.sign(u, process.env.REFRESH_TOKEN_SECRET);
 
-            refershTokens.push(refreshToken);
-            return res.status(200).json({
-              msg: 'Admin login successfully!',
-              url: '/admin',
-              accessToken: accessToken,
-              refreshToken: refreshToken
-            });
+        refershTokens.push(refreshToken);
+        return res.status(200).json({
+          msg: 'Admin login successfully!',
+          url: '/admin',
+          accessToken: accessToken,
+          refreshToken: refreshToken
+        });
+      }
 
-          }
-
-        })
-        .catch(err => {
-          console.log(err);
-          return res.status(err.code).json({
-            msg: err.message
-          })
-        })
     })
     .catch(err => {
       return res.status(err.code).json({

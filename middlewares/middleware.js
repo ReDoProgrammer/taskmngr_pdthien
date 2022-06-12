@@ -1,7 +1,7 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const _MODULE = 'ADMIN';
-const {getModuleId} = require('../middlewares/common');
+const { getModule } = require('../middlewares/common');
 
 
 
@@ -12,7 +12,7 @@ function authenticateAdminToken(req, res, next) {
     msg: `Lỗi xác thực tài khoản. token null`
   });
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
     if (err) {
       console.log('got an error when veryfy account: ', new Error(err.message));
 
@@ -22,26 +22,13 @@ function authenticateAdminToken(req, res, next) {
 
     }
 
-    getModuleId(_MODULE)
-      .then(result => {
+    getModule(_MODULE)
+      .then(m => { 
         
-        UserModule
-          .countDocuments({ user: user._id, module: result.mod._id }, (err, count) => {
-            if (err) {
-              return res.status(500).json({
-                msg: `Can not check user module with error: ${new Error(err.message)}`
-              })
-            }
-
-            if (count == 0) {
-              return res.status(403).json({
-                msg: `You can not access this module`
-              })
-            }
-            req.user = user;
-            next();
-          })
-
+        if(m.users.includes(user._id)){
+          req.user =user;
+          next();
+        }
       })
       .catch(err => {
         console.log(err);
