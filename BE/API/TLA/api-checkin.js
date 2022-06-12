@@ -3,7 +3,6 @@ const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const CheckIn = require('../../models/staff-checkin');
 const User = require('../../models/user-model');
 const Module = require('../../models/module-model');
-const UserModule = require('../../models/user-module-model');
 const { ObjectId } = require('mongodb');
 
 router.put('/', authenticateTLAToken, async (req, res) => {
@@ -155,20 +154,7 @@ const GetCheckInList = (users) => {
 
 const GetUsersByModule = (moduleId) => {
     return new Promise((resolve, reject) => {
-        UserModule
-            .find({ module: moduleId })
-            .then(um => {
-                let users = um.map(x => {
-                    return x.user;
-                });
-                return resolve(users);
-            })
-            .catch(err => {
-                return reject({
-                    code: 500,
-                    msg: `Can not get users by module id with error: ${new Error(err.message)}`
-                })
-            })
+   
     })
 }
 

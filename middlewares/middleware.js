@@ -1,7 +1,6 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const _MODULE = 'ADMIN';
-const UserModule = require('../BE/models/user-module-model');
 const {getModuleId} = require('../middlewares/common');
 
 

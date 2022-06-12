@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const User = require('../../models/user-model');
-const UserModule = require('../../models/user-module-model');
 const Module = require('../../models/module-model');
 const { ObjectId } = require('mongodb');
 

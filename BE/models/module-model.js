@@ -24,7 +24,13 @@ const moduleSchema = new Schema({
     appling_wage:{
         type:Boolean,
         default:false
-    }    
+    },
+    users:[
+        {
+            type:Schema.Types.ObjectId,
+            ref:'user'
+        }
+    ]    
     
 });
 

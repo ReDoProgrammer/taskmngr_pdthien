@@ -1,7 +1,6 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const _MODULE = 'EDITOR';
-const UserModule = require('../BE/models/user-module-model');
 const {getModuleId} = require('../middlewares/common');
 
 function authenticateEditorToken(req, res, next) {

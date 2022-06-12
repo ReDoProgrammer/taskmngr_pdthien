@@ -1,7 +1,6 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const _MODULE = 'ACCOUNTANT';
-const UserModule = require('../BE/models/user-module-model');
 const {getModuleId} = require('./common');
 
 function authenticateAccountantToken(req, res, next) {

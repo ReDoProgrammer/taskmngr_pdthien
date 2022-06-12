@@ -230,7 +230,6 @@ const apiAdminStatus = require('./BE/API/admin/api-status');
 const apiAdminStyle = require('./BE/API/admin/api-style');
 const apiAdminTemplate = require('./BE/API/admin/api-template');
 const apiAdminUserGroup = require('./BE/API/admin/api-user-group');
-const apiAdminUserModuleRole = require('./BE/API/admin/api-user-module');
 const apiAdminUser = require('./BE/API/admin/api-user');
 
 
@@ -370,7 +369,7 @@ app.use('/admin/status',apiAdminStatus);//trạng thái của đơn hàng, tạm
 app.use('/admin/style',apiAdminStyle);//style này tạm thời chưa sử dụng tới
 app.use('/admin/template',apiAdminTemplate);
 app.use('/admin/user-group',apiAdminUserGroup);//quản lý nhóm nhân viên: người nhà, người dưng,....
-app.use('/admin/user-module',apiAdminUserModuleRole);//quản lý quyền truy cập module của từng user
+
 
 
 
