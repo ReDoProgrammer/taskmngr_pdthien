@@ -12,6 +12,12 @@ const UserGroupSchema = new Schema({
         type: String,
         default: ''
     },   
+    users:[
+        {
+            type:Schema.Types.ObjectId,
+            ref:'user'
+        }
+    ],
     wages: [{
         module:{
             type:Schema.Types.ObjectId,

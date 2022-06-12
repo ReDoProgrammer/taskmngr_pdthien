@@ -43,41 +43,7 @@ router.get('/', authenticateAdminToken, async (req, res) => {
 
 router.get('/list-by-job-level', authenticateAdminToken, (req, res) => {
     let { jobLevelId } = req.query;
-    StaffJobLevel
-        .find({
-            job_lv: jobLevelId
-        })
-        .exec()
-        .then(sjl => {
-            let staffLevelIds = sjl.map(e => {
-                return e.staff_lv
-            })
-
-            StaffLevel
-                .find({
-                    _id: { $in: staffLevelIds }
-                })
-                .exec()
-                .then(sl => {
-                    console.log(sl);
-                    return res.status(200).json({
-                        msg: `Load staff level with job level successfully!`,
-                        sl
-                    })
-                })
-                .catch(err => {
-                    console.log(`Can not load staff level with job level id in caught error: ${new Error(err.message)}`);
-                    return res.status(500).json({
-                        msg: `Can not load staff level with job level id in caught error: ${new Error(err.message)}`
-                    })
-                })
-        })
-        .catch(err => {
-            console.log(`Can not load staff job level with joblevelid caught error: ${new Error(err.message)} `);
-            return res.status(500).json({
-                msg: `Can not load staff job level with joblevelid caught error: ${new Error(err.message)} `
-            })
-        })
+    
 })
 
 router.get('/list-by-user-group', authenticateAdminToken, (req, res) => {

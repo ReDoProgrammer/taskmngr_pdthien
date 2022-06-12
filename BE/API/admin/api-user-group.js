@@ -2,42 +2,39 @@ const router = require('express').Router();
 const UserGroup = require('../../models/user-group-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
-router.delete('/', authenticateAdminToken, (req, res) => {
-    let id = req.body.id;
-    UserGroup.findOneAndDelete({ _id: id }, (err, ut) => {
-        if (err) {
-            return res.status(500).json({
-                msg: 'Delete user type failed!',
-                error: new Error(err.message)
-            });
-        }
+router.delete('/', authenticateAdminToken, async (req, res) => {
+    let {ugId} = req.body;
+    let ug = await UserGroup.findById(ugId);
+    if (!ug) {
+        return res.status(404).json({
+            msg: `User group not found!`
+        })
+    }
+    if (ug.users.length > 0) {
+        return res.status(303).json({
+            msg: `Can not delete this group when having users belong to it!`
+        })
+    }
 
-        if (ut) {
+    await ug.delete()
+        .then(_ => {
             return res.status(200).json({
-                msg: 'User type was deleted successfully!'
-            });
-        } else {
-            return res.status(404).json({
-                msg: 'User type can not found!'
-            });
-        }
-
-    })
+                msg: `User group has been deleted!`
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not delete this user group with error: ${new Error(err.message)}`
+            })
+        })
 })
 
-router.get('/list', (req, res) => {
-    UserGroup.find({}, (err, uts) => {
-        if (err) {
-            return res.status(500).json({
-                msg: 'load user group types failed'
-            });
-        }
-
-        return res.status(200).json({
-            msg: 'Load user types successfully!',
-            uts: uts
-        });
-    });
+router.get('/list', async (req, res) => {
+    let ugs = await UserGroup.find({});
+    return res.status(200).json({
+        msg: `Load user groups successfully!`,
+        ugs
+    })
 });
 
 router.get('/detail', authenticateAdminToken, (req, res) => {
@@ -90,7 +87,7 @@ router.post('/', authenticateAdminToken, (req, res) => {
 
     let ut = new UserGroup({
         name,
-        description       
+        description
     });
     ut.save()
         .then(ug => {

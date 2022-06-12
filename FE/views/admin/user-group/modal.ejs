@@ -1,4 +1,4 @@
-<div class="modal" tabindex="-1" id="modalUserType">
+<div class="modal" tabindex="-1" id="modalUserGroup">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -17,7 +17,7 @@
             <label for="">Description</label>
             <input type="text" name="txtDescription" id="txtDescription" class="form-control"
               placeholder="Description" />
-          </div>         
+          </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -63,11 +63,15 @@
         data: {
           id: ugId,
           name,
-          description         
+          description
         },
         success: function (data, textStatus, xhr) {
-          alert(data.msg);
-          $("#modalUserType").modal("hide");
+          Swal.fire({
+            icon: 'success',
+            title: 'Successfully',
+            text: data.msg
+          })
+          $("#modalUserGroup").modal("hide");
           ugId = "";
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -83,11 +87,15 @@
         },
         data: {
           name,
-          description        
+          description
         },
         success: function (data, textStatus, xhr) {
-          alert(data.msg);
-          $("#modalUserType").modal("hide");
+          Swal.fire({
+            icon: 'success',
+            title: 'Successfully',
+            text: data.msg
+          });
+          $("#modalUserGroup").modal("hide");
           ugId = "";
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -103,6 +111,9 @@
     $.ajax({
       url: "/admin/staff-level",
       type: "get",
+      headers: {
+        authorization: "Bearer " + localStorage.getItem('accessToken'),
+      },
       success: function (data, textStatus, xhr) {
         $("#slLevel").empty();
         data.levels.forEach((level) => {
