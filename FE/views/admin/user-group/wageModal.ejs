@@ -11,31 +11,26 @@
                                 <label for="recipient-name" class="col-form-label">Role:</label>
                                 <select name="" id="slModule" class="form-control"></select>
                             </div>
-
-
-                            <div class="form-group col-md-6 col-sm-6 col-xs-12">
-                                <label for="recipient-name" class="col-form-label">Job level:</label>
-                                <select name="" id="slJobLevel" class="form-control"></select>
-                            </div>
-
-                        </div>
-
-                        <div class="form-row">
                             <div class="form-group col-md-6 col-sm-6 col-xs-12">
                                 <label for="recipient-name" class="col-form-label">Staff level:</label>
                                 <select name="" id="slStaffLevels" class="form-control"></select>
                             </div>
+                        </div>
 
+                        <div class="form-row">
+                            <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                                <label for="recipient-name" class="col-form-label">Local job level:</label>
+                                <select name="" id="slJobLevel" class="form-control"></select>
+                            </div>
                             <div class="form-group col-md-2 col-sm-2 col-xs-6">
                                 <label for="recipient-name" class="col-form-label">Wage:</label>
                                 <input type="text" class="form-control text-right" id="txtWage" value="0" />
                             </div>
-
                             <div class="form-group col-md-2 col-sm-2 col-xs-4 text-right">
                                 <label for="recipient-name" class="col-form-label"></label><br>
                                 <button class="btn btn-sm btn-success mt-1" id="btnSubmitWage">
                                     <i class="fa fa-floppy-o"></i>
-                                    Save
+                                    Add wage
                                 </button>
                             </div>
 
@@ -85,13 +80,13 @@
             var _id = '';
             $(document).ready(function () {
                 LoadModule();
-                LoadJobLevels();
+                LoadStaffLevels();
                 $('#lblError').hide();
             })
 
             $("#slModule").change(function () {
                 LoadWages();
-            }); 
+            });
 
 
             $("#tblWages").on("click", "button[name='deleteWage']", function () {
@@ -159,13 +154,12 @@
 
 
 
-            $('#modalWage').on('shown.bs.modal', function (e) {               
+            $('#modalWage').on('shown.bs.modal', function (e) {
                 $('#lblError').text('');
                 $('#lblError').hide();
                 $('#txtWage').text('0');
-
                 moduleId = $('#slModule option:selected').val();
-                        LoadWages();
+                LoadWages();
             })
 
 
@@ -206,65 +200,39 @@
                 }
 
 
+                $.ajax({
+                    url: '/admin/user-group/push-wage',
+                    type: 'put',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem('accessToken'),
+                    },
+                    data: {
+                        ugId,
+                        module: $('#slModule option:selected').val(),
+                        staff_lv,
+                        job_lv,
+                        wage
+                    },
+                    success: function (data) {
+                        alert(data.msg);
+                        LoadWages();
+                        $('#btnCancel').click();
+                        $('#txtWage').text('0');
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('#lblError').text(jqXHR.responseJSON.msg);
+                        $('#lblError').show();
+                    }
 
+                })
 
-                if (_id.trim().length > 0) {//update exist record
-                    $.ajax({
-                        url: '/admin/user-group-wage',
-                        type: 'put',
-                        headers: {
-                            authorization: "Bearer " + localStorage.getItem('accessToken'),
-                        },
-                        data: {
-                            _id,
-                            user_group: ugId,
-                            staff_lv,
-                            job_lv,
-                            wage
-                        },
-                        success: function (data) {
-                            alert(data.msg);
-                            LoadWages();
-                            $('#btnCancel').click();
-                            $('#txtWage').text('0');
-                        },
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            $('#lblError').text(jqXHR.responseJSON.msg);
-                            $('#lblError').show();
-                        }
-
-                    })
-                } else {
-                    $.ajax({
-                        url: '/admin/user-group-wage',
-                        type: 'post',
-                        headers: {
-                            authorization: "Bearer " + localStorage.getItem('accessToken'),
-                        },
-                        data: {
-                            module,
-                            user_group: ugId,
-                            staff_lv,
-                            job_lv,
-                            wage
-                        },
-                        success: function (data) {
-                            LoadWages();
-                            $('#txtWage').text('0');
-                        },
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            $('#lblError').text(jqXHR.responseJSON.msg);
-                            $('#lblError').show().delay(3000).fadeOut();
-                        }
-                    })
-                }
             })
 
 
             function LoadWages() {
 
                 $.ajax({
-                    url: '/admin/user-group-wage',
+                    url: '/admin/user-group/list-wage',
                     type: 'get',
                     headers: {
                         authorization: "Bearer " + localStorage.getItem('accessToken'),
@@ -310,46 +278,53 @@
                 }
             });
 
-
-
-            $("#slJobLevel").change(function () {
-                LoadStaffLevels($('#slJobLevel option:selected').val());
+            $("#txtWage").focusout(_ => {
+                if ($("#txtWage").val().trim().length === 0) {
+                    $("#txtWage").val('0');
+                }
             })
 
 
 
-            function LoadJobLevels() {
+            $('#slStaffLevels').change(function () {
+                LoadJobLevelsBasedOnStaffLevel();
+            })
+
+
+            function LoadStaffLevels() {
                 $.ajax({
-                    url: '/admin/job-level',
+                    url: '/admin/staff-level',
                     type: 'get',
                     headers: {
                         authorization: "Bearer " + localStorage.getItem('accessToken'),
                     },
                     success: function (data) {
-                        data.jl.forEach(l => {
-                            let opt = '<option value="' + l._id + '">' + l.name + '</option>';
-                            $('#slJobLevel').append(opt);
-                        })                       
-                        LoadStaffLevels($('#slJobLevel option:selected').val());
+                        $('#slStaffLevels').empty();
+                        data.levels.forEach(l => {
+                            let lvNames = (l.levels.map(x => x.name)).toString();
+                            let opt = '<option value="' + l._id + '">' + l.name + ' [ ' + lvNames + ' ] </option>';
+                            $('#slStaffLevels').append(opt);
+                        });
+                        LoadJobLevelsBasedOnStaffLevel();
                     }
                 })
             }
 
-            function LoadStaffLevels(jobLevelId) {
+            function LoadJobLevelsBasedOnStaffLevel() {
                 $.ajax({
-                    url: '/admin/staff-level/list-by-job-level',
+                    url: '/admin/staff-level/get-jobs',
                     type: 'get',
                     headers: {
                         authorization: "Bearer " + localStorage.getItem('accessToken'),
                     },
                     data: {
-                        jobLevelId
+                        levelId: $('#slStaffLevels option:selected').val()
                     },
                     success: function (data) {
-                        $('#slStaffLevels').empty();
-                        data.sl.forEach(l => {
+                        $('#slJobLevel').empty();
+                        data.levels.forEach(l => {
                             let opt = '<option value="' + l._id + '">' + l.name + '</option>';
-                            $('#slStaffLevels').append(opt);
+                            $('#slJobLevel').append(opt);
                         })
                     }
                 })
@@ -369,7 +344,7 @@
                             let opt = '<option value="' + s._id + '">' + s.name + '</option>';
                             $('#slModule').append(opt);
                         })
-                       
+
                     }
                 })
             }

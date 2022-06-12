@@ -3,7 +3,7 @@ const UserGroup = require('../../models/user-group-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 router.delete('/', authenticateAdminToken, async (req, res) => {
-    let {ugId} = req.body;
+    let { ugId } = req.body;
     let ug = await UserGroup.findById(ugId);
     if (!ug) {
         return res.status(404).json({
@@ -29,6 +29,9 @@ router.delete('/', authenticateAdminToken, async (req, res) => {
         })
 })
 
+router.get('/list-wage', authenticateAdminToken, async (req, res) => {
+
+})
 router.get('/list', async (req, res) => {
     let ugs = await UserGroup.find({});
     return res.status(200).json({
@@ -139,6 +142,47 @@ router.put('/', authenticateAdminToken, (req, res) => {
     })
 })
 
+router.put('/push-wage', authenticateAdminToken, async (req, res) => {
+    let {
+        ugId,
+        module,
+        staff_lv,
+        job_lv,
+        wage
+    } = req.body;
+    let ug = await UserGroup.findById(ugId);
+    if (!ug) {
+        return res.status(404).json({
+            msg: `User group not found!`
+        })
+    }
+
+    var chk = ug.wages.filter(x=>x.module == module && x.staff_lv == staff_lv && x.job_lv == job_lv);
+    if(chk.length>0){
+        return res.status(303).json({
+            msg:`This wage already exist in database!`
+        })
+    }
+
+    ug.wages.push({
+        module,
+        staff_lv,
+        job_lv,
+        wage        
+    });
+    await ug.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`The wage has been added!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not add this wage with error: ${new Error(err.message)}`
+        })
+    })
+
+})
 
 
 

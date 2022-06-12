@@ -41,10 +41,7 @@ router.get('/', authenticateAdminToken, async (req, res) => {
     })
 });
 
-router.get('/list-by-job-level', authenticateAdminToken, (req, res) => {
-    let { jobLevelId } = req.query;
-    
-})
+
 
 router.get('/list-by-user-group', authenticateAdminToken, (req, res) => {
     let { groupId } = req.query;
