@@ -1,63 +1,449 @@
-<div class="modal fade" id="modalCustomer" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- Modal -->
+<div id="modalCustomer" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Customer modal</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add or update customer</h4>
             </div>
             <div class="modal-body">
-                <form>                   
 
+                <div class="panel panel-info">
+                    <div class="panel-heading">Basic infomation</div>
+                    <div class="panel-body">
+                        <div class="form-row">
+                            <div class="form-group col-md-2 col-sm-6 col-xs-6">
+                                <label class="col-form-label">Firstname <span class="text-danger">(*)</span>:</label>
+                                <input type="text" class="form-control" id="txtFirstname" placeholder="Firstname" />
+                            </div>
+                            <div class="form-group col-md-2 col-sm-6 col-xs-6">
+                                <label class="col-form-label">Lastname:</label>
+                                <input type="text" class="form-control" id="txtLastname" placeholder="Lastname" />
+                            </div>
+                            <div class="form-group col-md-4 col-sm-4 col-xs-12">
+                                <label class="col-form-label">Email <span class="text-danger">(*)</span>:</label>
+                                <input type="email" class="form-control" id="txtEmail" placeholder="Email" />
+                            </div>
+                            <div class="form-group col-md-2 col-sm-4 col-xs-6">
+                                <label class="col-form-label">Password:</label>
+                                <input type="password" class="form-control" id="txtPassword" placeholder="Password"
+                                    value="123" />
+                            </div>
+                            <div class="form-group col-md-2 col-sm-4 col-xs-6">
+                                <label class="col-form-label">Confirm pwd:</label>
+                                <input type="password" class="form-control" id="txtConfirmPassword"
+                                    placeholder="Confirm password" value="123" />
+                            </div>
+                        </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-3">
-                            <label for="recipient-name" class="col-form-label">Customer name:</label>
-                            <input type="text" class="form-control" id="recipient-name">
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="recipient-name" class="col-form-label">Username:</label>
-                            <input type="text" class="form-control" id="recipient-name">
-                        </div>
-
-                        <div class="form-group col-md-3">
-                            <label for="recipient-name" class="col-form-label">Password:</label>
-                            <input type="password" class="form-control" id="recipient-name">
-                        </div>
-
-                        <div class="form-group col-md-3">
-                            <label for="recipient-name" class="col-form-label">Confirm Password:</label>
-                            <input type="password" class="form-control" id="recipient-name">
-                        </div>
-
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group col-md-3">
-                            <label for="recipient-name" class="col-form-label">Phone:</label>
-                            <input type="text" class="form-control" id="recipient-name">
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="recipient-name" class="col-form-label">Email:</label>
-                            <input type="text" class="form-control" id="recipient-name">
-                        </div>
-                        
-                        <div class="form-group offset-md-1 col-md-2">
-                            <label for="recipient-name" class="col-form-label">Status:</label>
-                            <div class="form-group form-check mt-1">
-                                <input type="checkbox" class="form-check-input" id="exampleCheck1" checked>
-                                <label class="form-check-label" for="exampleCheck1">Active</label>
+                        <div class="form-row">
+                            <div class="form-group col-md-2">
+                                <label class="col-form-label">Phone:</label>
+                                <input type="text" class="form-control" id="txtPhone" placeholder="Phone" />
+                            </div>
+                            <div class="form-group col-md-8">
+                                <label class="col-form-label">Address:</label>
+                                <input type="text" class="form-control" id="txtAddress" placeholder="Address" />
+                            </div>
+                            <div class="form-group col-md-2 col-sm-2 col-xs-6">
+                                <label for="">Status:</label>
+                                <div class="form-check mt-1">
+                                    <input class="form-check-input" type="checkbox" value="" id="ckbStatus" />
+                                    <label class="form-check-label" for="defaultCheck1">
+                                        Active
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
-                </form>
+                </div>
+
+                <div class="panel panel-primary">
+                    <div class="panel-heading font-weight-bold">Style list</div>
+                    <div class="panel-body">
+
+                        <div class="form-row">
+                            <div class="form-group col-md-3 col-sm-3 col-xs-12">
+                                <label for="">National Style</label>
+                                <select name="" id="slNationalStyle" class="form-control">
+                                    <option value="">US Style</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-2 col-sm-3 col-xs-12">
+                                <label for="">Output</label>
+                                <select name="" id="slOutput" class="form-control"></select>
+                            </div>
+                            <div class="form-group col-md-3 col-sm-6 col-xs-12">
+                                <label for="">Size</label>
+                                <select name="" id="slSize" class="form-control"></select>
+                            </div>
+
+                            <div class="form-group col-md-2 col-sm-6 col-xs-12">
+                                <label for="">Color mode</label>
+                                <select name="" id="slColorMode" class="form-control"> </select>
+                            </div>
+
+                            <div class="form-group col-md-2 col-sm-6 col-xs-12">
+                                <label for="">Cloud</label>
+                                <select name="" id="slCloud" class="form-control"></select>
+                            </div>
+
+                        </div>
+
+
+
+
+
+
+                        <div class="form-row mt-2">
+
+                            <div class="form-group col-md-3 col-sm-6 col-xs-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="ckbAlign" />
+                                    <label class="form-check-label" for="defaultCheck1"> Align </label>
+                                </div>
+                                <input type="text" name="" id="txtAlign" class="form-control"
+                                    placeholder="Align note" />
+                            </div>
+
+
+
+                            <div class="form-group col-md-2 col-sm-6 col-xs-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="ckbTV" />
+                                    <label class="form-check-label" for="defaultCheck1"> TV </label>
+                                </div>
+                                <input type="text" name="" id="txtTV" class="form-control" placeholder="TV note" />
+                            </div>
+
+                            <div class="form-group col-md-3 col-sm-4 col-xs-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="ckbGrass" />
+                                    <label class="form-check-label" for="defaultCheck1">
+                                        Grass
+                                    </label>
+                                </div>
+                                <input type="text" name="" id="txtGrass" class="form-control"
+                                    placeholder="Grass note" />
+                            </div>
+
+                            <div class="form-group col-md-2 col-sm-4 col-xs-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="ckbSky" />
+                                    <label class="form-check-label" for="defaultCheck1">
+                                        Sky
+                                    </label>
+                                </div>
+                                <input type="text" name="" id="txtSky" class="form-control" placeholder="Sky note" />
+                            </div>
+
+                            <div class="form-group col-md-2 col-sm-4 col-xs-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="ckbFire" />
+                                    <label class="form-check-label" for="defaultCheck1">
+                                        Fire
+                                    </label>
+                                </div>
+                                <input type="text" name="" id="txtFire" class="form-control" placeholder="Fire note" />
+                            </div>
+
+                        </div>
+
+                        <div class="form-row">
+
+                            <div class="form-group col-md-12">
+                                <label for="">Style note:</label>
+                                <input type="text" name="" id="txtStyleNote" class="form-control"
+                                    placeholder="Style note" />
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                </div>
+                <label for="" class="text-danger font-weight-bold" id="msgError"></label>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Submit</button>
+                <button class="btn btn-success" id="btnSubmit">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i> Submit
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
+
     </div>
 </div>
+
+
+<script src="/js/common.js"></script>
+
+<script>
+    $(document).ready(function () {
+        LoadCloud();
+        LoadColorMode();
+        LoadNationalStyle();
+        LoadOutput();
+        LoadSize();
+    })
+
+
+    $("#btnSubmit").click(function () {
+        let firstname = $("#txtFirstname").val().trim();
+        if (firstname.length == 0) {
+            $('#lblError').text("Firstname can not be blank");
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+        }
+        let lastname = $("#txtLastname").val().trim();
+        // if (lastname.length == 0) {
+        //   $('#lblError').text("Lastname can not be blank");
+        //   $('#lblError').show().delay(5000).fadeOut();
+        //   return;
+        // }
+
+        let email = $("#txtEmail").val().trim();
+        if (email.length == 0) {
+            $('#lblError').text("Email can not be blank");
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+        }
+
+        if (!isEmail(email)) {
+            $('#lblError').text("Email is not valid");
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+        }
+
+        let password = $("#txtPassword").val();
+        let confirmpassword = $("#txtConfirmPassword").val();
+        if (password.length == 0 || confirmpassword.length == 0) {
+            $('#lblError').text("Password can not be blank");
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+        }
+
+        if (password !== confirmpassword) {
+            $('#lblError').text("Password and confirm password not match!");
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+        }
+
+        let phone = $("#txtPhone").val().trim();
+
+        let address = $("#txtAddress").val().trim();
+
+        let output = $("#slOutput option:selected").val();
+        let size = $("#slSize option:selected").val();
+        let color = $("#slColorMode option:selected").val();
+        let is_align = $("#ckbAlign").is(":checked") ? true : false;
+
+        let align_note = $("#txtAlign").val().trim();
+        let cloud = $("#slCloud option:selected").val();
+        let nation = $("#slNationalStyle option:selected").val();
+        let style_note = $("#txtStyleNote").val().trim();
+
+        let has_TV = $("#ckbTV").is(":checked") ? true : false;
+        let TV_note = $("#txtTV").val().trim();
+        let has_grass = $("#ckbGrass").is(":checked") ? true : false;
+        let grass_note = $("#txtGrass").val().trim();
+        let has_sky = $("#ckbSky").is(":checked") ? true : false;
+        let sky_note = $("#txtSky").val().trim();
+        let has_fire = $("#ckbFire").is(":checked") ? true : false;
+        let fire_note = $("#txtFire").val().trim();
+
+
+        //validate as if option selected
+        if (typeof nation === 'undefined') {
+            $('#lblError').text("No national style has been selected. Please set national style list first!");
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+        }
+
+        if (typeof output === 'undefined') {
+            $('#lblError').text("No output has been selected. Please set ouput list first!");
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+        }
+
+
+
+        if (typeof size === 'undefined') {
+            $('#lblError').text("No size has been selected. Please set size list first!");
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+        }
+
+        if (typeof color === 'undefined') {
+            $('#lblError').text("No color mod has been selected. Please set color mode list first!");
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+        }
+
+        if (typeof cloud === 'undefined') {
+            $('#lblError').text("No cloud has been selected. Please set cloud list first!");
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+        }
+
+
+        if (customerId.length == 0) {
+            $.ajax({
+                url: "/accountant/customer",
+                type: "post",
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                    firstname,
+                    lastname,
+                    email,
+                    password,
+                    phone,
+                    address,
+                    output,
+                    size,
+                    color,
+                    is_align,
+                    align_note,
+                    cloud,
+                    nation,
+                    style_note,
+                    has_TV,
+                    TV_note,
+                    has_grass,
+                    grass_note,
+                    has_sky,
+                    sky_note,
+                    has_fire,
+                    fire_note
+                },
+                success: function (data) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    })
+                    $(location).attr("href", data.url);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('#msgError').text(jqXHR.responseJSON.msg);
+                    $('#msgError').show().delay(5000).fadeOut();
+
+                }
+            });
+        }
+
+
+
+    });
+
+
+
+    function LoadOutput() {
+        $.ajax({
+            url: "/accountant/file-format/type",
+            type: "get",
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                is_input: false,
+            },
+            success: function (data, textStatus, xhr) {
+                $("#slOutput").empty();
+                data.ffs.forEach((ff) => {
+                    let opt = '<option value="' + ff._id + '">' + ff.name + "</option>";
+                    $("#slOutput").append(opt);
+                });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+            },
+        });
+    }
+
+    function LoadSize() {
+        $.ajax({
+            url: "/accountant/size",
+            type: "get",
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            success: function (data, textStatus, xhr) {
+                $("#slSize").empty();
+                data.sizes.forEach((size) => {
+                    let opt =
+                        '<option value="' + size._id + '">' + size.name + "</option>";
+                    $("#slSize").append(opt);
+                });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+            },
+        });
+    }
+
+    function LoadColorMode() {
+        $.ajax({
+            url: "/accountant/color-mode",
+            type: "get",
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            success: function (data, textStatus, xhr) {
+                $("#slColorMode").empty();
+                data.cms.forEach((cm) => {
+                    let opt = '<option value="' + cm._id + '">' + cm.name + "</option>";
+                    $("#slColorMode").append(opt);
+                });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+            },
+        });
+    }
+
+    function LoadCloud() {
+        $.ajax({
+            url: "/accountant/cloud",
+            type: "get",
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            success: function (data, textStatus, xhr) {
+                $("#slCloud").empty();               
+                data.clouds.forEach((cl) => {
+                    let opt = '<option value="' + cl._id + '">' + cl.name + "</option>";
+                    $("#slCloud").append(opt);
+                });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+            },
+        });
+    }
+
+    function LoadNationalStyle() {
+        $.ajax({
+            url: "/accountant/national-style",
+            type: "get",
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            success: function (data, textStatus, xhr) {
+                $("#slNationalStyle").empty();
+                data.nss.forEach((s) => {
+                    let opt = '<option value="' + s._id + '">' + s.name + "</option>";
+                    $("#slNationalStyle").append(opt);
+                });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+            },
+        });
+    }
+</script>
