@@ -49,7 +49,6 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th>#</th>
-                                    <th scope="col">Role</th>
                                     <th scope="col">Job Level</th>
                                     <th scope="col">Staff Level</th>
                                     <th scope="col" class="text-right">Wage</th>
@@ -77,7 +76,7 @@
         </div>
 
         <script>
-            var _id = '';
+
             $(document).ready(function () {
                 LoadModule();
                 LoadStaffLevels();
@@ -90,65 +89,45 @@
 
 
             $("#tblWages").on("click", "button[name='deleteWage']", function () {
-                let _id = $(this).closest("tr").attr("id");
-                var r = confirm(
-                    "Are you sure want to delete this wage?"
-                );
-                if (r) {
-                    $.ajax({
-                        url: '/admin/user-group-wage',
-                        type: 'delete',
-                        headers: {
-                            authorization: "Bearer " + localStorage.getItem('accessToken'),
-                        },
-                        data: {
-                            _id
-                        },
-                        success: function (data) {
-                            alert(data.msg);
-                            LoadWages();
-                        },
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            $('#lblError').text(jqXHR.responseJSON.msg);
-                            $('#lblError').show();
-                        }
 
-                    })
-                }
-            })
+                Swal.fire({
+                    title: 'Are you sure want to delete this wage?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/admin/user-group/pull-wage',
+                            type: 'put',
+                            headers: {
+                                authorization: "Bearer " + localStorage.getItem('accessToken'),
+                            },
+                            data: {
+                                ugId,
+                                wageId: $(this).closest("tr").attr("id")
+                            },
+                            success: function (data) {
+                                Swal.fire(
+                                    'Deleted!',
+                                    data.msg,
+                                    'success'
+                                )
+                                LoadWages();
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                $('#lblError').text(jqXHR.responseJSON.msg);
+                                $('#lblError').show();
+                            }
 
-            $('#btnCancel').click(function () {
-                _id = '';
-                $('#txtWage').val(0);
-                $('#btnSubmitWage').html('<i class="fa fa-plus" aria-hidden="true"></i>Add');
-                $('#btnSubmitWage').addClass('btn-success').removeClass('btn-warning');
-            })
+                        })
 
-            $("#tblWages").on("click", "button[name='updateWage']", function () {
-                _id = $(this).closest("tr").attr("id");
-                $.ajax({
-                    url: '/admin/user-group-wage/detail',
-                    type: 'get',
-                    headers: {
-                        authorization: "Bearer " + localStorage.getItem('accessToken'),
-                    },
-                    data: {
-                        _id
-                    },
-                    success: function (data) {
-                        $('#slModule').val(data.w.module);
-                        $('#slUserGroup').val(data.w.user_group);
-                        $('#slStaffLevels').val(data.w.staff_lv);
-                        $('#txtWage').val(data.w.wage);
-
-                        $('#btnSubmitWage').html('<i class="fa fa-refresh" aria-hidden="true"></i> Update');
-                        $('#btnSubmitWage').addClass('btn-warning').removeClass('btn-success');
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        $('#lblError').text(jqXHR.responseJSON.msg);
-                        $('#lblError').show();
                     }
                 })
+
             })
 
 
@@ -177,10 +156,6 @@
                     return;
                 }
 
-
-
-
-
                 if (typeof job_lv === "undefined") {
                     $('#lblError').text('(*) No acceptable job level!');
                     $('#lblError').show().delay(3000).fadeOut();
@@ -194,7 +169,7 @@
                 }
 
                 if (wage == 0 || isNaN(wage)) {
-                    $('#lblError').text('(*) No acceptable wage!');
+                    $('#lblError').text('(*) Wage is invalid');
                     $('#lblError').show().delay(3000).fadeOut();
                     return;
                 }
@@ -214,18 +189,20 @@
                         wage
                     },
                     success: function (data) {
-                        alert(data.msg);
+                        Swal.fire(
+                            'Successfully!',
+                            data.msg,
+                            'success'
+                        )
                         LoadWages();
-                        $('#btnCancel').click();
                         $('#txtWage').text('0');
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
                         $('#lblError').text(jqXHR.responseJSON.msg);
-                        $('#lblError').show();
+                        $('#lblError').fadeIn().delay(3000).fadeOut();
                     }
 
                 })
-
             })
 
 
@@ -239,25 +216,20 @@
                     },
                     data: {
                         ugId,
-                        moduleId: $('#slModule option:selected').val()
+                        module: $('#slModule option:selected').val()
                     },
                     success: function (data) {
                         $('#tblWages').empty();
                         let idx = 1;
+                        console.log(data)
                         data.wages.forEach(w => {
+
                             let tr = '<tr id = "' + w._id + '">';
                             tr += '<td>' + (idx++) + '</td>';
-                            tr += '<td class="font-weight-bold text-info">' + w.module.name + '</td>';
                             tr += '<td class="text-warning font-weight-bold">' + w.job_lv.name + '</td>';
                             tr += '<td class="text-warning font-weight-bold">' + w.staff_lv.name + '</td>';
-
                             tr += '<td class="text-danger font-weight-bold text-right">' + w.wage + '</td>';
-                            tr +=
-                                '<td class="text-right"><button class="btn btn-xs btn-warning ml-1" name="updateWage"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
-                            tr +=
-                                '<button class="btn btn-xs btn-danger ml-1" name="deleteWage"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
-
-
+                            tr += '<td class="text-right"><button class="btn btn-xs btn-danger ml-1" name="deleteWage"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
                             tr += "</tr>";
                             tr += '</tr>';
                             $('#tblWages').append(tr);
@@ -283,8 +255,6 @@
                     $("#txtWage").val('0');
                 }
             })
-
-
 
             $('#slStaffLevels').change(function () {
                 LoadJobLevelsBasedOnStaffLevel();

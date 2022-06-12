@@ -205,6 +205,8 @@ router.put('/push-level', authenticateAdminToken, async (req, res) => {
         })
 })
 
+
+
 router.delete('/pull-level', authenticateAdminToken, async (req, res) => {
     let { id ,levelId} = req.body;
     let sl = await StaffLevel.findById(levelId);

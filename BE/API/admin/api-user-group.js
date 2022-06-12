@@ -30,15 +30,43 @@ router.delete('/', authenticateAdminToken, async (req, res) => {
 })
 
 router.get('/list-wage', authenticateAdminToken, async (req, res) => {
+    let {module,ugId} = req.query;
+    let ug = await UserGroup.findById(ugId)
+    .populate('wages.staff_lv')
+    .populate('wages.job_lv');
+    if(!ug){
+        return res.status(404).json({
+            msg:`User group not found!`
+        })
+    }
+
+    return res.status(200).json({
+        msg:`Load wage by module and user group successfully!`,
+        wages: ug.wages.filter(x=>x.module == module)
+    })
 
 })
-router.get('/list', async (req, res) => {
+router.get('/list',authenticateAdminToken, async (req, res) => {
     let ugs = await UserGroup.find({});
     return res.status(200).json({
         msg: `Load user groups successfully!`,
         ugs
     })
 });
+router.get('/wage-detail',authenticateAdminToken,async (req,res)=>{
+    let {wageId,ugId} = req.query;
+    let ug = await UserGroup.findById(ugId);
+    if(!ug){
+        return res.status(404).json({
+            msg:`User group not found!`
+        })
+    }
+    return res.status(200).json({
+        msg:`Load wage detail successfully!`,
+        wage: (ug.wages.filter(x=>x._id == wageId))[0]
+    })
+})
+
 
 router.get('/detail', authenticateAdminToken, (req, res) => {
     let { id } = req.query;
@@ -183,6 +211,30 @@ router.put('/push-wage', authenticateAdminToken, async (req, res) => {
     })
 
 })
+
+router.put('/pull-wage',authenticateAdminToken,async (req,res)=>{
+    let {ugId,wageId} = req.body;
+    let ug = await UserGroup.findById(ugId);
+    if(!ug){
+        return res.status(404).json({
+            msg:`User group not found!`
+        })
+    }
+    ug.wages.pull(wageId);
+    await ug.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`Wage has been removed!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not remote this wage with error: ${new Error(err.message)}`
+        })
+    })
+})
+
+
 
 
 
