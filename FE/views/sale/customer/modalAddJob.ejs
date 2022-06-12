@@ -79,10 +79,11 @@
 
             <div class="form-group">
               <label for="">Template</label>
-              <select id="slTemplates" class="selectpicker form-control" multiple title="Choose one of the following..."></select>
+              <select id="slTemplates" class="selectpicker form-control" multiple
+                title="Choose one of the following..."></select>
             </div>
-           
-            
+
+
 
             <div class="row">
               <div class="col-sm-12 form-group">
@@ -140,20 +141,20 @@
   $(document).ready(function () {
     LoadCombo();
     LoadCaptureders();
-    LoadTemplates();    
+    LoadTemplates();
   })
 
-  function LoadTemplates(){
+  function LoadTemplates() {
     $.ajax({
-      url:'/sale/template',
-      type:'get',
+      url: '/sale/template',
+      type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      success:function(data){
+      success: function (data) {
         $('#slTemplates').empty();
-        data.templates.forEach(temp=>{
-          $('#slTemplates').append('<option value="'+temp._id+'">'+temp.name+'</option>')
+        data.templates.forEach(temp => {
+          $('#slTemplates').append('<option value="' + temp._id + '">' + temp.name + '</option>')
         })
         $('#slTemplates').selectpicker();
         $('#slTemplates').selectpicker('refresh');
@@ -223,7 +224,7 @@
 
   })
   $('#addJobModal').on('hidden.bs.modal', function () {
-    LoadCustomers(search, page);  
+    LoadCustomers(search, page);
   })
 
 
@@ -259,7 +260,7 @@
     let quantity = $('#txtQuantity').val();
 
     var templates = ($("#slTemplates").val() || []).join(', ');
-  
+
 
 
 
@@ -301,14 +302,22 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { customer, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity,templates },
+      data: { customer, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity, templates },
       success: function (data) {
-        alert(data.msg);
+        Swal.fire({
+          icon: 'success',
+          title: 'Successfully!',
+          text: data.msg
+        })
         $('#addJobModal').modal('hide');
         customerId = "";
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        alert(jqXHR.responseJSON.msg);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: request.responseJSON.msg
+        })
       },
     })
   })

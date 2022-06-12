@@ -344,9 +344,6 @@ router.post("/", authenticateSaleToken, async (req, res) => {
       })
     })
 
-
-
-
 });
 
 module.exports = router;
