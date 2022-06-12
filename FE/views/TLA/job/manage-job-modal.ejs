@@ -193,7 +193,7 @@
 
 
   $("#slCustomerLevles").change(function () {
-    console.log(12345)
+    LoadLocalLevel();
   });
 
   $("#slLocalLevels").change(function () {
@@ -220,8 +220,8 @@
           $('#slLocalLevels').append(opt);
         })
 
-        LoadQA($('#slLocalLevels option:selected').val());
-        LoadEditor($('#slLocalLevels option:selected').val());
+        LoadQA();
+        LoadEditor();
       }
 
     })
@@ -812,7 +812,7 @@
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       data: {
-        levelId:$('#slLocalLevels option:selected').val()
+        levelId: $('#slLocalLevels option:selected').val()
       },
       success: function (data) {
         $('#slQA').empty();
