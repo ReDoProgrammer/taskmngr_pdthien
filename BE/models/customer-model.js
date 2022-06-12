@@ -6,26 +6,26 @@ const SALT_WORK_FACTOR = 10;
 
 
 const customerSchema = new Schema({
-    created:{
-        by:{
-            type:Schema.Types.ObjectId,
-            ref:'user'
+    created: {
+        by: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
         },
-        at:{
-            type:Date,
-            default:new Date()
+        at: {
+            type: Date,
+            default: new Date()
         }
     },
-    updated:{
-        by:{
-            type:Schema.Types.ObjectId,
-            ref:'user'
+    updated: {
+        by: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
         },
-        at:{
-            type:Date
+        at: {
+            type: Date
         }
     },
-   
+
     name: {
         firstname: {
             type: String
@@ -141,65 +141,45 @@ const customerSchema = new Schema({
     ],
     contracts: [
         {
+            title: {
+                type: String
+            },
             lines: [
                 {
-                    title:{
-                        type:String
+                    root: {
+                        type: Schema.Types.ObjectId,
+                        ref: 'root_level'
                     },
-                    basic: {
-                        root: {
-                            type: Schema.Types.ObjectId,
-                            ref: 'root_level'
-                        },
-                        parents: {
-                            type: Schema.Types.ObjectId,
-                            ref: 'parents_level'
-                        },
-                        price: {
-                            type: Number,
-                            required: [
-                                true,
-                                `Please input price as number`
-                            ],
-                            min: [
-                                0.001,
-                                `Price is invalid!`
-                            ]
-                        }
+                    parents: {
+                        type: Schema.Types.ObjectId,
+                        ref: 'parents_level'
                     },
-                    created: {
-                        at: {
-                            type: Date,
-                            default: new Date()
-                        },
-                        by: {
-                            type: Schema.Types.ObjectId,
-                            ref: 'user'
-                        }
-                    },
-                    updated: {
-                        at: {
-                            type: Date,
-                            default: new Date()
-                        },
-                        by: {
-                            type: Schema.Types.ObjectId,
-                            ref: 'user'
-                        }
-                    },
-                    actived:{
-                        at: {
-                            type:Date,
-                            default: new Date()
-                        },
-                        status:{
-                            type:Boolean,
-                            default:false
-                        }
+                    price: {
+                        type: Number,
+                        required: [
+                            true,
+                            `Please input price as number`
+                        ],
+                        min: [
+                            0.001,
+                            `Price is invalid!`
+                        ]
                     }
                 }
-            ]
+            ],
+            created: {
+                at: {
+                    type: Date,
+                    default: new Date()
+                },
+                by: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'user'
+                }
+            }          
+           
         }
+
     ]
 
 });

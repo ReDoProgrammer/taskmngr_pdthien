@@ -52,8 +52,11 @@ router.get('/list', authenticateAccountantToken, async (req, res) => {
         ],
         status
     })
-        .sort({ _id: 1 })
-        .select('name.firstname name.lastname contact.phone contact.email status')
+
+        .populate('contracts.lines.basic.root')
+        .populate('contracts.lines.basic.parents')
+        .sort({ '_id': 1 })
+        .select('name.firstname name.lastname contact.phone contact.email status contracts')
         .skip((page - 1) * pageSize)
         .limit(pageSize);
 
@@ -304,34 +307,41 @@ router.put('/contract', authenticateAccountantToken, async (req, res) => {
             msg: `Customer not found!`
         })
     }
-    let desContract = {};
-    desContract.title = contract.title;
-    var lines = contract.lines.map(x => {        
+
+
+    let c = {};
+    c.title = contract.title;
+
+    let lines = await contract.lines.map(x => {
         let obj = {};
-        let basic  = {};
-        if (x.child =='true') {
-            basic.parents = x.value;
+        if (x.child == 'true') {
+            obj.parents = x.value;
         } else {
-            basic.root = x.value;
+            obj.root = x.value;
         }
-        basic.price = x.price;
-        obj.basic = basic;      
-        console.log(obj)
+        obj.price = x.price;
         return obj;
     })
-    desContract.lines = lines;
-    customer.contracts.push(desContract);
+
+    c.lines = lines;
+    c.created = {
+        by: req.user._id,
+        at: new Date()
+    };
+   
+   customer.contracts.push(c);
+
     await customer.save()
-    .then(_=>{
-        return res.status(200).json({
-            msg:`Contract has been added!`
+        .then(_ => {
+            return res.status(200).json({
+                msg: `Contract has been added!`
+            })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not add contract with error: ${new Error(err.message)}`
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not add contract with error: ${new Error(err.message)}`
+            })
         })
-    })
 })
 
 router.delete('/', authenticateAccountantToken, async (req, res) => {
