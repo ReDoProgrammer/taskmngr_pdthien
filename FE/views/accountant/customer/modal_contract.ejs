@@ -17,11 +17,7 @@
 
         <div class="panel panel-default mt-2" id="panelContract">
           <div class="panel-heading">New contract</div>
-          <div class="panel-body">
-            <div class="form-group col-md-12">
-              <label for="">Contract title</label>
-              <input type="text" placeholder="Contract title" id="txtContractTitle" class="form-control">
-            </div>
+          <div class="panel-body">            
             <div class="col-md-8 form-group">
               <label for="">Root levels</label>
               <select name="" id="slRootLevels" class="form-control"></select>
@@ -80,13 +76,7 @@
             </button>
             <button class="btn btn-secondary" id="btnCancelContract">Cancel</button>
           </div>
-        </div>
-
-
-        <div class="panel panel-info mt-2" id="panelContractsList">
-          <div class="panel-heading">Contracts list</div>
-          <div class="panel-body"></div>
-        </div>
+        </div>     
 
       </div>
       <div class="modal-footer">
@@ -140,10 +130,8 @@
     let item = {};
 
     if (jQuery.isEmptyObject(contract)) {
-      contract.customer = customerId;
-      contract.title = title;
+      contract.customer = customerId;     
       contract.lines = [];
-
     }
 
     var mArr = contract.lines.map(x => x.value);
@@ -201,8 +189,7 @@
   $('#btnAddNewContract').click(function () {
     $('#panelContract').slideDown(500);
     $('#btnAddNewContract').slideUp(500);
-    $('#divParentsLevel').slideUp(500);
-    $('#panelContractsList').slideUp(500);
+    $('#divParentsLevel').slideUp(500);  
     contract = {};
     ShowContractLines();
   })
@@ -229,8 +216,7 @@
     $('#btnAddNewContract').slideUp(500);
     $('#ckbDivide').prop('checked', false);
     $('#divParentsLevel').slideUp(500);
-    $('#btnAddNewContract').slideDown(500);
-    $('#panelContractsList').slideDown(500);
+    $('#btnAddNewContract').slideDown(500);  
   })
 
   $('input[name="price"]').focusout(function (e) {

@@ -140,10 +140,7 @@ const customerSchema = new Schema({
         }
     ],
     contracts: [
-        {
-            title: {
-                type: String
-            },
+        {           
             lines: [
                 {
                     root: {

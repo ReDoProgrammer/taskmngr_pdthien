@@ -5,6 +5,29 @@ const Job = require('../../models/job-model');
 
 const pageSize = 20;
 
+router.get('/contract',authenticateAccountantToken,async (req,res)=>{
+    let {customerId} = req.query;
+    let customer = await Customer.findById(customerId)
+    .populate('contracts.lines.parents')
+    .populate('contracts.lines.root');
+    if(!customer){
+        return res.status(404).json({
+            msg:`Customer not found!`
+        })
+    }
+
+    if(customer.contracts.length == 0){
+        return res.status(404).json({
+            msg:`Customer contracts not found!`
+        })
+    }
+
+    return res.status(200).json({
+        msg:`Load contract detail successfully!`,
+        contract: customer.contracts[customer.contracts.length-1]
+    })
+})
+
 router.get('/contracts', authenticateAccountantToken, async (req, res) => {
     let { customerId } = req.query;
     let contracts = await Customer.findById(customerId)
@@ -53,8 +76,8 @@ router.get('/list', authenticateAccountantToken, async (req, res) => {
         status
     })
 
-        .populate('contracts.lines.basic.root')
-        .populate('contracts.lines.basic.parents')
+        .populate('contracts.lines.root')
+        .populate('contracts.lines.parents')
         .sort({ '_id': 1 })
         .select('name.firstname name.lastname contact.phone contact.email status contracts')
         .skip((page - 1) * pageSize)
@@ -309,8 +332,7 @@ router.put('/contract', authenticateAccountantToken, async (req, res) => {
     }
 
 
-    let c = {};
-    c.title = contract.title;
+    let c = {};  
 
     let lines = await contract.lines.map(x => {
         let obj = {};
