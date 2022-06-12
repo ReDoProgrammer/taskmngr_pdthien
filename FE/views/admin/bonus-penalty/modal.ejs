@@ -11,7 +11,8 @@
                 <div class="form-row">
                     <div class="form-group col-md-4">
                         <label for="">Name</label>
-                        <input type="text" name="txtName" id="txtName" class="form-control" placeholder="Bonus panelty name">
+                        <input type="text" name="txtName" id="txtName" class="form-control"
+                            placeholder="Bonus panelty name">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="">Description</label>
@@ -22,9 +23,9 @@
                         <label for="">Is bonus</label>
                         <input type="checkbox" name="" id="ckbIsBonus" checked class="mt-1">
                     </div>
-                </div>               
+                </div>
             </div>
-            <div class="modal-footer">              
+            <div class="modal-footer">
                 <button type="button" class="btn btn-primary" id="btnSubmit">Save changes</button>
             </div>
         </div>
@@ -35,7 +36,7 @@
 
     $('#btnSubmit').click(function () {
         let name = $('#txtName').val().trim();
-        let description = $('#txtDescription').val().trim();      
+        let description = $('#txtDescription').val().trim();
 
         if (bpId.length > 0) {
             $.ajax({
@@ -48,10 +49,14 @@
                     bpId,
                     name,
                     description,
-                    is_bonus:$("#ckbIsBonus").is(':checked')                   
+                    is_bonus: $("#ckbIsBonus").is(':checked')
                 },
                 success: function (data, textStatus, xhr) {
-                    alert(data.msg);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
                     $('#modalBonusPenalty').modal('hide');
                     bpId = '';
                 }, error: function (jqXHR, textStatus, errorThrown) {
@@ -68,10 +73,14 @@
                 data: {
                     name,
                     description,
-                    is_bonus:$("#ckbIsBonus").is(':checked')                    
+                    is_bonus: $("#ckbIsBonus").is(':checked')
                 },
                 success: function (data, textStatus, xhr) {
-                    alert(data.msg);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
                     $('#modalBonusPenalty').modal('hide');
                     bpId = '';
                 }, error: function (jqXHR, textStatus, errorThrown) {
