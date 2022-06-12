@@ -109,13 +109,17 @@
                   );
                   LoadData();
                 }, error: function (jqXHR, textStatus, errorThrown) {
-                  alert(jqXHR.responseJSON.msg);
+                  Swal.fire(
+                    'Error!!',
+                    jqXHR.responseJSON.msg,
+                    'error'
+                  );
                 }
               })
 
             }
           })
-         
+
         });
 
 
