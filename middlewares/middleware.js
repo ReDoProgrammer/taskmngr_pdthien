@@ -5,17 +5,19 @@ const { getModule } = require('../middlewares/common');
 
 
 
-function authenticateAdminToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
+async function authenticateAdminToken(req, res, next) {
+  const authHeader =await req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
-  if (token == null) return res.status(401).json({
-    msg: `Lỗi xác thực tài khoản. token null`
-  });
+  if (!token) {
+    console.log(  `Authenticate failed. token null`)
+    return res.status(401).json({
+      msg: `Authenticate failed. token null`
+    });
+  }
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
     if (err) {
       console.log('got an error when veryfy account: ', new Error(err.message));
-
       return res.status(403).json({
         msg: `Lỗi xác thực tài khoản ${err.message}`
       });
@@ -23,10 +25,10 @@ function authenticateAdminToken(req, res, next) {
     }
 
     getModule(_MODULE)
-      .then(m => { 
-        
-        if(m.users.includes(user._id)){
-          req.user =user;
+      .then(m => {
+
+        if (m.users.includes(user._id)) {
+          req.user = user;
           next();
         }
       })

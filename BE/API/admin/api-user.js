@@ -246,7 +246,7 @@ router.post("/login", (req, res) => {
       if (chk > -1) {
 
         let u = {
-          _id: user._id        
+          _id: user._id               
         };
 
         const accessToken = generateAccessToken(u);
@@ -256,8 +256,8 @@ router.post("/login", (req, res) => {
         return res.status(200).json({
           msg: 'Admin login successfully!',
           url: '/admin',
-          accessToken: accessToken,
-          refreshToken: refreshToken
+          accessToken,
+          refreshToken
         });
       }
 

@@ -206,7 +206,7 @@
       return;
     }
 
-   
+
 
     if (userId.length == 0) {
 
@@ -263,7 +263,7 @@
           is_active,
           bank,
           bank_no,
-          bank_holder         
+          bank_holder
         },
         success: function (data, textStatus, xhr) {
           alert(data.msg);
@@ -312,17 +312,15 @@
     $.ajax({
       url: "/admin/user-group/list",
       type: "get",
-      data: {},
-      success: function (data, textStatus, xhr) {
-        let idx = 1;
-        data.uts.forEach((ut) => {
-          let opt = '<option value="' + ut._id + '">' + ut.name + "</option>";
+      headers: {
+        authorization: "Bearer " + localStorage.getItem('accessToken'),
+      },
+      success: function (data) {
+        data.ugs.forEach((u) => {
+          let opt = '<option value="' + u._id + '">' + u.name + "</option>";
           $("#slUserGroup").append(opt);
         });
-
         LoadUserLevels($('#slUserGroup option:selected').val());
-
-
       },
       error: function (jqXHR, textStatus, errorThrown) {
         alert(jqXHR.responseJSON.msg);
