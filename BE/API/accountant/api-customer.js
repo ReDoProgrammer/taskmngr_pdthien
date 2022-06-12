@@ -275,6 +275,34 @@ router.put('/change-state',authenticateAccountantToken,async (req,res)=>{
     })
 })
 
+router.delete('/',authenticateAccountantToken, async (req,res)=>{
+    let {customerId} = req.body;
+    let customer = await Customer.findById(customerId);
+    if(!customer){
+        return res.status(404).json({
+            msg:`Customer not found!`
+        })
+    }
+
+    if(customer.jobs.length>0){
+        return res.status(303).json({
+            msg:`Can not delete this customer when having jobs depend on it!`
+        })
+    }
+
+    customer.delete()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`The customer has been deleted!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not delete this customer with error: ${new Error(err.message)}`
+        })
+    })
+})
+
 module.exports = router;
 
 
