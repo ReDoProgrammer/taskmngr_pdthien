@@ -16,6 +16,22 @@ const comboSchema = new Schema({
         type: Number,
         default: 0
     },
+    applied:{
+        from_date:{
+            type:Date
+        },
+        to_date:{
+            type: Date
+        },
+        unlimited:{
+            type: Boolean,
+            default: false
+        },
+        status:{
+            type: Boolean,
+            default: true
+        }
+    },
     lines: [
         {
             type: Schema.Types.ObjectId,
