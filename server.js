@@ -215,7 +215,6 @@ const apiAdminBonusPenalty = require('./BE/API/admin/api-bonus-penalty');
 const apiAdminCloud = require('./BE/API/admin/api-cloud');
 const apiAdminColorMode = require('./BE/API/admin/api-color-mode');
 const apiCombo = require('./BE/API/admin/api-combo');
-const apiComboLine = require('./BE/API/admin/api-combo-line');
 const apiAdminCustomer = require('./BE/API/admin/api-customer');
 const apiAdminFileFormat = require('./BE/API/admin/api-file-format');
 const apiAdminJobLevel = require('./BE/API/admin/api-job-level');
@@ -317,8 +316,7 @@ app.use('/tla/bonus-penalty-line',apiTLABonusPenaltyLine);
 const apiTLACC = require('./BE/API/TLA/api-cc');
 app.use('/tla/cc',apiTLACC);
 
-const apiTLAComboLine = require('./BE/API/TLA/api-tla-combo-line');
-app.use('/tla/combo-line',apiTLAComboLine);
+
 
 
 const apiTLACheckIn = require('./BE/API/TLA/api-checkin');
@@ -353,7 +351,7 @@ app.use('/admin/user',apiAdminUser);//quản lý thông tin nhân viên
 app.use('/admin/cloud',apiAdminCloud);//quản lý thông tin cloud để upload link file của khách
 app.use('/admin/color-mode',apiAdminColorMode);//quảnlý hệ màu của hình ảnh
 app.use('/admin/combo',apiCombo);//quan ly combo
-app.use('/admin/combo-line',apiComboLine);//quan ly comboline
+
 app.use('/admin/customer',apiAdminCustomer);//quản lý thông tin khách hàng
 app.use('/admin/file-format',apiAdminFileFormat);//quản lý thông tin định dạng file hình ảnh xuất cho khách
 app.use('/admin/job-level',apiAdminJobLevel);//quản lý thông tin danh sách level, khác với apiAdminCustomerLevel

@@ -34,8 +34,18 @@ const comboSchema = new Schema({
     },
     lines: [
         {
-            type: Schema.Types.ObjectId,
-            ref: 'combo_line'
+           root:{
+               type:Schema.Types.ObjectId,
+               ref:'root_level'
+           },
+           parents:{
+               type:Schema.Types.ObjectId,
+               ref:'parents_level'
+           },
+           quantity:{
+               type:Number,
+               required: [true, 'Quantity is invalid!']
+           }
         }
     ]
 

@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const Combo = require('../../models/combo-model');
-const ComboLine = require('../../models/combo-line-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 
@@ -98,12 +97,22 @@ router.put('/', authenticateAdminToken, async (req, res) => {
 
 
 router.post('/', authenticateAdminToken, async (req, res) => {
-    let { name, description, price } = req.body;
+    let { name, description, price, from_date,to_date,status,unlimited } = req.body;
     let combo = new Combo({
         name,
         description,
-        price
+        price            
     });
+
+    combo.applied = {
+        from_date,
+        unlimited,
+        status
+    }
+
+    if(unlimited == 'false'){
+        combo.applied.to_date = to_date;
+    }
 
     await combo
         .save()
