@@ -84,31 +84,7 @@
     $(document).ready(function () {
         LoadRootLevels();
     })
-
-    $(document).on("click", "button[name='edit_line']", function () {
-        lineId = $(this).closest("tr").attr("id");
-
-        $.ajax({
-            url: '/admin/combo-line/detail',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-                _id: lineId
-            },
-            success: function (data) {
-                $('#slLevel').val(data.cbl.lv);
-                $('#txtQuantity').val(data.cbl.qty);
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                $('#lblLineMsg').text(jqXHR.responseJSON.msg);
-                $('#lblLineMsg').show().delay(5000).fadeOut();
-            }
-
-        })
-
-    })
+    
 
     $('#btnSubmitLine').click(function () {
         let quantity = parseInt($('#ckbDivide').is(':checked') ? $('#txtParentsQuantity').val() : $('#txtRootQuantity').val());
@@ -137,6 +113,7 @@
                     title: 'Successfully!',
                     text: data.msg
                 });
+                ResetComponents();
                 LoadLines();
             }
             , error: function (jqXHR, textStatus, errorThrown) {
@@ -167,13 +144,14 @@
             success: function (data) {
                 $('#tblLines').empty();
                 let idx = 1;
-                data.cbls.forEach(l => {
+                data.lines.forEach(l => {
                     let tr = '<tr id="' + l._id + '">';
                     tr += '<td>' + (idx++) + '</td>';
-                    tr += '<td class = "font-weight-bold text-primary">' + l.lv.name + '</td>';
+                    tr += '<td class = "font-weight-bold text-primary">';
+                    tr += l.root ? l.root.name : l.parents.name;
+                    tr += '</td>';
                     tr += '<td class = "text-right">' + l.qty + '</td>';
                     tr += '<td class = "text-right">';
-                    tr += '<button class = "btn btn-xs btn-warning" name="edit_line"><i class="fa fa-edit"></i> </button>';
                     tr += '<button class = "btn btn-xs btn-danger ml-2" name="delete_line"><i class="fa fa-trash" aria-hidden="true"></i></button>';
                     tr += '</td>';
                     tr += '</tr>';
@@ -185,7 +163,7 @@
 
     $('#modalComboLine').on('shown.bs.modal', function (e) {
         LoadLines();
-        ResetComponent();
+        ResetComponents();
 
     })
 
@@ -224,7 +202,7 @@
     });
 
 
-    function ResetComponent() {
+    function ResetComponents() {
         $('#ckbDivide').prop('checked', false);
         $('#rowParents').slideUp(500);
         $('#colRootQuantity').slideDown(500);
@@ -238,8 +216,7 @@
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
-            success: function (data) {
-                console.log(data)
+            success: function (data) {               
                 $('#slRootLevels').empty();
                 data.roots.forEach(r => {
                     let parents = (r.parents.map(x => x.name)).toString();
@@ -260,8 +237,7 @@
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
             data: { rootId: $('#slRootLevels option:selected').val() },
-            success: function (data) {
-                console.log(data);
+            success: function (data) {               
                 $('#slParentsLevels').empty();
                 data.parentsList.forEach(p => {
                     let levels = (p.job_levels.map(x => x.name)).toString();

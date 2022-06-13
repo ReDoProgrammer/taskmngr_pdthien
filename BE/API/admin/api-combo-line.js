@@ -5,23 +5,16 @@ const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 
 
-router.get('/list', authenticateAdminToken, (req, res) => {
+router.get('/list', authenticateAdminToken,async (req, res) => {
     let { cb } = req.query;
-    ComboLine
-        .find({ cb: cb })
-        .populate('lv')
-        .exec()
-        .then(cbls => {
-            return res.status(200).json({
-                msg: `Get combolines list successfully!`,
-                cbls
-            })
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not get combolines list with error: ${new Error(err.message)}`
-            })
-        })
+    let lines = await ComboLine.find({cb})
+    .populate('root')
+    .populate('parents');
+
+    return res.status(200).json({
+        msg:`Load comboline by combo successfully!`,
+        lines
+    })
 })
 
 router.get('/detail', authenticateAdminToken, (req, res) => {
