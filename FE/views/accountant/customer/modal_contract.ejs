@@ -11,13 +11,9 @@
         <h4 class="modal-title">Contract list</h4>
       </div>
       <div class="modal-body">
-        <button class="btn btn-primary" id="btnAddNewContract">
-          <i class="fa fa-plus" aria-hidden="true"></i> New contract
-        </button>
-
         <div class="panel panel-default mt-2" id="panelContract">
           <div class="panel-heading">New contract</div>
-          <div class="panel-body">            
+          <div class="panel-body">
             <div class="col-md-8 form-group">
               <label for="">Root levels</label>
               <select name="" id="slRootLevels" class="form-control"></select>
@@ -67,19 +63,14 @@
               <tbody id="tblContractLines">
               </tbody>
             </table>
-
-
           </div>
-          <div class="panel-footer">
-            <button class="btn btn-success" id="btnSubmitContract">
-              <i class="fa fa-floppy-o" aria-hidden="true"></i> Save contract
-            </button>
-            <button class="btn btn-secondary" id="btnCancelContract">Cancel</button>
-          </div>
-        </div>     
+        </div>
 
       </div>
       <div class="modal-footer">
+        <button class="btn btn-success" id="btnSubmitContract">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i> Save contract
+        </button>
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
       </div>
     </div>
@@ -114,6 +105,7 @@
           text: data.msg
         });
         $('#btnCancelContract').click();
+        $('#modalContract').modal('hide');
       },
       error: function (jqXHR, textStatus, errorThrown) {
         $('#lblContractMsg').text(jqXHR.responseJSON.msg);
@@ -130,7 +122,7 @@
     let item = {};
 
     if (jQuery.isEmptyObject(contract)) {
-      contract.customer = customerId;     
+      contract.customer = customerId;
       contract.lines = [];
     }
 
@@ -170,13 +162,18 @@
     } else {
       contract.lines.push(item);
       ShowContractLines();
+      $('#ckbDivide').prop('checked', false);
+      $('#divParentsLevel').slideUp(200);
+      $('#colRootPrice').fadeIn(200);
+      $('#colDivide').removeClass('col-md-4').addClass('col-md-2');
     }
+
   })
 
   $(document).on('show.bs.modal', '#modalContract', function () {
-    LoadContracts();
-    $('#btnAddNewContract').show();
-    $('#panelContract').slideUp(200);
+    contract = {};
+    ShowContractLines();
+    $('#divParentsLevel').slideUp(200);
   })
 
   $('#modalContract').on('hidden.bs.modal', function () {
@@ -186,13 +183,6 @@
 
 
 
-  $('#btnAddNewContract').click(function () {
-    $('#panelContract').slideDown(500);
-    $('#btnAddNewContract').slideUp(500);
-    $('#divParentsLevel').slideUp(500);  
-    contract = {};
-    ShowContractLines();
-  })
 
 
 
@@ -211,14 +201,7 @@
     }
   });
 
-  $('#btnCancelContract').click(function () {
-    $('#panelContract').slideUp(500);
-    $('#btnAddNewContract').slideUp(500);
-    $('#ckbDivide').prop('checked', false);
-    $('#divParentsLevel').slideUp(500);
-    $('#btnAddNewContract').slideDown(500);  
-  })
-
+  
   $('input[name="price"]').focusout(function (e) {
     if ($(this).val().length == 0) {
       $(this).val('0');
@@ -246,14 +229,17 @@
   function ShowContractLines() {
     $('#tblContractLines').empty();
     let idx = 1;
-    contract.lines.forEach(l => {
-      let tr = '<tr id="' + l.value + '">';
-      tr += '<td>' + (idx++) + '</td>';
-      tr += '<td class="text-danger font-weight-bold">' + l.name + '</td>';
-      tr += '<td>' + l.price + '<td>';
-      tr += '<tr>';
-      $('#tblContractLines').append(tr);
-    })
+    if (!jQuery.isEmptyObject(contract)) {
+      contract.lines.forEach(l => {
+        let tr = '<tr id="' + l.value + '">';
+        tr += '<td>' + (idx++) + '</td>';
+        tr += '<td class="text-danger font-weight-bold">' + l.name + '</td>';
+        tr += '<td>' + l.price + '<td>';
+        tr += '<tr>';
+        $('#tblContractLines').append(tr);
+      })
+    }
+
   }
 
   function LoadParentsLevels() {
