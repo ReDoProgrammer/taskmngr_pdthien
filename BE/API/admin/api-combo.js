@@ -5,129 +5,118 @@ const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 
 
-router.get('/list',authenticateAdminToken,(req,res)=>{
-    Combo
-    .find({})
-    .exec()
-    .then(cbs=>{
-        return res.status(200).json({
-            msg:`Get combo list successfully!`,
-            cbs
-        })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not get combo list with error: ${new Error(err.message)}`
-        })
-    })
-})
-
-router.get('/detail',authenticateAdminToken,(req,res)=>{
-    let {_id} = req.query;
-    Combo
-    .findById(_id)
-    .exec()
-    .then(combo=>{
-        if(!combo){
-            return res.status(404).json({
-                msg:`Combo not found!`
-            })
-        }
-
-        return res.status(200).json({
-            msg:`Get combo detail successfully!`,
-            combo
-        })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not get combo info with error: ${new Error(err.message)}`
-        })
-    })
-})
-
-
-router.delete('/',authenticateAdminToken,(req,res)=>{
-    let {_id} = req.body;
-    Combo.findByIdAndDelete(_id)
-    .exec()
-    .then(combo=>{
-        if(!combo){
-            return res.status(404).json({
-                msg:`Combo not found!`
-            })
-        }
-
-        ComboLine
-        .deleteMany({cb:_id},(err)=>{
-            if(err){
-                return res.status(500).json({
-                    msg:`Can not delete comboline based on combo with error: ${new Error(err.message)}`
-                })
+router.get('/list', authenticateAdminToken, async (req, res) => {
+    let cbs = await Combo.find({})
+        .populate({
+            path: 'lines',
+            populate: {
+                path: 'root'
             }
+        })
+        .populate({
+            path: 'lines',
+            populate: {
+                path: 'parents'
+            }
+        });
+
+    return res.status(200).json({
+        msg: `Load combo list successfully!`,
+        cbs
+    })
+})
+
+router.get('/detail', authenticateAdminToken, async (req, res) => {
+    let { _id } = req.query;
+    let combo = await Combo.findById(_id);
+    if (!combo) {
+        return res.status(404).json({
+            msg: `Combo not found!`
+        })
+    }
+
+    return res.status(200).json({
+        msg: `Get combo detail successfully!`,
+        combo
+    })
+})
+
+
+router.delete('/', authenticateAdminToken, async (req, res) => {
+    let { _id } = req.body;
+
+    let cb = await Combo.findById(_id);
+    if (!cb) {
+        return res.status(404).json({
+            msg: `Combo not found!`
+        })
+    }
+    if (cb.lines.length > 0) {
+        return res.status(403).json({
+            msg: `Can not delete this combo when having lines based on it!`
+        })
+    }
+
+    await cb.delete()
+        .then(_ => {
             return res.status(200).json({
-                msg:`The combo  and combolines based on it have been deleted!`
+                msg: `The combo has been deleted!`
             })
         })
-
-       
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not delete this combo with error: ${new Error(err.message)}`
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not delete this combo with error: ${new Error(err.message)}`
+            })
         })
-    })
-    
 })
 
-router.put('/',authenticateAdminToken,(req,res)=>{
-    let {_id,name,description,price}=req.body;
-    Combo
-    .findByIdAndUpdate(_id,
-        {
-            name,
-            description,
-            price
-        },{new:true},(err,combo)=>{
-            if(err){
-                return res.status(500).json({
-                    msg:`Can not update combo with error: ${new Error(err.message)}`
-                })
-            }
+router.put('/', authenticateAdminToken, async (req, res) => {
+    let { _id, name, description, price } = req.body;
+    let cb = await Combo.findById(_id);
+    if (!cb) {
+        return res.status(404).json({
+            msg: `Combo not found!`
+        })
+    }
 
-            if(!combo){
-                return res.status(404).json({
-                    msg:`Combo not found!`
-                })
-            }
+    cb.name = name;
+    cb.description = description;
+    cb.price = price;
+
+    await cb.save()
+        .then(_ => {
             return res.status(200).json({
-                msg:`Update combo successfully!`,
-                combo
+                msg: `Combo has been updated!`
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not update this combo with error: ${new Error(err.message)}`
             })
         })
 })
 
 
-router.post('/',authenticateAdminToken,(req,res)=>{
-    let {name,description,price}  = req.body;
+router.post('/', authenticateAdminToken, async (req, res) => {
+    let { name, description, price } = req.body;
     let combo = new Combo({
         name,
         description,
         price
     });
 
-    combo
-    .save()
-    .then(_=>{
-        return res.status(201).json({
-            msg:`The combo has been created!`
+    await combo
+        .save()
+        .then(_ => {
+            return res.status(201).json({
+                msg: `The combo has been created!`
+            })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not create combo with error: ${new Error(err.message)}`
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not create combo with error: ${new Error(err.message)}`
+            })
         })
-    })
 })
 
 module.exports = router;

@@ -58,26 +58,43 @@ router.delete('/delete-many', authenticateAdminToken, (req, res) => {
     // })
 })
 
-router.delete('/', authenticateAdminToken, (req, res) => {
-    let { _id } = req.body;
-    ComboLine
-        .findByIdAndDelete(_id)
-        .exec()
-        .then(cbl => {
-            if (!cbl) {
-                return res.status(404).json({
-                    msg: `Comboline not found!`
-                })
-            }
+router.delete('/', authenticateAdminToken,async (req, res) => {
+    let { combo,lineId } = req.body;
+    let cb = await Combo.findById(combo);
+    if(!cb){
+        return res.status(404).json({
+            msg:`Combo not found!`
+        })
+    }
+
+    let line = await ComboLine.findById(lineId);
+    if(!line){
+        return res.status(404).json({
+            msg:`Combo line not found!`
+        })
+    }
+
+    await line.delete()
+    .then(async _=>{
+        cb.lines.pull(line);
+        await cb.save()
+        .then(_=>{
             return res.status(200).json({
-                msg: `Comboline has been deleted!`
+                msg:`The combo line has been removed!`
             })
         })
-        .catch(err => {
+        .catch(err=>{
             return res.status(500).json({
-                msg: `Can not delete this comboline with error: ${new Error(err.message)}`
+                msg:`Can not remove this combo line with error: ${new Error(err.message)}`
             })
         })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not delete this combo line with error: ${new Error(err.message)}`
+        })
+    })
+
 })
 
 router.put('/', authenticateAdminToken, (req, res) => {
