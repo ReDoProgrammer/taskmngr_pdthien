@@ -1,7 +1,7 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const _MODULE = 'ACCOUNTANT';
-const {getModuleId} = require('./common');
+const { getModule } = require('./common');
 
 function authenticateAccountantToken(req, res, next) {
   const authHeader = req.headers["authorization"];
@@ -20,24 +20,16 @@ function authenticateAccountantToken(req, res, next) {
 
     }
 
-    getModuleId(_MODULE)
-      .then(result => {       
-        UserModule
-          .countDocuments({ user: user._id, module: result.mod._id }, (err, count) => {
-            if (err) {
-              return res.status(500).json({
-                msg: `Can not check user module with error: ${new Error(err.message)}`
-              })
-            }
-
-            if (count == 0) {
-              return res.status(403).json({
-                msg: `You can not access this module`
-              })
-            }
-            req.user = user;
-            next();
+    getModule(_MODULE)
+      .then(m => {       
+        if (m.users.includes(user._id)) {
+          req.user = user;
+          next();
+        } else {
+          return res.status(403).json({
+            msg: `You have no permission to access this module!`
           })
+        }
 
       })
       .catch(err => {
@@ -49,9 +41,6 @@ function authenticateAccountantToken(req, res, next) {
 
   });
 }
-
-
-
 
 module.exports = {
   authenticateAccountantToken
