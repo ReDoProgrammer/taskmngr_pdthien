@@ -93,6 +93,10 @@
                         $('#txtName').val(data.combo.name);
                         $('#txtPrice').val(data.combo.price);
                         $('#txaDescription').val(data.combo.description);
+                        $('#txtFromDate').val(convertISODateToTimeFormat(data.combo.applied.from_date));
+                        $('#txtToDate').val(convertISODateToTimeFormat(data.combo.applied.to_date));
+                        $('#cbkUnlimited').prop('checked',data.combo.applied.unlimited);
+                        $('#ckbActive').prop('checked',data.combo.applied.status);
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
                         alert(jqXHR.responseJSON.msg);
@@ -102,6 +106,7 @@
                 })
             })
             $('#btnAddNew').click(function () {
+                _id = '';
                 $('#modalCombo').modal();
             })
 

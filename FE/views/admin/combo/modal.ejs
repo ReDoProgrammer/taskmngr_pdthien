@@ -87,10 +87,15 @@
 <script>
     //sự kiện load lại hàm ds level khi modal đc đóng lại
     $(document).on('hidden.bs.modal', '#modalCombo', function () {
-        $('#txtName').val('');
-        $('#txtPrice').val(0);
-        $('#txaDescription').val('');
-        _id = '';
+        if (_id.trim().length == 0) {
+            $('#txtName').val('');
+            $('#txtPrice').val(0);
+            $('#txaDescription').val('');
+            $('#txtFromDate').val(getCurrentTime());
+            $('#txtToDate').val('');
+            $('#cbkUnlimited').prop('checked', false);
+            $('#ckbActive').prop('checked', true);
+        }
         LoadCombo();
     });
 
