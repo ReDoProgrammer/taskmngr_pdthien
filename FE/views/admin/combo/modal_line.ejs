@@ -17,14 +17,39 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-md-8 col-sm-8 col-xs-12 mt-2">
-                                <select name="" id="slLevel" class="form-control"></select>
+                            <div class="col-md-8 form-group">
+                                <label for="">Root levels</label>
+                                <select name="" id="slRootLevels" class="form-control"></select>
                             </div>
-                            <div class="col-md-2 col-sm-2 col-xs-12 mt-2">
-                                <input type="text" value="0" id="txtQuantity" class="form-control text-right">
+                            <div class="col-md-2 form-group" id="colRootQuantity">
+                                <label for="">Quantity:</label>
+                                <input type="text" name="quantity" value="0" id="txtRootQuantity" class="form-control">
                             </div>
-                            <div class="col-md-2 col-sm-2 col-xs-12 text-center mt-2">
-                                <button class="btn btn-primary" id="btnSubmitLine">Submit</button>
+                            <div class="col-md-2 form-group mt-2">
+                                <div class="checkbox mt-2">
+                                    <label class="mt-2"><input type="checkbox" value="" id="ckbDivide">Divide
+                                        levels</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="rowParents">
+                            <div class="col-md-10 form-group">
+                                <label for="">Parents levels:</label>
+                                <select name="" id="slParentsLevels" class="form-control"></select>
+                            </div>
+                            <div class="col-md-2 form-group">
+                                <label for="">Quantity:</label>
+                                <input type="text" name="quantity" id="txtParentsQuantity" value="0"
+                                    class="form-control">
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 text-right">
+                                <button class="btn btn-primary" id="btnSubmitLine">
+                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                    Add level to combo
+                                </button>
                             </div>
                         </div>
                         <div class="row mt-2">
@@ -57,7 +82,7 @@
 <script>
     var lineId = '';
     $(document).ready(function () {
-        LoadLevel();
+        LoadRootLevels();
     })
 
     $(document).on("click", "button[name='edit_line']", function () {
@@ -126,7 +151,7 @@
                 },
                 data: {
                     _id: lineId,
-                    cb:_id,
+                    cb: _id,
                     lv, qty
                 }, success: function (data) {
                     alert(data.msg);
@@ -180,7 +205,29 @@
 
     $('#modalComboLine').on('shown.bs.modal', function (e) {
         LoadLines();
+        ResetComponent();
+
     })
+
+    $('input[name="quantity"]').focusout(function () {
+        $(this).val('0');
+    })
+
+    $('input[name="quantity"]').keyup(function (e) {
+        if (/\D/g.test(this.value)) {
+            this.value = this.value.replace(/\D/g, '');
+        }
+    });
+
+    $('#ckbDivide').change(function () {
+        if (this.checked) {
+            $('#rowParents').slideDown(500);
+            $('#colRootQuantity').slideUp(500);
+        } else {
+            $('#colRootQuantity').slideDown(500);
+            $('#rowParents').slideUp(500);
+        }
+    });
 
     $(document).on('hidden.bs.modal', '#modalComboLine', function () {
         $('#txtName').val('');
@@ -190,24 +237,57 @@
         LoadCombo();
     });
 
-    function LoadLevel() {
+    $("#slRootLevels").change(function () {
+        LoadParentsByRoot();
+    });
+
+
+    function ResetComponent(){
+        $('#ckbDivide').prop('checked',false);
+        $('#rowParents').slideUp(500);
+        $('#colRootQuantity').slideDown(500);
+    }
+
+    function LoadRootLevels() {
         $.ajax({
-            url: '/admin/job-level',
+            url: '/admin/root-level',
             type: 'get',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
             success: function (data) {
-                $('#slLevel').empty();
-                data.jl.forEach(l => {
-                    let opt = '<option value="' + l._id + '">' + l.name + '</option>';
-                    $('#slLevel').append(opt);
+                console.log(data)
+                $('#slRootLevels').empty();
+                data.roots.forEach(r => {
+                    let parents = (r.parents.map(x => x.name)).toString();
+                    $('#slRootLevels').append('<option value="' + r._id + '">' + r.name + ' [ ' + parents + ' ]</option>');
                 })
+                LoadParentsByRoot();
             }, error: function (jqXHR, textStatus, errorThrown) {
                 alert(jqXHR.responseJSON.msg);
             }
         })
     }
+
+    function LoadParentsByRoot() {
+        $.ajax({
+            url: '/admin/parents-level/list-by-root',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: { rootId: $('#slRootLevels option:selected').val() },
+            success: function (data) {
+                console.log(data);
+                $('#slParentsLevels').empty();
+                data.parentsList.forEach(p => {
+                    let levels = (p.job_levels.map(x => x.name)).toString();
+                    $('#slParentsLevels').append('<option value="' + p._id + '">' + p.name + ' [' + levels + ' ]</option>');
+                })
+            }
+        })
+    }
+
 
     $("#txtQuantity").on("keypress keyup blur", function (event) {
         //this.value = this.value.replace(/[^0-9\.]/g,'');
@@ -225,3 +305,9 @@
     });
 
 </script>
+
+<style>
+    input[name="quantity"] {
+        text-align: right;
+    }
+</style>

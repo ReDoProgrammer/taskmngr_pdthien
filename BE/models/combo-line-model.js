@@ -9,9 +9,13 @@ const comboLineSchema = new Schema({
         type:Schema.Types.ObjectId,
        ref:'combo'
     },
-    lv:{
+    parents:{
         type:Schema.Types.ObjectId,
-        ref:'job_level'
+        ref:'parents_level'
+    },
+    root:{
+        type:Schema.Types.ObjectId,
+        ref:'root_level'
     },
     qty:{
         type:Number,
