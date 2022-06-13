@@ -10,6 +10,18 @@ router.delete('/', authenticateAdminToken,async (req, res) => {
             msg:`Size not found!`
         })
     }
+
+    await size.delete()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`The size has been deleted!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not delete this size with error: ${new Error(err.message)}`
+        })
+    })
 })
 
 router.get('/', async (req, res) => {
