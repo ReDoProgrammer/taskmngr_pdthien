@@ -18,7 +18,7 @@
                         <input type="text" name="txtDescription" id="txtDescription" class="form-control"
                             placeholder="Description">
                     </div>
-                </div>               
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -32,7 +32,7 @@
 
     $('#btnSubmit').click(function () {
         let name = $('#txtName').val().trim();
-        let description = $('#txtDescription').val().trim();      
+        let description = $('#txtDescription').val().trim();
 
         if (sizeId.length > 0) {
             $.ajax({
@@ -42,12 +42,16 @@
                     authorization: "Bearer " + localStorage.getItem('accessToken'),
                 },
                 data: {
-                    id:sizeId,
+                    id: sizeId,
                     name,
-                    description                   
+                    description
                 },
                 success: function (data, textStatus, xhr) {
-                    alert(data.msg);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
                     $('#modalSize').modal('hide');
                     sizeId = '';
                 }, error: function (jqXHR, textStatus, errorThrown) {
@@ -63,10 +67,14 @@
                 },
                 data: {
                     name,
-                    description                  
+                    description
                 },
                 success: function (data, textStatus, xhr) {
-                    alert(data.msg);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
                     $('#modalSize').modal('hide');
                     sizeId = '';
                 }, error: function (jqXHR, textStatus, errorThrown) {
