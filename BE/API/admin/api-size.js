@@ -2,129 +2,103 @@ const router = require('express').Router();
 const Size = require('../../models/size-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
-router.delete('/', authenticateAdminToken, (req, res) => {
+router.delete('/', authenticateAdminToken,async (req, res) => {
     let id = req.body.id;
-    Size.findOneAndDelete({ _id: id }, (err, size) => {
-        if (err) {
-            return res.status(500).json({
-                msg: 'Xóa size thất bại!',
-                error: new Error(err.message)
-            });
-        }
-
-        if (size) {
-            return res.status(200).json({
-                msg: 'Xóa size thành công!'
-            });
-        } else {
-            return res.status(404).json({
-                msg: 'Lỗi không tìm thấy size tương ứng!'
-            });
-        }
-
-    })
+    let size = await Size.findById(id);
+    if(!size){
+        return res.status(404).json({
+            msg:`Size not found!`
+        })
+    }
 })
 
-router.get('/', (req, res) => {
-    Size.find({}, (err, sizes) => {
-        if (err) {
-            return res.status(500).json({
-                msg: 'load size list failed'
-            });
-        }
-
-        return res.status(200).json({
-            msg: 'Load size list successfully!',
-            sizes: sizes
-        });
-    });
+router.get('/', async (req, res) => {
+    let sizes = await Size.find({});
+    return res.status(200).json({
+        msg:`Load sizes list successfully!`,
+        sizes
+    })
 });
 
-router.get('/detail', authenticateAdminToken, (req, res) => {
+router.get('/detail', authenticateAdminToken, async (req, res) => {
     let { id } = req.query;
-    Size.findById(id, (err, size) => {
-        if (err) {
-            return res.status(500).json({
-                msg: 'Lấy thông tin size thất bại!',
-                error: new Error(err.message)
-            });
-        }
-        if (size) {
-            return res.status(200).json({
-                msg: 'Lấy thông tin size thành công!',
-                size: size
-            })
-        } else {
-            return res.status(404).json({
-                msg: 'Không tìm thấy size tương ứng!'
-            });
-        }
+    let size = await Size.findById(id);
+    if(!size){
+        return res.status(404).json({
+            msg:`Size not found!`
+        })
+    }
+
+    return res.status(200).json({
+        msg:`Load size detail successfully!`,
+        size
     })
 })
 
 
-router.post('/', authenticateAdminToken, (req, res) => {
+router.post('/', authenticateAdminToken, async (req, res) => {
     let { name, description } = req.body;
     //ràng buộc dữ liệu cho đầu vào tên size
     if (name.length == 0) {
         return res.status(403).json({
-            msg: 'Vui lòng nhập tên size'
+            msg: 'Size name can not be blank!'
         });
     }
 
     let size = new Size({
-        name: name,
-        description: description        
+        name,
+        description
     });
-    size.save()
-        .then(size => {
-            return res.status(201).json({
-                msg: 'Thêm mới size thành công!',
-                size: size
-            });
+
+    await size.save()
+    .then(_=>{
+        return res.status(201).json({
+            msg:`Size has been created!`
         })
-        .catch(err => {
-            return res.status(500).json({
-                msg: 'Thêm mới size thất bại!',
-                error: new Error(err.message)
-            });
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not create new size with error: ${new Error(err.message)}`
         })
+    })
+
+    
 })
 
-router.put('/', authenticateAdminToken, (req, res) => {
+router.put('/', authenticateAdminToken,async (req, res) => {
     let { id, name, description } = req.body;
 
     //ràng buộc dữ liệu cho đầu vào tên size
     if (name.length == 0) {
         return res.status(403).json({
-            msg: 'Vui lòng nhập tên size'
+            msg: `Size nam can not be blank!`
         });
     }
 
+    let size = await Size.findById(id);
+    if(!size){
+        return res.status(404).json({
+            msg:`Size not found!`
+        })
+    }
 
+    size.name =name;
+    size.description = description;
 
-    Size.findOneAndUpdate({ _id: id }, {
-        name,
-        description      
-    }, { new: true }, (err, size) => {
-        if (err) {
-            return res.status(500).json({
-                msg: 'Cập nhật thông tin size thất bại!',
-                error: new Error(err.message)
-            });
-        }
-
-        if (size) {
-            return res.status(200).json({
-                msg: 'Cập nhật thông tin size thành công!',
-                size: size
-            });
-        } else {
-            return res.status(500).json({
-                msg: 'Cập nhật thông tin size thất bại!'
-            });
-        }
+    await size.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`Size has been updated!`
+        })
     })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not update size with error: ${new Error(err.message)}`
+        })
+    })
+
+
+    
 })
 
 module.exports = router;
