@@ -111,62 +111,42 @@
     })
 
     $('#btnSubmitLine').click(function () {
-        let lv = $('#slLevel option:selected').val();
-        let qty = parseInt($('#txtQuantity').val());
-
-        if (qty == 0) {
-            $('#lblLineMsg').text('(!) Quantity is invalid!');
-            $('#lblLineMsg').show().delay(5000).fadeOut();
+        let quantity = parseInt($('#ckbDivide').is(':checked') ? $('#txtParentsQuantity').val() : $('#txtRootQuantity').val());
+        console.log(quantity)
+        if (quantity == 0) {
+            $('#lblLineMsg').text('(!) Quantity must be greater than 0');
+            $('#lblLineMsg').fadeIn().delay(3000).fadeOut();
             return;
         }
+        $.ajax({
+            url: '/admin/combo-line',
+            type: 'post',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                combo: _id,
+                level: $('#ckbDivide').is(':checked') ? $('#slParentsLevels option:selected').val() : $('#slRootLevels option:selected').val(),
+                divided: $('#ckbDivide').is(':checked'),
+                quantity
 
-        if (lineId.trim().length == 0) {
-            //trường hợp thêm mới 1 line vào combo
-            $.ajax({
-                url: '/admin/combo-line',
-                type: 'post',
-                headers: {
-                    authorization: "Bearer " + localStorage.getItem("accessToken"),
-                },
-                data: {
-                    lv,
-                    cb: _id,
-                    qty
-                },
-                success: function (data) {
-                    alert(data.msg);
-                    LoadLines();
-                }, error: function (jqXHR, textStatus, errorThrown) {
-                    $('#lblLineMsg').text(jqXHR.responseJSON.msg);
-                    $('#lblLineMsg').show().delay(5000).fadeOut();
-                }
-            })
-        } else {
-            //cập nhật line đã tồn tại 
-            $.ajax({
-                url: '/admin/combo-line',
-                type: 'put',
-                headers: {
-                    authorization: "Bearer " + localStorage.getItem("accessToken"),
-                },
-                data: {
-                    _id: lineId,
-                    cb: _id,
-                    lv, qty
-                }, success: function (data) {
-                    alert(data.msg);
-                    LoadLines();
-                }
-            })
-        }
-
-        //reset lại giá trị cho các input
-        $('#txtQuantity').val('0');
-        lineId = '';
-
-
-
-
+            },
+            success: function (data) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Successfully!',
+                    text: data.msg
+                });
+                LoadLines();
+            }
+            , error: function (jqXHR, textStatus, errorThrown) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Opp...!',
+                    text: jqXHR.responseJSON.msg
+                });
+            }
+        })
     })
 
 
@@ -210,7 +190,9 @@
     })
 
     $('input[name="quantity"]').focusout(function () {
-        $(this).val('0');
+        if ($(this).val().length == 0) {
+            $(this).val('0');
+        }
     })
 
     $('input[name="quantity"]').keyup(function (e) {
@@ -242,10 +224,11 @@
     });
 
 
-    function ResetComponent(){
-        $('#ckbDivide').prop('checked',false);
+    function ResetComponent() {
+        $('#ckbDivide').prop('checked', false);
         $('#rowParents').slideUp(500);
         $('#colRootQuantity').slideDown(500);
+        $('input[name="quantity"]').val('0');
     }
 
     function LoadRootLevels() {

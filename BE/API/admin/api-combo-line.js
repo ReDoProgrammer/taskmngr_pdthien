@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const ComboLine = require('../../models/combo-line-model');
+const Combo = require('../../models/combo-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 
@@ -47,8 +48,8 @@ router.get('/detail', authenticateAdminToken, (req, res) => {
         })
 })
 
-router.delete('/delete-many',authenticateAdminToken,(req,res)=>{
-    let {comboId} = req.body;//lấy id của combo
+router.delete('/delete-many', authenticateAdminToken, (req, res) => {
+    let { comboId } = req.body;//lấy id của combo
     console.log(comboId);
     // ComboLine
     // .deleteMany({cb:comboId},err=>{
@@ -112,44 +113,57 @@ router.put('/', authenticateAdminToken, (req, res) => {
             })
 })
 
-router.post('/', authenticateAdminToken, (req, res) => {
-    let { cb, lv, qty } = req.body;
+router.post('/', authenticateAdminToken, async (req, res) => {
+    let { combo, level, quantity, divided } = req.body;
 
-    //kiểm tra xem job level tương ứng với combo truyền vào đã tồn tại trong csdl hay chưa
-    ComboLine
-        .countDocuments({ cb, lv }, (err, count) => {
-            if (err) {
-                return res.status(500).json({
-                    msg: `Can not count comboline with error: ${new Error(err.message)}`
-                })
-            }
-            //nếu đã tồn tại thì không cho phép thêm mới để tránh trùng lặp dữ liệu
-            if (count > 0) {
-                return res.status(403).json({
-                    msg: `This job level already exist in this combo!`
-                })
-            }
+    let cb = await Combo.findById(combo);
+    if (!cb) {
+        return res.status(404).json({
+            msg: `Combo not found!`
+        })
+    }
 
-            //nếu chưa có thì tiến hành thêm line này vào combo đã chọn
-            let cbl = new ComboLine({ cb, lv, qty });
-            cbl
-                .save()
+    var chk = await ComboLine.countDocuments({
+        $or: [
+            { cb: combo, parents: level },
+            { cb: combo, root: level }
+        ]
+    });
+    if (chk > 0) {
+        return res.status(409).json({
+            msg: `This line already exists in combo!`
+        })
+    }
+
+    let cbl = new ComboLine();
+    cbl.cb = combo;
+    if (divided == 'true') {
+        cbl.parents = level;
+    } else {
+        cbl.root = level;
+    }
+    cbl.qty = quantity;
+
+    await cbl.save()
+        .then(async _ => {
+            cb.lines.push(cbl);
+            await cb.save()
                 .then(_ => {
                     return res.status(201).json({
-                        msg: `Combo line has been created!`
+                        msg: `Comboline has been added!`
                     })
                 })
                 .catch(err => {
                     return res.status(500).json({
-                        msg: `Can not create new comboline with error: ${new Error(err.message)}`
+                        msg: `Can not add comboline into combo with error: ${new Error(err.message)}`
                     })
                 })
-
         })
-
-
-
-
+        .catch(err=>{
+            return res.status(500).json({
+                msg:`Can not create new comboline with error: ${new Error(err.message)}`
+            })
+        })
 
 })
 
