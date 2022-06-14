@@ -1,0 +1,126 @@
+<%-include('modal')%>
+    <button class="btn btn-primary" id="btnAddNew">
+        <i class="fa fa-plus" aria-hidden="true"></i>
+        Add new
+    </button>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="tblGroups"></tbody>
+    </table>
+
+    <script>
+        var groupId = '';
+        $(document).ready(function () {
+            LoadGroups();
+        })
+
+
+        $(document).on("click", "button[name='delete']", function () {
+            Swal.fire({
+                title: 'Are you sure want to delete this customer group?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/admin/customer-group',
+                        type: 'delete',
+                        headers: {
+                            authorization: "Bearer " + localStorage.getItem("accessToken"),
+                        },
+                        data: {
+                            groupId: $(this).closest("tr").attr("id")
+                        },
+                        success: function (data, textStatus, xhr) {
+                            Swal.fire(
+                                'Deleted!',
+                                data.msg,
+                                'success'
+                            )
+                            LoadGroups();
+                        }, error: function (jqXHR, textStatus, errorThrown) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Opp...!',
+                                text: jqXHR.responseJSON.msg
+                            });
+                        }
+                    })
+
+                }
+            })
+        })
+
+
+        $(document).on("click", "button[name='update']", function () {
+
+
+            $.ajax({
+                url: '/admin/customer-group/detail',
+                type: 'get',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                    groupId: $(this).closest("tr").attr("id")
+                },
+                success: function (data) {
+                    $('#txtName').val(data.group.name);
+                    $('#txaDescription').val(data.group.description);
+                    $('#modalGroup').modal();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseJSON.msg);
+
+                }
+
+            })
+        })
+
+
+        $('#btnAddNew').click(function () {
+            $('#modalGroup').modal();
+            $('#txtName').val('');
+            groupId = '';
+            $('#txaDescription').val('');
+            $('#txtName').select();
+        })
+
+        function LoadGroups() {
+            $.ajax({
+                url: '/admin/customer-group/list',
+                type: 'get',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                success: function (data) {
+                    $('#tblGroups').empty();
+                    let idx = 1;
+                    data.groups.forEach(g => {
+                        let tr = '<tr id = "' + g._id + '">';
+                        tr += '<td>' + (idx++) + '</td>';
+                        tr += '<td class="font-weight-bold text-info">' + g.name + '</td>';
+                        tr += '<td>' + g.description + '</td>';
+                        tr += '<td class="text-right">';
+                        tr += '<button name = "update" class="btn btn-xs btn-warning ml-2"><i class="fa fa-edit"></i></button>';
+                        tr += '<button name = "delete" class="btn btn-xs btn-danger ml-1"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                        tr += '</td>';
+                        tr += '</tr>';
+                        $('#tblGroups').append(tr);
+                    })
+
+                }
+            })
+        }
+    </script>
