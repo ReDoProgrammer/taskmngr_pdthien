@@ -17,7 +17,39 @@ const bonusPenaltySchema = new Schema({
     is_bonus:{
         type:Boolean,
         default:false
-    }
+    },
+    lines:[
+        {
+            task:{
+                type:Schema.Types.ObjectId,
+                ref:'task'
+            },
+            user:{
+                type:Schema.Types.ObjectId,
+                ref:'user'
+            },
+            is_bonus:{
+                type:Boolean,
+                default:true
+            },
+            remark:{
+                type:String
+            },
+            costs:{
+                type:Number
+            },
+            
+            decided:{
+                by:{
+                    type:Schema.Types.ObjectId,
+                    ref:'user'
+                },
+                at:{
+                    type:Date
+                }
+            }
+        }
+    ]
    
 });
 
