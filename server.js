@@ -310,8 +310,6 @@ app.use('/tla/task',TLATaskController);
 const apiTLAAuth = require('./BE/API/TLA/api-auth');
 app.use('/tla/auth',apiTLAAuth);
 
-const apiTLABonusPenaltyLine = require('./BE/API/TLA/api-bonus-penalty-line');
-app.use('/tla/bonus-penalty-line',apiTLABonusPenaltyLine);
 
 const apiTLACC = require('./BE/API/TLA/api-cc');
 app.use('/tla/cc',apiTLACC);

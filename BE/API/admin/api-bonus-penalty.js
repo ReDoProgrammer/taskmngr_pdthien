@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 const BonusPenalty = require('../../models/bonus-penalty-model');
-const BonusPennaltyLine = require('../../models/bonus-penalty-line-model');
+
 
 
 router.get('/detail',authenticateAdminToken,(req,res)=>{
