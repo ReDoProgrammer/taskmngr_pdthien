@@ -124,7 +124,7 @@ router.put('/push-line',authenticateAdminToken,async (req,res)=>{
         })
     }else{
         cb.lines.push({
-            parents:level,
+            root:level,
             quantity
         })
     }
