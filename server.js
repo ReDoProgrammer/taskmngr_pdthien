@@ -167,6 +167,7 @@ const adminCloudController = require('./BE/controllers/Admin/cloud-controller');
 const adminColorModeController = require('./BE/controllers/Admin/color-mode-controller');
 const adminComboController = require('./BE/controllers/Admin/combo-controller');
 const adminCustomerController = require("./BE/controllers/Admin/customer-controller");
+const adminCustomerGroupController = require('./BE/controllers/Admin/customer-group-controller');//quan ly nhom khach hang
 const adminCustomerStyleController = require("./BE/controllers/Admin/customer-style-controller");
 const adminFileFormatController = require("./BE/controllers/Admin/file-format-controller");
 const adminHomeController = require("./BE/controllers/Admin/home-controller");
@@ -216,6 +217,7 @@ const apiAdminCloud = require('./BE/API/admin/api-cloud');
 const apiAdminColorMode = require('./BE/API/admin/api-color-mode');
 const apiCombo = require('./BE/API/admin/api-combo');
 const apiAdminCustomer = require('./BE/API/admin/api-customer');
+const apiAdminCustomerGroup = require('./BE/API/admin/api-customer-group');
 const apiAdminFileFormat = require('./BE/API/admin/api-file-format');
 const apiAdminJobLevel = require('./BE/API/admin/api-job-level');
 const apiMaterial = require('./BE/API/admin/api-material');
@@ -345,15 +347,15 @@ app.use('/tla/user',apiTLAUser);
 //  *
 //  */
 app.use('/admin/bank',apiAdminBank);//quản lý thông tin danh sách ngân hàng
+app.use('/admin/bonus-penalty',apiAdminBonusPenalty);//quản lý các hình thức phạt đối với nhân viên
 app.use('/admin/user',apiAdminUser);//quản lý thông tin nhân viên
 app.use('/admin/cloud',apiAdminCloud);//quản lý thông tin cloud để upload link file của khách
 app.use('/admin/color-mode',apiAdminColorMode);//quảnlý hệ màu của hình ảnh
 app.use('/admin/combo',apiCombo);//quan ly combo
-
 app.use('/admin/customer',apiAdminCustomer);//quản lý thông tin khách hàng
+app.use('/admin/customer-group',apiAdminCustomerGroup);//quan ly nhom khach hang
 app.use('/admin/file-format',apiAdminFileFormat);//quản lý thông tin định dạng file hình ảnh xuất cho khách
 app.use('/admin/job-level',apiAdminJobLevel);//quản lý thông tin danh sách level, khác với apiAdminCustomerLevel
-app.use('/admin/bonus-penalty',apiAdminBonusPenalty);//quản lý các hình thức phạt đối với nhân viên
 app.use('/admin/material',apiMaterial);//quan ly don gia hinh anh dau vao duoc chup boi sale
 app.use('/admin/module',apiAdminModule);// quản lý danh sách module của web
 app.use('/admin/national-style',apiAdminNationalStyle);//quản lý thông tin style của khách hàng theo quốc gia
@@ -377,6 +379,7 @@ app.use("/admin", adminHomeController);
 app.use("/admin", adminAccountController);
 
 app.use("/admin/customer", adminCustomerController);
+app.use('/admin/customer-group',adminCustomerGroupController);
 app.use("/admin/customer-style", adminCustomerStyleController);
 
 

@@ -177,7 +177,11 @@ const customerSchema = new Schema({
            
         }
 
-    ]
+    ],
+    group:{
+        type:Schema.Types.ObjectId,
+        ref:'customer_group'
+    }
 
 });
 
