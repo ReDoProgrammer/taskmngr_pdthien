@@ -219,26 +219,19 @@ router.delete('/', authenticateAdminToken, (req, res) => {
 })
 
 
-router.get('/profile', authenticateAdminToken, (req, res) => {
-  User
-    .findById(req.user._id)
-    .exec()
-    .then(user => {
-      if (!user) {
-        return res.status(404).json({
-          msg: `User not found!`
-        })
-      }
-      return res.status(200).json({
-        msg: `Get user profile successfully!`,
-        fullname: user.fullname
-      })
+router.get('/profile', authenticateAdminToken,async (req, res) => {
+  let user = await User.findById(req.user._id);
+  if(!user){
+    return res.status(401).json({
+      msg:`Need login to access this module`,
+      url:'/admin/login'
     })
-    .catch(err => {
-      return res.status(500).json({
-        msg: `Can not get user profile with error: ${new Error(err.message)}`
-      })
-    })
+  }
+  return res.status(200).json({
+    msg:`Load user profile successfully!`,
+    fullname:user.fullname
+  })
+  
 })
 
 
@@ -266,6 +259,11 @@ router.post("/login", (req, res) => {
           accessToken,
           refreshToken
         });
+      }else{
+        return res.status(409).json({
+          msg:`You can not access this module!`,
+          url:'/admin/login'
+        })
       }
 
     })

@@ -6,10 +6,11 @@ const { getModule } = require('../middlewares/common');
 
 
 async function authenticateAdminToken(req, res, next) {
-  const authHeader =await req.headers["authorization"];
+  const authHeader = await req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
+
   if (!token) {
-    console.log(  `Authenticate failed. token null`)
+    console.log(`Authenticate failed. token null`)
     return res.status(401).json({
       msg: `Authenticate failed. token null`
     });
@@ -30,6 +31,11 @@ async function authenticateAdminToken(req, res, next) {
         if (m.users.includes(user._id)) {
           req.user = user;
           next();
+        } else {
+          return res.status(403).json({
+            msg: `You can not access this module!`,
+            url: '/admin/login'
+          })
         }
       })
       .catch(err => {
