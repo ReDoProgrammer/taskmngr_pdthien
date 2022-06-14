@@ -53,4 +53,4 @@ const bonusPenaltySchema = new Schema({
    
 });
 
-module.exports = mongoose.model('bonus-penalty',bonusPenaltySchema);
+module.exports = mongoose.model('bonus_penalty',bonusPenaltySchema);

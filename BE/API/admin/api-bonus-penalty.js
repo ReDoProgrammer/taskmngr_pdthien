@@ -41,32 +41,31 @@ router.get('/list',authenticateAdminToken,(req,res)=>{
     })
 })
 
-router.delete('/',authenticateAdminToken,(req,res)=>{
+router.delete('/',authenticateAdminToken,async (req,res)=>{
     let {pId} = req.body;
-    BonusPennaltyLine
-    .countDocuments({bpId:pId},async (err,count)=>{
-        if(err){
-            return res.status(500).json({
-                msg:`Can not check bonus penalty line belong to this bonus penalty with error: ${new Error(err.message)}`
-            })
-        }
+    let bp = await BonusPenalty.findById(pId);
 
-        if(count>0){
-            return res.status(403).json({
-                msg:`Can not delete this bonus penalty when bonus penalty lines based on it!`
-            })
-        }
+    if(!bp){
+        return res.status(404).json({
+            msg:`Bonus penalty not found!`
+        })
+    }
 
-        await BonusPenalty.findByIdAndDelete(pId,(err)=>{
-            if(err){
-                return res.status(500).json({
-                    msg:`Can not delete this bonus penalty `
-                })
-            }
+    if(bp.lines.length > 0){
+        return res.status(403).json({
+            msg:`Can not delete this bonus penalty cause having lines depend on it!`
+        })
+    }
 
-            return res.status(200).json({
-                msg:`The bonus penalty has been deleted!`
-            })
+    await bp.delete()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`Bonus penalty has been deleted!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not delete this bonus penalty with error: ${new Error(err.message)}`
         })
     })
 })
