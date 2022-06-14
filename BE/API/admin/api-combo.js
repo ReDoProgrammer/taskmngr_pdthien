@@ -3,6 +3,21 @@ const Combo = require('../../models/combo-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 
+router.get('/list-lines',authenticateAdminToken,async (req,res)=>{
+    let {combo} = req.query;
+    let cb = await Combo.findById(combo)
+            .populate('lines.root')
+            .populate('lines.parents');
+    if(!cb){
+        return res.status(404).json({
+            msg:`Combo not found!`
+        })
+    }
+    return res.status(200).json({
+        msg:`Load combo lines successfully!`,
+        lines: cb.lines
+    })
+})
 
 router.get('/list', authenticateAdminToken, async (req, res) => {
     let cbs = await Combo.find({})
@@ -49,12 +64,7 @@ router.delete('/', authenticateAdminToken, async (req, res) => {
         return res.status(404).json({
             msg: `Combo not found!`
         })
-    }
-    if (cb.lines.length > 0) {
-        return res.status(403).json({
-            msg: `Can not delete this combo when having lines based on it!`
-        })
-    }
+    }  
 
     await cb.delete()
         .then(_ => {
