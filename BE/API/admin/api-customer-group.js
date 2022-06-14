@@ -11,6 +11,22 @@ router.get('/list',authenticateAdminToken,async (req,res)=>{
     })
 })
 
+router.get('/list-combo',authenticateAdminToken,async (req,res)=>{
+    let {groupId} = req.query;
+    let group = await CustomerGroup.findById(groupId).populate('combos');
+    if(!group){
+        return res.status(404).json({
+            msg:`Customer group not found`
+        })
+    }
+
+    return res.status(200).json({
+        msg:`Load combos list that belong to this customer group successfully!`,
+        combos:group.combos
+    })
+
+})
+
 router.get('/detail',authenticateAdminToken, async (req,res)=>{
     let {groupId} = req.query;
     let group = await CustomerGroup.findById(groupId);
@@ -86,6 +102,67 @@ router.put('/',authenticateAdminToken,async (req,res)=>{
         })
     })
 })
+
+router.put('/push-combo',authenticateAdminToken,async (req,res)=>{
+    let {combo,groupId} = req.body;
+    let group = await CustomerGroup.findById(groupId);
+    if(!group){
+        return res.status(404).json({
+            msg:`Customer group not found!`
+        })
+    }
+
+    if(group.combos.includes(combo)){
+        return res.status(409).json({
+            msg:`The combo already applied to this group`
+        })
+    }
+
+    group.combos.push(combo);
+    await group.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`Combo has been added into this group!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not add this combo to customer group with error: ${new Error(err.message)}`
+        })
+    })
+})
+
+router.put('/pull-combo',authenticateAdminToken, async (req,res)=>{
+    let {combo,groupId} = req.body;
+
+    let group = await CustomerGroup.findById(groupId);
+    if(!group){
+        return res.status(404).json({
+            msg:`Customer group not found!`
+        })
+    }
+
+    if(!group.combos.includes(combo)){
+        return res.status(404).json({
+            msg:`Combo is not belongs to this customer group!`
+        })
+    }
+
+    group.combos.pull(combo);
+    await group.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`The combo has been removed from this customer group!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not remove combo from this customer group with error: ${new Error(err.message)}`
+        })
+    })
+})
+
+
 
 router.post('/',authenticateAdminToken,async (req,res)=>{
     let {name,description} = req.body;
