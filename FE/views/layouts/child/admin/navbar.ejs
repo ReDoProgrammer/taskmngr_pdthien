@@ -77,8 +77,7 @@
         $('#spUser').text(data.fullname)
       },
       error: function (err) {
-        console.log(err)
-        // window.location.href = err.responseJSON.url;
+        window.location.href = err.responseJSON.url;
       }
 
     })
