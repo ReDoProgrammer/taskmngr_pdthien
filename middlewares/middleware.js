@@ -41,7 +41,8 @@ async function authenticateAdminToken(req, res, next) {
       .catch(err => {
         console.log(err);
         return res.status(err.code).json({
-          msg: err.msg
+          msg: err.msg,
+          url:'/admin/login'
         })
       })
 
