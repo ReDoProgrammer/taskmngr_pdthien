@@ -129,15 +129,14 @@
 
     $('#btnSubmitLine').click(function () {
         let quantity = parseInt($('#ckbDivide').is(':checked') ? $('#txtParentsQuantity').val() : $('#txtRootQuantity').val());
-        console.log(quantity)
         if (quantity == 0) {
             $('#lblLineMsg').text('(!) Quantity must be greater than 0');
             $('#lblLineMsg').fadeIn().delay(3000).fadeOut();
             return;
         }
         $.ajax({
-            url: '/admin/combo-line',
-            type: 'post',
+            url: '/admin/combo/push-line',
+            type: 'put',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
@@ -146,7 +145,6 @@
                 level: $('#ckbDivide').is(':checked') ? $('#slParentsLevels option:selected').val() : $('#slRootLevels option:selected').val(),
                 divided: $('#ckbDivide').is(':checked'),
                 quantity
-
             },
             success: function (data) {
                 Swal.fire({

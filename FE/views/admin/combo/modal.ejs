@@ -123,15 +123,20 @@
         }
         let from_date = strToDate($('#txtFromDate').val());
         if (isNaN(from_date) || from_date === null) {
-            $('#lblError').text('(*) From date field is invalid');
+            $('#lblError').text('(*) From date is invalid');
             $('#lblError').show().delay(3000).fadeOut();
             return;
         }
 
         let to_date = strToDate($('#txtToDate').val());
-        if ($('#cbkUnlimited').is(':checked')) {
+        if (!$('#cbkUnlimited').is(':checked')) {
             if (isNaN(to_date) || to_date === null) {
-                $('#lblError').text('(*) To date field is invalid');
+                $('#lblError').text('(*) To date is invalid');
+                $('#lblError').show().delay(3000).fadeOut();
+                return;
+            }
+            if(to_date<from_date){
+                $('#lblError').text('(*) To date is invalid');
                 $('#lblError').show().delay(3000).fadeOut();
                 return;
             }

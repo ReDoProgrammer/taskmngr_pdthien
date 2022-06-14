@@ -95,6 +95,52 @@ router.put('/', authenticateAdminToken, async (req, res) => {
         })
 })
 
+router.put('/push-line',authenticateAdminToken,async (req,res)=>{
+    let {combo,level,divided,quantity} = req.body;
+
+    let check = await Combo.countDocuments({
+        _id: combo,
+        $or:[
+            {'lines.root':level},
+            {'lines.parents':level}
+        ]
+    });
+    if(check>0){
+        return res.status(409).json({
+            msg:`This line already exists in combo!`
+        })
+    }
+    
+    let cb = await Combo.findById(combo);
+    if(!cb){
+        return res.status(404).json({
+            msg:`Combo not found!`
+        })
+    }
+    if(divided == 'true'){
+        cb.lines.push({
+            parents:level,
+            quantity
+        })
+    }else{
+        cb.lines.push({
+            parents:level,
+            quantity
+        })
+    }
+    
+    await cb.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`Line has been added into this combo!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not add line into combo with error: ${new Error(err.message)}`
+        })
+    })   
+})
 
 router.post('/', authenticateAdminToken, async (req, res) => {
     let { name, description, price, from_date,to_date,status,unlimited } = req.body;
