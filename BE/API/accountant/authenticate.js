@@ -16,7 +16,8 @@ router.get('/profile', authenticateAccountantToken, async (req, res) => {
   let user = await User.findById(req.user._id);
   if (!user) {
     return res.status(404).json({
-      msg: `User not found!`
+      msg: `User not found!`,
+      url:'/accountant/login'
     })
   }
 
@@ -57,7 +58,8 @@ router.post("/login", (req, res) => {
     .catch(err => {
       console.log(err)
       return res.status(err.code).json({
-        msg: `${new Error(err.msg)}`
+        msg: `${new Error(err.msg)}`,
+        url:'/accountant/login'
       })
     })
 })

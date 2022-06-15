@@ -15,7 +15,8 @@ function authenticateAccountantToken(req, res, next) {
       console.log('got an error when veryfy account: ', new Error(err.message));
 
       return res.status(403).json({
-        msg: `Lỗi xác thực tài khoản ${err.message}`
+        msg: `Lỗi xác thực tài khoản ${err.message}`,
+        url:'/accountant/login'
       });
 
     }
@@ -27,7 +28,8 @@ function authenticateAccountantToken(req, res, next) {
           next();
         } else {
           return res.status(403).json({
-            msg: `You have no permission to access this module!`
+            msg: `You have no permission to access this module!`,
+            url:'/accountant/login'
           })
         }
 
@@ -35,7 +37,8 @@ function authenticateAccountantToken(req, res, next) {
       .catch(err => {
         console.log(err);
         return res.status(err.code).json({
-          msg: err.msg
+          msg: err.msg,
+          url:'/accountant/login'
         })
       })
 

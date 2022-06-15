@@ -65,7 +65,7 @@
         $('#spUser').text(data.fullname)
       },
       error: function (err) {
-        window.location.href = '/accountant/login';
+        window.location.href = err.responseJSON.url;
       }
 
     })
