@@ -266,9 +266,9 @@ router.put('/', authenticateAccountantToken, async (req, res) => {
 
     //xu ly khi group bi thay doi
     let exists = false;
-    if(!g.customers.includes(customerId)){
+    if(customer.group != group){
         let oGroup = await Group.findById(customer.group);
-        oGroup.pull(customer);
+        oGroup.customers.pull(customer);
         await oGroup.save();   
         exists = true;   
     }
@@ -320,11 +320,26 @@ router.put('/', authenticateAccountantToken, async (req, res) => {
     };
     customer.status = status;
     await customer.save()
-        .then(async _ => {           
-            return res.status(201).json({
-                msg: `Customer has been updated!`,
-                url: '/accountant/customer'
-            })
+        .then(async _ => {  
+            if(exists){
+                g.customers.push(customer);
+                await g.save()
+                .then(_=>{
+                    return res.status(201).json({
+                        msg:`Customer has been updated!`
+                    })
+                })
+                .catch(err=>{
+                    return res.status(500).json({
+                        msg:`Can not update customer with error: ${new Error(err.message)}`
+                    })
+                })
+            }   else{
+                return res.status(201).json({
+                    msg: `Customer has been updated!`                   
+                })
+            }      
+           
         })
         .catch(err => {
             return res.status(500).json({
