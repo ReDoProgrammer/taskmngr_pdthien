@@ -12,7 +12,8 @@ async function authenticateAdminToken(req, res, next) {
   if (!token) {
     console.log(`Authenticate failed. token null`)
     return res.status(401).json({
-      msg: `Authenticate failed. token null`
+      msg: `Authenticate failed. token null`,
+      url:'/admin/login'
     });
   }
 
@@ -20,7 +21,8 @@ async function authenticateAdminToken(req, res, next) {
     if (err) {
       console.log('got an error when veryfy account: ', new Error(err.message));
       return res.status(403).json({
-        msg: `Lỗi xác thực tài khoản ${err.message}`
+        msg: `Lỗi xác thực tài khoản ${err.message}`,
+        url:'/admin/login'
       });
 
     }

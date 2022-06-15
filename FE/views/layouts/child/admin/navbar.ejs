@@ -79,6 +79,7 @@
       },
       error: function (err) {
         window.location.href = err.responseJSON.url;
+        console.log(err.responseJSON)
       }
 
     })

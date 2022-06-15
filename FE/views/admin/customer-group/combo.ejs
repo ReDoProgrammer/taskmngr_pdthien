@@ -1,0 +1,90 @@
+<div id="modalGroup" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="">Group name:</label>
+                    <input type="text" placeholder="Group name" id="txtName" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="">Description:</label>
+                    <textarea placeholder="Description" id="txaDescription" rows="2" class="form-control"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="" class="text-danger font-weight-bold" id="lblError"></label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" id="btnSubmit">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Submit changes
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $('#btnSubmit').click(function () {
+        let name = $('#txtName').val();
+        let description = $('#txaDescription').val();
+
+        if (name.trim().length === 0) {
+            $('#lblError').text('(!) Group name can not be blank');
+            $('#lblError').fadeIn().delay(3000).fadeOut();
+            return;
+        }
+
+        if (groupId.length === 0) {
+            $.ajax({
+                url: '/admin/customer-group',
+                type: 'post',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                    name, description
+                },
+                success: function (data) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
+                    $('#modalGroup').modal('hide');
+                }
+            })
+        } else {
+            $.ajax({
+                url: '/admin/customer-group',
+                type: 'put',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                    groupId, name, description
+                },
+                success: function (data) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully!',
+                        text: data.msg
+                    });
+                    $('#modalGroup').modal('hide');
+                }
+            })
+        }
+    })
+
+    $('#modalGroup').on('hidden.bs.modal', function () {
+        LoadGroups();
+    })
+</script>
