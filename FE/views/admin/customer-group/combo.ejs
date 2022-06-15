@@ -1,5 +1,7 @@
-<div id="modalGroup" class="modal fade" role="dialog">
-    <div class="modal-dialog">
+<script src="/js/bootstrap-select.min.js"></script>
+<link href="/css/bootstrap-select.min.css" rel="stylesheet" />
+<div id="modalComboes" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
 
         <!-- Modal content-->
         <div class="modal-content">
@@ -8,24 +10,28 @@
                 <h4 class="modal-title">Modal Header</h4>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label for="">Group name:</label>
-                    <input type="text" placeholder="Group name" id="txtName" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label for="">Description:</label>
-                    <textarea placeholder="Description" id="txaDescription" rows="2" class="form-control"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="" class="text-danger font-weight-bold" id="lblError"></label>
+                <div class="input-group">
+                    <select name="" id="slComboes" class="form-control selectpicker" data-live-search="true"></select>
+                    <div class="input-group-btn">
+                        <button class="btn btn-primary" id="btnAddCombo">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                            Add combo
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-success" id="btnSubmit">
-                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
-                    Submit changes
-                </button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Combo</th>
+                            <th class="text-right">Price</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblComboes"></tbody>
+                </table>
             </div>
         </div>
 
@@ -33,58 +39,132 @@
 </div>
 
 <script>
-    $('#btnSubmit').click(function () {
-        let name = $('#txtName').val();
-        let description = $('#txaDescription').val();
-
-        if (name.trim().length === 0) {
-            $('#lblError').text('(!) Group name can not be blank');
-            $('#lblError').fadeIn().delay(3000).fadeOut();
-            return;
-        }
-
-        if (groupId.length === 0) {
-            $.ajax({
-                url: '/admin/customer-group',
-                type: 'post',
-                headers: {
-                    authorization: "Bearer " + localStorage.getItem("accessToken"),
-                },
-                data: {
-                    name, description
-                },
-                success: function (data) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Successfully!',
-                        text: data.msg
-                    });
-                    $('#modalGroup').modal('hide');
-                }
-            })
-        } else {
-            $.ajax({
-                url: '/admin/customer-group',
-                type: 'put',
-                headers: {
-                    authorization: "Bearer " + localStorage.getItem("accessToken"),
-                },
-                data: {
-                    groupId, name, description
-                },
-                success: function (data) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Successfully!',
-                        text: data.msg
-                    });
-                    $('#modalGroup').modal('hide');
-                }
-            })
-        }
+    $(document).ready(function () {
+        LoadCombos();
     })
 
-    $('#modalGroup').on('hidden.bs.modal', function () {
+    $('#btnAddCombo').click(function () {
+        $.ajax({
+            url: '/admin/customer-group/push-combo',
+            type: 'put',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                groupId,
+                combo: $('#slComboes option:selected').val()
+            },
+            success: function (data) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Successfully!',
+                    text: data.msg
+                });
+                LoadComboesByGroup();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed!',
+                    text: jqXHR.responseJSON.msg
+                });
+            }
+        })
+    })
+
+    $('#modalComboes').on('hidden.bs.modal', function () {
         LoadGroups();
     })
+    $(document).on('show.bs.modal', '#modalComboes', function () {
+        LoadComboesByGroup();
+    });
+
+    $(document).on("click", "button[name='delete-combo']", function () {
+        Swal.fire({
+            title: 'Are you sure want to delete this combo from customer group?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/admin/customer-group/pull-combo',
+                    type: 'put',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem('accessToken'),
+                    },
+                    data: {
+                        groupId,
+                        combo: $(this).closest("tr").attr("id")
+                    },
+                    success: function (data) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Congratulation',
+                            text: data.msg
+                        });
+                        LoadComboesByGroup();
+                    }
+                    , error: function (jqXHR, textStatus, errorThrown) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Opp..',
+                            text: jqXHR.responseJSON.msg
+                        });
+                    }
+                })
+            }
+        })
+    })
+
+    function LoadCombos() {
+        $.ajax({
+            url: '/admin/combo/list',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            success: function (data) {
+                $('#slComboes').empty();
+                data.cbs.forEach(c => {
+                    let levels = (c.lines.map(x => x.root ? x.root.name : x.parents.name)).toString();
+                    $('#slComboes').append('<option value="' + c._id + '">' + c.name + ' [' + levels + ' ]</option>');
+                })
+                $('#slComboes').selectpicker();
+                $('#slComboes').selectpicker('refresh');
+            }
+        })
+    }
+    function LoadComboesByGroup() {
+        $.ajax({
+            url: '/admin/customer-group/list-comboes',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: { groupId },
+            success: function (data) {
+                $('#tblComboes').empty();
+                let idx = 1;
+                data.comboes.forEach(c => {
+                    let details = c.lines.map(x => {
+                        return x.root ? ('{' + x.root.name + ' :' + x.quantity + '}') : ('{' + x.parents.name + ': ' + x.quantity + '}')
+                    })
+
+                    let tr = '<tr id="' + c._id + '">';
+                    tr += '<td>' + (idx++) + '</td>';
+                    tr += '<td class="text-primary font-weight-bold text-left">' + c.name + ' : [<span class="text-danger">' + details + '</span>]</td>';
+                    tr += '<td class="text-danger font-weight-bold ">' + c.price + '</td>';
+                    tr += '<td class="text-right">';
+                    tr += '<button name = "delete-combo" class="btn btn-xs btn-danger ml-1"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                    tr += '</td>'
+                    tr += '</tr>';
+                    $('#tblComboes').append(tr);
+                })
+            }
+        })
+    }
 </script>

@@ -10,7 +10,7 @@ const customerGroupSchema = new Schema({
     description:{
         type:String
     },
-    combos:[{
+    comboes:[{
         type:Schema.Types.ObjectId,
         ref:'combo'
     }],
