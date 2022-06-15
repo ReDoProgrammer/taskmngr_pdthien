@@ -10,6 +10,7 @@
                     <th>#</th>
                     <th>Name</th>
                     <th>Description</th>
+                    <th class="text-right">Combo</th>
                     <th></th>
                 </tr>
             </thead>
@@ -116,6 +117,7 @@
                             tr += '<td>' + (idx++) + '</td>';
                             tr += '<td class="font-weight-bold text-info">' + g.name + '</td>';
                             tr += '<td>' + g.description + '</td>';
+                            tr += '<td class="text-right">' + g.comboes.length + '</td>';
                             tr += '<td class="text-right">';
                             tr += '<button name = "combo" class="btn btn-xs btn-info ml-2">Combo</button>';
                             tr += '<button name = "update" class="btn btn-xs btn-warning ml-1"><i class="fa fa-edit"></i></button>';
