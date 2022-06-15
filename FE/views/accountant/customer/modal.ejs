@@ -14,24 +14,31 @@
                     <div class="panel-heading">Basic information</div>
                     <div class="panel-body">
                         <div class="form-row">
-                            <div class="form-group col-md-2 col-sm-6 col-xs-6">
+                            <div class="form-group col-md-6 col-sm-3 col-xs-3">
+                                <label for="">Customer group:</label>
+                                <select name="" id="slCustomerGroups" class="form-control"></select>
+                            </div>
+                            <div class="form-group col-md-3 col-sm-3 col-xs-3">
                                 <label class="col-form-label">Firstname <span class="text-danger">(*)</span>:</label>
                                 <input type="text" class="form-control" id="txtFirstname" placeholder="Firstname" />
                             </div>
-                            <div class="form-group col-md-2 col-sm-6 col-xs-6">
+                            <div class="form-group col-md-3 col-sm-3 col-xs-3">
                                 <label class="col-form-label">Lastname:</label>
                                 <input type="text" class="form-control" id="txtLastname" placeholder="Lastname" />
-                            </div>
-                            <div class="form-group col-md-4 col-sm-4 col-xs-12">
+                            </div>                            
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6 col-sm-6 col-xs-6">
                                 <label class="col-form-label">Email <span class="text-danger">(*)</span>:</label>
                                 <input type="email" class="form-control" id="txtEmail" placeholder="Email" />
                             </div>
-                            <div class="form-group col-md-2 col-sm-4 col-xs-6">
+                            <div class="form-group col-md-3 col-sm-3 col-xs-3">
                                 <label class="col-form-label">Password:</label>
                                 <input type="password" class="form-control" id="txtPassword" placeholder="Password"
                                     value="123" />
                             </div>
-                            <div class="form-group col-md-2 col-sm-4 col-xs-6">
+                            <div class="form-group col-md-3 col-sm-3 col-xs-3">
                                 <label class="col-form-label">Confirm pwd:</label>
                                 <input type="password" class="form-control" id="txtConfirmPassword"
                                     placeholder="Confirm password" value="123" />
@@ -188,7 +195,25 @@
         LoadNationalStyle();
         LoadOutput();
         LoadSize();
+        LoadCustomerGroups();
     })
+
+    function LoadCustomerGroups(){
+       $.ajax({
+        url:'/accountant/customer-group',
+        type:'get',
+        headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                success:function(data){
+                    $('#slCustomerGroups').empty();
+                    data.groups.forEach(g=>{
+                        $('#slCustomerGroups').append('<option value="'+g._id+'">'+g.name+'</option>');
+                    })
+                }
+       })
+
+    }
 
     $(document).on('show.bs.modal', '#modalCustomer', function () {
 
@@ -246,6 +271,12 @@
 
 
     $("#btnSubmit").click(function () {
+        let group = $('#slCustomerGroups option:selected').val();
+        if(!group || typeof group === 'undefined'){
+            $('#lblError').text("(!) Customer group is invalid!");
+            $('#lblError').show().delay(5000).fadeOut();
+            return;
+        }
         let firstname = $("#txtFirstname").val().trim();
         if (firstname.length == 0) {
             $('#lblError').text("Firstname can not be blank");
@@ -352,6 +383,7 @@
                     authorization: "Bearer " + localStorage.getItem("accessToken"),
                 },
                 data: {
+                    group,
                     firstname,
                     lastname,
                     email,
@@ -384,9 +416,11 @@
                     })
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    $('#msgError').text(jqXHR.responseJSON.msg);
-                    $('#msgError').show().delay(5000).fadeOut();
-
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Opp.....!',
+                        text: jqXHR.responseJSON.msg
+                    })
                 }
             });
         } else {
@@ -398,6 +432,7 @@
                 },
                 data: {
                     customerId,
+                    group,
                     firstname,
                     lastname,
                     email,
@@ -429,9 +464,12 @@
                         text: data.msg
                     })
                 },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    $('#msgError').text(jqXHR.responseJSON.msg);
-                    $('#msgError').show().delay(5000).fadeOut();
+                error: function (jqXHR, textStatus, errorThrown) {                  
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Opp.....!',
+                        text: jqXHR.responseJSON.msg
+                    })
 
                 }
             });

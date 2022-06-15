@@ -17,7 +17,7 @@ const customerGroupSchema = new Schema({
     customers:[
         {
             type:Schema.Types.ObjectId,
-            ref:'customer'
+            ref:'customer',            
         }
     ],
     created:{

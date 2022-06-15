@@ -79,6 +79,8 @@ app.use('/accountant/customer',accountantCustomerController);
 const accountantCustomerAPI = require('./BE/API/accountant/api-customer');
 app.use('/accountant/customer',accountantCustomerAPI);
 
+const accountantCustomerGroupAPI = require('./BE/API/accountant/api-customer-group');
+app.use('/accountant/customer-group',accountantCustomerGroupAPI);//quan ly nhom khach hang
 
 const accountantFFAPI = require('./BE/API/accountant/api-file-format');
 app.use('/accountant/file-format',accountantFFAPI);

@@ -1,30 +1,30 @@
 const router = require('express').Router();
 const { authenticateAccountantToken } = require("../../../middlewares/accountant-middleware");
 const Customer = require("../../models/customer-model");
-const Job = require('../../models/job-model');
+const Group = require('../../models/customer-group-model');
 
 const pageSize = 20;
 
-router.get('/contract',authenticateAccountantToken,async (req,res)=>{
-    let {customerId} = req.query;
+router.get('/contract', authenticateAccountantToken, async (req, res) => {
+    let { customerId } = req.query;
     let customer = await Customer.findById(customerId)
-    .populate('contracts.lines.parents')
-    .populate('contracts.lines.root');
-    if(!customer){
+        .populate('contracts.lines.parents')
+        .populate('contracts.lines.root');
+    if (!customer) {
         return res.status(404).json({
-            msg:`Customer not found!`
+            msg: `Customer not found!`
         })
     }
 
-    if(customer.contracts.length == 0){
+    if (customer.contracts.length == 0) {
         return res.status(404).json({
-            msg:`Customer contracts not found!`
+            msg: `Customer contracts not found!`
         })
     }
 
     return res.status(200).json({
-        msg:`Load contract detail successfully!`,
-        contract: customer.contracts[customer.contracts.length-1]
+        msg: `Load contract detail successfully!`,
+        contract: customer.contracts[customer.contracts.length - 1]
     })
 })
 
@@ -105,6 +105,7 @@ router.get('/list', authenticateAccountantToken, async (req, res) => {
 
 router.post('/', authenticateAccountantToken, async (req, res) => {
     let {
+        group,
         firstname,
         lastname,
         email,
@@ -131,6 +132,12 @@ router.post('/', authenticateAccountantToken, async (req, res) => {
     } = req.body;
 
 
+    let g = await Group.findById(group);
+    if (!g) {
+        return res.status(404).json({
+            msg: `Customer group not found!`
+        })
+    }
 
     let chk = await Customer.countDocuments({ 'contact.email': email });
     if (chk > 0) {
@@ -142,6 +149,7 @@ router.post('/', authenticateAccountantToken, async (req, res) => {
 
     let customer = new Customer();
 
+    customer.group = group;
     customer.created = {
         by: req.user._id,
         at: new Date()
@@ -188,11 +196,19 @@ router.post('/', authenticateAccountantToken, async (req, res) => {
     };
     customer.status = status;
     await customer.save()
-        .then(_ => {
-            return res.status(201).json({
-                msg: `Customer has been added!`,
-                url: '/accountant/customer'
-            })
+        .then(async _ => {
+            g.customers.push(customer);
+            await g.save()
+                .then(_ => {
+                    return res.status(201).json({
+                        msg: `Customer has been created!`
+                    })
+                })
+                .catch(err => {
+                    return res.status(500).json({
+                        msg: `Can not add customer into group with error: ${new Error(err.message)}`
+                    })
+                })
         })
         .catch(err => {
             return res.status(500).json({
@@ -204,6 +220,7 @@ router.post('/', authenticateAccountantToken, async (req, res) => {
 router.put('/', authenticateAccountantToken, async (req, res) => {
     let {
         customerId,
+        group,
         firstname,
         lastname,
         email,
@@ -229,7 +246,17 @@ router.put('/', authenticateAccountantToken, async (req, res) => {
         status
     } = req.body;
 
+   
+    let g = await Group.findById(group);
+    if(!g){
+        return res.status(404).json({
+            msg:`Customer group not found!`
+        })
+    }
+
     let customer = await Customer.findById(customerId);
+
+  
 
     if (!customer) {
         return res.status(404).json({
@@ -237,6 +264,16 @@ router.put('/', authenticateAccountantToken, async (req, res) => {
         })
     }
 
+    //xu ly khi group bi thay doi
+    let exists = false;
+    if(!g.customers.includes(customerId)){
+        let oGroup = await Group.findById(customer.group);
+        oGroup.pull(customer);
+        await oGroup.save();   
+        exists = true;   
+    }
+
+   
     customer.updated = {
         by: req.user._id,
         at: new Date()
@@ -283,7 +320,7 @@ router.put('/', authenticateAccountantToken, async (req, res) => {
     };
     customer.status = status;
     await customer.save()
-        .then(_ => {
+        .then(async _ => {           
             return res.status(201).json({
                 msg: `Customer has been updated!`,
                 url: '/accountant/customer'
@@ -332,7 +369,7 @@ router.put('/contract', authenticateAccountantToken, async (req, res) => {
     }
 
 
-    let c = {};  
+    let c = {};
 
     let lines = await contract.lines.map(x => {
         let obj = {};
@@ -350,8 +387,8 @@ router.put('/contract', authenticateAccountantToken, async (req, res) => {
         by: req.user._id,
         at: new Date()
     };
-   
-   customer.contracts.push(c);
+
+    customer.contracts.push(c);
 
     await customer.save()
         .then(_ => {
