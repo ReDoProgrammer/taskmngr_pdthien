@@ -1,21 +1,38 @@
 const router = require('express').Router();
 const Combo = require('../../models/combo-model');
+const Group = require('../../models/customer-group-model');
+const Customer = require('../../models/customer-model');
 const { authenticateSaleToken } = require("../../../middlewares/sale-middleware");
 
-router.get('/',authenticateSaleToken,(req,res)=>{
-    Combo
-    .find({})
-    .exec()
-    .then(cbs=>{
-        return res.status(200).json({
-            msg:`Load comboes list successfully!`,
-            cbs
+router.get('/', authenticateSaleToken, async (req, res) => {
+    let { customerId } = req.query;
+    let customer = await Customer.findById(customerId);
+
+    if (!customer) {
+        return res.status(404).json({
+            msg: `Customer not found!`
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not get comboes list with error: ${new Error(err.message)}`
+    }
+
+    let group = await Group.findById(customer.group);
+    if (!group) {
+        return res.status(404).json({
+            msg: `Customer group not found!`
         })
+    }
+
+    let cbIds = group.comboes;
+    let comboes = await Combo.find({
+        _id: { $in: cbIds },
+        $or:[
+            {'applied.unlimited':true},
+            {'applied.todate':{$gte:new Date()}}
+        ]
+    });
+   
+    return res.status(200).json({
+        msg:`Load comboes list successfully!`,
+        comboes
     })
 })
 

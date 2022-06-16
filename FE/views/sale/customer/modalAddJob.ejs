@@ -61,7 +61,7 @@
               </div>
             </div>
 
-            <div class="row">
+            <div class="row" id="rowCombo">
               <div class="col-sm-12 form-group">
                 <div class="form-check">
                   <input class="form-check-input" type="checkbox" value="" id="ckbChooseCombo">
@@ -138,8 +138,7 @@
 
 <script>
 
-  $(document).ready(function () {
-    LoadCombo();
+  $(document).ready(function () {  
     LoadCaptureders();
     LoadTemplates();
   })
@@ -164,18 +163,23 @@
 
 
 
-  function LoadCombo() {
+  function LoadComboes() {
     $.ajax({
       url: '/sale/combo',
       type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
+      data:{customerId},
       success: function (data) {
-        data.cbs.forEach(c => {
+        if(data.comboes.length>0){
+          $('#rowCombo').slideDown(500);
+          data.comboes.forEach(c => {
           let opt = '<option value="' + c._id + '">' + c.name + '</option>';
           $('#slCombo').append(opt);
         })
+        }
+        
       }
     })
   }
@@ -216,12 +220,13 @@
 
 
   $("#addJobModal").on('shown.bs.modal', function (e) {
+    $('#rowCombo').slideUp(100);
     $('#txtReceivedDate').val(getCurrentTime())
     $('#lblError').hide();
     $('#ckbChooseCombo').prop('checked', false);
     $('#divCombo').hide();
     LoadMaterials();
-
+    LoadComboes();
   })
   $('#addJobModal').on('hidden.bs.modal', function () {
     LoadCustomers(search, page);

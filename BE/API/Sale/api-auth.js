@@ -6,7 +6,6 @@ const _MODULE = 'SALE';
 const {
   getModule,
   checkAccount,
-  getRole,
   generateAccessToken } = require('../common');
 
 
@@ -48,14 +47,16 @@ router.post("/login", (req, res) => {
         });
       }else{
         return res.status(403).json({
-          msg:`You have no permission to access this module!`
+          msg:`You have no permission to access this module!`,
+          url:'/sale/login'
         })
       }
     })
     .catch(err => {
       console.log(err);
       return res.status(err.code).json({
-        msg: `${new Error(err.msg)}`
+        msg: `${new Error(err.msg)}`,
+        url:'/sale/login'
       })
     })
 })
