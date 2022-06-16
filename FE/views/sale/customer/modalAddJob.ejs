@@ -150,6 +150,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
+      data:{customerId},
       success: function (data) {
         $('#slTemplates').empty();
         data.templates.forEach(temp => {
