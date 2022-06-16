@@ -7,7 +7,8 @@ function authenticateSaleToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
   if (token == null) return res.status(401).json({
-    msg: `Lỗi xác thực tài khoản. token null`
+    msg: `Token null`,
+    url:'/sale/login'
   });
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {

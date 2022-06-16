@@ -20,7 +20,7 @@ router.get('/check-contract',authenticateSaleToken,async (req,res)=>{
     })
   }
   return res.status(200).json({
-    msg:`Available to add job into this customer!`,
+    msg:`Job has been added!`,
     customer
   })
 })
