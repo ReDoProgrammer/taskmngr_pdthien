@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { authenticateAccountantToken } = require("../../../middlewares/accountant-middleware");
 const Customer = require("../../models/customer-model");
 const Group = require('../../models/customer-group-model');
+const { resolveInclude } = require('ejs');
 
 const pageSize = 20;
 
@@ -246,34 +247,30 @@ router.put('/', authenticateAccountantToken, async (req, res) => {
         status
     } = req.body;
 
-   
+
     let g = await Group.findById(group);
-    if(!g){
+    if (!g) {
         return res.status(404).json({
-            msg:`Customer group not found!`
+            msg: `Customer group not found!`
         })
     }
 
     let customer = await Customer.findById(customerId);
-
-  
-
     if (!customer) {
         return res.status(404).json({
             msg: `Customer not found!`
         })
     }
 
-    //xu ly khi group bi thay doi
-    let exists = false;
-    if(customer.group != group){
-        let oGroup = await Group.findById(customer.group);
-        oGroup.customers.pull(customer);
-        await oGroup.save();   
-        exists = true;   
-    }
 
+    //xu ly khi group bi thay doi
+    let oGroup = null;
+    if (customer.group != group) {
+        oGroup = customer.group;
+        customer.group = group;
+    }
    
+
     customer.updated = {
         by: req.user._id,
         at: new Date()
@@ -319,27 +316,28 @@ router.put('/', authenticateAccountantToken, async (req, res) => {
         }
     };
     customer.status = status;
+
     await customer.save()
-        .then(async _ => {  
-            if(exists){
-                g.customers.push(customer);
-                await g.save()
-                .then(_=>{
-                    return res.status(201).json({
-                        msg:`Customer has been updated!`
+        .then(async _ => {
+
+            if (oGroup) {
+                Promise.all([PushCustomer(group, customer._id), PullCustomer(oGroup, customer._id)])
+                    .then(_ => {
+                        return res.status(201).json({
+                            msg: `Customer has been updated!`
+                        })
                     })
-                })
-                .catch(err=>{
-                    return res.status(500).json({
-                        msg:`Can not update customer with error: ${new Error(err.message)}`
+                    .catch(err => {
+                        return res.status(500).json({
+                            msg: `Can not update customer with error: ${new Error(err.message)}`
+                        })
                     })
-                })
-            }   else{
+            } else {
                 return res.status(201).json({
-                    msg: `Customer has been updated!`                   
+                    msg: `Customer has been updated!`
                 })
-            }      
-           
+            }
+
         })
         .catch(err => {
             return res.status(500).json({
@@ -446,7 +444,56 @@ router.delete('/', authenticateAccountantToken, async (req, res) => {
         })
 })
 
+
+
 module.exports = router;
+
+const PullCustomer = (groupId, customerId) => {
+    return new Promise(async (resolve, reject) => {
+        let group = await Group.findById(groupId);
+        if (!group) {
+            return reject({
+                code: 404,
+                msg: `Customer group not found!`
+            })
+        }
+        group.customers.pull(customerId);
+        await group.save()
+            .then(_ => {
+                return resolve(group);
+            })
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not pull customer from group with error: ${new Error(err.message)}`
+                })
+            })
+    })
+}
+
+const PushCustomer = (groupId, customerId) => {
+    return new Promise(async (resolve, reject) => {
+        let group = await Group.findById(groupId);
+        if (!group) {
+            return reject({
+                code: 404,
+                msg: `Customer not found!`
+            })
+        }
+
+        group.customers.push(customerId);
+        await group.save()
+            .then(_ => {
+                return resolve(group);
+            })
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not add customer into group with error: ${new Error(err.message)}`
+                })
+            })
+    })
+}
 
 
 
