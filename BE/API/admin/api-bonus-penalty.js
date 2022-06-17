@@ -4,46 +4,9 @@ const BonusPenalty = require('../../models/bonus-penalty-model');
 
 
 
-router.get('/detail',authenticateAdminToken,(req,res)=>{
-    let {bpId} = req.query;
-    BonusPenalty
-    .findById(bpId)
-    .exec()
-    .then(bp=>{
-        if(!bp){
-            return res.status(404).json({
-                msg:`BonusPenalty not found!`
-            })
-        }
-
-        return res.status(200).json({
-            msg:`Get BonusPenalty detail successfully!`,
-            bp
-        })
-    })
-})
-
-router.get('/list',authenticateAdminToken,(req,res)=>{
-   
-    BonusPenalty
-    .find()
-    .exec()
-    .then(bplist=>{
-        return res.status(200).json({
-            msg:`Get bonus penalties list successfully!`,
-            bplist
-        })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not get bonus penalties list with error: ${new Error(err.message)}`
-        })
-    })
-})
-
-router.delete('/',authenticateAdminToken,async (req,res)=>{
-    let {pId} = req.body;
-    let bp = await BonusPenalty.findById(pId);
+router.get('/detail', authenticateAdminToken, async (req, res) => {
+    let { bpId } = req.query;
+    let bp = await BonusPenalty.findById(bpId);
 
     if(!bp){
         return res.status(404).json({
@@ -51,73 +14,102 @@ router.delete('/',authenticateAdminToken,async (req,res)=>{
         })
     }
 
-    if(bp.lines.length > 0){
-        return res.status(403).json({
-            msg:`Can not delete this bonus penalty cause having lines depend on it!`
+    return res.status(200).json({
+        msg:`Get bonus penalty detail successfully!`,
+        bp
+    })
+})
+
+router.get('/list', authenticateAdminToken, async (req, res) => {
+    let bps = await BonusPenalty.find({});
+    return res.status(200).json({
+        msg: `Load bonus penalties list successfully!`,
+        bps
+    })
+
+})
+
+router.delete('/', authenticateAdminToken, async (req, res) => {
+    let { pId } = req.body;
+    let bp = await BonusPenalty.findById(pId);
+
+    if (!bp) {
+        return res.status(404).json({
+            msg: `Bonus penalty not found!`
         })
     }
 
+
     await bp.delete()
-    .then(_=>{
-        return res.status(200).json({
-            msg:`Bonus penalty has been deleted!`
+        .then(_ => {
+            return res.status(200).json({
+                msg: `Bonus penalty has been deleted!`
+            })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not delete this bonus penalty with error: ${new Error(err.message)}`
-        })
-    })
-})
-
-router.put('/',authenticateAdminToken, (req,res)=>{
-    let {bpId,name,description,is_bonus} = req.body;
-
-    BonusPenalty
-    .findByIdAndUpdate(bpId,{
-        name,
-        description,
-        is_bonus
-    },{new:true},(err,b)=>{
-        if(err){
+        .catch(err => {
             return res.status(500).json({
-                msg:`Can not update bonus penalty with error: ${new Error(err.message)}`
+                msg: `Can not delete this bonus penalty with error: ${new Error(err.message)}`
             })
-        }
-
-        if(!b){
-            return res.status(404).json({
-                msg:`bonus penalty not found!`
-            })
-        }
-
-        return res.status(200).json({
-            msg:`Update bonus penalty successfully!`,
-            b
         })
-    })
 })
 
-router.post('/',authenticateAdminToken,async (req,res)=>{
-    let {name,description,is_bonus} = req.body;
+router.put('/', authenticateAdminToken, async (req, res) => {
+    let { bpId, name, description, is_bonus, costs } = req.body;
 
-    let p = new BonusPenalty({
+    let bp = await BonusPenalty.findById(bpId);
+    if (!bp) {
+        return res.status(404).json({
+            msg: `Bonus or penalty not found!`
+        })
+    }
+
+    bp.name = name;
+    bp.description = description;
+    bp.is_bonus = is_bonus;
+    bp.costs = costs;
+    bp.updated = {
+        at: new Date(),
+        by: req.user._id
+    };
+
+    await bp.save()
+        .then(_ => {
+            return res.status(200).json({
+                msg: is_bonus == 'true' ? `Bonus has been updated` : `Penalty has been updated!`
+            })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not update bonus or penalty with error: ${new Error(err.message)}`
+            })
+        })
+
+
+})
+
+router.post('/', authenticateAdminToken, async (req, res) => {
+    let { name, description, is_bonus, costs } = req.body;
+    let bp = new BonusPenalty({
         name,
         description,
-        is_bonus
+        is_bonus,
+        costs,
+        created: {
+            by: req.user._id
+        }
     });
 
-    await p.save()
-    .then(_=>{
-        return res.status(201).json({
-            msg:`The bonus penalty has been created!`
+    await bp.save()
+        .then(_ => {
+            return res.status(201).json({
+                msg: is_bonus == 'true' ? `Bonus has been created!` : 'Penalty has been created!'
+            })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not create new bonus penalty with error: ${new Error(err.message)}`
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not create bonus penalty with error: ${new Error(err.message)}`
+            })
         })
-    })
 
 })
 
