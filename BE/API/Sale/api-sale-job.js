@@ -6,21 +6,25 @@ const Material = require('../../models/material-model');
 const Combo = require('../../models/combo-model');
 const Customer = require('../../models/customer-model');
 
-router.get('/check-contract',authenticateSaleToken,async (req,res)=>{
-  let {customerId} = req.query;
+
+
+
+
+router.get('/check-contract', authenticateSaleToken, async (req, res) => {
+  let { customerId } = req.query;
   let customer = await Customer.findById(customerId);
-  if(!customer){
+  if (!customer) {
     return res.status(404).json({
-      msg:`Customer not found!`
+      msg: `Customer not found!`
     })
   }
-  if(customer.contracts.length == 0){
+  if (customer.contracts.length == 0) {
     return res.status(303).json({
-      msg:`Can not add job into this customer when contract has been not initialized. Please contact your administrator or accountant to set it!`
+      msg: `Can not add job into this customer when contract has been not initialized. Please contact your administrator or accountant to set it!`
     })
   }
   return res.status(200).json({
-    msg:`Job has been added!`,
+    msg: `Job has been added!`,
     customer
   })
 })
@@ -68,8 +72,8 @@ router.get("/list", authenticateSaleToken, (req, res) => {
       // }
 
     })
+    .populate('group')
     .populate('cb')
-    .populate('tasks')
     .populate('captured.user')
     .populate('templates')
     .exec()
@@ -112,6 +116,8 @@ router.get('/list-by-customer', authenticateSaleToken, async (req, res) => {
   })
 
 })
+
+
 
 router.delete('/', authenticateSaleToken, async (req, res) => {
   let { jobId } = req.body;
@@ -264,10 +270,6 @@ router.post("/", authenticateSaleToken, async (req, res) => {
 
 
 
-  let arr = templates.split(',');
-  arr = arr.map(x => x.trim())
-
-
   let cust = await Customer.findById(customer);
   if (!cust) {
     return res.status(404).json({
@@ -287,10 +289,7 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     end: delivery_date
   };
 
-  if (arr.length > 0) {
-    job.templates = arr;
-  }
-
+  job.templates = templates;
 
 
   if (cb.length > 0) {

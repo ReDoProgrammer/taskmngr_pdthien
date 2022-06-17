@@ -138,23 +138,23 @@
 
 <script>
 
-  $(document).ready(function () {  
+  $(document).ready(function () {
     LoadCaptureders();
-    LoadTemplates();
   })
 
   function LoadTemplates() {
     $.ajax({
-      url: '/sale/template',
+      url: '/sale/customer/list-templates',
       type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data:{customerId},
+      data: { customerId },
       success: function (data) {
         $('#slTemplates').empty();
         data.templates.forEach(temp => {
-          $('#slTemplates').append('<option value="' + temp._id + '">' + temp.name + '</option>')
+          let name = temp.root ? temp.root.name : temp.parents.name;
+          $('#slTemplates').append('<option value="' + name + '">' + name + '</option>')
         })
         $('#slTemplates').selectpicker();
         $('#slTemplates').selectpicker('refresh');
@@ -171,16 +171,18 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data:{customerId},
+      data: { customerId },
       success: function (data) {
-        if(data.comboes.length>0){
+        if (data.comboes.length > 0) {
           $('#rowCombo').slideDown(500);
           data.comboes.forEach(c => {
-          let opt = '<option value="' + c._id + '">' + c.name + '</option>';
-          $('#slCombo').append(opt);
-        })
+            let levels = (c.lines.map(x => (x.root ? x.root.name : x.parents.name)+': '+x.quantity)).toString();
+            
+            let opt = '<option value="' + c._id + '">' + c.name +' [ '+levels+ ' ]</option>';
+            $('#slCombo').append(opt);
+          })
         }
-        
+
       }
     })
   }
@@ -228,9 +230,10 @@
     $('#divCombo').hide();
     LoadMaterials();
     LoadComboes();
+    LoadTemplates();
   })
   $('#addJobModal').on('hidden.bs.modal', function () {
-    LoadCustomers(search, page);
+    LoadCustomers();
   })
 
 
@@ -250,7 +253,12 @@
     }
   });
 
-
+  $("#txtDuration").bind('keyup mouseup', function () {
+    let duration = parseInt($('#txtDuration').val());
+    let assigned_date = strToDate($('#txtReceivedDate').val());
+    let deadline = assigned_date.addHours(duration);
+    $('#txtDeliveryDate').val(convertISODateToTimeFormat(deadline));
+  });
 
   $('#btnSubmitJob').click(function () {
     let customer = customerId;
@@ -265,9 +273,9 @@
     let captureder = $('#ckbMaterial').is(':checked') ? $('#slCaptureders option:selected').val() : null;
     let quantity = $('#txtQuantity').val();
 
+
+
     var templates = ($("#slTemplates").val() || []).join(', ');
-
-
 
 
     if (isNaN(delivery_date) || delivery_date === null || isNaN(received_date) || received_date == null) {

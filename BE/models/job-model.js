@@ -112,12 +112,11 @@ const jobSchema = new Schema({
     },
 
     //phần liên quan tới job template
-    templates:[
-        {
-            type:Schema.Types.ObjectId,
-            ref:'template'
-        }
-    ]
+    templates:{
+        type:String,
+        default:''
+    }      
+    
 
 });
 

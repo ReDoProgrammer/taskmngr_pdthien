@@ -28,7 +28,9 @@ router.get('/', authenticateSaleToken, async (req, res) => {
             {'applied.unlimited':true},
             {'applied.todate':{$gte:new Date()}}
         ]
-    });
+    })
+    .populate('lines.root')
+    .populate('lines.parents');
    
     return res.status(200).json({
         msg:`Load comboes list successfully!`,

@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const { authenticateSaleToken } = require("../../../middlewares/sale-middleware");
 const Customer = require('../../models/customer-model');
+const Group = require('../../models/customer-group-model');
+const Combo = require('../../models/combo-model');
 const pageSize = 20;
 
 router.get('/list',authenticateSaleToken,async (req,res)=>{
@@ -41,6 +43,37 @@ router.get('/list',authenticateSaleToken,async (req,res)=>{
     });
    
 })
+
+router.get('/list-templates', authenticateSaleToken, async (req, res) => {
+    let { customerId } = req.query;
+  
+    let customer = await Customer
+    .findById(customerId)
+    .populate({
+        path : 'contracts.lines',
+        populate : {
+          path : 'root'
+        }
+      })
+      .populate({
+        path : 'contracts.lines',
+        populate : {
+          path : 'parents'
+        }
+      })
+    ;
+    if (!customer) {
+      return res.status(404).json({
+        msg: `Customer not found!`
+      })
+    }
+  
+  
+    return res.status(200).json({
+        msg:`Load customer templates successfully!`,
+        templates: customer.contracts[customer.contracts.length-1].lines
+    })  
+  })
 
 router.get('/detail',async (req,res)=>{
     let {id} = req.query;
