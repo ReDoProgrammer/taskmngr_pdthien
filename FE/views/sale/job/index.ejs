@@ -372,9 +372,8 @@
             success: function (data) {
               $('#tblJobs').empty();
               let idx = 1;
-              data.jobs.forEach(j => {
-                console.log(j.templates)
-                let templates = (j.templates && j.templates.length > 0)?(j.templates.map(x => x.name)).toString():'';
+              data.jobs.forEach(j => {              
+             
                 let isInit = j.tasks.filter(x => x.status !== 0);
 
                 let tr = '<tr id="' + j._id + '" data-customer="' + j.customer._id + '">';
@@ -388,7 +387,7 @@
                 tr += '</td>';
                 tr += '<td>' + (idx++) + '</td>';
                 tr += '<td class="font-weight-bold text-primary">' + j.customer.name.firstname + ' ' + j.customer.name.lastname + '</td>';
-                tr += '<td class="font-weight-bold text-danger">' + getFirstLetters(j.customer.name.firstname + ' ' + j.customer.name.lastname) + getLastLetters(j.customer._id) + '</td>';
+                tr += '<td class="font-weight-bold text-danger">' + (getFirstLetters(j.customer.name.firstname + ' ' + j.customer.name.lastname)).toUpperCase() + getLastLetters(j.customer._id) + '</td>';
                 tr += '<td class="font-weight-bold text-warning">';
                 tr += j.name;
                 if (j.captured.user) {
@@ -407,7 +406,7 @@
                 tr += '</td>';
 
                 tr += '<td class="font-weight-bold text-danger">';
-                tr += templates;
+                tr += j.templates;
                 tr += '</td>';
 
 

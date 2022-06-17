@@ -6,7 +6,7 @@ const Material = require('../../models/material-model');
 const Combo = require('../../models/combo-model');
 const Customer = require('../../models/customer-model');
 
-
+const pageSize = 20;
 
 
 
@@ -53,45 +53,32 @@ router.get('/detail', authenticateSaleToken, (req, res) => {
     })
 })
 
-router.get("/list", authenticateSaleToken, (req, res) => {
+router.get("/list", authenticateSaleToken, async (req, res) => {
   let { page, search } = req.query;
 
-
-  Job.find({
+  let jobs = await Job.find({
     $or: [
-      { name: { "$regex": search, "$options": "i" } }
+      { "name": { "$regex": search, "$options": "i" } },
+      { "intruction": { "$regex": search, "$options": "i" } }
     ]
   })
-    .populate({
-      path: 'customer',
-
-      // match: {
-      //   $or: [
-      //     { firstname: { "$regex": search, "$options": "i" } }
-      //   ]
-      // }
-
-    })
-    .populate('group')
-    .populate('cb')
+    .populate('customer')
     .populate('captured.user')
-    .populate('templates')
-    .exec()
-    .then((jobs) => {
-      let result = jobs.slice(process.env.PAGE_SIZE * (page - 1), process.env.PAGE_SIZE);
-      return res.status(200).json({
-        msg: 'Load jobs list successfully!',
-        pages: jobs.length % process.env.PAGE_SIZE == 0 ? jobs.length / process.env.PAGE_SIZE : Math.floor(jobs.length / process.env.PAGE_SIZE) + 1,
-        jobs: result
-      })
+    .skip((page - 1) * pageSize)
+    .limit(pageSize);
+  let count = await Job.countDocuments({
+    $or: [
+      { "name": { "$regex": search, "$options": "i" } },
+      { "intruction": { "$regex": search, "$options": "i" } }
+    ]
+  });
+  return res.status(200).json({
+    msg: `Load jobs list successfully!`,
+    jobs,
+    pageSize,
+    pages: count % pageSize == 0 ? count / pageSize : (Math.floor(count / pageSize) + 1)
+  })
 
-    })
-    .catch((err) => {
-      return res.status(500).json({
-        msg: "Can not load jobs list",
-        error: new Error(err.message),
-      });
-    });
 });
 
 router.get('/list-by-customer', authenticateSaleToken, async (req, res) => {
