@@ -185,7 +185,6 @@ const adminSizeController = require('./BE/controllers/Admin/size-controller');
 const adminStatusController = require("./BE/controllers/Admin/status-controller");
 const adminStaffController = require("./BE/controllers/Admin/staff-controller");
 const adminStyleController = require("./BE/controllers/Admin/style-controller");
-const adminTemplateController = require('./BE/controllers/Admin/template-controller');
 const adminUserGroupController = require('./BE/controllers/Admin/user-group-controller');
 
 
@@ -231,7 +230,6 @@ const apiAdminSize = require('./BE/API/admin/api-size');
 const apiAdminStaffLevel = require('./BE/API/admin/api-staff-level');
 const apiAdminStatus = require('./BE/API/admin/api-status');
 const apiAdminStyle = require('./BE/API/admin/api-style');
-const apiAdminTemplate = require('./BE/API/admin/api-template');
 const apiAdminUserGroup = require('./BE/API/admin/api-user-group');
 const apiAdminUser = require('./BE/API/admin/api-user');
 
@@ -280,8 +278,6 @@ app.use('/sale/material',apiSaleMaterial);
 const apiSaleTask = require('./BE/API/Sale/api-sale-task');
 app.use('/sale/task',apiSaleTask);
 
-const apiSaleTemplate = require('./BE/API/Sale/api-template');
-app.use('/sale/template',apiSaleTemplate);
 
 const apiSaleUser = require('./BE/API/Sale/api-user');
 app.use('/sale/user',apiSaleUser);
@@ -367,7 +363,6 @@ app.use('/admin/size',apiAdminSize);//quản lý thông tin kích thước file 
 app.use('/admin/staff-level',apiAdminStaffLevel);//quản lý level của nhân viên, phân loại nhân viên: người mới, tập sự, học việc,...
 app.use('/admin/status',apiAdminStatus);//trạng thái của đơn hàng, tạm thời không sử dụng tới
 app.use('/admin/style',apiAdminStyle);//style này tạm thời chưa sử dụng tới
-app.use('/admin/template',apiAdminTemplate);
 app.use('/admin/user-group',apiAdminUserGroup);//quản lý nhóm nhân viên: người nhà, người dưng,....
 
 
@@ -402,7 +397,6 @@ app.use('/admin/setting/parents-level',adminParentsLevelController);
 app.use("/admin/setting/size", adminSizeController);
 app.use("/admin/setting/status", adminStatusController);
 app.use("/admin/setting/style", adminStyleController);
-app.use('/admin/setting/template',adminTemplateController);
 app.use('/admin/setting/user-group',adminUserGroupController);
 app.use("/admin/staff", adminStaffController);
 app.use("/admin/setting/staff-level", adminStaffLevelController);
