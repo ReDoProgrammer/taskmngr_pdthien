@@ -145,7 +145,7 @@
   $("#updateJobModal").on('shown.bs.modal', function (e) {
     LoadComboes();   
     LoadTemplates();
-    
+    LoadJobToEdit();
   })
 
   function LoadJobToEdit() {
@@ -224,7 +224,7 @@
         })
         $('#slTemplates').selectpicker();
         $('#slTemplates').selectpicker('refresh');
-        LoadJobToEdit();
+        
       }
     })
   }
