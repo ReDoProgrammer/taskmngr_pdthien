@@ -237,7 +237,7 @@
     let received_date = strToDate($('#txtReceivedDate').val());
     let delivery_date = strToDate($('#txtDeliveryDate').val());
     let intruction = $('#txaIntruction').val();
-    let cb = $("#ckbChooseCombo").is(':checked') ? $('#slCombo option:selected').val() : null;
+    let cb = $("#ckbChooseCombo").is(':checked') ? $('#slComboes option:selected').val() : null;
     let material = $('#ckbMaterial').is(':checked') ? $('#slMaterials option:selected').val() : null;
     let captureder = $('#ckbMaterial').is(':checked') ? $('#slCaptureders option:selected').val() : null;
     let quantity = $('#ckbMaterial').is(':checked') ? $('#txtQuantity').val() : 0;

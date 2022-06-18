@@ -202,7 +202,7 @@ router.put("/", authenticateSaleToken, async (req, res) => {
     job.cb = cb;
   }
 
-  job.udpated = {
+  job.updated = {
     at: new Date(),
     by: req.user._id
   }
@@ -223,20 +223,23 @@ router.put("/", authenticateSaleToken, async (req, res) => {
     }
   }
 
-  if (templates.length == 0) {
-    job.templates = [];
-  } else {
-    let arr = templates.split(',');
-    arr = arr.map(x => x.trim());
-    job.templates = arr;
-  }
+ job.templates = [];
 
 
   await job.save()
     .then(_ => {
-      return res.status(200).json({
-        msg: `The job has been updated!`
+      PushTemplate(templates,job._id)
+      .then(_=>{
+        return res.status(200).json({
+          msg: `The job has been updated!`
+        })
       })
+      .catch(err=>{
+        return res.status(err.code).json({
+          msg:err.msg
+        })
+      })
+      
     })
     .catch(err => {
       console.log(`Can not update this job with error: ${new Error(err.message)}`)
