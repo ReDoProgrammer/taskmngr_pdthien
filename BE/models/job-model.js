@@ -70,32 +70,32 @@ const jobSchema = new Schema({
         ref: 'cc'
     }],
 
-    created:{
-        by:{
-            type:Schema.Types.ObjectId,
-            ref:'user'
+    created: {
+        by: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
         },
-        at:{
-            type:Date,
+        at: {
+            type: Date,
             default: new Date()
         }
     },
-    updated:{
-        by:{
-            type:Schema.Types.ObjectId,
-            ref:'user'
+    updated: {
+        by: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
         },
-        at:{
-            type:Date
+        at: {
+            type: Date
         }
     },
 
 
     //phan lien quan toi nhan vien chup anh
     captured: {
-        material:{
-            type:Schema.Types.ObjectId,
-            ref:'material'
+        material: {
+            type: Schema.Types.ObjectId,
+            ref: 'material'
         },
         user: {
             type: Schema.Types.ObjectId,
@@ -112,11 +112,17 @@ const jobSchema = new Schema({
     },
 
     //phần liên quan tới job template
-    templates:{
-        type:String,
-        default:''
-    }      
-    
+    templates: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'root'
+        },
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'parents'
+        }
+    ]
+
 
 });
 

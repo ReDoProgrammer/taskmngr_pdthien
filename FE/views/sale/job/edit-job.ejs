@@ -168,7 +168,7 @@
         $('#txtDeliveryDate').val(convertISODateToTimeFormat(data.job.deadline.end));
         $('#txaIntruction').val(data.job.intruction);
 
-        $('#slTemplates').val(data.job.templates);
+        $('#slTemplates').text(data.job.templates);
         $('#slTemplates').selectpicker('refresh')
 
         if (data.job.cb) {

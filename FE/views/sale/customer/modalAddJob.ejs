@@ -154,7 +154,7 @@
         $('#slTemplates').empty();
         data.templates.forEach(temp => {
           let name = temp.root ? temp.root.name : temp.parents.name;
-          $('#slTemplates').append('<option value="' + name + '">' + name + '</option>')
+          $('#slTemplates').append('<option value="' + temp._id + '">' + name + '</option>')
         })
         $('#slTemplates').selectpicker();
         $('#slTemplates').selectpicker('refresh');

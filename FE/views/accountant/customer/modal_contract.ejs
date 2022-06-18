@@ -180,7 +180,9 @@
     LoadCustomers();
   })
 
-
+  $('#slRootLevels').on('change', function () {
+    LoadParentsLevels();
+  })
 
 
 
@@ -201,7 +203,7 @@
     }
   });
 
-  
+
   $('input[name="price"]').focusout(function (e) {
     if ($(this).val().length == 0) {
       $(this).val('0');
