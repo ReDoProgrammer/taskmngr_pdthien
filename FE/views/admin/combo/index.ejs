@@ -1,3 +1,4 @@
+<script src="/js/common.js"></script>
 <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
         <button class="btn btn-primary" id="btnAddNew">
@@ -16,6 +17,8 @@
                 <th scope="col">Description</th>
                 <th scope="col">Levels</th>
                 <th scope="col" class="text-right">Price <span class="text-warning font-weight-bold">($)</span></th>
+                <th scope="col">From date</th>
+                <th scope="col">To date</th>
                 <th></th>
             </tr>
         </thead>
@@ -95,8 +98,8 @@
                         $('#txaDescription').val(data.combo.description);
                         $('#txtFromDate').val(convertISODateToTimeFormat(data.combo.applied.from_date));
                         $('#txtToDate').val(convertISODateToTimeFormat(data.combo.applied.to_date));
-                        $('#cbkUnlimited').prop('checked',data.combo.applied.unlimited);
-                        $('#ckbActive').prop('checked',data.combo.applied.status);
+                        $('#cbkUnlimited').prop('checked', data.combo.applied.unlimited);
+                        $('#ckbActive').prop('checked', data.combo.applied.status);
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
                         alert(jqXHR.responseJSON.msg);
@@ -105,7 +108,7 @@
 
                 })
             })
-            
+
             $('#btnAddNew').click(function () {
                 _id = '';
                 $('#txtFromDate').val(getCurrentTime());
@@ -123,6 +126,7 @@
                         $('#tblData').empty();
                         let idx = 1;
                         data.cbs.forEach(c => {
+                            console.log(c)
                             let levels = (c.lines.map(x => {
                                 return x.root ? x.root.name : x.parents.name
                             })).toString();
@@ -134,7 +138,12 @@
                             tr += '<td>' + c.description + '</td>';
                             tr += '<td class="font-weight-bold text-danger">' + levels + '</td>';
                             tr += '<td class="text-warning text-right">' + c.price + '</td>';
-
+                            tr += '<td>' + convertISODateToTimeFormat(c.applied.from_date) + '</td>';
+                            tr += '<td>';
+                            if (!c.applied.unlimited) {
+                                tr += convertISODateToTimeFormat(c.applied.to_date);
+                            }
+                            tr += '</td>';
                             tr += '<td class="text-right">';
                             tr += '<button name = "lines" class="btn btn-xs btn-info"><i class="fa fa-bars" aria-hidden="true"></i></button>';
                             tr += '<button name = "update" class="btn btn-xs btn-warning ml-2"><i class="fa fa-edit"></i></button>';

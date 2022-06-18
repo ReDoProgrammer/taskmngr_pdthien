@@ -14,12 +14,15 @@ router.get('/', authenticateSaleToken, async (req, res) => {
         })
     }
 
+    
+
     let group = await Group.findById(customer.group);
     if (!group) {
         return res.status(404).json({
             msg: `Customer group not found!`
         })
     }
+ 
 
     let cbIds = group.comboes;
     let comboes = await Combo.find({
@@ -29,9 +32,9 @@ router.get('/', authenticateSaleToken, async (req, res) => {
             {'applied.todate':{$gte:new Date()}}
         ]
     })
-    .populate('lines.root')
-    .populate('lines.parents');
-   
+    // .populate('lines.root')
+    // .populate('lines.parents');
+    console.log(comboes)
     return res.status(200).json({
         msg:`Load comboes list successfully!`,
         comboes

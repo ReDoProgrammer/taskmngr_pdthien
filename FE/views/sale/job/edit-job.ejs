@@ -2,10 +2,10 @@
 <script type='text/javascript'
   src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
 
-  <script src="/js/bootstrap-select.min.js"></script>
-  <link href="/css/bootstrap-select.min.css" rel="stylesheet" />
+<script src="/js/bootstrap-select.min.js"></script>
+<link href="/css/bootstrap-select.min.css" rel="stylesheet" />
 
-  
+
 <div class="modal" tabindex="-1" role="dialog" id="updateJobModal">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -71,9 +71,10 @@
 
             <div class="form-group">
               <label for="">Template</label>
-              <select id="slTemplates" class="selectpicker form-control" multiple title="Choose one of the following..."></select>
+              <select id="slTemplates" class="selectpicker form-control" multiple
+                title="Choose one of the following..."></select>
             </div>
-           
+
 
             <div class="row">
               <div class="col-sm-12 form-group">
@@ -126,31 +127,10 @@
 
 
 <script>
-  $(document).ready(function () {   
+  $(document).ready(function () {
 
   })
-  function LoadComboes() {
-    $.ajax({
-      url: '/sale/combo',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: { customerId },
-      success: function (data) {
-        if (data.comboes.length > 0) {
-          $('#rowCombo').slideDown(500);
-          data.comboes.forEach(c => {
-            let levels = (c.lines.map(x => (x.root ? x.root.name : x.parents.name)+': '+x.quantity)).toString();
-            
-            let opt = '<option value="' + c._id + '">' + c.name +' [ '+levels+ ' ]</option>';
-            $('#slComboes').append(opt);
-          })
-        }
-
-      }
-    })
-  }
+  
 
 
   $("#ckbChooseCombo").change(function () {
@@ -165,6 +145,10 @@
     LoadComboes();
     // LoadCaptureders();
     // LoadMaterials();
+    LoadJobToEdit();
+  })
+
+  function LoadJobToEdit() {
     $.ajax({
       url: '/sale/job/detail',
       type: 'get',
@@ -197,12 +181,12 @@
           $('#divCombo').slideUp();
         }
 
-        if(data.job.captured.user){
+        if (data.job.captured.user) {
           $('#ckbMaterial').prop('checked', true);
           $('#rMaterial').slideDown();
           $('#slMaterials').val(data.job.captured.material);
           $('#txtQuantity').val(data.job.captured.quantity)
-        }else{
+        } else {
           $('#ckbMaterial').prop('checked', false);
           $('#rMaterial').slideUp();
         }
@@ -214,17 +198,19 @@
         alert(jqXHR.responseJSON.msg);
       },
     })
-  })
+  }
+
+
   $('#btnUpdateJob').click(function () {
     let name = $('#txtName').val();
     let input_link = $('#txtLinkSource').val();
     let received_date = strToDate($('#txtReceivedDate').val());
     let delivery_date = strToDate($('#txtDeliveryDate').val());
     let intruction = $('#txaIntruction').val();
-    let cb = $("#ckbChooseCombo").is(':checked')?$('#slCombo option:selected').val():null;
-    let material = $('#ckbMaterial').is(':checked')?$('#slMaterials option:selected').val():null;
-    let captureder = $('#ckbMaterial').is(':checked')?$('#slCaptureders option:selected').val():null;
-    let quantity = $('#ckbMaterial').is(':checked')?$('#txtQuantity').val():0;
+    let cb = $("#ckbChooseCombo").is(':checked') ? $('#slCombo option:selected').val() : null;
+    let material = $('#ckbMaterial').is(':checked') ? $('#slMaterials option:selected').val() : null;
+    let captureder = $('#ckbMaterial').is(':checked') ? $('#slCaptureders option:selected').val() : null;
+    let quantity = $('#ckbMaterial').is(':checked') ? $('#txtQuantity').val() : 0;
     var templates = ($("#slTemplates").val() || []).join(', ');
 
     if (isNaN(delivery_date) || delivery_date === null || isNaN(received_date) || received_date == null) {
@@ -246,13 +232,13 @@
       return;
     }
 
-    if($("#ckbChooseCombo").is(':checked') && (typeof cb === 'undefined'|| cb === null)){
+    if ($("#ckbChooseCombo").is(':checked') && (typeof cb === 'undefined' || cb === null)) {
       $('#lblError').text('(*) Please set combo when it has choosen to continue');
       $('#lblError').show().delay(3000).fadeOut();
       return;
     }
 
-    if($('#ckbMaterial').is(':checked') &&(typeof material === 'undefined' || material === null)){
+    if ($('#ckbMaterial').is(':checked') && (typeof material === 'undefined' || material === null)) {
       $('#lblError').text('(*) Please set material when it has choosen to continue');
       $('#lblError').show().delay(3000).fadeOut();
       return;
@@ -266,7 +252,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { jobId, name, input_link, received_date, delivery_date, intruction,cb,material,captureder,quantity,templates },
+      data: { jobId, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity, templates },
       success: function (data) {
         Swal.fire({
           icon: 'success',
@@ -276,7 +262,7 @@
         $('#updateJobModal').modal('hide');
         LoadJobs();
       },
-      error: function (jqXHR, textStatus, errorThrown) {      
+      error: function (jqXHR, textStatus, errorThrown) {
         Swal.fire({
           icon: 'error',
           title: 'Opp.....!',
@@ -284,9 +270,9 @@
         })
       }
     })
-  
+
   })
-  function LoadComboes() {
+  function LoadComboes() {  
     $.ajax({
       url: '/sale/combo',
       type: 'get',
@@ -295,13 +281,14 @@
       },
       data: { customerId },
       success: function (data) {
+        console.log(data)
         if (data.comboes.length > 0) {
           $('#rowCombo').slideDown(500);
-          console.log(data)
+        
           data.comboes.forEach(c => {
-            let levels = (c.lines.map(x => (x.root ? x.root.name : x.parents.name)+': '+x.quantity)).toString();
-            
-            let opt = '<option value="' + c._id + '">' + c.name +' [ '+levels+ ' ]</option>';
+            let levels = (c.lines.map(x => (x.root ? x.root.name : x.parents.name) + ': ' + x.quantity)).toString();
+
+            let opt = '<option value="' + c._id + '">' + c.name + ' [ ' + levels + ' ]</option>';
             $('#slComboes').append(opt);
           })
         }
