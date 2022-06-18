@@ -143,12 +143,13 @@
   });
 
   $("#updateJobModal").on('shown.bs.modal', function (e) {
-    LoadComboes();
-    LoadJobToEdit();
+    LoadComboes();   
     LoadTemplates();
+    
   })
 
   function LoadJobToEdit() {
+
     $.ajax({
       url: '/sale/job/detail',
       type: 'get',
@@ -159,6 +160,13 @@
         jobId
       },
       success: function (data) {
+       
+        let templates = data.job.templates.map(x=>{
+          return x.root?x.root:x.parents
+        })
+        $('#slTemplates').val(templates).trigger('change');
+        $('#slTemplates').selectpicker('refresh')
+
         $('#lblCustomerFullname').text(data.job.customer.name.firstname + ' ' + data.job.customer.name.lastname);
         $('#lblCustomerPhone').text(data.job.customer.contact.phone);
         $('#lblCustomerEmail').text(data.job.customer.contact.email);
@@ -168,8 +176,8 @@
         $('#txtDeliveryDate').val(convertISODateToTimeFormat(data.job.deadline.end));
         $('#txaIntruction').val(data.job.intruction);
 
-        $('#slTemplates').text(data.job.templates);
-        $('#slTemplates').selectpicker('refresh')
+     
+       
 
         if (data.job.cb) {
           $('#ckbChooseCombo').prop('checked', true);
@@ -212,10 +220,11 @@
         $('#slTemplates').empty();
         data.templates.forEach(temp => {
           let name = temp.root ? temp.root.name : temp.parents.name;
-          $('#slTemplates').append('<option value="' + name + '">' + name + '</option>')
+          $('#slTemplates').append('<option value="' + (temp.root?temp.root._id:temp.parents._id) + '">' + name + '</option>')
         })
         $('#slTemplates').selectpicker();
         $('#slTemplates').selectpicker('refresh');
+        LoadJobToEdit();
       }
     })
   }
