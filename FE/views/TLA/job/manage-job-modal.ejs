@@ -367,12 +367,12 @@
 
   $("#JobMngrModal").on('shown.bs.modal', function (e) {
     LoadTasks();
-    LoadContract();
     LoadJob();
     LoadCCList();
+    LoadCustomer();
+
 
     $('.job-info').hide();
-
     $('#divLevel').hide();
     $('#divEditTask').hide();
     $('#divAssign').hide();
@@ -465,6 +465,7 @@
   })
 
 
+  
 
   function LoadCCList() {
     $.ajax({
@@ -641,33 +642,6 @@
     });
   }
 
-  function LoadContract() {
-
-    $.ajax({
-      url: '/tla/customer/contract',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        customerId
-      },
-
-      success: function (data) {
-        $('#slCustomerLevles').empty();
-        data.contract.lines.forEach(l => {
-          let opt = '<option value="' + (l.root ? l.root._id : l.parents._id) + '" data-root="' + (l.root ? 1 : 0) + '">' + (l.root ? l.root.name : l.parents.name) + '</option>';
-          $('#slCustomerLevles').append(opt);
-        })
-        LoadLocalLevel();
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $('#msgError').text(jqXHR.responseJSON.msg);
-      },
-    })
-  }
-
-
 
   $("#ckbAssignEditor").change(function () {
     if (this.checked) {
@@ -830,7 +804,6 @@
       },
     })
   }
-
 
 
   $('.inputDate').inputmask("datetime", {

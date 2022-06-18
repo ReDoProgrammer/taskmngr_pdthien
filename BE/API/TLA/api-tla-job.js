@@ -51,7 +51,15 @@ router.get('/detail', authenticateTLAToken, async (req, res) => {
 
     let { jobId } = req.query;
     let job = await Job.findById(jobId)
-        .populate('customer');
+    .populate('customer')
+    .populate({
+        path : 'cb',
+        populate : [
+            {path:'lines.root'},
+            {path:'lines.parents'}
+        ]
+      });
+     
     if (!job) {
         return res.status(404).json({
             msg: `Job not found!`

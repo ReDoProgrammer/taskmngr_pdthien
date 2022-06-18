@@ -61,8 +61,6 @@
     var page = 1;
     var jobId = '';
     var customerId = '';
-
-
     $(document).ready(function () {
         LoadJobs();
         setInterval(function () {
@@ -262,12 +260,6 @@
         $('#uploadJobModal').modal();
     })
 
-    $(document).on("click", "button[name='btn-job-info']", function () {
-        jobId = $(this).closest('tr').attr('id');
-        customerId =  $(this).closest('tr').data('customer');
-        LoadJob();
-        $('#JobDetailModal').modal();
-    })
 
     $(document).on("click", "button[name='process-job']", function () {
         jobId = $(this).closest('tr').attr('id');
@@ -375,6 +367,117 @@
         })
     }
 
+    function LoadCustomer(){
+    $.ajax({
+      url:'/tla/customer/detail',
+      type:'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data:{id:customerId},
+      success:function(data){
+        $('.divNationalStyle').html('<i class="text-warning font-weight-bold">' + data.customer.style.nation.name + '</i>');
+        $('.divColor').html('<i class="text-warning font-weight-bold">' + data.customer.style.color.name + '</i>');
+        $('.divSize').html('<i class="text-warning font-weight-bold">' + data.customer.style.size.name + '</i>');
+        $('.divOutput').html('<i class="text-warning font-weight-bold">' + data.customer.style.output.name + '</i>');
+        $('.divCloud').html('<i class="text-warning font-weight-bold">' + data.customer.style.cloud.name + '</i>')
+
+        if (data.customer.style.align.checked) {
+            if (data.customer.style.align.note.trim().length > 0) {
+                $('.divAlign').html(data.customer.style.align.note);
+            } else {
+                $('.divAlign').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+            }
+        } else {
+            $('.divAlign').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+        }
+
+        if (data.customer.style.sky.checked) {
+            if (data.customer.style.sky.note.trim().length > 0) {
+                $('.divSky').html(data.customer.style.sky.note);
+            } else {
+                $('.divSky').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+            }
+        } else {
+            $('.divSky').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+        }
+
+        if (data.customer.style.fire.checked) {
+            if (data.customer.style.fire.note.trim().length > 0) {
+                $('.divFire').html(data.customer.style.fire.note);
+            } else {
+                $('.divFire').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+            }
+        } else {
+            $('.divFire').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+        }
+
+        if (data.customer.style.tv.checked) {
+            if (data.customer.style.tv.note.trim().length > 0) {
+                $('.divTV').html(data.customer.style.tv.note);
+            } else {
+                $('.divTV').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+            }
+        } else {
+            $('.divTV').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+        }
+
+        if (data.customer.style.grass.checked) {
+            if (data.customer.style.grass.note.trim().length > 0) {
+                $('.divGrass').html(data.customer.style.grass.note);
+            } else {
+                $('.divGrass').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+            }
+        } else {
+            $('.divGrass').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+        }
+
+
+        $('.lblStyleNote').text(data.customer.style.style_note);
+
+
+      
+      }
+    })
+  }
+
+
+  function LoadJob() {
+        $.ajax({
+            url: '/tla/job/detail',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                jobId
+            },
+            success: function (data) {
+                $('.lblCustomer').text(getFirstLetters(data.job.customer.name.firstname + ' ' + data.job.customer.name.lastname) + getLastLetters(data.job.customer._id));
+                $('.lblJobName').text(data.job.name);
+                $('.lblReceivedDate').text(convertISODateToTimeFormat(data.job.deadline.begin));
+                $('.lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.deadline.end));
+                $('.lblIntruction').text(data.job.intruction);
+                $('.lblInputLink').html('<a href="' + data.job.link.input + '" target="_blank" rel="noopener noreferrer">Click here</a>');
+                
+                $('.tblComboLines').empty();
+                if(typeof data.job.cb !=='undefined'){                  
+                    let idx = 1;
+                    data.job.cb.lines.forEach(l=>{                      
+                        let name = l.root?l.root.name:l.parents.name;
+                        console.log(name)
+                        let tr = '<tr>';
+                            tr+= '<td>'+(idx++)+'</td>';
+                            tr+= '<td class="text-danger font-weight-bold">'+ (l.root?l.root.name:l.parents.name)+'</td>';
+                            tr+= '<td class="text-right">'+l.quantity+'</td>';
+                            tr+= '</tr>';
+                            $('.tblComboLines').append(tr);  
+                    })
+                }
+            }
+        })
+    }
+
 
 
     //phan xu ly lien quan toi job detail
@@ -394,125 +497,4 @@
         }
         isShown = !isShown;
     })
-
-
-    function LoadJob() {
-        $.ajax({
-            url: '/tla/job/detail',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-                jobId
-            },
-            success: function (data, textStatus, xhr) {
-
-                $('.lblCustomer').text(getFirstLetters(data.job.customer.name.firstname + ' ' + data.job.customer.name.lastname) + getLastLetters(data.job.customer._id));
-                $('.lblJobName').text(data.job.name);
-                $('.lblReceivedDate').text(convertISODateToTimeFormat(data.job.deadline.begin));
-                $('.lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.deadline.end));
-
-                $('.lblIntruction').text(data.job.intruction);
-
-                $('.lblInputLink').html('<a href="' + data.job.link.input + '" target="_blank" rel="noopener noreferrer">Click here</a>');
-
-                $('.divNationalStyle').html('<i class="text-warning font-weight-bold">' + data.job.customer.style.nation.name + '</i>');
-                $('.divColor').html('<i class="text-warning font-weight-bold">' + data.job.customer.style.color.name + '</i>');
-                $('.divSize').html('<i class="text-warning font-weight-bold">' + data.job.customer.style.size.name + '</i>');
-                $('.divOutput').html('<i class="text-warning font-weight-bold">' + data.job.customer.style.output.name + '</i>');
-                $('.divCloud').html('<i class="text-warning font-weight-bold">' + data.job.customer.style.cloud.name + '</i>')
-
-                if (data.job.customer.style.align.checked) {
-                    if (data.job.customer.style.align.note.trim().length > 0) {
-                        $('.divAlign').html(data.job.customer.style.align.note);
-                    } else {
-                        $('.divAlign').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                    }
-                } else {
-                    $('.divAlign').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-                }
-
-                if (data.job.customer.style.sky.checked) {
-                    if (data.job.customer.style.sky.note.trim().length > 0) {
-                        $('.divSky').html(data.job.customer.style.sky.note);
-                    } else {
-                        $('.divSky').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                    }
-                } else {
-                    $('.divSky').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-                }
-
-                if (data.job.customer.style.fire.checked) {
-                    if (data.job.customer.style.fire.note.trim().length > 0) {
-                        $('.divFire').html(data.job.customer.style.fire.note);
-                    } else {
-                        $('.divFire').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                    }
-                } else {
-                    $('.divFire').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-                }
-
-                if (data.job.customer.style.tv.checked) {
-                    if (data.job.customer.style.tv.note.trim().length > 0) {
-                        $('.divTV').html(data.job.customer.style.tv.note);
-                    } else {
-                        $('.divTV').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                    }
-                } else {
-                    $('.divTV').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-                }
-
-                if (data.job.customer.style.grass.checked) {
-                    if (data.job.customer.style.grass.note.trim().length > 0) {
-                        $('.divGrass').html(data.job.customer.style.grass.note);
-                    } else {
-                        $('.divGrass').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                    }
-                } else {
-                    $('.divGrass').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-                }
-
-
-                $('.lblStyleNote').text(data.job.customer.style.style_note);
-
-                if (data.job.cb_ticked) {
-                    $('.liCombo').show();
-                    $('.combo_tab').show();
-                    LoadComboLine(data.job.cb);
-                } else {
-                    $('.liCombo').hide();
-                    $('.combo_tab').show();
-                }
-
-
-            }
-        })
-    }
-
-    function LoadComboLine(cb) {
-        $.ajax({
-            url: '/tla/combo-line',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-                cb
-            },
-            success: function (data) {
-                $('.tblComboLines').empty();
-                let idx = 1;
-                data.cbls.forEach(l => {
-                    let tr = '<tr>';
-                    tr += '<td>' + (idx++) + '</td>';
-                    tr += '<td class="font-weight-bold">' + l.lv.name + '</td>';
-                    tr += '<td class="text-right">' + l.qty + '</td>';
-                    tr += '</tr>';
-                    $('.tblComboLines').append(tr);
-                })
-            }
-        })
-    }
-
 </script>

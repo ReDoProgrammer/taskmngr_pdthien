@@ -2,15 +2,11 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-body text-dark">
-
-
                 <div class="panel panel-primary text-white bg-dark">
                     <div class="panel-heading"> <button class="btn btn-xs btn-primary btn-job-info">Show job info
                             <i class="fa fa-arrow-down" aria-hidden="true"></i></button> </div>
                     <%-include('panel-job-info')%>
                 </div>
-
-
                 <div class="panel panel-warning">
                     <div class="panel-heading">Tasks list</div>
                     <div class="panel-body">
@@ -18,7 +14,6 @@
                             <table class="table mt-1 table-striped bg-white text-dark nowrap text-nowrap">
                                 <thead class="thead-dark">
                                     <tr>
-
                                         <th scope="col">#</th>
                                         <th scope="col">Level</th>
                                         <th scope="col">Assign date</th>
@@ -40,7 +35,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -57,69 +51,13 @@
 <script src="/js/common.js"></script>
 <script>
     $("#JobDetailModal").on('shown.bs.modal', function (e) {
-        LoadTasksList();
-        LoadCustomer();
-        LoadJob();
+        // LoadTasksList();
+        // LoadCustomer();
+        // LoadJob();
         $('.job-info').hide();
     })
 
    
-
-
-
-    function LoadCustomer() {
-        $.ajax({
-            url: '/tla/customer/detail',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-                id: customerId
-            },
-            success: function (data) {
-                console.log(data)
-                $('#divNationalStyle').html(data.customer.style.nation.name);
-                $('#divColor').html(data.customer.style.color.name);
-                $('#divOutput').html(data.customer.style.output.name);
-                $('#divSize').html(data.customer.style.size.name);
-                $('#lblStyleNote').text(data.customer.style.style_note);
-
-                if (data.customer.style.align.checked) {
-                    $('#divAlign').html('<i class="fa fa-check-square-o"></i>  <span class="text-warning">' + data.customer.style.align.note + '</span>');
-                } else {
-                    $('#divAlign').html('<i class="fa fa-square-o"></i>');
-                }
-
-
-                if (data.customer.style.sky.checked) {
-                    $('#divSky').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.style.sky.note + '</span>');
-                } else {
-                    $('#divSky').html('<i class="fa fa-square-o"></i>');
-                }
-
-
-                if (data.customer.style.tv.checked) {
-                    $('#divTV').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.style.tv.note + '</span>');
-                } else {
-                    $('#divTV').html('<i class="fa fa-square-o"></i>');
-                }
-
-
-                if (data.customer.style.fire.checked) {
-                    $('#divFire').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.style.fire.note + '</span>');
-                } else {
-                    $('#divFire').html('<i class="fa fa-square-o"></i>');
-                }
-
-
-            }, error: function (jqXHR, textStatus, errorThrown) {
-                alert(jqXHR.responseJSON.msg);
-            }
-        })
-
-    }
-
     function LoadTasksList() {
         $('#tblTasksList').empty();
         $.ajax({
