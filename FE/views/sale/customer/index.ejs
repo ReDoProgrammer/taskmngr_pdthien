@@ -195,7 +195,7 @@
                     success: function (data) {
                         let idx = 1;
 
-                        data.jobs.forEach(j => {                          
+                        data.jobs.forEach(j => {
 
                             newRow += '<tr id = "' + j._id + '">';
                             newRow += '<td>' + (idx++) + '</td>';
@@ -218,7 +218,10 @@
                             }
                             newRow += '</td>';
                             newRow += '<td class="font-weight-bold text-danger">';
-                            newRow += j.templates;
+                            let templates = (j.templates.map(x => {
+                                return x.root ? x.root.name : x.parents.name
+                            }))
+                            newRow += templates;
                             newRow += '</td>';
                             newRow += '<td>';
                             switch (j.status) {

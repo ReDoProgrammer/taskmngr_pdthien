@@ -99,6 +99,8 @@ router.get('/list-by-customer', authenticateSaleToken, async (req, res) => {
   let jobs = await Job.find({
     customer: custId
   })
+    .populate('templates.root')
+    .populate('templates.parents')
     .populate('customer')
     .populate('cb')
     .populate('created.by');
