@@ -203,31 +203,6 @@
 
 
 
-  function LoadLocalLevel() {
-    $.ajax({
-      url: '/tla/job/local-level',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        customer_level: $('#slCustomerLevles option:selected').val(),
-        is_root: $('#slCustomerLevles option:selected').data('root') == '1' ? true : false
-      },
-      success: function (data) {
-        data.local_levels.forEach(l => {
-          let opt = '<option value="' + l._id + '">' + l.name + '</option>';
-          $('#slLocalLevels').append(opt);
-        })
-
-        LoadQA();
-        LoadEditor();
-      }
-
-    })
-  }
-
-
 
   //sự kiện click button sửa task trên table
 
@@ -372,6 +347,7 @@
     LoadCustomer();
 
 
+
     $('.job-info').hide();
     $('#divLevel').hide();
     $('#divEditTask').hide();
@@ -381,91 +357,31 @@
   });
 
 
-  $(document).on("click", "button[name='btnCC']", function () {
-    ccId = $(this).closest('tr').attr('id');
+  function LoadLocalLevel() {
     $.ajax({
-      url: '/tla/cc/detail',
+      url: '/tla/job/local-level',
       type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       data: {
-        ccId
+        customer_level: $('#slCustomerLevles option:selected').val(),
+        is_root: $('#slCustomerLevles option:selected').data('root') == '1' ? true : false
       },
       success: function (data) {
-        $('.btn-job-info').click();
-        $('#JobMngrModal').modal('hide');
-        if (data.cc.type) {
-          $('#modalCCNewTask').modal(200);
-        } else {
-          $('#modalCCRejectTask').modal(200);
-        }
+        data.local_levels.forEach(l => {
+          let opt = '<option value="' + l._id + '">' + l.name + '</option>';
+          $('#slLocalLevels').append(opt);
+        })
+
+        LoadQA();
+        LoadEditor();
       }
+
     })
-  })
+  }
 
 
-
-  $(document).on("click", "button[name='btnEditTask']", function () {
-    $('#divAssign').hide(100);
-    $('#divLevel').hide(100);
-    $('#divEditTask').slideDown(1000);
-  })
-
-  $(document).on("click", "button[name='btnAssignStaff']", function () {
-    taskId = $(this).closest("tr").attr("id");
-    levelId = $(this).closest("tr").data('level');
-
-    if ($(this).closest("tr").data('editor') === 'undefined') {
-      $('#divEditor').show();
-    } else {
-      $('#divEditor').hide();
-    }
-
-    if ($(this).closest("tr").data('qa') === 'undefined') {
-      $('#divQA').show();
-    } else {
-      $('#divQA').hide();
-    }
-
-
-
-
-    $('#divAssign').slideDown(1000);
-    $('#divLevel').slideUp(500);
-    $('#divEditTask').slideUp(500);
-    $("button[name='btnAssignStaff']").fadeOut(100);
-    $("button[name='btnDelTask']").fadeOut(100);
-  })
-
-  $(document).on("click", "button[name='btnDelTask']", function () {
-
-    let _id = $(this).closest("tr").attr("id");
-    if (confirm("Are you sure to delete this task?")) {
-      $.ajax({
-        url: '/tla/task',
-        type: 'delete',
-        headers: {
-          authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-        data: {
-          _id
-        },
-        success: function (data) {
-          $('#msgError').text(data.msg);
-          $('#msgError').show();
-          $('#msgError').hide(2000);
-          LoadTasks();
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          $('#msgError').text(jqXHR.responseJSON.msg);
-        }
-      })
-    }
-  })
-
-
-  
 
   function LoadCCList() {
     $.ajax({
@@ -642,7 +558,120 @@
     });
   }
 
+  function LoadEditor() {
+    $.ajax({
+      url: '/tla/user/list-editor',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        levelId: $('#slLocalLevels option:selected').val()
+      },
+      success: function (data) {
+        $('#slEditor').empty();
+        data.editors.forEach(e => {
+          let opt = '<option value="' + e._id + '">' + e.fullname + ' ( ' + e.username + ' )</option>';
+          $('#slEditor').append(opt);
+        })
+        $('#slEditor').selectpicker();
+        $('#slEditor').selectpicker('refresh');
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $('#msgError').text(jqXHR.responseJSON.msg);
+        $('#msgError').fadeIn().delay(3000).fadeOut();
+      },
+    })
+  }
 
+
+  function LoadQA() {
+    $.ajax({
+      url: '/tla/user/list-qa',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        levelId: $('#slLocalLevels option:selected').val()
+      },
+      success: function (data) {
+        $('#slQA').empty();
+        $('#slQAInEditDiv').empty();
+        data.qas.forEach(q => {
+          let opt = '<option value="' + q._id + '">' + q.fullname + '</option>';
+          $('#slQA').append(opt);
+        })
+        $('#slQA').selectpicker();
+        $('#slQA').selectpicker('refresh');
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $('#msgError').text(jqXHR.responseJSON.msg);
+        $('#msgError').fadeIn().delay(3000).fadeOut();
+      },
+    })
+  }
+
+
+
+  $(document).on("click", "button[name='btnCC']", function () {
+    ccId = $(this).closest('tr').attr('id');
+    $.ajax({
+      url: '/tla/cc/detail',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        ccId
+      },
+      success: function (data) {
+        $('.btn-job-info').click();
+        $('#JobMngrModal').modal('hide');
+        if (data.cc.type) {
+          $('#modalCCNewTask').modal(200);
+        } else {
+          $('#modalCCRejectTask').modal(200);
+        }
+      }
+    })
+  })
+
+
+
+  $(document).on("click", "button[name='btnEditTask']", function () {
+    $('#divAssign').hide(100);
+    $('#divLevel').hide(100);
+    $('#divEditTask').slideDown(1000);
+  })
+
+  $(document).on("click", "button[name='btnDelTask']", function () {
+
+    let _id = $(this).closest("tr").attr("id");
+    if (confirm("Are you sure to delete this task?")) {
+      $.ajax({
+        url: '/tla/task',
+        type: 'delete',
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: {
+          _id
+        },
+        success: function (data) {
+          $('#msgError').text(data.msg);
+          $('#msgError').show();
+          $('#msgError').hide(2000);
+          LoadTasks();
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          $('#msgError').text(jqXHR.responseJSON.msg);
+        }
+      })
+    }
+  })
+
+  
   $("#ckbAssignEditor").change(function () {
     if (this.checked) {
       $('#colEditor').slideDown(500);
@@ -750,61 +779,6 @@
     // LoadEditor(levelId);
     // LoadQA(levelId);
   });
-
-  function LoadEditor() {
-    $.ajax({
-      url: '/tla/user/list-editor',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        levelId: $('#slLocalLevels option:selected').val()
-      },
-      success: function (data) {
-        $('#slEditor').empty();
-        data.editors.forEach(e => {
-          let opt = '<option value="' + e._id + '">' + e.fullname + ' ( ' + e.username + ' )</option>';
-          $('#slEditor').append(opt);
-        })
-        $('#slEditor').selectpicker();
-        $('#slEditor').selectpicker('refresh');
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $('#msgError').text(jqXHR.responseJSON.msg);
-        $('#msgError').fadeIn().delay(3000).fadeOut();
-      },
-    })
-  }
-
-
-  function LoadQA() {
-    $.ajax({
-      url: '/tla/user/list-qa',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        levelId: $('#slLocalLevels option:selected').val()
-      },
-      success: function (data) {
-        $('#slQA').empty();
-        $('#slQAInEditDiv').empty();
-        data.qas.forEach(q => {
-          let opt = '<option value="' + q._id + '">' + q.fullname + '</option>';
-          $('#slQA').append(opt);
-        })
-        $('#slQA').selectpicker();
-        $('#slQA').selectpicker('refresh');
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $('#msgError').text(jqXHR.responseJSON.msg);
-        $('#msgError').fadeIn().delay(3000).fadeOut();
-      },
-    })
-  }
-
 
   $('.inputDate').inputmask("datetime", {
     mask: "1/2/y h:s",

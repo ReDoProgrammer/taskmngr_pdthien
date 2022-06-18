@@ -376,6 +376,20 @@
       },
       data:{id:customerId},
       success:function(data){
+        $('#slCustomerLevles').empty();
+        data.customer.contracts[data.customer.contracts.length-1].lines.forEach(l=>{
+            let opt = '';
+            if(l.root){
+                opt = '<option value = "'+l.root._id+'" data-root="1">'+l.root.name+'</option>';
+            }else{
+                opt = '<option value = "'+l.parents._id+'" data-root="0">'+l.parents.name+'</option>';
+            }
+            $('#slCustomerLevles').append(opt);
+        })
+        LoadLocalLevel();
+
+
+
         $('.divNationalStyle').html('<i class="text-warning font-weight-bold">' + data.customer.style.nation.name + '</i>');
         $('.divColor').html('<i class="text-warning font-weight-bold">' + data.customer.style.color.name + '</i>');
         $('.divSize').html('<i class="text-warning font-weight-bold">' + data.customer.style.size.name + '</i>');

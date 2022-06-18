@@ -42,7 +42,9 @@ router.get('/detail',async (req,res)=>{
         {path:'style.size'},
         {path:'style.color'},
         {path:'style.cloud'},
-        {path:'style.nation'}
+        {path:'style.nation'},
+        {path:'contracts.lines.root'},
+        {path:'contracts.lines.parents'}
     ]);
     if(!customer){
         return res.status(404).json({
