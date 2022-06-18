@@ -362,6 +362,7 @@
               $('#tblJobs').empty();
               let idx = (page - 1) * data.pageSize;
               data.jobs.forEach(j => {
+
                 let isInit = j.tasks.filter(x => x.status !== 0);
 
                 let tr = '<tr id="' + j._id + '" data-customer="' + j.customer._id + '">';

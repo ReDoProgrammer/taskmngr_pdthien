@@ -47,29 +47,26 @@ router.get("/list", authenticateSaleToken, async (req, res) => {
   let { page, search } = req.query;
 
   let jobs = await Job
-    .find(
+    .find({
+      $or: [
+        { "name": { "$regex": search, "$options": "i" } },
+        { "intruction": { "$regex": search, "$options": "i" } }
+      ]
+    })
+    .populate([
       {
-        $or: [
-          { "name": { "$regex": search, "$options": "i" } },
-          { "intruction": { "$regex": search, "$options": "i" } }         
-        ]
-      }
-    )
-    .populate({
-      path: 'customer',     
-    })
-    .populate('cb')
-    .populate('catured.user')
-    .populate({
-      path:'customer',
-      match:{
-        $or: [
-          { "name.firstname": { "$regex":'.*'+ search, "$options": "i" } }         
-        ]
-      }
-    })
+        path: 'customer',
+        'name.firstname':{
+          $regex: '.*' + search + '.*' 
+        }
+      },
+      { path: 'cb' },
+      { path: 'captured.user' },
+      { path: 'tasks' }
+    ])
     .skip((page - 1) * pageSize)
     .limit(pageSize);
+
   let count = await Job.countDocuments({
     $or: [
       { "name": { "$regex": search, "$options": "i" } },
