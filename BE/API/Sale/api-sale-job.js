@@ -28,42 +28,46 @@ router.get('/check-contract', authenticateSaleToken, async (req, res) => {
     customer
   })
 })
-router.get('/detail', authenticateSaleToken, (req, res) => {
+router.get('/detail', authenticateSaleToken, async (req, res) => {
   let { jobId } = req.query;
-  Job
-    .findById(jobId)
-    .populate('customer')
-    .populate({ path: 'links', populate: ({ path: 'created_by', select: 'fullname' }) })
-    .exec()
-    .then(job => {
-      if (!job) {
-        return res.status(404).json({
-          msg: `Job not found!`
-        })
-      }
-      return res.status(200).json({
-        msg: `Get job detail successfully!`,
-        job
-      })
+  let job = await Job.findById(jobId)
+    .populate('customer');
+  if (!job) {
+    return res.status(404).json({
+      msg: `Job not found!`
     })
-    .catch(err => {
-      return res.status(500).json({
-        msg: `Can not get job detail by id with error: ${new Error(err.message)}`
-      })
-    })
+  }
+  return res.status(200).json({
+    msg: `Get job detail successfully!`,
+    job
+  })
 })
 
 router.get("/list", authenticateSaleToken, async (req, res) => {
   let { page, search } = req.query;
 
-  let jobs = await Job.find({
-    $or: [
-      { "name": { "$regex": search, "$options": "i" } },
-      { "intruction": { "$regex": search, "$options": "i" } }
-    ]
-  })
-    .populate('customer')
-    .populate('captured.user')
+  let jobs = await Job
+    .find(
+      {
+        $or: [
+          { "name": { "$regex": search, "$options": "i" } },
+          { "intruction": { "$regex": search, "$options": "i" } }         
+        ]
+      }
+    )
+    .populate({
+      path: 'customer',     
+    })
+    .populate('cb')
+    .populate('catured.user')
+    .populate({
+      path:'customer',
+      match:{
+        $or: [
+          { "name.firstname": { "$regex":'.*'+ search, "$options": "i" } }         
+        ]
+      }
+    })
     .skip((page - 1) * pageSize)
     .limit(pageSize);
   let count = await Job.countDocuments({
@@ -72,6 +76,7 @@ router.get("/list", authenticateSaleToken, async (req, res) => {
       { "intruction": { "$regex": search, "$options": "i" } }
     ]
   });
+
   return res.status(200).json({
     msg: `Load jobs list successfully!`,
     jobs,
@@ -93,12 +98,12 @@ router.get('/list-by-customer', authenticateSaleToken, async (req, res) => {
   let jobs = await Job.find({
     customer: custId
   })
-  .populate('customer')
-  .populate('cb')
-  .populate('created.by');
+    .populate('customer')
+    .populate('cb')
+    .populate('created.by');
   return res.status(200).json({
-    msg:`Load jobs depend on customer successfully!`,
-    jobs    
+    msg: `Load jobs depend on customer successfully!`,
+    jobs
   })
 
 })

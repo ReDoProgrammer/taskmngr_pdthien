@@ -145,6 +145,7 @@
 
         $(document).on("click", "button[name='edit-job']", function () {
           jobId = $(this).closest("tr").attr("id");
+          customerId = $(this).closest("tr").data("customer");
           $('#updateJobModal').modal();
 
         })
@@ -164,18 +165,6 @@
           search = $('#txtSearch').val();
           LoadJobs();
         })
-
-
-
-        $('#txtSearch').keyup(function (e) {
-          if (e.keyCode == 13) {
-            $("#btnSearch").click()
-          }
-        });
-
-
-
-
 
 
         var $table = $('.js-table');
@@ -371,9 +360,8 @@
             },
             success: function (data) {
               $('#tblJobs').empty();
-              let idx = 1;
-              data.jobs.forEach(j => {              
-             
+              let idx = (page - 1) * data.pageSize;
+              data.jobs.forEach(j => {
                 let isInit = j.tasks.filter(x => x.status !== 0);
 
                 let tr = '<tr id="' + j._id + '" data-customer="' + j.customer._id + '">';
@@ -385,7 +373,7 @@
                 }
 
                 tr += '</td>';
-                tr += '<td>' + (idx++) + '</td>';
+                tr += '<td>' + (++idx) + '</td>';
                 tr += '<td class="font-weight-bold text-primary">' + j.customer.name.firstname + ' ' + j.customer.name.lastname + '</td>';
                 tr += '<td class="font-weight-bold text-danger">' + (getFirstLetters(j.customer.name.firstname + ' ' + j.customer.name.lastname)).toUpperCase() + getLastLetters(j.customer._id) + '</td>';
                 tr += '<td class="font-weight-bold text-warning">';
@@ -439,6 +427,12 @@
 
               })
 
+              $('.pagination').empty();
+              for (let i = 1; i <= data.pages; i++) {
+                let li = '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>';
+                $('.pagination').append(li);
+              }
+
             },
             error: function (jqXHR, textStatus, errorThrown) {
               alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
@@ -446,6 +440,11 @@
           });
         }
 
+        $(document).on("click", ".pagination li", function (e) {
+            e.preventDefault();
+            page = $(this).find('a').text();
+            LoadJobs();
+        })
 
       </script>
 
