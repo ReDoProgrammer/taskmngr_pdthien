@@ -5,59 +5,62 @@ const Root = require('../../models/root-level-model');
 const Parents = require('../../models/parents-level-model');
 const LocalLevel = require('../../models/job-level-model');
 
+const pageSize = 20;
 
-
-router.get('/list', authenticateTLAToken, (req, res) => {
+router.get('/list', authenticateTLAToken, async (req, res) => {
     let { page, search } = req.query;
-    Job.find({})
-        .populate('customer', 'firstname lastname remark')
-        .populate('cb')
-        .populate('cc')
-        .populate('templates')
-        .exec()
-        .then(jobs => {
+    let jobs = await Job
+        .find({
+            $or: [
+                { "name": { "$regex": search, "$options": "i" } },
+                { "intruction": { "$regex": search, "$options": "i" } }
+            ]
+        })
+        .populate([
+            {
+                path: 'customer',
+                'name.firstname': {
+                    $regex: '.*' + search + '.*'
+                }
+            },
+            { path: 'cb' },
+            { path: 'captured.user' },
+            { path: 'tasks' },
+            { path: 'templates.root' },
+            { path: 'templates.parents' }
+        ])
+        .skip((page - 1) * pageSize)
+        .limit(pageSize);
 
-            return res.status(200).json({
-                msg: 'Load joblist successfully!',
-                jobs: jobs
-            })
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: 'Load jobs list failed!',
-                error: new Error(err.message)
-            })
-        })
+    let count = await Job.countDocuments({
+        $or: [
+            { "name": { "$regex": search, "$options": "i" } },
+            { "intruction": { "$regex": search, "$options": "i" } }
+        ]
+    });
+
+    return res.status(200).json({
+        msg: `Load jobs list successfully!`,
+        jobs,
+        pageSize,
+        pages: count % pageSize == 0 ? count / pageSize : (Math.floor(count / pageSize) + 1)
+    })
 })
 
-router.get('/detail', authenticateTLAToken, (req, res) => {
+router.get('/detail', authenticateTLAToken, async (req, res) => {
 
-    let { id } = req.query;
-    Job.findById(id)
-        .populate({ path: 'customer', populate: ({ path: 'style.cloud', select: 'name -_id' }) })
-        .populate({ path: 'customer', populate: ({ path: 'style.color', select: 'name -_id' }) })
-        .populate({ path: 'customer', populate: ({ path: 'style.nation', select: 'name -_id' }) })
-        .populate({ path: 'customer', populate: ({ path: 'style.output', select: 'name -_id' }) })
-        .populate({ path: 'customer', populate: ({ path: 'style.size', select: 'name -_id' }) })
-        .populate({ path: 'links', populate: ({ path: 'created.by', select: 'fullname' }) })
-        .exec()
-        .then(job => {
-            if (!job) {
-                return res.status(404).json({
-                    msg: `Job not found!`
-                })
-            }
-            return res.status(200).json({
-                msg: 'Get job detail successfully!',
-                job: job
-            })
+    let { jobId } = req.query;
+    let job = await Job.findById(jobId)
+        .populate('customer');
+    if (!job) {
+        return res.status(404).json({
+            msg: `Job not found!`
         })
-        .catch(err => {
-            return res.status(500).json({
-                msg: 'Get job information failed!',
-                error: new Error(err.message)
-            })
-        })
+    }
+    return res.status(200).json({
+        msg: `Get job detail successfully!`,
+        job
+    })
 })
 
 router.get('/local-level', authenticateTLAToken, async (req, res) => {

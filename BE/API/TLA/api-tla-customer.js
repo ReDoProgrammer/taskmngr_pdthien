@@ -34,32 +34,24 @@ router.get('/list',authenticateTLAToken,(req,res)=>{
     })
 })
 
-router.get('/detail',(req,res)=>{
+router.get('/detail',async (req,res)=>{
     let {id} = req.query;
-    Customer
-    .findById(id)
-    .populate('output')
-    .populate('size')
-    .populate('color')
-    .populate('cloud')
-    .populate('nation')
-    .exec()
-    .then(customer=>{
-        if(!customer){
-            return res.status(404).json({
-                msg:`Customer not found!`
-            })
-        }
-        
-        return res.status(200).json({
-            msg:`Get customer detail successfully!`,
-            customer
+    let customer  = await Customer.findById(id)
+    .populate([
+        {path:'style.output'},
+        {path:'style.size'},
+        {path:'style.color'},
+        {path:'style.cloud'},
+        {path:'style.nation'}
+    ]);
+    if(!customer){
+        return res.status(404).json({
+            msg:`Customer not found!`
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not get customer detail with error: ${new Error(err.message)}`
-        })
+    }
+    return res.status(200).json({
+        msg:`Get customer detail successfully!`,
+        customer
     })
 })
 

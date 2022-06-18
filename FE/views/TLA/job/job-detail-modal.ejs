@@ -78,6 +78,7 @@
                 id: customerId
             },
             success: function (data) {
+                console.log(data)
                 $('#divNationalStyle').html(data.customer.style.nation.name);
                 $('#divColor').html(data.customer.style.color.name);
                 $('#divOutput').html(data.customer.style.output.name);
