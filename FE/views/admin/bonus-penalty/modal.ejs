@@ -28,6 +28,10 @@
                     <textarea placeholder="Bonus or penalty description" id="txaDescription" rows="3"
                         class="form-control"></textarea>
                 </div>
+
+                <div class="form-group col-md-12">
+                    <label for="" class="font-weight-bold text-danger" id="lblMsg"></label>
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" id="btnSubmit">
@@ -45,7 +49,13 @@
 
     $('#btnSubmit').click(function () {
         let name = $('#txtName').val().trim();
-        let description = $('#txtDescription').val().trim();
+        let description = $('#txaDescription').val();
+        let costs = parseInt($('#txtCosts').val());
+        if (costs <= 0) {
+            $('#lblMsg').text('(!) costs is invalid');
+            $('#lblMsg').fadeIn().delay(3000).fadeOut();
+            return;
+        }
 
         if (bpId.length > 0) {
             $.ajax({
@@ -58,6 +68,7 @@
                     bpId,
                     name,
                     description,
+                    costs,
                     is_bonus: $("#ckbIsBonus").is(':checked')
                 },
                 success: function (data, textStatus, xhr) {
@@ -67,7 +78,6 @@
                         text: data.msg
                     });
                     $('#modalBonusPenalty').modal('hide');
-                    bpId = '';
                 }, error: function (jqXHR, textStatus, errorThrown) {
                     alert(jqXHR.responseJSON.msg);
                 }
@@ -82,7 +92,8 @@
                 data: {
                     name,
                     description,
-                    is_bonus: $("#ckbIsBonus").is(':checked')
+                    is_bonus: $("#ckbIsBonus").is(':checked'),
+                    costs
                 },
                 success: function (data, textStatus, xhr) {
                     Swal.fire({
@@ -99,4 +110,17 @@
         }
 
     })
+    $('#txtCosts').keyup(function (e) {
+        if (/\D/g.test(this.value)) {
+            // Filter non-digits from input value.
+            this.value = this.value.replace(/\D/g, '');
+        }
+    });
+    $('#txtCosts').focusout(function () {
+        if ($('#txtCosts').val().trim() == 0) {
+            $('#txtCosts').val('0');
+        }
+    })
+
+
 </script>
