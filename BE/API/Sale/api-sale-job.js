@@ -5,6 +5,8 @@ const { authenticateSaleToken } = require("../../../middlewares/sale-middleware"
 const Material = require('../../models/material-model');
 const Combo = require('../../models/combo-model');
 const Customer = require('../../models/customer-model');
+const Root = require('../../models/root-level-model');
+const { ObjectId } = require('mongodb');
 
 const pageSize = 20;
 
@@ -56,13 +58,15 @@ router.get("/list", authenticateSaleToken, async (req, res) => {
     .populate([
       {
         path: 'customer',
-        'name.firstname':{
-          $regex: '.*' + search + '.*' 
+        'name.firstname': {
+          $regex: '.*' + search + '.*'
         }
       },
       { path: 'cb' },
       { path: 'captured.user' },
-      { path: 'tasks' }
+      { path: 'tasks' },
+      { path: 'templates.root' },
+      { path: 'templates.parents' }
     ])
     .skip((page - 1) * pageSize)
     .limit(pageSize);
@@ -258,12 +262,6 @@ router.post("/", authenticateSaleToken, async (req, res) => {
 
 
 
-  let cust = await Customer.findById(customer);
-  if (!cust) {
-    return res.status(404).json({
-      msg: `Customer not found!`
-    })
-  }
 
   let job = new Job();
   job.customer = customer;
@@ -277,7 +275,8 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     end: delivery_date
   };
 
-  job.templates = templates;
+
+
 
 
   if (cb.length > 0) {
@@ -290,20 +289,7 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     job.cb = cb;
   }
 
-  if (material.length > 0) {
-    let m = await Material.findById(material);
-    if (!m) {
-      return res.status(404).json({
-        msg: `Material not found!`
-      })
-    }
-    job.captured = {
-      material,
-      user: captureder,
-      price: m.price,
-      quantity: quantity.length == 0 ? 0 : parseInt(quantity)
-    }
-  }
+
 
   job.created = {
     by: req.user._id,
@@ -312,16 +298,15 @@ router.post("/", authenticateSaleToken, async (req, res) => {
 
   await job.save()
     .then(async _ => {
-      cust.jobs.push(job);
-      await cust.save()
-        .then(_ => {
+        Promise.all([PushJob(job._id,customer),PushTemplate(templates,job._id)])
+        .then(_=>{
           return res.status(201).json({
-            msg: `Job has been created!`
+            msg:`Job has been created!`
           })
         })
-        .catch(err => {
-          return res.status(500).json({
-            msg: `Can not push this job into customer with error: ${new Error(err.message)}`
+        .catch(err=>{
+          return res.status(err.code).json({
+            msg:err.msg
           })
         })
     })
@@ -335,6 +320,60 @@ router.post("/", authenticateSaleToken, async (req, res) => {
 
 module.exports = router;
 
+const PushJob = (jobId,customerId)=>{
+  return new Promise(async (resolve,reject)=>{
+    let customer = await Customer.findById(customerId);
+    if(!customer){
+      return reject({
+        code:404,
+        msg:`Customer not found!`
+      })
+    }
+    customer.jobs.push(jobId);
+    await customer.save()
+    .then(_=>{
+      return resolve(customer);
+    })
+    .catch(err=>{
+      return reject({
+        code:500,
+        msg:`Can not push job into customer with ${new Error(err.message)}`
+      })
+    })
+  })
+}
+
+const PushTemplate = (templates,jobId)=>{
+  return new Promise(async (resolve,reject)=>{
+    let job = await Job.findById(jobId);
+    if(!job){
+      return reject({
+        code:404,
+        msg:`Job not found!`
+      })
+    }
+    let arr = templates.split(',');
+    for(const temp of arr){
+      let count = await Root.countDocuments({_id:ObjectId(temp.trim())});
+      if(count > 0){
+        job.templates.push({root:ObjectId(temp.trim())})
+      }else{
+        job.templates.push({parents:ObjectId(temp.trim())})
+      }
+    }
+
+   await job.save()
+   .then(_=>{
+    return resolve(job)
+   })
+   .catch(err=>{
+    return reject({
+      code:500,
+      msg:`Can not push template with error: ${new Error(err.message)}`
+    })
+   })
+  })
+}
 
 
 

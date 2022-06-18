@@ -362,6 +362,7 @@
               $('#tblJobs').empty();
               let idx = (page - 1) * data.pageSize;
               data.jobs.forEach(j => {
+                
 
                 let isInit = j.tasks.filter(x => x.status !== 0);
 
@@ -395,7 +396,10 @@
                 tr += '</td>';
 
                 tr += '<td class="font-weight-bold text-danger">';
-                tr += j.templates;
+                  let templates = (j.templates.map(x=>{
+                    return x.root?x.root.name:x.parents.name
+                  }))
+                tr += templates;
                 tr += '</td>';
 
 

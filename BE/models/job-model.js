@@ -114,16 +114,20 @@ const jobSchema = new Schema({
     //phần liên quan tới job template
     templates: [
         {
-            type: Schema.Types.ObjectId,
-            ref: 'root'
-        },
-        {
-            type: Schema.Types.ObjectId,
-            ref: 'parents'
+            root: {
+
+                type: Schema.Types.ObjectId,
+                ref: 'root_level'
+
+            },
+            parents: {
+
+                type: Schema.Types.ObjectId,
+                ref: 'parents_level'
+
+            }
         }
     ]
-
-
 });
 
 
