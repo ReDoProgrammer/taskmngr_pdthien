@@ -126,7 +126,6 @@
                         $('#tblData').empty();
                         let idx = 1;
                         data.cbs.forEach(c => {
-                            console.log(c)
                             let levels = (c.lines.map(x => {
                                 return x.root ? x.root.name : x.parents.name
                             })).toString();
