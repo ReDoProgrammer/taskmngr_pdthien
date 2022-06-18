@@ -195,12 +195,11 @@
                     success: function (data) {
                         let idx = 1;
 
-                        data.jobs.forEach(j => {
-                            let templates = (j.templates && j.templates.length > 0) ? (j.templates.map(x => x.name)).toString() : '';
+                        data.jobs.forEach(j => {                          
 
                             newRow += '<tr id = "' + j._id + '">';
                             newRow += '<td>' + (idx++) + '</td>';
-                            newRow += '<td>';
+                            newRow += '<td class="font-weight-bold text-danger">';
                             newRow += j.name;
                             if (j.captured.user) {
                                 newRow += '<i class="fa fa-camera text-primary ml-2" aria-hidden="true"></i>'
@@ -219,7 +218,7 @@
                             }
                             newRow += '</td>';
                             newRow += '<td class="font-weight-bold text-danger">';
-                            newRow += templates;
+                            newRow += j.templates;
                             newRow += '</td>';
                             newRow += '<td>';
                             switch (j.status) {

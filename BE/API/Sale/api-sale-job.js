@@ -90,16 +90,15 @@ router.get('/list-by-customer', authenticateSaleToken, async (req, res) => {
     })
   }
 
-  let jobs = await Job.find({ customer: custId })
-    .populate('cb')
-    .populate('created.by')
-    .populate('captured.user')
-    .populate('templates')
-    .sort({ _id: -1 })
-    .limit(10);
+  let jobs = await Job.find({
+    customer: custId
+  })
+  .populate('customer')
+  .populate('cb')
+  .populate('created.by');
   return res.status(200).json({
-    msg: `Load jobs list by customer successfully!`,
-    jobs
+    msg:`Load jobs depend on customer successfully!`,
+    jobs    
   })
 
 })
