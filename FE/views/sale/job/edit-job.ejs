@@ -128,9 +128,10 @@
 
 <script>
   $(document).ready(function () {
-
+    LoadCaptureders();
+    LoadMaterials();
   })
-  
+
 
 
   $("#ckbChooseCombo").change(function () {
@@ -143,9 +144,8 @@
 
   $("#updateJobModal").on('shown.bs.modal', function (e) {
     LoadComboes();
-    // LoadCaptureders();
-    // LoadMaterials();
     LoadJobToEdit();
+    LoadTemplates();
   })
 
   function LoadJobToEdit() {
@@ -199,6 +199,27 @@
       },
     })
   }
+
+  function LoadTemplates() {
+    $.ajax({
+      url: '/sale/customer/list-templates',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: { customerId },
+      success: function (data) {
+        $('#slTemplates').empty();
+        data.templates.forEach(temp => {
+          let name = temp.root ? temp.root.name : temp.parents.name;
+          $('#slTemplates').append('<option value="' + name + '">' + name + '</option>')
+        })
+        $('#slTemplates').selectpicker();
+        $('#slTemplates').selectpicker('refresh');
+      }
+    })
+  }
+
 
 
   $('#btnUpdateJob').click(function () {
@@ -272,7 +293,7 @@
     })
 
   })
-  function LoadComboes() {  
+  function LoadComboes() {
     $.ajax({
       url: '/sale/combo',
       type: 'get',
@@ -281,10 +302,8 @@
       },
       data: { customerId },
       success: function (data) {
-        console.log(data)
         if (data.comboes.length > 0) {
           $('#rowCombo').slideDown(500);
-        
           data.comboes.forEach(c => {
             let levels = (c.lines.map(x => (x.root ? x.root.name : x.parents.name) + ': ' + x.quantity)).toString();
 
