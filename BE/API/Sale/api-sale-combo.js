@@ -29,12 +29,11 @@ router.get('/', authenticateSaleToken, async (req, res) => {
         _id: { $in: cbIds },
         $or:[
             {'applied.unlimited':true},
-            {'applied.todate':{$gte:new Date()}}
+            {'applied.to_date':{$gte:new Date()}}
         ]
     })
-    // .populate('lines.root')
-    // .populate('lines.parents');
-    console.log(comboes)
+    .populate('lines.root')
+    .populate('lines.parents');
     return res.status(200).json({
         msg:`Load comboes list successfully!`,
         comboes

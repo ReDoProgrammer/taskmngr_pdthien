@@ -80,7 +80,7 @@ router.delete('/', authenticateAdminToken, async (req, res) => {
 })
 
 router.put('/', authenticateAdminToken, async (req, res) => {
-    let { _id, name, description, price } = req.body;
+    let { _id, name, description, price,from_date,to_date,unlimited } = req.body;
     let cb = await Combo.findById(_id);
     if (!cb) {
         return res.status(404).json({
@@ -91,6 +91,12 @@ router.put('/', authenticateAdminToken, async (req, res) => {
     cb.name = name;
     cb.description = description;
     cb.price = price;
+    cb.applied.from_date = from_date;
+    if(unlimited!='true'){
+        cb.applied.to_date = to_date;       
+    }
+    cb.applied.unlimited = unlimited;
+
 
     await cb.save()
         .then(_ => {
