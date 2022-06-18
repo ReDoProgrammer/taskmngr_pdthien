@@ -60,6 +60,19 @@ const taskSchema = new Schema({
             //Tiền công của DC
             type: Number
         },
+        bp:{
+            ref:{
+                type: Schema.Types.ObjectId,
+                ref:'bonus_penalty'
+            },
+            is_bonus:{
+                type:Boolean                
+            },
+            costs:{
+                type:Number,
+                default:0
+            }
+        },
         unregisted: {
             //lưu trạng thái task có bị DC hủy đăng ký hay không
             type: Boolean,
@@ -90,6 +103,19 @@ const taskSchema = new Schema({
         wage: {
             type: Number,
             default: 0
+        },
+        bp:{
+            ref:{
+                type: Schema.Types.ObjectId,
+                ref:'bonus_penalty'
+            },
+            is_bonus:{
+                type:Boolean                
+            },
+            costs:{
+                type:Number,
+                default:0
+            }
         },
         tla: {
             type: Schema.Types.ObjectId,
@@ -143,6 +169,19 @@ const taskSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'user'
         },
+        bp:{
+            ref:{
+                type: Schema.Types.ObjectId,
+                ref:'bonus_penalty'
+            },
+            is_bonus:{
+                type:Boolean                
+            },
+            costs:{
+                type:Number,
+                default:0
+            }
+        },
         submited: [{
             at: {
                 type: Date
@@ -191,8 +230,9 @@ const taskSchema = new Schema({
               5: Done
               6: Finish
      
-              
+              -10: pause - tạm thời chưa cho các module khác xử lý
               -1: khởi tạo
+
               -2: Q.A reject            
               -3: DC reject
               -4: Sale reject
@@ -292,13 +332,7 @@ const taskSchema = new Schema({
             ref: 'user'
         }
     },
-
-    bp: [{
-        // lưu lý do thưởng/phạt
-        //vì cùng 1 task có thể vừa thưởng, vừa phạt nên cần lưu trữ dạng mảng
-        type: Schema.Types.ObjectId,
-        ref: 'bonus-penalty'
-    }],
+  
     remarks: [{
         //phần ghi chú cho task/level
         //cả tla, sale,admin,dc đều có thể can thiệp
