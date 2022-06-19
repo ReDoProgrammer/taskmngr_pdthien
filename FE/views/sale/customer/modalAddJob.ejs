@@ -154,7 +154,7 @@
         $('#slTemplates').empty();
         data.templates.forEach(temp => {
           let name = temp.root ? temp.root.name : temp.parents.name;
-          $('#slTemplates').append('<option value="' + ( temp.root ?temp.root._id:temp.parents._id) + '">' + name + '</option>')
+          $('#slTemplates').append('<option value="' + (temp.root ? temp.root._id : temp.parents._id) + '">' + name + '</option>')
         })
         $('#slTemplates').selectpicker();
         $('#slTemplates').selectpicker('refresh');
@@ -176,9 +176,9 @@
         if (data.comboes.length > 0) {
           $('#rowCombo').slideDown(500);
           data.comboes.forEach(c => {
-            let levels = (c.lines.map(x => (x.root ? x.root.name : x.parents.name)+': '+x.quantity)).toString();
-            
-            let opt = '<option value="' + c._id + '">' + c.name +' [ '+levels+ ' ]</option>';
+            let levels = (c.lines.map(x => (x.root ? x.root.name : x.parents.name) + ': ' + x.quantity)).toString();
+
+            let opt = '<option value="' + c._id + '">' + c.name + ' [ ' + levels + ' ]</option>';
             $('#slCombo').append(opt);
           })
         }
@@ -197,7 +197,7 @@
       success: function (data) {
         $('#slMaterials').empty();
         data.materials.forEach(m => {
-          $('#slMaterials').append('<option value = "' + m._id + '">' + m.name + '</option>');
+          $('#slMaterials').append('<option value = "' + m._id + '" data-price="' + m.price + '">' + m.name + '</option>');
         })
       }
     })
@@ -248,6 +248,7 @@
   $("#ckbMaterial").change(function () {
     if (this.checked) {
       $('#rMaterial').slideDown(600);
+      $('#txtQuantity').val('0');
     } else {
       $('#rMaterial').slideUp(600);
     }
@@ -271,8 +272,8 @@
 
     let material = $('#ckbMaterial').is(':checked') ? $('#slMaterials option:selected').val() : null;
     let captureder = $('#ckbMaterial').is(':checked') ? $('#slCaptureders option:selected').val() : null;
-    let quantity = $('#txtQuantity').val();
-
+    let quantity = $('#ckbMaterial').is(':checked') ? parseInt($('#txtQuantity').val()) : 0;
+    let price = $('#ckbMaterial').is(':checked') ? parseInt($('#slMaterials option:selected').data('price')) : 0;
 
 
     var templates = ($("#slTemplates").val() || []).join(', ');
@@ -309,6 +310,12 @@
       return;
     }
 
+    if ($('#ckbMaterial').is(':checked') && quantity === 0) {
+      $('#lblError').text('(*) Captured quantity is invalid!');
+      $('#lblError').show().delay(3000).fadeOut();
+      return;
+    }
+
 
     $.ajax({
       url: '/sale/job',
@@ -316,7 +323,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { customer, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity, templates },
+      data: { customer, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity, price, templates },
       success: function (data) {
         Swal.fire({
           icon: 'success',
@@ -336,7 +343,11 @@
     })
   })
 
-
+  $('#txtQuantity').focusout(function () {
+    if (($('#txtQuantity').val()).trim().length === 0) {
+      $('#txtQuantity').val('0');
+    }
+  })
 
   $('.inputDate').inputmask("datetime", {
     mask: "1/2/y h:s",

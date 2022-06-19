@@ -101,7 +101,7 @@
               </div>
               <div class="col-md-2 form-group">
                 <label for="">Quantity:</label>
-                <input type="text" name="" id="txtQuantity" class="form-control">
+                <input type="text" value="0" id="txtCapturedQuantity" class="form-control">
               </div>
             </div>
 
@@ -143,7 +143,7 @@
   });
 
   $("#updateJobModal").on('shown.bs.modal', function (e) {
-    LoadComboes();   
+    LoadComboes();
     LoadTemplates();
     LoadJobToEdit();
   })
@@ -160,9 +160,9 @@
         jobId
       },
       success: function (data) {
-       
-        let templates = data.job.templates.map(x=>{
-          return x.root?x.root:x.parents
+
+        let templates = data.job.templates.map(x => {
+          return x.root ? x.root : x.parents
         })
         $('#slTemplates').val(templates).trigger('change');
         $('#slTemplates').selectpicker('refresh')
@@ -176,9 +176,6 @@
         $('#txtDeliveryDate').val(convertISODateToTimeFormat(data.job.deadline.end));
         $('#txaIntruction').val(data.job.intruction);
 
-     
-       
-
         if (data.job.cb) {
           $('#ckbChooseCombo').prop('checked', true);
           $('#divCombo').slideDown();
@@ -189,18 +186,17 @@
           $('#divCombo').slideUp();
         }
 
-        if (data.job.captured.user) {
+        if (data.job.captured && data.job.captured.user) {
           $('#ckbMaterial').prop('checked', true);
           $('#rMaterial').slideDown();
           $('#slMaterials').val(data.job.captured.material);
-          $('#txtQuantity').val(data.job.captured.quantity)
+          $('#slCaptureders').val(data.job.captured.user);
+          $('#slCaptureders').selectpicker('refresh');
+          $('#txtCapturedQuantity').val(data.job.captured.quantity)
         } else {
           $('#ckbMaterial').prop('checked', false);
           $('#rMaterial').slideUp();
         }
-
-
-
       },
       error: function (jqXHR, textStatus, errorThrown) {
         alert(jqXHR.responseJSON.msg);
@@ -220,11 +216,11 @@
         $('#slTemplates').empty();
         data.templates.forEach(temp => {
           let name = temp.root ? temp.root.name : temp.parents.name;
-          $('#slTemplates').append('<option value="' + (temp.root?temp.root._id:temp.parents._id) + '">' + name + '</option>')
+          $('#slTemplates').append('<option value="' + (temp.root ? temp.root._id : temp.parents._id) + '">' + name + '</option>')
         })
         $('#slTemplates').selectpicker();
         $('#slTemplates').selectpicker('refresh');
-        
+
       }
     })
   }
@@ -240,7 +236,7 @@
     let cb = $("#ckbChooseCombo").is(':checked') ? $('#slComboes option:selected').val() : null;
     let material = $('#ckbMaterial').is(':checked') ? $('#slMaterials option:selected').val() : null;
     let captureder = $('#ckbMaterial').is(':checked') ? $('#slCaptureders option:selected').val() : null;
-    let quantity = $('#ckbMaterial').is(':checked') ? $('#txtQuantity').val() : 0;
+    let quantity = $('#ckbMaterial').is(':checked') ? $('#txtCapturedQuantity').val() : 0;
     var templates = ($("#slTemplates").val() || []).join(', ');
 
     if (isNaN(delivery_date) || delivery_date === null || isNaN(received_date) || received_date == null) {
@@ -365,6 +361,7 @@
   $("#ckbMaterial").change(function () {
     if (this.checked) {
       $('#rMaterial').slideDown(600);
+      $('#txtCapturedQuantity').val('0');
     } else {
       $('#rMaterial').slideUp(600);
     }
@@ -387,5 +384,13 @@
     leapday: "-02-29",
     separator: "/",
     alias: "dd/mm/yyyy hh:mm"
+  })
+  
+  
+  $('#txtCapturedQuantity').focusout(function() {
+    if(($('#txtCapturedQuantity').val()).trim().length == 0){
+      console.log(0)
+    } 
+   
   })
 </script>

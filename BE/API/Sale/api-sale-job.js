@@ -170,6 +170,7 @@ router.put("/", authenticateSaleToken, async (req, res) => {
     material,
     captureder,
     quantity,
+    price,
     templates
   } = req.body;
 
@@ -206,23 +207,16 @@ router.put("/", authenticateSaleToken, async (req, res) => {
     by: req.user._id
   }
 
-  if (material.length > 0) {
-    let mat = await Material.findById(material);
-    if (!mat) {
-      console.log(`Material not found!`)
-      return res.status(404).json({
-        msg: `Material not found!`
-      })
-    }
+  if(material){
     job.captured = {
       material,
-      user: captureder,
-      price: mat.price,
-      quantity: quantity.length > 0 ? parseInt(quantity) : 0
+      user:captureder,
+      price,
+      quantity
     }
+  }  else{
+    job.captured = null;
   }
-
-  job.templates = [];
 
 
   await job.save()
@@ -261,10 +255,9 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     material,
     captureder,
     quantity,
+    price,
     templates
   } = req.body;
-
-
 
 
   let job = new Job();
@@ -279,9 +272,14 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     end: delivery_date
   };
 
-
-
-
+  if(material){
+    job.captured = {
+      material,
+      user:captureder,
+      price,
+      quantity
+    }
+  }  
 
   if (cb.length > 0) {
     let c = await Combo.findById(cb);
