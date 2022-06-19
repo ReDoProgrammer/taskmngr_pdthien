@@ -221,9 +221,7 @@
                     success: function (data) {
                         $('#tblWages').empty();
                         let idx = 1;
-                        console.log(data)
                         data.wages.forEach(w => {
-
                             let tr = '<tr id = "' + w._id + '">';
                             tr += '<td>' + (idx++) + '</td>';
                             tr += '<td class="text-warning font-weight-bold">' + w.job_lv.name + '</td>';
