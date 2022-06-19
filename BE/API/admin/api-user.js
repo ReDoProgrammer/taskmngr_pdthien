@@ -166,7 +166,6 @@ router.put('/', authenticateAdminToken, async (req, res) => {
     user_level,
     userId,
     fullname,
-    username,
     password,
     phone,
     email,
@@ -233,25 +232,35 @@ router.put('/', authenticateAdminToken, async (req, res) => {
 
 })
 
-router.delete('/', authenticateAdminToken, (req, res) => {
+router.delete('/', authenticateAdminToken,async (req, res) => {
   let { userId } = req.body;
-  User.findByIdAndDelete(userId, (err, user) => {
-    if (err) {
-      return res.status(500).json({
-        msg: `Delete user failed with error: ${new Error(err.message)}`,
-        error: new Error(err.message)
-      })
-    }
-    if (user == null) {
-      return res.status(404).json({
-        msg: `User not found!`
-      })
-    }
+  let user = await User.findById(userId);
+  if(!user){
+    return res.status(404).json({
+      msg:`User not found!`
+    })
+  }
 
-    return res.status(200).json({
-      msg: `User has been deleted!`
+  await user.delete()
+  .then(_=>{
+    Promise.all([ PullUserFromGroup(user.user_group,user._id),PullUserFromLevel(user.user_level,user._id)])
+    .then(_=>{
+      return res.status(200).json({
+        msg:`User has been deleted!`
+      })
+    })
+    .catch(err=>{
+      return res.status(err.code).json({
+        msg:err.msg
+      })
     })
   })
+  .catch(err=>{
+    return res.status(500).json({
+      msg:`Can not delete user with error: ${new Error(err.message)}`
+    })
+  })
+
 })
 
 

@@ -143,7 +143,6 @@
         },
         success: function (data) {
 
-
           $('#slUserGroup').val(data.user.user_group);
           $('#slUserLevel').val(data.user.user_level);
 
@@ -241,7 +240,11 @@
           $('#modalStaff').modal('hide');
           userId = '';
         }, error: function (jqXHR, textStatus, errorThrown) {
-          alert(jqXHR.responseJSON.msg);
+          Swal.fire({
+            icon: 'error',
+            title: 'Fail!',
+            text: jqXHR.responseJSON.msg
+          });
         }
 
       })
@@ -277,8 +280,12 @@
           });
           $('#modalStaff').modal('hide');
           userId = '';
-        }, error: function (jqXHR, textStatus, errorThrown) {
-          alert(jqXHR.responseJSON.msg);
+        }, error: function (jqXHR, textStatus, errorThrown) {         
+          Swal.fire({
+            icon: 'error',
+            title: 'Fail!',
+            text: jqXHR.responseJSON.msg
+          });
         }
       })
     }

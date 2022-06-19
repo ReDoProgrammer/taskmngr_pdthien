@@ -65,6 +65,7 @@
     });
 
     $(document).on("click", "button[name='btnEditUser']", function () {
+      userId = $(this).closest("tr").attr("id");
       $('#modalStaff').modal();
     })
     $(document).on("click", "button[name='btnDelUser']", function () {
