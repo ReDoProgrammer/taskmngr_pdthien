@@ -5,7 +5,7 @@ const Root = require('../../models/root-level-model');
 const Parents = require('../../models/parents-level-model');
 const LocalLevel = require('../../models/job-level-model');
 
-const pageSize = 20;
+const pageSize = 2;
 
 router.get('/list', authenticateTLAToken, async (req, res) => {
     let { page, search } = req.query;
@@ -79,20 +79,18 @@ router.get('/local-level', authenticateTLAToken, async (req, res) => {
         let parents = await Parents.find({ _id: { $in: root.parents } })
 
         for (const p of parents) {
-            for (const l of p.job_levels) {
+            for (const l of p.job_levels) {                
+               if(!levels.includes(l)){
                 levels.push(l);
+               }
             }
         }
 
-        var unique = levels.filter(function (itm, i, a) {
-            return i == a.indexOf(itm);
-        });
-
-        let ll = await LocalLevel.find({ _id: { $in: unique } });
-
+        let local_levels = await LocalLevel.find({_id:levels});
+       
         return res.status(200).json({
             msg: `Load local levels successfully!`,
-            local_levels: ll
+            local_levels
         })
 
     } else {

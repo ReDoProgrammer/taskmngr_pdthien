@@ -42,6 +42,15 @@
         </tbody>
     </table>
 </div>
+<nav aria-label="..." class="mt-3">
+    <ul class="pagination pagination-sm">
+      <li class="page-item disabled">
+        <a class="page-link" href="#" tabindex="-1">1</a>
+      </li>
+      <li class="page-item"><a class="page-link" href="#">2</a></li>
+      <li class="page-item"><a class="page-link" href="#">3</a></li>
+    </ul>
+  </nav>
 
 <script src="/js/common.js"></script>
 
@@ -270,7 +279,11 @@
 
     })
 
-
+    $(document).on("click", ".pagination li", function (e) {
+        e.preventDefault();
+        page = $(this).find('a').text();
+        LoadJobs();
+    })
 
     function LoadJobs() {
         $.ajax({
@@ -284,7 +297,16 @@
                 page
             },
             success: function (data, textStatus, xhr) {
+
+                $('.pagination').empty();
+                for (let i = 1; i <= data.pages; i++) {
+                    let li = '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>';
+                    $('.pagination').append(li);
+                }
+
+              
                 $('#tblJobs').empty();
+                idx = (page-1)*data.pageSize;
                 data.jobs.forEach(job => {
                     let cc = job.cc.filter(x => x.status == -1);
                     let tr = '<tr id = "' + job._id + '" data-customer="' + job.customer._id + '"';
@@ -297,7 +319,7 @@
                         tr += '<button class="btn btn-xs btn-info parents js-view-parents" name="js-view-parents"> (' + job.tasks.length + ') <i class="fa fa-plus"></i></button>';
                     }
                     tr += '</td>';
-                    tr += '<td>' + (idx++) + '</td>'
+                    tr += '<td>' + (++idx) + '</td>'
                     tr += '<td>';
                     if (job.status == -1 || job.status == 0) {
                         tr += '<button class="btn btn-xs btn-primary ml-2" name="process-job"><i class="fa fa-bars" aria-hidden="true"></i></button>';
@@ -368,91 +390,91 @@
     }
 
     function LoadCustomer(){
-    $.ajax({
-      url:'/tla/customer/detail',
-      type:'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data:{id:customerId},
-      success:function(data){
-        $('#slCustomerLevles').empty();
-        data.customer.contracts[data.customer.contracts.length-1].lines.forEach(l=>{
-            let opt = '';
-            if(l.root){
-                opt = '<option value = "'+l.root._id+'" data-root="1">'+l.root.name+'</option>';
-            }else{
-                opt = '<option value = "'+l.parents._id+'" data-root="0">'+l.parents.name+'</option>';
+        $.ajax({
+        url:'/tla/customer/detail',
+        type:'get',
+        headers: {
+            authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data:{id:customerId},
+        success:function(data){
+            $('#slCustomerLevles').empty();
+            data.customer.contracts[data.customer.contracts.length-1].lines.forEach(l=>{
+                let opt = '';
+                if(l.root){
+                    opt = '<option value = "'+l.root._id+'" data-root="1">'+l.root.name+'</option>';
+                }else{
+                    opt = '<option value = "'+l.parents._id+'" data-root="0">'+l.parents.name+'</option>';
+                }
+                $('#slCustomerLevles').append(opt);
+            })
+            LoadLocalLevel();
+
+
+
+            $('.divNationalStyle').html('<i class="text-warning font-weight-bold">' + data.customer.style.nation.name + '</i>');
+            $('.divColor').html('<i class="text-warning font-weight-bold">' + data.customer.style.color.name + '</i>');
+            $('.divSize').html('<i class="text-warning font-weight-bold">' + data.customer.style.size.name + '</i>');
+            $('.divOutput').html('<i class="text-warning font-weight-bold">' + data.customer.style.output.name + '</i>');
+            $('.divCloud').html('<i class="text-warning font-weight-bold">' + data.customer.style.cloud.name + '</i>')
+
+            if (data.customer.style.align.checked) {
+                if (data.customer.style.align.note.trim().length > 0) {
+                    $('.divAlign').html(data.customer.style.align.note);
+                } else {
+                    $('.divAlign').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                }
+            } else {
+                $('.divAlign').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
             }
-            $('#slCustomerLevles').append(opt);
+
+            if (data.customer.style.sky.checked) {
+                if (data.customer.style.sky.note.trim().length > 0) {
+                    $('.divSky').html(data.customer.style.sky.note);
+                } else {
+                    $('.divSky').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                }
+            } else {
+                $('.divSky').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+            }
+
+            if (data.customer.style.fire.checked) {
+                if (data.customer.style.fire.note.trim().length > 0) {
+                    $('.divFire').html(data.customer.style.fire.note);
+                } else {
+                    $('.divFire').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                }
+            } else {
+                $('.divFire').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+            }
+
+            if (data.customer.style.tv.checked) {
+                if (data.customer.style.tv.note.trim().length > 0) {
+                    $('.divTV').html(data.customer.style.tv.note);
+                } else {
+                    $('.divTV').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                }
+            } else {
+                $('.divTV').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+            }
+
+            if (data.customer.style.grass.checked) {
+                if (data.customer.style.grass.note.trim().length > 0) {
+                    $('.divGrass').html(data.customer.style.grass.note);
+                } else {
+                    $('.divGrass').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                }
+            } else {
+                $('.divGrass').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+            }
+
+
+            $('.lblStyleNote').text(data.customer.style.style_note);
+
+
+        
+        }
         })
-        LoadLocalLevel();
-
-
-
-        $('.divNationalStyle').html('<i class="text-warning font-weight-bold">' + data.customer.style.nation.name + '</i>');
-        $('.divColor').html('<i class="text-warning font-weight-bold">' + data.customer.style.color.name + '</i>');
-        $('.divSize').html('<i class="text-warning font-weight-bold">' + data.customer.style.size.name + '</i>');
-        $('.divOutput').html('<i class="text-warning font-weight-bold">' + data.customer.style.output.name + '</i>');
-        $('.divCloud').html('<i class="text-warning font-weight-bold">' + data.customer.style.cloud.name + '</i>')
-
-        if (data.customer.style.align.checked) {
-            if (data.customer.style.align.note.trim().length > 0) {
-                $('.divAlign').html(data.customer.style.align.note);
-            } else {
-                $('.divAlign').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-            }
-        } else {
-            $('.divAlign').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-        }
-
-        if (data.customer.style.sky.checked) {
-            if (data.customer.style.sky.note.trim().length > 0) {
-                $('.divSky').html(data.customer.style.sky.note);
-            } else {
-                $('.divSky').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-            }
-        } else {
-            $('.divSky').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-        }
-
-        if (data.customer.style.fire.checked) {
-            if (data.customer.style.fire.note.trim().length > 0) {
-                $('.divFire').html(data.customer.style.fire.note);
-            } else {
-                $('.divFire').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-            }
-        } else {
-            $('.divFire').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-        }
-
-        if (data.customer.style.tv.checked) {
-            if (data.customer.style.tv.note.trim().length > 0) {
-                $('.divTV').html(data.customer.style.tv.note);
-            } else {
-                $('.divTV').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-            }
-        } else {
-            $('.divTV').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-        }
-
-        if (data.customer.style.grass.checked) {
-            if (data.customer.style.grass.note.trim().length > 0) {
-                $('.divGrass').html(data.customer.style.grass.note);
-            } else {
-                $('.divGrass').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-            }
-        } else {
-            $('.divGrass').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-        }
-
-
-        $('.lblStyleNote').text(data.customer.style.style_note);
-
-
-      
-      }
-    })
   }
 
 

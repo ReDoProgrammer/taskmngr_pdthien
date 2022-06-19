@@ -13,7 +13,7 @@ const _QA = 'QA';
 router.get('/list-editor', authenticateTLAToken, async (req, res) => {
     let { levelId } = req.query;
     let groups = await Group.find({job_lv:levelId});
-    console.log(groups)
+    // console.log(groups)
    
 
 

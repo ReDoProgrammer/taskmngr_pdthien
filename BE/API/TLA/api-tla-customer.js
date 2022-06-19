@@ -57,28 +57,6 @@ router.get('/detail',async (req,res)=>{
     })
 })
 
-router.get('/contract',authenticateTLAToken,async (req,res)=>{
-    let {customerId} = req.query;
-    let customer = await Customer.findById(customerId)
-    .populate('contracts.lines.root')
-    .populate('contracts.lines.parents');
-    if(!customer){
-        return res.status(404).json({
-            msg:`Customer not found!`
-        })
-    }
-
-    if(customer.contracts.length == 0){
-        return res.status(303).json({
-            msg:`Contracts not found. Please contact your administrator or accountant to set contracts into this customer to continue!`
-        })
-    }
-
-    return res.status(200).json({
-        msg:`Load customer contract successfully!`,
-        contract: customer.contracts[customer.contracts.length-1]
-    })
-})
 
 
 
