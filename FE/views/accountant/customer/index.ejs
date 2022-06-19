@@ -292,7 +292,6 @@
             $('#pagination').empty();
             let idx = (page - 1) * data.pageSize;
             data.customers.forEach((customer) => {
-              console.log(customer);
               let tr = "  <tr id='" + customer._id + "'>";
               tr += '<td>';
               tr += '<button class="btn btn-success btn-xs" name="contract"><i class="fa fa-file" aria-hidden="true"></i> Contract</button>'
