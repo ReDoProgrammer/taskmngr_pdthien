@@ -16,6 +16,10 @@ function convertISODateToTimeFormat(ISO_Date) {
   return dateTemplate;
 }
 
+function GetDifferenceBetweenTwoDatesToHours(ISO_Date){  
+  return (new Date(ISO_Date) - new Date())/36e5;
+}
+
 function getFirstLetters(str) {
   let arr = str.split(' ');
   let result = '';

@@ -362,11 +362,20 @@
               $('#tblJobs').empty();
               let idx = (page - 1) * data.pageSize;
               data.jobs.forEach(j => {
-                
-
                 let isInit = j.tasks.filter(x => x.status !== 0);
 
-                let tr = '<tr id="' + j._id + '" data-customer="' + j.customer._id + '">';
+                let tr = '<tr id="' + j._id + '" data-customer="' + j.customer._id + '"';
+                let deadline = GetDifferenceBetweenTwoDatesToHours(j.deadline.end);
+                if (deadline < 6 && deadline > 4) {
+                  tr += 'style="background-color: #FFFF99;"'
+                }
+                if (deadline <= 4 && deadline > 2) {
+                  tr += 'style="background-color:#33CCFF; color:white;"'
+                }
+                if (deadline <= 2) {
+                  tr += 'style="background-color:#FF3366; color:white;"'
+                }
+                tr += '>';
                 tr += '<td>';
                 if (j.tasks.length > 0) {
                   tr += '<button class="btn btn-xs parents js-view-parents " name="js-view-parents">(';
@@ -396,9 +405,9 @@
                 tr += '</td>';
 
                 tr += '<td class="font-weight-bold text-danger">';
-                  let templates = (j.templates.map(x=>{
-                    return x.root?x.root.name:x.parents.name
-                  }))
+                let templates = (j.templates.map(x => {
+                  return x.root ? x.root.name : x.parents.name
+                }))
                 tr += templates;
                 tr += '</td>';
 
@@ -446,9 +455,9 @@
         }
 
         $(document).on("click", ".pagination li", function (e) {
-            e.preventDefault();
-            page = $(this).find('a').text();
-            LoadJobs();
+          e.preventDefault();
+          page = $(this).find('a').text();
+          LoadJobs();
         })
 
       </script>

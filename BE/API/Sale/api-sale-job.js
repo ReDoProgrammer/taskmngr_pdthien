@@ -138,16 +138,15 @@ router.delete('/', authenticateSaleToken, async (req, res) => {
 
   await job.delete()
     .then(async _ => {
-      customer.jobs.pull(job);
-      await customer.save()
+      PullJob(job.customer, jobId)
         .then(_ => {
           return res.status(200).json({
             msg: `Job has been deleted!`
           })
         })
         .catch(err => {
-          return res.status(500).json({
-            msg: `Can not pull job from jobs list of customer with error: ${new Error(err.message)}`
+          return res.status(err.code).json({
+            msg: err.msg
           })
         })
 
@@ -223,23 +222,23 @@ router.put("/", authenticateSaleToken, async (req, res) => {
     }
   }
 
- job.templates = [];
+  job.templates = [];
 
 
   await job.save()
     .then(_ => {
-      PushTemplate(templates,job._id)
-      .then(_=>{
-        return res.status(200).json({
-          msg: `The job has been updated!`
+      PushTemplate(templates, job._id)
+        .then(_ => {
+          return res.status(200).json({
+            msg: `The job has been updated!`
+          })
         })
-      })
-      .catch(err=>{
-        return res.status(err.code).json({
-          msg:err.msg
+        .catch(err => {
+          return res.status(err.code).json({
+            msg: err.msg
+          })
         })
-      })
-      
+
     })
     .catch(err => {
       console.log(`Can not update this job with error: ${new Error(err.message)}`)
@@ -301,17 +300,18 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     at: new Date()
   }
 
+
   await job.save()
     .then(async _ => {
-        Promise.all([PushJob(job._id,customer),PushTemplate(templates,job._id)])
-        .then(_=>{
+      Promise.all([PushJob(job._id, customer), PushTemplate(templates, job._id)])
+        .then(_ => {
           return res.status(201).json({
-            msg:`Job has been created!`
+            msg: `Job has been created!`
           })
         })
-        .catch(err=>{
+        .catch(err => {
           return res.status(err.code).json({
-            msg:err.msg
+            msg: err.msg
           })
         })
     })
@@ -325,58 +325,84 @@ router.post("/", authenticateSaleToken, async (req, res) => {
 
 module.exports = router;
 
-const PushJob = (jobId,customerId)=>{
-  return new Promise(async (resolve,reject)=>{
+const PushJob = (jobId, customerId) => {
+  return new Promise(async (resolve, reject) => {
     let customer = await Customer.findById(customerId);
-    if(!customer){
+    if (!customer) {
       return reject({
-        code:404,
-        msg:`Customer not found!`
+        code: 404,
+        msg: `Customer not found!`
       })
     }
     customer.jobs.push(jobId);
     await customer.save()
-    .then(_=>{
-      return resolve(customer);
-    })
-    .catch(err=>{
-      return reject({
-        code:500,
-        msg:`Can not push job into customer with ${new Error(err.message)}`
+      .then(_ => {
+        return resolve(customer);
       })
-    })
+      .catch(err => {
+        return reject({
+          code: 500,
+          msg: `Can not push job into customer with ${new Error(err.message)}`
+        })
+      })
   })
 }
 
-const PushTemplate = (templates,jobId)=>{
-  return new Promise(async (resolve,reject)=>{
-    let job = await Job.findById(jobId);
-    if(!job){
+const PullJob = (customerId, jobId) => {
+  return new Promise(async (resolve, reject) => {
+    let customer = await Customer.findById(customerId);
+    if (!customer) {
       return reject({
-        code:404,
-        msg:`Job not found!`
+        code: 404,
+        msg: `Customer not found!`
       })
     }
+    customer.jobs.pull(jobId);
+    await customer.save()
+      .then(_ => {
+        return resolve(customer)
+      })
+      .catch(err => {
+        return reject({
+          code: 500,
+          msg: `Can not remove job from customer with error: ${new Error(err.message)}`
+        })
+      })
+  })
+}
+
+const PushTemplate = (templates, jobId) => {
+  return new Promise(async (resolve, reject) => {
+    let job = await Job.findById(jobId);
+    if (!job) {
+      return reject({
+        code: 404,
+        msg: `Job not found!`
+      })
+    }
+    if(templates.trim().length == 0){
+      return resolve();
+    }
     let arr = templates.split(',');
-    for(const temp of arr){
-      let count = await Root.countDocuments({_id:ObjectId(temp.trim())});
-      if(count > 0){
-        job.templates.push({root:ObjectId(temp.trim())})
-      }else{
-        job.templates.push({parents:ObjectId(temp.trim())})
+    for (const temp of arr) {
+      let count = await Root.countDocuments({ _id: ObjectId(temp.trim()) });
+      if (count > 0) {
+        job.templates.push({ root: ObjectId(temp.trim()) })
+      } else {
+        job.templates.push({ parents: ObjectId(temp.trim()) })
       }
     }
 
-   await job.save()
-   .then(_=>{
-    return resolve(job)
-   })
-   .catch(err=>{
-    return reject({
-      code:500,
-      msg:`Can not push template with error: ${new Error(err.message)}`
-    })
-   })
+    await job.save()
+      .then(_ => {
+        return resolve(job)
+      })
+      .catch(err => {
+        return reject({
+          code: 500,
+          msg: `Can not push template with error: ${new Error(err.message)}`
+        })
+      })
   })
 }
 
