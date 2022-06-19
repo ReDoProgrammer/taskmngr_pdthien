@@ -63,6 +63,10 @@
   $(document).ready(function () {
     $('#btnAddNew').click(function () {
       bpId = '';
+      $('#txtName').val('');
+      $('#ckbIsBonus').prop('checked',true);
+      $('#txtCosts').val('0');
+      $('#txaDescription').val('');     
       $('#modalBonusPenalty').modal();
     });
     LoadData();
@@ -70,8 +74,7 @@
 
   //sự kiện modal shown --> set các giá trị mặc định cho component trên form
   $(document).on('show.bs.modal', '.modal', function () {
-    
-
+    $('#txtName').select();
   });
 
   //sự kiện load lại hàm ds level khi modal đc đóng lại
