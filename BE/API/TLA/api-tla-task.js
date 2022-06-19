@@ -392,67 +392,36 @@ router.get('/cc', authenticateTLAToken, async (req, res) => {
         })
 })
 
-router.get('/list', authenticateTLAToken, (req, res) => {
+router.get('/list', authenticateTLAToken,async (req, res) => {
     let { jobId } = req.query;
-    Task
-        .find({ 'basic.job': jobId })
-        .populate([
-            {
-                path: 'basic.job',
-                populate: {
-                    path: 'customer'
-                }
-            },
-            {
-                path: 'basic.level',
-                select: 'name'
-            },
-            {
-                path: 'editor.staff',
-                select: 'fullname username'
-            },
-            {
-                path: 'qa.staff',
-                select: 'fullname username'
-            },
-            {
-                path: 'dc.staff',
-                select: 'fullname username'
-            },
-            {
-                path: 'tla.created.by',
-                select: 'fullname username'
-            },
-            {
-                path: 'tla.uploaded.by',
-                select: 'fullname username'
-            },
-            {
-                path: 'remarks',
-                options: { sort: { 'timestamp': -1 } }
-            },
-            {
-                path: 'fixible_task'
-            },
-            {
-                path: 'additional_task'
-            },
+    let tasks = await Task.find({'basic.job':jobId})
+    .populate([
+        {
+            path:'basic.job',
+            select:'name'
+        },
+        {
+            path:'basic.level',
+            select:'name'
+        },
+        {
+            path:'remarks',
+            select:'content'        
+        },
+        {
+            path:'editor.staff',
+            select:'fullname'
+        },
+        {
+            path:'qa.staff',
+            select:'fullname'
+        }
+    ]);
 
-        ])
-        .exec()
-        .then(tasks => {
-            return res.status(200).json({
-                tasks,
-                msg: 'Load tasks by job id successfully!'
-            })
-        })
-        .catch(err => {
-            console.log(`Can not load task with job ${jobId}`);
-            return res.status(500).json({
-                msg: `Can not load task with job ${jobId}`,
-                error: new Error(err.message)
-            })
-        })
+    return res.status(200).json({
+        msg:`Load tasks based on job successfully!`,
+        tasks
+    })
 })
 
 router.get('/all', authenticateTLAToken, (req, res) => {
@@ -706,10 +675,80 @@ router.post('/', authenticateTLAToken, async (req, res) => {
         input_link,
         remark,
         qa,
-        editor
+        editor,
+        status
     } = req.body;
 
-  
+  let task = new Task();
+
+task.basic = {
+    job:jobId,
+    level,
+    deadline:{
+        begin:assigned_date,
+        end:deadline
+    },
+    link:{
+        input:input_link
+    }
+}
+if(qa){
+    task.qa = [
+        {
+            staff:qa,
+            tla:req.user._id,
+            timestamp: new Date()
+        }
+    ]
+}
+if(editor){
+    task.editor = [
+        {
+            staff:editor,
+            timestamp: new Date(),
+            tla:req.user._id
+        }
+    ]
+}
+
+task.status = status;
+task.tla = {
+    created:{
+        by:req.user._id
+    }
+};
+
+await task.save()
+.then(async _=>{
+    Promise.all([CreateRemark(task._id,remark,req.user._id),PushTaskIntoJob(jobId,task._id)])
+    .then(async rs=>{
+        task.remarks.push(rs[0]);
+        await task.save()
+        .then(_=>{
+            return res.status(201).json({
+                msg:`Task has been created!`
+            })
+        })
+        .catch(err=>{
+            return res.status(err.code).json({
+                msg:err.msg
+            })
+        })
+       
+    })
+    .catch(err=>{
+        return res.status(err.code).json({
+            msg:err.msg
+        })
+    })
+})
+.catch(err=>{
+    return res.status(500).json({
+        msg:`Can not add new task with error: ${new Error(err.message)}`
+    })
+})
+
+
 
 
   
@@ -1115,16 +1154,23 @@ const DeleteRemarks = (taskId) => {
     })
 }
 
-const getCustomerLevelPrice = (customerId, levelId) => {
-    return new Promise(async (resolve, reject) => {
-        let clp = await CustomerLevel.findOne({ customer: customerId, level: levelId })
-        if (!clp) {
+
+const CreateRemark = (tid,content,user)=>{
+    return new Promise(async (resolve,reject)=>{
+        let remark = new Remark({
+            user,
+            content,
+            tid
+        });
+        await remark.save()
+        .then(_=>{
+            return resolve(remark);
+        })
+        .catch(err=>{
             return reject({
-                code: 404,
-                msg: `Get customer level price failed with error: ${new Error(err.message)}`
+                code:500,
+                msg:`Can not create remark with error: ${new Error(err.message)}`
             })
-        }
-        return resolve(clp)
+        })
     })
 }
-

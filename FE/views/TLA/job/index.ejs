@@ -129,7 +129,7 @@
                         }
                         newRow += '</td>';
                         newRow += '<td>';
-                        if (t.status !== -1) {
+                        if (t.editor.length>0) {
                             newRow += t.editor[t.editor.length - 1].staff.fullname;
                         }
                         newRow += '</td>';
@@ -141,7 +141,7 @@
                         newRow += '</td>';
 
                         newRow += '<td>';
-                        if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
+                        if (t.qa.length > 0) {
                             newRow += t.qa[t.qa.length - 1].staff.fullname;
                         }
                         newRow += '</td>';
@@ -504,7 +504,6 @@
                     let idx = 1;
                     data.job.cb.lines.forEach(l=>{                      
                         let name = l.root?l.root.name:l.parents.name;
-                        console.log(name)
                         let tr = '<tr>';
                             tr+= '<td>'+(idx++)+'</td>';
                             tr+= '<td class="text-danger font-weight-bold">'+ (l.root?l.root.name:l.parents.name)+'</td>';

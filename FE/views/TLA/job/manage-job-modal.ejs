@@ -460,6 +460,7 @@
         jobId
       },
       success: function (data) {
+        console.log(data)
         let idx = 1;
         $("#tblTasks").empty();
         data.tasks.forEach(t => {
@@ -485,14 +486,14 @@
           tr += '</td>';
 
           tr += '<td>';
-          if (typeof t.remarks[0] !== 'undefined') {
-            tr += t.remarks[0].content;
+          if (t.remarks.length>0) {
+            tr += t.remarks[t.remarks.length - 1].content;
           }
           tr += '</td>';
 
 
           tr += '<td>';
-          if (t.status !== -1)
+          if (t.editor.length>0)            
             tr += t.editor[t.editor.length - 1].staff.fullname;
           tr += "</td>";
 
@@ -570,7 +571,6 @@
         levelId: $('#slLocalLevels option:selected').val()
       },
       success: function (data) {
-        console.log(data.editors)
         $('#slEditor').empty();
         data.editors.forEach(e => {
           let opt = '<option value="' + e._id + '">' + e.fullname + ' ( ' + e.username + ' )</option>';
@@ -690,7 +690,7 @@
   });
 
   $("#btnSubmit").click(function () {
-    let level = $("#slJobLevels option:selected").val();
+    let level = $("#slLocalLevels option:selected").val();
     let name = $("#slJobLevels option:selected").text();
 
     let assigned_date = strToDate($('#txtAssignDate').val());
