@@ -30,6 +30,7 @@
       <tr>
         <th scope="col"></th>
         <th scope="col">#</th>
+        <th scope="col">Group</th>
         <th scope="col">Customer</th>
         <th scope="col">Phone</th>
         <th scope="col">Email</th>
@@ -300,6 +301,7 @@
               }
               tr += '</td>';
               tr += '<td scope="row">' + (++idx) + '</td>';
+              tr+= '<td class="font-weight-bold text-danger">'+customer.group.name+'</td>';
               tr += " <td class='font-weight-bold text-info'>" + customer.name.firstname + " " + customer.name.lastname + "</td>";
               tr += "<td>" + customer.contact.phone + "</td>";
               tr += "<td>" + customer.contact.email + "</td>";

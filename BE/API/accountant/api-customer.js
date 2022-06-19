@@ -79,6 +79,7 @@ router.get('/list', authenticateAccountantToken, async (req, res) => {
 
         .populate('contracts.lines.root')
         .populate('contracts.lines.parents')
+        .populate('group')
         .sort({ '_id': 1 })
         .select('name.firstname name.lastname contact.phone contact.email status contracts')
         .skip((page - 1) * pageSize)
@@ -431,11 +432,20 @@ router.delete('/', authenticateAccountantToken, async (req, res) => {
         })
     }
 
-    customer.delete()
-        .then(_ => {
-            return res.status(200).json({
-                msg: `The customer has been deleted!`
+    await customer.delete()
+        .then(async _ => {
+            PullCustomer(customer.group,customer._id)
+            .then(_=>{
+                return res.status(200).json({
+                    msg: `The customer has been deleted!`
+                })
             })
+            .catch(err=>{
+                return res.status(err.code).json({
+                    msg:err.msg
+                })
+            })
+            
         })
         .catch(err => {
             return res.status(500).json({
