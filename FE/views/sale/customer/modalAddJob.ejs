@@ -175,9 +175,9 @@
       success: function (data) {
         if (data.comboes.length > 0) {
           $('#rowCombo').slideDown(500);
+          $('#slCombo').empty();
           data.comboes.forEach(c => {
             let levels = (c.lines.map(x => (x.root ? x.root.name : x.parents.name) + ': ' + x.quantity)).toString();
-
             let opt = '<option value="' + c._id + '">' + c.name + ' [ ' + levels + ' ]</option>';
             $('#slCombo').append(opt);
           })
