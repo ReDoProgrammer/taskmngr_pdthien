@@ -57,6 +57,26 @@ const UserSchema = new Schema({
     //tài khoản đang hoạt động?
     type: Boolean,
     default: true
+  },
+
+  created:{
+    by:{
+      type:Schema.Types.ObjectId,
+      ref:'user'
+    },
+    at:{
+      type:Date,
+      default:new Date()
+    }
+  },
+  updated:{
+    by:{
+      type:Schema.Types.ObjectId,
+      ref:'user'
+    },
+    at:{
+      type:Date
+    }
   }
 
 });

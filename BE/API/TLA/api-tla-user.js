@@ -4,6 +4,7 @@ const User = require('../../models/user-model');
 const Group = require('../../models/user-group-model');
 const Module = require('../../models/module-model');
 const { ObjectId } = require('mongodb');
+const { getModule } = require('../../../middlewares/common');
 
 const _EDITOR = 'EDITOR';
 const _QA = 'QA';
@@ -12,8 +13,16 @@ const _QA = 'QA';
 
 router.get('/list-editor', authenticateTLAToken, async (req, res) => {
     let { levelId } = req.query;
-    let groups = await Group.find({job_lv:levelId});
-    // console.log(groups)
+   
+    getModule(_EDITOR)
+    .then(async m=>{
+        let groups = await Group.findOne({
+            'wages.job_lv':levelId,
+            'wages.module':m._id
+        }).populate('users');
+        console.log(groups)
+      
+    })
    
 
 

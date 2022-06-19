@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 const User = require('../../models/user-model');
+const Group = require('../../models/user-group-model');
+const Level = require('../../models/staff-level-model');
 const jwt = require("jsonwebtoken");
 
 const { getModule, getRole, checkAccount } = require('../common');
@@ -38,10 +40,10 @@ router.get('/', authenticateAdminToken, async (req, res) => {
   });
 
   return res.status(200).json({
-    msg:`Load users list successfully!`,
+    msg: `Load users list successfully!`,
     pageSize,
     users,
-    pages:count%pageSize == 0? count/pageSize: Math.floor(count/pageSize)+1
+    pages: count % pageSize == 0 ? count / pageSize : Math.floor(count / pageSize) + 1
   })
 
 
@@ -89,7 +91,7 @@ router.get('/detail', authenticateAdminToken, (req, res) => {
     })
 })
 
-router.post('/', authenticateAdminToken, (req, res) => {
+router.post('/', authenticateAdminToken, async (req, res) => {
   let {
     user_group,
     user_level,
@@ -108,6 +110,12 @@ router.post('/', authenticateAdminToken, (req, res) => {
 
   } = req.body;
 
+  let group = await Group.findById(user_group);
+  if (!group) {
+    return res.status(404).json({
+      msg: `User group not found!`
+    })
+  }
 
 
   let u = new User({
@@ -127,12 +135,21 @@ router.post('/', authenticateAdminToken, (req, res) => {
     bank_holder
 
   });
-  u.save()
-    .then(user => {
-      return res.status(201).json({
-        msg: 'New user has been created successfully!',
-        user: user
-      })
+  await u.save()
+    .then(async _ => {
+     
+        Promise.all([PushUserIntoGroup(user_group,u._id),PushUserIntoLevel(user_level,u._id)])
+        .then(_=>{
+          return res.status(201).json({
+            msg:`User has been created`
+          })
+        })
+        .catch(err=>{
+          return res.status(err.code).json({
+            msg:err.msg
+          })
+        })
+
     })
     .catch(err => {
       console.log(new Error(err.message));
@@ -143,7 +160,7 @@ router.post('/', authenticateAdminToken, (req, res) => {
     })
 })
 
-router.put('/', authenticateAdminToken, (req, res) => {
+router.put('/', authenticateAdminToken, async (req, res) => {
   let {
     user_group,
     user_level,
@@ -162,39 +179,58 @@ router.put('/', authenticateAdminToken, (req, res) => {
     bank_holder
   } = req.body;
 
-  User.findByIdAndUpdate(userId, {
-    user_group,
-    user_level,
-    fullname,
-    username,
-    phone,
-    email,
-    idNo,
-    issued_by,
-    address,
-    is_active,
-    bank,
-    bank_no,
-    bank_holder
-  }, { new: true }, async (err, user) => {
-    if (err) {
-      return res.status(500).json({
-        msg: `Update employee failed with error: ${new Error(err.message)}`,
-        error: new Error(err.message)
-      })
-    }
+  let user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({
+      msg: `User not found!`
+    })
+  }
+  let oLevel = user.user_level;
+  let oGroup = user.user_group;
+  user.user_group = user_group;
+  user.user_level = user_level;
+  user.fullname = fullname;
+  user.password = password;
+  user.phone = phone;
+  user.email = email;
+  user.idNo = idNo;
+  user.issued_by = issued_by;
+  user.address = address;
+  user.is_active = is_active;
+  user.bank = bank;
+  user.bank_no = bank_no;
+  user.bank_holder = bank_holder;
 
-    if (user == null) {
-      return res.status(404).json({
-        msg: `Employee not found!!!`
+  user.updated = {
+    by:req.user._id,
+    at: new Date()
+  }
+
+  await user.save()
+  .then(_=>{
+    Promise.all([
+      PullUserFromGroup(oGroup,user._id),
+      PullUserFromLevel(oLevel,user._id),
+      PushUserIntoGroup(user_group,user._id),
+      PushUserIntoLevel(user_level,user._id)
+    ])
+    .then(_=>{
+      return res.status(200).json({
+        msg:`User has been updated!`
       })
-    }
-    user.password = password;
-    await user.save();
-    return res.status(200).json({
-      msg: `Update employee info successfully!!`
+    })
+    .catch(err=>{
+      return res.status(err.code).json({
+        msg:err.msg
+      })
     })
   })
+  .catch(err=>{
+    return res.status(500).json({
+      msg:`Can not update user with error: ${new Error(err.message)}`
+    })
+  })
+
 })
 
 router.delete('/', authenticateAdminToken, (req, res) => {
@@ -219,19 +255,19 @@ router.delete('/', authenticateAdminToken, (req, res) => {
 })
 
 
-router.get('/profile', authenticateAdminToken,async (req, res) => {
+router.get('/profile', authenticateAdminToken, async (req, res) => {
   let user = await User.findById(req.user._id);
-  if(!user){
+  if (!user) {
     return res.status(401).json({
-      msg:`Need login to access this module`,
-      url:'/admin/login'
+      msg: `Need login to access this module`,
+      url: '/admin/login'
     })
   }
   return res.status(200).json({
-    msg:`Load user profile successfully!`,
-    fullname:user.fullname
+    msg: `Load user profile successfully!`,
+    fullname: user.fullname
   })
-  
+
 })
 
 
@@ -259,10 +295,10 @@ router.post("/login", (req, res) => {
           accessToken,
           refreshToken
         });
-      }else{
+      } else {
         return res.status(409).json({
-          msg:`You can not access this module!`,
-          url:'/admin/login'
+          msg: `You can not access this module!`,
+          url: '/admin/login'
         })
       }
 
@@ -289,3 +325,96 @@ module.exports = router;
 function generateAccessToken(user) {
   return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "8h" });
 }
+
+const PushUserIntoGroup = (groupId,userId)=>{
+  return new Promise(async(resolve,reject)=>{
+    let group = await Group.findById(groupId);
+    if(!group){
+      return reject({
+        code:404,
+        msg:`User group not found!`
+      })
+    }
+    group.users.push(userId);
+    await group.save()
+    .then(_=>{
+      return resolve(group);
+    })
+    .catch(err=>{
+      return reject({
+        code:500,
+        msg:`Can not add user into group with error: ${new Error(err.message)}`
+      })
+    })
+  })
+}
+
+const PullUserFromGroup = (groupId,userId)=>{
+  return new Promise(async (resolve,reject)=>{
+    let group = await Group.findById(groupId);
+    if(!group){
+      return reject({
+        code:404,
+        msg:`User group not found!`
+      })
+    }
+    group.users.pull(userId);
+    await group.save()
+    .then(_=>{
+      return resolve(group);
+    })
+    .catch(err=>{
+      return reject({
+        code:500,
+        msg:`Can not remove user from old group with error: ${new Error(err.message)}`
+      })
+    })
+  })
+}
+
+const PushUserIntoLevel = (levelId,userId)=>{
+  return new Promise(async (resolve,reject)=>{
+    let level = await Level.findById(levelId);
+    if(!level){
+      return reject({
+        code:404,
+        msg:`User level not found`
+      })
+    }
+    level.users.push(userId);
+    await level.save()
+    .then(_=>{
+      return resolve(level);
+    })
+    .catch(err=>{
+      return reject({
+        code:500,
+        msg:`Can not add user into level with error: ${new Error(err.message)}`
+      })
+    })
+  })
+}
+
+const PullUserFromLevel = (levelId,userId)=>{
+  return new Promise(async (resolve,reject)=>{
+    let level = await Level.findById(levelId);
+    if(!level){
+      return reject({
+        code:404,
+        msg:`User level not found!`
+      })
+    }
+    level.users.pull(userId);
+    await level.save()
+    .then(_=>{
+      return resolve(level)
+    })
+    .catch(err=>{
+      return reject({
+        code:500,
+        msg:`Can not remove user from old level with error: ${new Error(err.message)}`
+      })
+    })
+  })
+}
+

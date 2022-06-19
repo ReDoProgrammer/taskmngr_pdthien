@@ -5,7 +5,7 @@ const Root = require('../../models/root-level-model');
 const Parents = require('../../models/parents-level-model');
 const LocalLevel = require('../../models/job-level-model');
 
-const pageSize = 2;
+const pageSize = 20;
 
 router.get('/list', authenticateTLAToken, async (req, res) => {
     let { page, search } = req.query;
