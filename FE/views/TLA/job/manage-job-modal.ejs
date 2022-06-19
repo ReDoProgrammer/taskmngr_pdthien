@@ -570,6 +570,7 @@
         levelId: $('#slLocalLevels option:selected').val()
       },
       success: function (data) {
+        console.log(data.editors)
         $('#slEditor').empty();
         data.editors.forEach(e => {
           let opt = '<option value="' + e._id + '">' + e.fullname + ' ( ' + e.username + ' )</option>';
