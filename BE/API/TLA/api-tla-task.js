@@ -60,15 +60,15 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
                 -- nên chỉ cần quan tâm tới trường hợp có editor truyền vào
                 -- và khác editor hiện đang xử lý task đó
             */
-           
-            
-                if (editor.length > 0 && task.editor[task.editor.length - 1].staff !== editor) {
+
+
+            if (editor.length > 0 && task.editor[task.editor.length - 1].staff !== editor) {
                 await getModule(_EDITOR)
                     .then(async m => {
-                       
+
                         await getWage(editor, task.basic.level, m._id)
                             .then(async w => {
-                               
+
                                 let ed = {
                                     staff: editor,
                                     wage: w.wage,
@@ -76,7 +76,7 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
                                     timestamp: new Date() //thời điểm được gán task
                                 };
 
-                               
+
                                 //xử lý liên quan tới timeline của editor hiện tại
                                 if (task.editor[task.editor.length - 1].timeline && task.editor[task.editor.length - 1].timeline.length > 0) {
                                     task.editor[task.editor.length - 1].timeline[task.editor[task.editor.length - 1].timeline.length - 1].unregisted = true;
@@ -106,8 +106,8 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
                 1: qa được truyền vào phải là 1 id Q.A cụ thể
                 2: thiết lập các thông số  cần thiết đối với các Q.A đã xử lý trước đó(nếu có)
             */
-         
-                console.log(qa)
+
+            console.log(qa)
             if (qa && qa.length > 0) {
                 await getModule(_QA)
                     .then(async m => {
@@ -196,14 +196,14 @@ router.post('/cc', authenticateTLAToken, async (req, res) => {
 
     await getCustomerLevelPrice(customerId, level)
         .then(async p => {
-           
+
             if (p.price == 0) {
                 return res.status(403).json({
                     msg: `Customer level price unit not available!`
                 })
             }
 
-          
+
 
             let task = new Task();
 
@@ -498,12 +498,12 @@ router.get('/all', authenticateTLAToken, (req, res) => {
                     options: { sort: { 'timestamp': -1 } }
                 },
                 {
-                    path: 'bp'                   
+                    path: 'bp'
                 }
             ])
 
             .exec()
-            .then(tasks => {               
+            .then(tasks => {
                 return res.status(200).json({
                     msg: 'Load tasks list successfully!',
                     tasks
@@ -628,7 +628,7 @@ router.get('/detail', authenticateTLAToken, (req, res) => {
         .then(async task => {
             await getCustomer(task.basic.job.customer)
                 .then(customer => {
-                
+
                     return res.status(200).json({
                         msg: `Load task detail successfully!`,
                         task,
@@ -699,7 +699,7 @@ router.get('/detail-to-edit', authenticateTLAToken, (req, res) => {
 
 router.post('/', authenticateTLAToken, async (req, res) => {
     let {
-        job,
+        jobId,
         level,
         assigned_date,
         deadline,
@@ -709,167 +709,10 @@ router.post('/', authenticateTLAToken, async (req, res) => {
         editor
     } = req.body;
 
-    let j = await Job.findById(job).populate('customer');
-    if (!j) {
-        return res.status(404).json({
-            msg: `Job not found that this task based on`
-        })
-    }
+  
 
 
-    await getCustomerLevelPrice(j.customer._id, level)
-        .then(async clp => {
-            
-            if (clp.price == 0) {
-                return res.status(403).json({
-                    msg: `Customer level price unit not available!`
-                })
-            }
-
-            let task = new Task();
-
-            //THIẾT LẬP CÁC THÔNG TIN CƠ BẢN CỦA TASK
-            let bs = {
-                job: job,
-                level: level,
-                price: clp.price
-            };
-
-            //deadline
-            let dl = {};
-            dl.begin = assigned_date;
-            if (deadline.length !== 0) {
-                dl.end = deadline;
-            }
-            bs.deadline = dl;
-
-            let link = {};
-            link.input = input_link;
-            bs.link = link;
-
-            task.basic = bs;
-
-
-
-            //THÔNG TIN LIÊN QUAN TỚI TLA
-            let tla = {};
-            tla.created = {
-                at: new Date(),
-                by: req.user._id
-            };
-
-            task.tla = tla;
-
-
-
-
-            // THÔNG TIN LIÊN QUAN TỚI GÁN EDITOR
-            if (editor.length > 0) {
-                await getModule(_EDITOR)
-                    .then(async m => {
-                        await getWage(editor, level, m._id)
-                            .then(async w => {
-                                let ed = {
-                                    staff: editor,
-                                    wage: w.wage,
-                                    tla: req.user._id,
-                                    timestamp: new Date()
-                                };
-
-                                task.editor = ed;
-                                task.status = 0;
-
-                            })
-                            .catch(err => {
-                                return res.status(err.code).json({
-                                    msg: err.msg
-                                })
-                            })
-                    })
-                    .catch(err => {
-                        return res.status(err.code).json({
-                            msg: err.msg
-                        })
-                    })
-
-            }
-
-            //THÔNG TIN LIÊN QUAN TỚI GÁN Q.A
-            if (qa.length > 0) {
-                await getModule(_QA)
-                    .then(async m => {
-                        await getWage(qa, level, m._id)
-                            .then(async w => {
-                                let q = {
-                                    staff: qa,
-                                    wage: w.wage,
-                                    tla: req.user._id,
-                                    timestamp: new Date()
-                                };
-                                task.qa = q;
-                            })
-                            .catch(err => {
-                                return res.status(err.code).json({
-                                    msg: err.msg
-                                })
-                            })
-                    })
-                    .catch(err => {
-                        return res.status(err.code).json({
-                            msg: err.msg
-                        })
-                    })
-
-            }
-
-
-
-            let rm = new Remark({
-                user: req.user._id,
-                content: remark,
-                tid: task._id
-            });
-
-            await rm.save()
-                .then(async r => {
-                    task.remarks.push(r);
-
-                    await task.save()
-                        .then(async t => {
-                            j.tasks.push(t);
-                            await j.save()
-                                .then(_ => {
-                                    return res.status(201).json({
-                                        msg: `Task has been created successfully!`
-                                    })
-                                })
-                                .catch(err => {
-                                    console.log(`Can not update tasks list into job with error: ${new Error(err.message)}`)
-                                    return res.status(500).json({
-                                        msg: `Can not update tasks list into job with error: ${new Error(err.message)}`
-                                    })
-                                })
-                        })
-                        .catch(err => {
-                            console.log(`Can not create task with error: ${new Error(err.message)}`)
-                            return res.status(500).json({
-                                msg: `Can not create task with error: ${new Error(err.message)}`
-                            })
-                        })
-                })
-                .catch(err => {
-                    console.log(`Can not create remark with error: ${new Error(err.message)}`)
-                    return res.status(500).json({
-                        msg: `Can not create remark with error: ${new Error(err.message)}`
-                    })
-                })
-        })
-        .catch(err => {
-            console.log(err);
-            return res.status(err.code).json({
-                msg: err.msg
-            })
-        })
+  
 })
 
 
@@ -1186,133 +1029,102 @@ router.delete('/', authenticateTLAToken, async (req, res) => {
         })
     }
 
-
-
-    //Bước 2: Xóa task
     await task.delete()
-        .then(async _ => {
-            //Bước 3: xóa các remark liên quan tới task bị xóa
-            let rm = Remark.find({ tid: _id });
-            rm.deleteMany()
-                .then(async _ => {
-                    //Bước 4: Xóa id task bị xóa ra khỏi job
-                    let job = await Job.findById(task.basic.job);
-                    if (!job) {
-                        return res.status(404).json({
-                            msg: `Can not find job which is parents of this task`
-                        })
-                    }
-                    job.tasks.pull(task);
-                    await job.save()
-                        .then(async _ => {
-                            //Bước 5: loại trừ taskid ra khỏi cc nếu có
-                            if (task.additional_task) {
-                                let cc = await CC.findById(task.additional_task);
-                                if (!cc) {
-                                    return res.status(404).json({
-                                        msg: `Can not found CC that this task based on it!`
-                                    })
-                                }
-                                cc.additional_tasks.pull(task);
-                                await cc.save()
-                                    .then(_ => {
-                                        return res.status(200).json({
-                                            msg: `This task has been deleted!`
-                                        })
-                                    })
-                            } else
-                                if (task.fixible_task) {
-                                    let cc = await CC.findById(task.fixible_task);
-                                    if (!cc) {
-                                        return res.status(404).json({
-                                            msg: `Can not found CC that this task based on it!`
-                                        })
-                                    }
-                                    cc.delete()
-                                        .then(_ => {
-                                            return res.status(200).json({
-                                                msg: `This task has been deleted!`
-                                            })
-                                        })
-                                        .catch(err => {
-                                            return res.status(500).json({
-                                                msg: `Can not delete this task from cc with error: ${new Error(err.message)}`
-                                            })
-                                        })
-                                } else {
-                                    return res.status(200).json({
-                                        msg: `This task has been deleted!`
-                                    })
-                                }
-
-                        })
-                        .catch(err => {
-                            console.log(`Can not update job tasklist with error:${new Error(err.message)}`)
-                            return res.status(500).json({
-                                msg: `Can not update job tasklist with error:${new Error(err.message)}`
-                            })
-                        })
+        .then(_ => {
+            Promise.all([PullTaskFromJob(task.basic.job, task._id), DeleteRemarks(task._id)])
+                .then(_ => {
+                    return res.status(200).json({
+                        msg: `Task has been deleted!`
+                    })
                 })
                 .catch(err => {
-                    console.log(`Can not delete remarks based on this task with error: ${new Error(err.message)}`)
-                    return res.status(500).json({
-                        msg: `Can not delete remarks based on this task with error: ${new Error(err.message)}`
+                    return res.status(err.code).json({
+                        msg: err.msg
                     })
                 })
         })
         .catch(err => {
-            console.log(`Can not delete this task with error: ${new Error(err.message)}`);
             return res.status(500).json({
                 msg: `Can not delete this task with error: ${new Error(err.message)}`
             })
         })
-
 })
 
 
 module.exports = router;
 
-
-
-const getCustomerIdFromJob = (jobId) => {
-    return new Promise((resolve, reject) => {
-        Job
-            .findById(jobId)
-            .exec()
-            .then(j => {
-                if (!j) {
-                    return reject({
-                        code: 404,
-                        msg: `Job not found`
-                    })
-                }
-                return resolve({
-                    code: 200,
-                    msg: `Job found`,
-                    customerId: j.customer
-                })
+const PushTaskIntoJob = (jobId, taskId) => {
+    return new Promise(async (resolve, reject) => {
+        let job = await Job.findById(jobId);
+        if (!job) {
+            return reject({
+                code: 404,
+                msg: `Job not found!`
+            })
+        }
+        job.tasks.push(taskId);
+        await job.save()
+            .then(_ => {
+                return resolve(job);
             })
             .catch(err => {
                 return reject({
                     code: 500,
-                    msg: `Can not get job with error: ${new Error(err.message)}`
+                    msg: `Can not add task into job with error: ${new Error(err.message)}`
                 })
             })
     })
 }
 
+const PullTaskFromJob = (jobId, taskId) => {
+    return new Promise(async (resolve, reject) => {
+        let job = await Job.findById(jobId);
+        if (!job) {
+            return reject({
+                code: 404,
+                msg: `Job not found!`
+            })
+        }
+        job.tasks.pull(taskId);
+        await job.save()
+            .then(_ => {
+                return resolve(job);
+            })
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not remove task from job with error: ${new Error(err.message)}`
+                })
+            })
+    })
+}
 
+const DeleteRemarks = (taskId) => {
+    return new Promise(async (resolve, reject) => {
+        let remarks = await Remark.find({ tid: taskId });
+        await remarks.deleteMany()
+            .then(_ => {
+                return resolve();
+            })
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not delete remarks based on this task with error: ${new Error(err.message)}`
+                })
+            })
+    })
+}
 
 const getCustomerLevelPrice = (customerId, levelId) => {
     return new Promise(async (resolve, reject) => {
-        let clp =await CustomerLevel.findOne({ customer: customerId, level: levelId })
-        if(!clp){
+        let clp = await CustomerLevel.findOne({ customer: customerId, level: levelId })
+        if (!clp) {
             return reject({
-                code:404,
-                msg:`Get customer level price failed with error: ${new Error(err.message)}`
+                code: 404,
+                msg: `Get customer level price failed with error: ${new Error(err.message)}`
             })
-        }  
-        return resolve(clp)  
+        }
+        return resolve(clp)
     })
 }
 

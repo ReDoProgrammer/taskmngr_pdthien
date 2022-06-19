@@ -7,41 +7,6 @@ const Customer = require('../models/customer-model');
 
 
 
-const getJobLevelBasedOnConditons = (staffId, moduleName) => {
-    //hàm này trả về những job level mà nhân viên có thể làm
-    return new Promise((resolve, reject) => {
-        Promise.all([getModule(moduleName), getUser(staffId)])
-            .then(rs => {
-                Wage
-                    .find({
-                        module: rs[0]._id,
-                        user_group: rs[1].user_group
-                    })
-                    .exec()
-                    .then(ws => {
-                        if (ws.length == 0) {
-                            return reject({
-                                code: 404,
-                                msg: `Can not get any job level that is suitable with you!`
-                            })
-                        }
-                        let levels = ws.map(x => {
-                            return x.job_lv
-                        })
-                        return resolve(levels);
-                    })
-                    .catch(err => {
-                        return reject({
-                            code: 500,
-                            msg: `Can not get joblevel based on conditons with error: ${new Error(err.message)}`
-                        })
-                    })
-            })
-            .catch(err => {
-                return reject(err);
-            })
-    })
-}
 
 
 function generateAccessToken(user) {
@@ -103,67 +68,22 @@ const checkAccount = (username, password) => {
 
 //hàm trả về module từ tên module
 const getModule = (_module) => {
-    return new Promise((resolve, reject) => {
-        Module.findOne({ name: _module })
-            .exec()
-            .then(mod => {
-                if (!mod) {
-                    return reject({
-                        code: 404,
-                        msg: `Module not found`
-                    })
-                }
-                return resolve(mod)
+    return new Promise(async (resolve, reject) => {
+        let m = await Module.findOne({name:_module});
+        if(!m){
+            return reject({
+                code:404,
+                msg:`Module not found!`
             })
-            .catch(err => {
-                return reject({
-                    code: 500,
-                    msg: `Can not find module with error: ${new Error(err.message)}`
-                })
-            })
+        }
+
+        return resolve(m);
     })
 
 }
 
 
-//hàm lấy tiền công của nhân viên
 
-const getWage = (staffId, job_lv, moduleId) => {
-    return new Promise((resolve, reject) => {
-        getUser(staffId)
-            .then(async u => {
-
-                await Wage
-                    .findOne({
-                        module: moduleId,
-                        job_lv,
-                        staff_lv: u.user_level,
-                        user_group: u.user_group
-                    })
-                    .exec()
-                    .then(w => {
-
-                        if (!w) {
-                            return reject({
-                                code: 404,
-                                msg: `Can not get wage with this job level and this user group. Please set this wage in user group module first!`
-                            })
-                        }
-                        return resolve(w);
-                    })
-                    .catch(err => {
-                        console.log(`Can not get wage with error: ${new Error(err.message)}`);
-                        return reject({
-                            code: 500,
-                            msg: `Can not get wage with error: ${new Error(err.message)}`
-                        })
-                    })
-            })
-            .catch(err => {
-                return reject(err)
-            })
-    })
-}
 
 //hàm trả về nhân viên từ mã nhân viên
 const getUser = (staffId) => {
@@ -347,9 +267,7 @@ const GetJobLevelsByStaffLevel = (staffLevel) => {
 module.exports = {
     generateAccessToken,
     getModule,
-    getWage,
     checkAccount,
-    getJobLevelBasedOnConditons,
     getCustomer,
     getTaskDetail,
     setJobStatus,

@@ -47,25 +47,5 @@ router.get('/list-qa', authenticateTLAToken, async (req, res) => {
 
 module.exports = router;
 
-const getModuleByName = (moduleName) => {
-    return new Promise(async (resolve, reject) => {
-        await Module.findOne({ name: moduleName })
-            .then(m => {
-                if (!m) {
-                    return reject({
-                        code: 404,
-                        msg: `Module not found`
-                    })
-                }
-                return resolve(m);
-            })
-            .catch(err => {
-                return reject({
-                    code: 500,
-                    msg: `Can not find module with error: ${new Error(err.message)}`
-                })
-            })
-    })
-}
 
 
