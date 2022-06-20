@@ -16,6 +16,8 @@ const { log } = require('npm');
 const _EDITOR = 'EDITOR';
 const _QA = 'QA';
 
+const pageSize = 20;
+
 router.put('/cc', authenticateTLAToken, async (req, res) => {
     let { taskId, remark, editor, qa, ccId } = req.body;
 
@@ -426,7 +428,40 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
 
 router.get('/all', authenticateTLAToken, async (req, res) => {
     let { page, search, status } = req.query;
-    
+    let stt = (status.split(',')).map(x=>{
+        return parseInt(x.trim());
+    })
+
+    let tasks = await Task
+    .find({status:{$in:stt}})
+    .sort({'deadline.end':1})
+    .skip((page-1)*pageSize)
+    .limit(pageSize)
+    .populate([
+        {
+            path:'basic.job',
+            populate:{
+                path:'customer',
+                select:'name.firstname name.lastname'
+            }
+        },
+        {
+            path:'basic.level',
+            select:'name'
+        },
+        {path:'editor.staff'},
+        {path:'qa.staff'},
+        {path:'remarks'}
+    ]);
+
+    let count = await Task.countDocuments({});
+
+    return res.status(200).json({
+        msg:`Load tasks list successfully!`,
+        tasks,
+        pageSize,
+        pages: count%pageSize == 0? count/pageSize: Math.floor(count/pageSize)+1
+    })
 
 })
 
