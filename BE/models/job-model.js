@@ -127,7 +127,13 @@ const jobSchema = new Schema({
 
             }
         }
-    ]
+    ],
+
+    //thuộc tính đánh dấu mức độ ưu tiên của job
+    urgent:{
+        type:Boolean,
+        default:false
+    }
 });
 
 

@@ -380,18 +380,7 @@
               data.jobs.forEach(j => {
                 let isInit = j.tasks.filter(x => x.status !== 0);
 
-                let tr = '<tr id="' + j._id + '" data-customer="' + j.customer._id + '"';
-                let deadline = GetDifferenceBetweenTwoDatesToHours(j.deadline.end);
-                if (deadline < 6 && deadline > 4) {
-                  tr += 'style="background-color: rgba(245,0,0,0.1);"'
-                }
-                if (deadline <= 4 && deadline > 2) {
-                  tr += 'style="background-color:rgba(245,0,0,0.5); color:white;"'
-                }
-                if (deadline <= 2) {
-                  tr += 'style="background-color:rgba(245,0,0,0.8); color:white;"'
-                }
-                tr += '>';
+                let tr = '<tr id="' + j._id + '" data-customer="' + j.customer._id + '">';
                 tr += '<td>';
                 if (j.tasks.length > 0) {
                   tr += '<button class="btn btn-xs parents js-view-parents " name="js-view-parents">(';
@@ -413,7 +402,12 @@
                 }
                 tr += '</td>';
                 tr += '<td>' + convertISODateToTimeFormat(j.deadline.begin) + '</td>';
-                tr += '<td>' + convertISODateToTimeFormat(j.deadline.end) + '</td>';
+                tr += '<td ';
+                if (j.urgent || j.cc.length > 0) {
+                  tr += 'style="background-color:rgba(245,0,0,0.5); color:white; font-weight: bold;"'
+                }
+
+                tr += '>' + convertISODateToTimeFormat(j.deadline.end) + '</td>';
                 tr += '<td class="font-weight-bold text-primary">';
                 if (j.cb) {
                   tr += j.cb.name;

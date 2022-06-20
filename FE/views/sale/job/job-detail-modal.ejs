@@ -157,7 +157,7 @@
                 $('#lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.deadline.end));
                 $('#lblIntruction').text(data.job.intruction);
                 $('#lblInputLink').html('<a href="' + data.job.link.input + '" target="_blank" rel="noopener noreferrer">Link</a>')
-
+                
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 alert(jqXHR.responseJSON.msg);

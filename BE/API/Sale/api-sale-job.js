@@ -171,6 +171,7 @@ router.put("/", authenticateSaleToken, async (req, res) => {
     captureder,
     quantity,
     price,
+    urgent,
     templates
   } = req.body;
 
@@ -200,7 +201,7 @@ router.put("/", authenticateSaleToken, async (req, res) => {
       })
     }
     job.cb = cb;
-  }else{
+  } else {
     job.cb = null;
   }
 
@@ -209,26 +210,26 @@ router.put("/", authenticateSaleToken, async (req, res) => {
     by: req.user._id
   }
 
-  if(material){
+  if (material) {
     await Material.findById(material)
-    .then(async m =>{
-      job.captured = {
-        material,
-        user:captureder,
-        price:m.price,
-        quantity
-      }
-    })
-    .catch(err=>{
-      return res.status(500).json({
-        msg:`Can not set captureder with material catch error: ${new Error(err.message)}`
+      .then(async m => {
+        job.captured = {
+          material,
+          user: captureder,
+          price: m.price,
+          quantity
+        }
       })
-    })
-    
-  }  else{
+      .catch(err => {
+        return res.status(500).json({
+          msg: `Can not set captureder with material catch error: ${new Error(err.message)}`
+        })
+      })
+
+  } else {
     job.captured = null;
   }
-
+  job.urgent = urgent;
 
   await job.save()
     .then(_ => {
@@ -267,7 +268,8 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     captureder,
     quantity,
     price,
-    templates
+    templates,
+    urgent
   } = req.body;
 
 
@@ -283,14 +285,14 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     end: delivery_date
   };
 
-  if(material){
+  if (material) {
     job.captured = {
       material,
-      user:captureder,
+      user: captureder,
       price,
       quantity
     }
-  }  
+  }
 
   if (cb.length > 0) {
     let c = await Combo.findById(cb);
@@ -308,6 +310,8 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     by: req.user._id,
     at: new Date()
   }
+
+  job.urgent = urgent;
 
 
   await job.save()
@@ -389,7 +393,7 @@ const PushTemplate = (templates, jobId) => {
         msg: `Job not found!`
       })
     }
-    if(templates.trim().length == 0){
+    if (templates.trim().length == 0) {
       return resolve();
     }
     let arr = templates.split(',');
@@ -415,34 +419,34 @@ const PushTemplate = (templates, jobId) => {
   })
 }
 
-const ChangeTemplate = (templates,jobId)=>{
-  return new Promise(async (resolve,reject)=>{
+const ChangeTemplate = (templates, jobId) => {
+  return new Promise(async (resolve, reject) => {
     let job = await Job.findById(jobId);
     job.templates = [];
-    if(templates.length > 0){
-      let temp = (templates.split(',')).map(x=>x.trim());
-      for(const t of temp){
-        let count = await Root.countDocuments({_id:t});
-        if(count > 0){
-          job.templates.push({root:t})
-        }else{
-          job.templates.push({parents:t})
+    if (templates.length > 0) {
+      let temp = (templates.split(',')).map(x => x.trim());
+      for (const t of temp) {
+        let count = await Root.countDocuments({ _id: t });
+        if (count > 0) {
+          job.templates.push({ root: t })
+        } else {
+          job.templates.push({ parents: t })
         }
       }
     }
 
     await job.save()
-    .then(_=>{
-      return resolve(job);
-    })
-    .catch(err=>{
-      return reject({
-        code:500,
-        msg:`Can not update job templates with error: ${new Error(err.message)}`
+      .then(_ => {
+        return resolve(job);
       })
-    })
-   
-    
+      .catch(err => {
+        return reject({
+          code: 500,
+          msg: `Can not update job templates with error: ${new Error(err.message)}`
+        })
+      })
+
+
   })
 }
 

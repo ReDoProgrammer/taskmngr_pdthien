@@ -114,6 +114,14 @@
                 <input type="text" name="" id="txtQuantity" class="form-control">
               </div>
             </div>
+            <div class="row">
+              <div class="form-group col-md-12">
+                <label for="">Priority:</label>
+                <div class="checkbox">
+                  <label><input type="checkbox" id="ckbUrgent">Urgent</label>
+                </div>
+              </div>
+            </div>
 
             <div class="row">
               <div class="col-md-12 col-sm-12 col-xs12">
@@ -277,7 +285,7 @@
 
 
     var templates = ($("#slTemplates").val() || []).join(', ');
-
+    let urgent = $('#ckbUrgent').is(':checked');
 
     if (isNaN(delivery_date) || delivery_date === null || isNaN(received_date) || received_date == null) {
       $('#lblError').text('(*) Received date or delivery date is  invalid!');
@@ -323,7 +331,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { customer, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity, price, templates },
+      data: { customer, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity, price, templates,urgent },
       success: function (data) {
         Swal.fire({
           icon: 'success',
