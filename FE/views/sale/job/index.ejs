@@ -383,13 +383,13 @@
                 let tr = '<tr id="' + j._id + '" data-customer="' + j.customer._id + '"';
                 let deadline = GetDifferenceBetweenTwoDatesToHours(j.deadline.end);
                 if (deadline < 6 && deadline > 4) {
-                  tr += 'style="background-color: #FFFF99;"'
+                  tr += 'style="background-color: rgba(245,0,0,0.1);"'
                 }
                 if (deadline <= 4 && deadline > 2) {
-                  tr += 'style="background-color:#33CCFF; color:white;"'
+                  tr += 'style="background-color:rgba(245,0,0,0.5); color:white;"'
                 }
                 if (deadline <= 2) {
-                  tr += 'style="background-color:#FF3366; color:white;"'
+                  tr += 'style="background-color:rgba(245,0,0,0.8); color:white;"'
                 }
                 tr += '>';
                 tr += '<td>';
