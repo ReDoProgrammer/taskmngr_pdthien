@@ -401,12 +401,12 @@
 
                 tr += '</td>';
                 tr += '<td>' + (++idx) + '</td>';
-                tr += '<td class="font-weight-bold text-primary">' + j.customer.name.firstname + ' ' + j.customer.name.lastname + '</td>';
-                tr += '<td class="font-weight-bold text-danger">' + (getFirstLetters(j.customer.name.firstname + ' ' + j.customer.name.lastname)).toUpperCase() + getLastLetters(j.customer._id) + '</td>';
-                tr += '<td class="font-weight-bold text-warning">';
+                tr += '<td class="font-weight-bold">' + j.customer.name.firstname + ' ' + j.customer.name.lastname + '</td>';
+                tr += '<td class="font-weight-bold">' + (getFirstLetters(j.customer.name.firstname + ' ' + j.customer.name.lastname)).toUpperCase() + getLastLetters(j.customer._id) + '</td>';
+                tr += '<td class="font-weight-bold">';
                 tr += j.name;
                 if (j.captured && j.captured.user) {
-                  tr += '<i class="fa fa-camera text-primary ml-2" aria-hidden="true"></i>'
+                  tr += '<i class="fa fa-camera text-info ml-2" aria-hidden="true"></i>'
                 }
                 if (j.cc.length > 0) {
                   tr += '<span class="ml-2 text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>'
@@ -420,7 +420,7 @@
                 }
                 tr += '</td>';
 
-                tr += '<td class="font-weight-bold text-danger">';
+                tr += '<td class="font-weight-bold">';
                 let templates = (j.templates.map(x => {
                   return x.root ? x.root.name : x.parents.name
                 }))
