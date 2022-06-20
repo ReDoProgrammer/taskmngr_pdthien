@@ -25,6 +25,12 @@ router.get('/list-editor', authenticateTLAToken, async (req, res) => {
             'wages.staff_lv':{$in:staffLevels},
             'wages.job_lv':levelId
         })).map(x=>x._id);
+
+        let g = (await Group.find({
+            'wages.module':module,
+            'wages.staff_lv':{$in:staffLevels},
+            'wages.job_lv':levelId
+        }));
        
         let editors = await User.find({
             user_level:{$in:staffLevels},

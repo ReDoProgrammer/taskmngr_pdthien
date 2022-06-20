@@ -5,6 +5,7 @@ const Job = require('../models/job-model');
 const Task = require('../models/task-model');
 const Customer = require('../models/customer-model');
 
+const { ObjectId } = require('mongodb');
 
 
 
@@ -63,6 +64,35 @@ const checkAccount = (username, password) => {
 }
 
 
+const getWage = (user,_module,levelId) =>{
+    return new Promise(async (resolve,reject)=>{      
+        Promise.all([getModule(_module),getUser(user)] .map(p => p.catch(e => e)))       
+        .then(async rs=>{
+           let user = rs[1];
+           let m = rs[0];
+          let wages = user.user_group.wages
+          .filter(
+            x=>x.module==m._id.toString()
+           && x.staff_lv == user.user_level.toString()
+           && x.job_lv == levelId
+           )
+
+           if(wages.length == 0){
+            return reject({
+                code:404,
+                msg:`Wage not found. Please contact your administrator to set wage first!`
+            })
+           }
+
+           return resolve(wages[0].wage);
+        })
+        .catch(err=>{
+            console.log(err)
+            return reject(err);
+        })
+    })
+}
+
 
 
 
@@ -87,45 +117,16 @@ const getModule = (_module) => {
 
 //hàm trả về nhân viên từ mã nhân viên
 const getUser = (staffId) => {
-    return new Promise((resolve, reject) => {
-        User
-            .findById(staffId)
-            .populate([
-                {
-                    path: 'user_level',
-                    populate: {
-                        path: 'staff_level'
-                    }
-                },
-                {
-                    path: 'user_group',
-                    populate: {
-                        path: 'user_group'
-                    }
-                },
-                {
-                    path: 'bank',
-                    populate: {
-                        path: 'bank'
-                    }
-                }
-            ])
-            .exec()
-            .then(u => {
-                if (!u) {
-                    return reject({
-                        code: 404,
-                        msg: `Staff not found`
-                    })
-                }
-                return resolve(u)
+    return new Promise(async (resolve,reject)=>{
+        let user = await User.findById(staffId)
+        .populate('user_group');
+        if(!user){
+            return reject({
+                code:404,
+                msg:`User not found!`
             })
-            .catch(err => {
-                return reject({
-                    code: 500,
-                    msg: `Can not get staff info with error: ${new Error(err.message)}`
-                })
-            })
+        }
+        return resolve(user);
     })
 }
 
@@ -247,22 +248,6 @@ const setJobStatus = (jobId, status, staff) => {
     })
 }
 
-//lấy những job level mà trình độ nhân viên có thể đảm nhận
-const GetJobLevelsByStaffLevel = (staffLevel) => {
-    return new Promise((resolve, reject) => {
-        StaffJobLevel
-            .find({ staff_lv: staffLevel })
-            .then(levels => {
-                return resolve(levels)
-            })
-            .catch(err => {
-                return reject({
-                    code: 500,
-                    msg: `Can not get job levels by staff level with error: ${new Error(err.message)}`
-                })
-            })
-    })
-}
 
 module.exports = {
     generateAccessToken,
@@ -272,5 +257,5 @@ module.exports = {
     getTaskDetail,
     setJobStatus,
     getUser,
-    GetJobLevelsByStaffLevel
+    getWage
 }

@@ -392,34 +392,34 @@ router.get('/cc', authenticateTLAToken, async (req, res) => {
         })
 })
 
-router.get('/list', authenticateTLAToken,async (req, res) => {
+router.get('/list', authenticateTLAToken, async (req, res) => {
     let { jobId } = req.query;
-    let tasks = await Task.find({'basic.job':jobId})
-    .populate([
-        {
-            path:'basic.job',
-            select:'name'
-        },
-        {
-            path:'basic.level',
-            select:'name'
-        },
-        {
-            path:'remarks',
-            select:'content'        
-        },
-        {
-            path:'editor.staff',
-            select:'fullname'
-        },
-        {
-            path:'qa.staff',
-            select:'fullname'
-        }
-    ]);
+    let tasks = await Task.find({ 'basic.job': jobId })
+        .populate([
+            {
+                path: 'basic.job',
+                select: 'name'
+            },
+            {
+                path: 'basic.level',
+                select: 'name'
+            },
+            {
+                path: 'remarks',
+                select: 'content'
+            },
+            {
+                path: 'editor.staff',
+                select: 'fullname'
+            },
+            {
+                path: 'qa.staff',
+                select: 'fullname'
+            }
+        ]);
 
     return res.status(200).json({
-        msg:`Load tasks based on job successfully!`,
+        msg: `Load tasks based on job successfully!`,
         tasks
     })
 })
@@ -679,79 +679,98 @@ router.post('/', authenticateTLAToken, async (req, res) => {
         status
     } = req.body;
 
-  let task = new Task();
+    let task = new Task();
 
-task.basic = {
-    job:jobId,
-    level,
-    deadline:{
-        begin:assigned_date,
-        end:deadline
-    },
-    link:{
-        input:input_link
-    }
-}
-if(qa){
-    task.qa = [
-        {
-            staff:qa,
-            tla:req.user._id,
-            timestamp: new Date()
+    task.basic = {
+        job: jobId,
+        level,
+        deadline: {
+            begin: assigned_date,
+            end: deadline
+        },
+        link: {
+            input: input_link
         }
-    ]
-}
-if(editor){
-    task.editor = [
-        {
-            staff:editor,
-            timestamp: new Date(),
-            tla:req.user._id
-        }
-    ]
-}
-
-task.status = status;
-task.tla = {
-    created:{
-        by:req.user._id
     }
-};
+    if (qa) {
+        getWage(qa, _QA, level)
+            .then(wage => {
+                task.qa = [
+                    {
+                        staff: qa,
+                        tla: req.user._id,
+                        timestamp: new Date(),
+                        wage
+                    }
+                ]
+            })
+            .catch(err => {
+                return res.status(err.code).json({
+                    msg: err.msg
+                })
+            })
 
-await task.save()
-.then(async _=>{
-    Promise.all([CreateRemark(task._id,remark,req.user._id),PushTaskIntoJob(jobId,task._id)])
-    .then(async rs=>{
-        task.remarks.push(rs[0]);
-        await task.save()
-        .then(_=>{
-            return res.status(201).json({
-                msg:`Task has been created!`
+    }
+    if (editor) {
+        getWage(editor, _EDITOR, level)
+            .then(wage => {
+                task.editor = [
+                    {
+                        staff: editor,
+                        timestamp: new Date(),
+                        tla: req.user._id,
+                        wage
+                    }
+                ]
+            })
+            .catch(err => {
+                return res.status(err.code).json({
+                    msg: err.msg
+                })
+            })
+    }
+
+    task.status = status;
+    task.tla = {
+        created: {
+            by: req.user._id
+        }
+    };
+
+    await task.save()
+        .then(async _ => {
+            Promise.all([CreateRemark(task._id, remark, req.user._id), PushTaskIntoJob(jobId, task._id)])
+                .then(async rs => {
+                    task.remarks.push(rs[0]);
+                    await task.save()
+                        .then(_ => {
+                            return res.status(201).json({
+                                msg: `Task has been created!`
+                            })
+                        })
+                        .catch(err => {
+                            return res.status(err.code).json({
+                                msg: err.msg
+                            })
+                        })
+
+                })
+                .catch(err => {
+                    return res.status(err.code).json({
+                        msg: err.msg
+                    })
+                })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not add new task with error: ${new Error(err.message)}`
             })
         })
-        .catch(err=>{
-            return res.status(err.code).json({
-                msg:err.msg
-            })
-        })
-       
-    })
-    .catch(err=>{
-        return res.status(err.code).json({
-            msg:err.msg
-        })
-    })
-})
-.catch(err=>{
-    return res.status(500).json({
-        msg:`Can not add new task with error: ${new Error(err.message)}`
-    })
-})
 
 
 
 
-  
+
 })
 
 
@@ -1155,22 +1174,23 @@ const DeleteRemarks = (taskId) => {
 }
 
 
-const CreateRemark = (tid,content,user)=>{
-    return new Promise(async (resolve,reject)=>{
+const CreateRemark = (tid, content, user) => {
+    return new Promise(async (resolve, reject) => {
         let remark = new Remark({
             user,
             content,
             tid
         });
         await remark.save()
-        .then(_=>{
-            return resolve(remark);
-        })
-        .catch(err=>{
-            return reject({
-                code:500,
-                msg:`Can not create remark with error: ${new Error(err.message)}`
+            .then(_ => {
+                return resolve(remark);
             })
-        })
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not create remark with error: ${new Error(err.message)}`
+                })
+            })
     })
 }
+
