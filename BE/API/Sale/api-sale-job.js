@@ -200,6 +200,8 @@ router.put("/", authenticateSaleToken, async (req, res) => {
       })
     }
     job.cb = cb;
+  }else{
+    job.cb = null;
   }
 
   job.updated = {
@@ -208,12 +210,21 @@ router.put("/", authenticateSaleToken, async (req, res) => {
   }
 
   if(material){
-    job.captured = {
-      material,
-      user:captureder,
-      price,
-      quantity
-    }
+    await Material.findById(material)
+    .then(async m =>{
+      job.captured = {
+        material,
+        user:captureder,
+        price:m.price,
+        quantity
+      }
+    })
+    .catch(err=>{
+      return res.status(500).json({
+        msg:`Can not set captureder with material catch error: ${new Error(err.message)}`
+      })
+    })
+    
   }  else{
     job.captured = null;
   }
@@ -221,7 +232,7 @@ router.put("/", authenticateSaleToken, async (req, res) => {
 
   await job.save()
     .then(_ => {
-      PushTemplate(templates, job._id)
+      ChangeTemplate(templates, job._id)
         .then(_ => {
           return res.status(200).json({
             msg: `The job has been updated!`
@@ -404,6 +415,36 @@ const PushTemplate = (templates, jobId) => {
   })
 }
 
+const ChangeTemplate = (templates,jobId)=>{
+  return new Promise(async (resolve,reject)=>{
+    let job = await Job.findById(jobId);
+    job.templates = [];
+    if(templates.length > 0){
+      let temp = (templates.split(',')).map(x=>x.trim());
+      for(const t of temp){
+        let count = await Root.countDocuments({_id:t});
+        if(count > 0){
+          job.templates.push({root:t})
+        }else{
+          job.templates.push({parents:t})
+        }
+      }
+    }
+
+    await job.save()
+    .then(_=>{
+      return resolve(job);
+    })
+    .catch(err=>{
+      return reject({
+        code:500,
+        msg:`Can not update job templates with error: ${new Error(err.message)}`
+      })
+    })
+   
+    
+  })
+}
 
 
 
