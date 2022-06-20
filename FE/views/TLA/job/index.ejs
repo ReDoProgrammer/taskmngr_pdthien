@@ -1,6 +1,6 @@
 <div class="row mt-2">
     <div class="col-md-offset-6 col-md-2 col-sm-offset-5 col-sm-3 col-xs-6">
-        <select name="" id="" class="form-control">
+        <select id="slJobStatus" class="selectpicker form-control" multiple title="Choose one of the following status">
             <option value="">Open</option>
             <option value="">Processing</option>
             <option value="">Upload</option>
@@ -44,13 +44,13 @@
 </div>
 <nav aria-label="..." class="mt-3">
     <ul class="pagination pagination-sm">
-      <li class="page-item disabled">
-        <a class="page-link" href="#" tabindex="-1">1</a>
-      </li>
-      <li class="page-item"><a class="page-link" href="#">2</a></li>
-      <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">1</a>
+        </li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
     </ul>
-  </nav>
+</nav>
 
 <script src="/js/common.js"></script>
 
@@ -59,480 +59,480 @@
 
 
 <%-include('manage-job-modal')%>
-<%-include('upload-job-modal')%>
-<%-include('job-detail-modal')%>
-<%-include('job-detail-modal')%>
-<%-include('modal-cc-new-task')%>
-<%-include('modal-cc-reject-task')%>
+    <%-include('upload-job-modal')%>
+        <%-include('job-detail-modal')%>
+            <%-include('job-detail-modal')%>
+                <%-include('modal-cc-new-task')%>
+                    <%-include('modal-cc-reject-task')%>
 
-<script>
-    var search = '';
-    var page = 1;
-    var jobId = '';
-    var customerId = '';
-    $(document).ready(function () {
-        LoadJobs();
-        setInterval(function () {
-            LoadJobs();
-        }, 10000);//run this thang every 10 seconds
-    })
+                        <script>
+                            var search = '';
+                            var page = 1;
+                            var jobId = '';
+                            var customerId = '';
+                            $(document).ready(function () {
+                                LoadJobs();
+                                setInterval(function () {
+                                    LoadJobs();
+                                }, 10000);//run this thang every 10 seconds
+                            })
 
-    $(document).on("click", "button[name='js-view-parents']", async function (e) {
+                            $(document).on("click", "button[name='js-view-parents']", async function (e) {
 
-        var $btn = $(e.target), $row = $btn.closest('tr'), $nextRow = $row.next('tr.expand-child');
+                                var $btn = $(e.target), $row = $btn.closest('tr'), $nextRow = $row.next('tr.expand-child');
 
-        $btn.toggleClass('fa-minus');
+                                $btn.toggleClass('fa-minus');
 
-        if ($nextRow.length) {
-            $nextRow.toggle($btn.hasClass('fa-minus'));
-        } else {
-            var newRow = '<tr class="expand-child" id="collapse' + $btn.data('id') + '">' +
-                '<td colspan="10">' +
-                '<table class="table table-condensed table-bordered table-striped" width=100% >' +
-                '<thead>' +
-                '<tr>' +
-                '<th class="text-right  ">#</th>' +
-                '<th>Level</th>' +
-                '<th>Editor</th>' +
-                '<th class="text-center">I-N</th>' +
-                '<th>Q.A</th>' +
-                '<th>DC</th>' +
-                '<th>Uploaded by</th>' +
-                '<th>Uploaded at</th>' +
-                '<th>I-Link</th>' +
-                '<th>O-Link</th>' +
-                '<th>U-Link</th>' +
-                '<th>Status</th>' +
-                '</tr>' +
-                '</thead>' +
-                '<tbody>';
-            jobId = $(this).closest('tr').attr('id');
+                                if ($nextRow.length) {
+                                    $nextRow.toggle($btn.hasClass('fa-minus'));
+                                } else {
+                                    var newRow = '<tr class="expand-child" id="collapse' + $btn.data('id') + '">' +
+                                        '<td colspan="10">' +
+                                        '<table class="table table-condensed table-bordered table-striped" width=100% >' +
+                                        '<thead>' +
+                                        '<tr>' +
+                                        '<th class="text-right  ">#</th>' +
+                                        '<th>Level</th>' +
+                                        '<th>Editor</th>' +
+                                        '<th class="text-center">I-N</th>' +
+                                        '<th>Q.A</th>' +
+                                        '<th>DC</th>' +
+                                        '<th>Uploaded by</th>' +
+                                        '<th>Uploaded at</th>' +
+                                        '<th>I-Link</th>' +
+                                        '<th>O-Link</th>' +
+                                        '<th>U-Link</th>' +
+                                        '<th>Status</th>' +
+                                        '</tr>' +
+                                        '</thead>' +
+                                        '<tbody>';
+                                    jobId = $(this).closest('tr').attr('id');
 
-            await $.ajax({
-                url: '/tla/task/list',
-                type: 'get',
-                headers: {
-                    authorization: "Bearer " + localStorage.getItem("accessToken"),
-                },
-                data: {
-                    jobId
-                },
-                success: function (data) {
-                    let idx = 1;
-                    data.tasks.forEach(t => {
-                        newRow += '<tr>';
-                        newRow += '<td class="text-right">' + (idx++) + '</td>';
-                        newRow += '<td class="font-weight-bold text-primary">';
-                        newRow += t.basic.level.name;
-                        if (t.fixible_task || t.additional_task) {
-                            newRow += '<span class="font-weight-bold text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>';
-                        }
-                        newRow += '</td>';
-                        newRow += '<td>';
-                        if (t.editor.length>0) {
-                            newRow += t.editor[t.editor.length - 1].staff.fullname;
-                        }
-                        newRow += '</td>';
+                                    await $.ajax({
+                                        url: '/tla/task/list',
+                                        type: 'get',
+                                        headers: {
+                                            authorization: "Bearer " + localStorage.getItem("accessToken"),
+                                        },
+                                        data: {
+                                            jobId
+                                        },
+                                        success: function (data) {
+                                            let idx = 1;
+                                            data.tasks.forEach(t => {
+                                                newRow += '<tr>';
+                                                newRow += '<td class="text-right">' + (idx++) + '</td>';
+                                                newRow += '<td class="font-weight-bold text-primary">';
+                                                newRow += t.basic.level.name;
+                                                if (t.fixible_task || t.additional_task) {
+                                                    newRow += '<span class="font-weight-bold text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>';
+                                                }
+                                                newRow += '</td>';
+                                                newRow += '<td>';
+                                                if (t.editor.length > 0) {
+                                                    newRow += t.editor[t.editor.length - 1].staff.fullname;
+                                                }
+                                                newRow += '</td>';
 
-                        newRow += '<td class="text-center">';
-                        if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                            newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount;
-                        }
-                        newRow += '</td>';
+                                                newRow += '<td class="text-center">';
+                                                if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                                                    newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount;
+                                                }
+                                                newRow += '</td>';
 
-                        newRow += '<td>';
-                        if (t.qa.length > 0) {
-                            newRow += t.qa[t.qa.length - 1].staff.fullname;
-                        }
-                        newRow += '</td>';
+                                                newRow += '<td>';
+                                                if (t.qa.length > 0) {
+                                                    newRow += t.qa[t.qa.length - 1].staff.fullname;
+                                                }
+                                                newRow += '</td>';
 
-                        newRow += '<td>';
-                        if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
-                            newRow += t.dc[t.dc.length - 1].staff.fullname;
-                        }
-                        newRow += '</td>';
-
-
-
-                        newRow += '<td>';
-                        if (t.tla.uploaded.length > 0) {
-                            newRow += t.tla.uploaded[t.tla.uploaded.length - 1].by.fullname;
-                        }
-                        newRow += '</td>';
-
-                        newRow += '<td>';
-                        if (t.tla.uploaded.length > 0) {
-                            newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
-                        }
-                        newRow += '</td>';
-
-                        newRow += '<td  class="text-center">';
-                        if (isValidHttpUrl(t.basic.link.input)) {
-                            newRow += '<a href="' + t.basic.link.input + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
-                        } else {
-                            newRow += t.basic.link.input;
-                        }
-                        newRow += '</td>';
-
-                        newRow += '<td class="text-center">';
-                        if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                            if (isValidHttpUrl(t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link)) {
-                                newRow += '<a href="' + t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
-                            } else {
-                                newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link;
-                            }
-                        }
-
-                        newRow += '</td>';
+                                                newRow += '<td>';
+                                                if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
+                                                    newRow += t.dc[t.dc.length - 1].staff.fullname;
+                                                }
+                                                newRow += '</td>';
 
 
 
-                        newRow += '<td  class="text-center">';
+                                                newRow += '<td>';
+                                                if (t.tla.uploaded.length > 0) {
+                                                    newRow += t.tla.uploaded[t.tla.uploaded.length - 1].by.fullname;
+                                                }
+                                                newRow += '</td>';
 
-                        if (t.tla.uploaded.length > 0) {
-                            if (isValidHttpUrl(t.tla.uploaded[t.tla.uploaded.length - 1].link)) {
-                                newRow += '<a href="' + t.tla.uploaded[t.tla.uploaded.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
-                            } else {
-                                newRow += t.tla.uploaded[t.tla.uploaded.length - 1].link
-                            }
-                        }
+                                                newRow += '<td>';
+                                                if (t.tla.uploaded.length > 0) {
+                                                    newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
+                                                }
+                                                newRow += '</td>';
 
-                        newRow += '</td>';
+                                                newRow += '<td  class="text-center">';
+                                                if (isValidHttpUrl(t.basic.link.input)) {
+                                                    newRow += '<a href="' + t.basic.link.input + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                                                } else {
+                                                    newRow += t.basic.link.input;
+                                                }
+                                                newRow += '</td>';
+
+                                                newRow += '<td class="text-center">';
+                                                if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                                                    if (isValidHttpUrl(t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link)) {
+                                                        newRow += '<a href="' + t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                                                    } else {
+                                                        newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link;
+                                                    }
+                                                }
+
+                                                newRow += '</td>';
 
 
 
-                        newRow += '<td><i>';
+                                                newRow += '<td  class="text-center">';
 
-                        switch (t.status) {
-                            case -1: newRow += '<span class="text-info">Initial</span>';
-                                break;
-                            case 0: newRow += '<span class="text-info">Processing</span>';
-                                break;
-                            case 1:
-                                {
-                                    if (t.editor[t.editor.length - 1].submited.length > 1) {
-                                        newRow += '<span class="text-primary">Fixed</span>';
-                                    } else {
-                                        newRow += '<span class="text-primary">Edited</span>';
-                                    }
-                                    break;
+                                                if (t.tla.uploaded.length > 0) {
+                                                    if (isValidHttpUrl(t.tla.uploaded[t.tla.uploaded.length - 1].link)) {
+                                                        newRow += '<a href="' + t.tla.uploaded[t.tla.uploaded.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
+                                                    } else {
+                                                        newRow += t.tla.uploaded[t.tla.uploaded.length - 1].link
+                                                    }
+                                                }
+
+                                                newRow += '</td>';
+
+
+
+                                                newRow += '<td><i>';
+
+                                                switch (t.status) {
+                                                    case -1: newRow += '<span class="text-info">Initial</span>';
+                                                        break;
+                                                    case 0: newRow += '<span class="text-info">Processing</span>';
+                                                        break;
+                                                    case 1:
+                                                        {
+                                                            if (t.editor[t.editor.length - 1].submited.length > 1) {
+                                                                newRow += '<span class="text-primary">Fixed</span>';
+                                                            } else {
+                                                                newRow += '<span class="text-primary">Edited</span>';
+                                                            }
+                                                            break;
+                                                        }
+                                                    case 2:
+                                                        newRow += '<span class="text-success">Q.A ok!</span>';
+                                                        break;
+                                                    case 3:
+                                                        newRow += '<span class="text-success">DC ok!</span>'
+                                                        break;
+                                                    case -2:
+                                                        newRow += '<span class="text-danger">Q.A rejected</span>';
+                                                        break;
+                                                    case -3:
+                                                        newRow += '<span class="text-danger">DC rejected</span>';
+                                                        break;
+                                                    case -4:
+                                                        newRow += '<span class="text-danger">Sale rejected</span>';
+                                                        break;
+                                                    case -5:
+                                                        newRow += '<span class="text-danger">Canceled</span>';
+                                                        break;
+                                                    case -6:
+                                                        newRow += '<span class="text-danger">Customer Rejected</span>';
+                                                        break;
+                                                    case 4: newRow += '<span class="text-success font-weight-bold">Upload</span>'; break;
+                                                    case 5: newRow += '<span class="text-success font-weight-bold">Done</span>'; break;
+                                                    case 6: newRow += '<span class="text-success font-weight-bold">Finish</span>'; break;
+
+                                                }
+                                                newRow += '</i></td>';
+
+
+                                                // newRow += '<td class="text-center">';
+                                                // newRow += '<input type="checkbox" name="check_task">'
+                                                // newRow += '</td>';
+                                                newRow += '</tr>';
+                                            })
+                                        }
+                                    })
+                                    newRow += '</tbody></table></td></tr>';
+                                    // set next row
+                                    $nextRow = $(newRow).insertAfter($row);
+
+
+                                    /*}
+                                        });*/
                                 }
-                            case 2:
-                                newRow += '<span class="text-success">Q.A ok!</span>';
-                                break;
-                            case 3:
-                                newRow += '<span class="text-success">DC ok!</span>'
-                                break;
-                            case -2:
-                                newRow += '<span class="text-danger">Q.A rejected</span>';
-                                break;
-                            case -3:
-                                newRow += '<span class="text-danger">DC rejected</span>';
-                                break;
-                            case -4:
-                                newRow += '<span class="text-danger">Sale rejected</span>';
-                                break;
-                            case -5:
-                                newRow += '<span class="text-danger">Canceled</span>';
-                                break;
-                            case -6:
-                                newRow += '<span class="text-danger">Customer Rejected</span>';
-                                break;
-                            case 4: newRow += '<span class="text-success font-weight-bold">Upload</span>'; break;
-                            case 5: newRow += '<span class="text-success font-weight-bold">Done</span>'; break;
-                            case 6: newRow += '<span class="text-success font-weight-bold">Finish</span>'; break;
-
-                        }
-                        newRow += '</i></td>';
+                            });
 
 
-                        // newRow += '<td class="text-center">';
-                        // newRow += '<input type="checkbox" name="check_task">'
-                        // newRow += '</td>';
-                        newRow += '</tr>';
-                    })
-                }
-            })
-            newRow += '</tbody></table></td></tr>';
-            // set next row
-            $nextRow = $(newRow).insertAfter($row);
+                            $(document).on("click", "button[name='btn-upload-job']", function () {
+                                jobId = $(this).closest('tr').attr('id');
+                                $('#uploadJobModal').modal();
+                            })
 
 
-            /*}
-                });*/
-        }
-    });
+                            $(document).on("click", "button[name='process-job']", function () {
+                                jobId = $(this).closest('tr').attr('id');
+                                customerId = $(this).closest('tr').data('customer');
+                                isShown = false;
+                                $('.btn-job-info').html('Show job info<i class="fa fa-arrow-down" aria-hidden="true"></i>');
+                                $('#JobMngrModal').modal();
+
+                            })
+
+                            $(document).on("click", ".pagination li", function (e) {
+                                e.preventDefault();
+                                page = $(this).find('a').text();
+                                LoadJobs();
+                            })
+
+                            function LoadJobs() {
+                                $.ajax({
+                                    url: '/tla/job/list',
+                                    type: 'get',
+                                    headers: {
+                                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                                    },
+                                    data: {
+                                        search,
+                                        page
+                                    },
+                                    success: function (data, textStatus, xhr) {
+
+                                        $('.pagination').empty();
+                                        for (let i = 1; i <= data.pages; i++) {
+                                            let li = '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>';
+                                            $('.pagination').append(li);
+                                        }
 
 
-    $(document).on("click", "button[name='btn-upload-job']", function () {
-        jobId = $(this).closest('tr').attr('id');
-        $('#uploadJobModal').modal();
-    })
+                                        $('#tblJobs').empty();
+                                        idx = (page - 1) * data.pageSize;
+                                        data.jobs.forEach(job => {
+                                            let cc = job.cc.filter(x => x.status == -1);
+                                            let tr = '<tr id = "' + job._id + '" data-customer="' + job.customer._id + '"';
+                                            if (cc.length > 0) {
+                                                tr += 'data-cc="' + cc[0]._id + '"'
+                                            }
+                                            tr += '>';
+                                            tr += '<td>';
+                                            if (job.tasks.length > 0) {
+                                                tr += '<button class="btn btn-xs btn-info parents js-view-parents" name="js-view-parents"> (' + job.tasks.length + ') <i class="fa fa-plus"></i></button>';
+                                            }
+                                            tr += '</td>';
+                                            tr += '<td>' + (++idx) + '</td>'
+                                            tr += '<td>';
+                                            if (job.status == -1 || job.status == 0) {
+                                                tr += '<button class="btn btn-xs btn-primary ml-2" name="process-job"><i class="fa fa-bars" aria-hidden="true"></i></button>';
+                                            }
+                                            tr += '<button class="btn btn-xs btn-warning ml-2" name="btn-upload-job"><i class="fa fa-upload" aria-hidden="true"></i></button>';
+                                            tr += '</td>';
+                                            tr += '<td class="text-info font-weight-bold">' + (getFirstLetters(job.customer.firstname + ' ' + job.customer.lastname)).toUpperCase() + getLastLetters(job.customer._id) + '</td>';
+                                            tr += '<td class="font-weight-bold text-warning">';
+                                            tr += job.name;
+                                            if (job.captured.user) {
+                                                tr += '<i class="fa fa-camera text-primary ml-2" aria-hidden="true"></i>'
+                                            }
+                                            if (cc.length > 0) {
+                                                tr += '<span class="ml-2 text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>'
+                                            }
+                                            tr += '</td>';
 
+                                            tr += '<td class="font-weight-bold text-danger">';
+                                            if (job.cb) {
+                                                tr += job.cb.name;
+                                            }
+                                            tr += '</td>';
+                                            tr += '<td class="font-weight-bold text-danger">';
+                                            let templates = job.templates.map(x => {
+                                                return x.root ? x.root.name : x.parents.name;
+                                            })
+                                            tr += templates;
+                                            tr += '</td>';
+                                            tr += "<td>" + convertISODateToTimeFormat(job.deadline.begin) + "</td>";
+                                            tr += "<td>" + convertISODateToTimeFormat(job.deadline.end) + "</td>";
+                                            tr += '<td><i>';
+                                            switch (job.status) {
+                                                case -1:
+                                                    tr += '<span class = "text-warning">Initial</span>';
+                                                    break;
+                                                case 0:
+                                                    tr += '<span class = "text-info">Processing</span>';
+                                                    break;
+                                                case 1:
+                                                    tr += '<span class = "text-primary">Upload</span>';
+                                                    break;
+                                                case 2:
+                                                    tr += '<span class = "text-success">Done</span>';
+                                                    break;
+                                                case -2:
+                                                    tr += '<span class = "text-danger">Rejected</span>';
+                                                    break;
+                                                case -3:
+                                                    tr += '<span class = "text-muted">Canceled</span>';
+                                                    break;
+                                            }
+                                            tr += '</i></td>';
+                                            tr += '</tr>';
+                                            $('#tblJobs').append(tr);
+                                        })
 
-    $(document).on("click", "button[name='process-job']", function () {
-        jobId = $(this).closest('tr').attr('id');
-        customerId = $(this).closest('tr').data('customer');
-        isShown = false;
-        $('.btn-job-info').html('Show job info<i class="fa fa-arrow-down" aria-hidden="true"></i>');
-        $('#JobMngrModal').modal();
+                                        $('.pagination').empty();
+                                        for (let i = 1; i <= data.pages; i++) {
+                                            let li = '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>';
+                                            $('.pagination').append(li);
+                                        }
 
-    })
+                                    },
+                                    error: function (jqXHR, textStatus, errorThrown) {
+                                        alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
+                                    }
+                                })
+                            }
 
-    $(document).on("click", ".pagination li", function (e) {
-        e.preventDefault();
-        page = $(this).find('a').text();
-        LoadJobs();
-    })
+                            function LoadCustomer() {
+                                $('#slCustomerLevles').empty();
+                                $.ajax({
+                                    url: '/tla/customer/detail',
+                                    type: 'get',
+                                    headers: {
+                                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                                    },
+                                    data: { id: customerId },
+                                    success: function (data) {
 
-    function LoadJobs() {
-        $.ajax({
-            url: '/tla/job/list',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-                search,
-                page
-            },
-            success: function (data, textStatus, xhr) {
-
-                $('.pagination').empty();
-                for (let i = 1; i <= data.pages; i++) {
-                    let li = '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>';
-                    $('.pagination').append(li);
-                }
-
-              
-                $('#tblJobs').empty();
-                idx = (page-1)*data.pageSize;
-                data.jobs.forEach(job => {
-                    let cc = job.cc.filter(x => x.status == -1);
-                    let tr = '<tr id = "' + job._id + '" data-customer="' + job.customer._id + '"';
-                    if (cc.length > 0) {
-                        tr += 'data-cc="' + cc[0]._id + '"'
-                    }
-                    tr += '>';
-                    tr += '<td>';
-                    if (job.tasks.length > 0) {
-                        tr += '<button class="btn btn-xs btn-info parents js-view-parents" name="js-view-parents"> (' + job.tasks.length + ') <i class="fa fa-plus"></i></button>';
-                    }
-                    tr += '</td>';
-                    tr += '<td>' + (++idx) + '</td>'
-                    tr += '<td>';
-                    if (job.status == -1 || job.status == 0) {
-                        tr += '<button class="btn btn-xs btn-primary ml-2" name="process-job"><i class="fa fa-bars" aria-hidden="true"></i></button>';
-                    }
-                    tr += '<button class="btn btn-xs btn-warning ml-2" name="btn-upload-job"><i class="fa fa-upload" aria-hidden="true"></i></button>';
-                    tr += '</td>';
-                    tr += '<td class="text-info font-weight-bold">' + (getFirstLetters(job.customer.firstname + ' ' + job.customer.lastname)).toUpperCase() + getLastLetters(job.customer._id) + '</td>';
-                    tr += '<td class="font-weight-bold text-warning">';
-                    tr += job.name;
-                    if (job.captured.user) {
-                        tr += '<i class="fa fa-camera text-primary ml-2" aria-hidden="true"></i>'
-                    }
-                    if (cc.length > 0) {
-                        tr += '<span class="ml-2 text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>'
-                    }
-                    tr += '</td>';
-
-                    tr += '<td class="font-weight-bold text-danger">';
-                    if (job.cb) {
-                        tr += job.cb.name;
-                    }
-                    tr += '</td>';
-                    tr += '<td class="font-weight-bold text-danger">';
-                        let templates = job.templates.map(x=>{
-                            return x.root?x.root.name:x.parents.name;
-                        })
-                    tr += templates;
-                    tr += '</td>';
-                    tr += "<td>" + convertISODateToTimeFormat(job.deadline.begin) + "</td>";
-                    tr += "<td>" + convertISODateToTimeFormat(job.deadline.end) + "</td>";
-                    tr += '<td><i>';
-                    switch (job.status) {
-                        case -1:
-                            tr += '<span class = "text-warning">Initial</span>';
-                            break;
-                        case 0:
-                            tr += '<span class = "text-info">Processing</span>';
-                            break;
-                        case 1:
-                            tr += '<span class = "text-primary">Upload</span>';
-                            break;
-                        case 2:
-                            tr += '<span class = "text-success">Done</span>';
-                            break;
-                        case -2:
-                            tr += '<span class = "text-danger">Rejected</span>';
-                            break;
-                        case -3:
-                            tr += '<span class = "text-muted">Canceled</span>';
-                            break;
-                    }
-                    tr += '</i></td>';
-                    tr += '</tr>';
-                    $('#tblJobs').append(tr);
-                })
-
-                $('.pagination').empty();
-                for (let i = 1; i <= data.pages; i++) {
-                    let li = '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>';
-                    $('.pagination').append(li);
-                }
-
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
-            }
-        })
-    }
-
-    function LoadCustomer(){
-        $('#slCustomerLevles').empty();
-        $.ajax({
-        url:'/tla/customer/detail',
-        type:'get',
-        headers: {
-            authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-        data:{id:customerId},
-        success:function(data){
-           
-            data.customer.contracts[data.customer.contracts.length-1].lines.forEach(l=>{
-                let opt = '';
-                if(l.root){
-                    opt = '<option value = "'+l.root._id+'" data-root="1">'+l.root.name+'</option>';
-                }else{
-                    opt = '<option value = "'+l.parents._id+'" data-root="0">'+l.parents.name+'</option>';
-                }
-                $('#slCustomerLevles').append(opt);
-            })
-            LoadLocalLevel();
+                                        data.customer.contracts[data.customer.contracts.length - 1].lines.forEach(l => {
+                                            let opt = '';
+                                            if (l.root) {
+                                                opt = '<option value = "' + l.root._id + '" data-root="1">' + l.root.name + '</option>';
+                                            } else {
+                                                opt = '<option value = "' + l.parents._id + '" data-root="0">' + l.parents.name + '</option>';
+                                            }
+                                            $('#slCustomerLevles').append(opt);
+                                        })
+                                        LoadLocalLevel();
 
 
 
-            $('.divNationalStyle').html('<i class="text-warning font-weight-bold">' + data.customer.style.nation.name + '</i>');
-            $('.divColor').html('<i class="text-warning font-weight-bold">' + data.customer.style.color.name + '</i>');
-            $('.divSize').html('<i class="text-warning font-weight-bold">' + data.customer.style.size.name + '</i>');
-            $('.divOutput').html('<i class="text-warning font-weight-bold">' + data.customer.style.output.name + '</i>');
-            $('.divCloud').html('<i class="text-warning font-weight-bold">' + data.customer.style.cloud.name + '</i>')
+                                        $('.divNationalStyle').html('<i class="text-warning font-weight-bold">' + data.customer.style.nation.name + '</i>');
+                                        $('.divColor').html('<i class="text-warning font-weight-bold">' + data.customer.style.color.name + '</i>');
+                                        $('.divSize').html('<i class="text-warning font-weight-bold">' + data.customer.style.size.name + '</i>');
+                                        $('.divOutput').html('<i class="text-warning font-weight-bold">' + data.customer.style.output.name + '</i>');
+                                        $('.divCloud').html('<i class="text-warning font-weight-bold">' + data.customer.style.cloud.name + '</i>')
 
-            if (data.customer.style.align.checked) {
-                if (data.customer.style.align.note.trim().length > 0) {
-                    $('.divAlign').html(data.customer.style.align.note);
-                } else {
-                    $('.divAlign').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                }
-            } else {
-                $('.divAlign').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-            }
+                                        if (data.customer.style.align.checked) {
+                                            if (data.customer.style.align.note.trim().length > 0) {
+                                                $('.divAlign').html(data.customer.style.align.note);
+                                            } else {
+                                                $('.divAlign').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                                            }
+                                        } else {
+                                            $('.divAlign').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+                                        }
 
-            if (data.customer.style.sky.checked) {
-                if (data.customer.style.sky.note.trim().length > 0) {
-                    $('.divSky').html(data.customer.style.sky.note);
-                } else {
-                    $('.divSky').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                }
-            } else {
-                $('.divSky').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-            }
+                                        if (data.customer.style.sky.checked) {
+                                            if (data.customer.style.sky.note.trim().length > 0) {
+                                                $('.divSky').html(data.customer.style.sky.note);
+                                            } else {
+                                                $('.divSky').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                                            }
+                                        } else {
+                                            $('.divSky').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+                                        }
 
-            if (data.customer.style.fire.checked) {
-                if (data.customer.style.fire.note.trim().length > 0) {
-                    $('.divFire').html(data.customer.style.fire.note);
-                } else {
-                    $('.divFire').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                }
-            } else {
-                $('.divFire').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-            }
+                                        if (data.customer.style.fire.checked) {
+                                            if (data.customer.style.fire.note.trim().length > 0) {
+                                                $('.divFire').html(data.customer.style.fire.note);
+                                            } else {
+                                                $('.divFire').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                                            }
+                                        } else {
+                                            $('.divFire').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+                                        }
 
-            if (data.customer.style.tv.checked) {
-                if (data.customer.style.tv.note.trim().length > 0) {
-                    $('.divTV').html(data.customer.style.tv.note);
-                } else {
-                    $('.divTV').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                }
-            } else {
-                $('.divTV').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-            }
+                                        if (data.customer.style.tv.checked) {
+                                            if (data.customer.style.tv.note.trim().length > 0) {
+                                                $('.divTV').html(data.customer.style.tv.note);
+                                            } else {
+                                                $('.divTV').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                                            }
+                                        } else {
+                                            $('.divTV').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+                                        }
 
-            if (data.customer.style.grass.checked) {
-                if (data.customer.style.grass.note.trim().length > 0) {
-                    $('.divGrass').html(data.customer.style.grass.note);
-                } else {
-                    $('.divGrass').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                }
-            } else {
-                $('.divGrass').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-            }
-            $('.lblStyleNote').text(data.customer.style.style_note);
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            Swal.fire({
-            icon: 'error',
-            title: 'Opp.....!',
-            text: jqXHR.responseJSON.msg
-            })
-        }
-    })
-  }
-
-
-  function LoadJob() {
-        $.ajax({
-            url: '/tla/job/detail',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-                jobId
-            },
-            success: function (data) {
-                $('.lblCustomer').text(getFirstLetters(data.job.customer.name.firstname + ' ' + data.job.customer.name.lastname) + getLastLetters(data.job.customer._id));
-                $('.lblJobName').text(data.job.name);
-                $('.lblReceivedDate').text(convertISODateToTimeFormat(data.job.deadline.begin));
-                $('.lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.deadline.end));
-                $('.lblIntruction').text(data.job.intruction);
-                $('.lblInputLink').html('<a href="' + data.job.link.input + '" target="_blank" rel="noopener noreferrer">Click here</a>');
-                
-                $('.tblComboLines').empty();
-                if(typeof data.job.cb !=='undefined'){                  
-                    let idx = 1;
-                    data.job.cb.lines.forEach(l=>{                      
-                        let name = l.root?l.root.name:l.parents.name;
-                        let tr = '<tr>';
-                            tr+= '<td>'+(idx++)+'</td>';
-                            tr+= '<td class="text-danger font-weight-bold">'+ (l.root?l.root.name:l.parents.name)+'</td>';
-                            tr+= '<td class="text-right">'+l.quantity+'</td>';
-                            tr+= '</tr>';
-                            $('.tblComboLines').append(tr);  
-                    })
-                }
-            }
-        })
-    }
+                                        if (data.customer.style.grass.checked) {
+                                            if (data.customer.style.grass.note.trim().length > 0) {
+                                                $('.divGrass').html(data.customer.style.grass.note);
+                                            } else {
+                                                $('.divGrass').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                                            }
+                                        } else {
+                                            $('.divGrass').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+                                        }
+                                        $('.lblStyleNote').text(data.customer.style.style_note);
+                                    },
+                                    error: function (jqXHR, textStatus, errorThrown) {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Opp.....!',
+                                            text: jqXHR.responseJSON.msg
+                                        })
+                                    }
+                                })
+                            }
 
 
+                            function LoadJob() {
+                                $.ajax({
+                                    url: '/tla/job/detail',
+                                    type: 'get',
+                                    headers: {
+                                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                                    },
+                                    data: {
+                                        jobId
+                                    },
+                                    success: function (data) {
+                                        $('.lblCustomer').text(getFirstLetters(data.job.customer.name.firstname + ' ' + data.job.customer.name.lastname) + getLastLetters(data.job.customer._id));
+                                        $('.lblJobName').text(data.job.name);
+                                        $('.lblReceivedDate').text(convertISODateToTimeFormat(data.job.deadline.begin));
+                                        $('.lblDeliveriedDate').text(convertISODateToTimeFormat(data.job.deadline.end));
+                                        $('.lblIntruction').text(data.job.intruction);
+                                        $('.lblInputLink').html('<a href="' + data.job.link.input + '" target="_blank" rel="noopener noreferrer">Click here</a>');
 
-    //phan xu ly lien quan toi job detail
-    $(document).ready(function () {
-        $('.job-info').hide();
-    })
+                                        $('.tblComboLines').empty();
+                                        if (typeof data.job.cb !== 'undefined') {
+                                            let idx = 1;
+                                            data.job.cb.lines.forEach(l => {
+                                                let name = l.root ? l.root.name : l.parents.name;
+                                                let tr = '<tr>';
+                                                tr += '<td>' + (idx++) + '</td>';
+                                                tr += '<td class="text-danger font-weight-bold">' + (l.root ? l.root.name : l.parents.name) + '</td>';
+                                                tr += '<td class="text-right">' + l.quantity + '</td>';
+                                                tr += '</tr>';
+                                                $('.tblComboLines').append(tr);
+                                            })
+                                        }
+                                    }
+                                })
+                            }
 
-    var isShown = false;
-    $('.btn-job-info').click(function () {
-        if (!isShown) {
-            $('.job-info').slideDown(1000);
-            $('.btn-job-info').html('Hide job info <i class="fa fa-arrow-up" aria-hidden="true"></i>');
 
-        } else {
-            $('.btn-job-info').html('Show job info <i class="fa fa-arrow-down" aria-hidden="true"></i>');
-            $('.job-info').slideUp(1000);
-        }
-        isShown = !isShown;
-    })
-</script>
+
+                            //phan xu ly lien quan toi job detail
+                            $(document).ready(function () {
+                                $('.job-info').hide();
+                            })
+
+                            var isShown = false;
+                            $('.btn-job-info').click(function () {
+                                if (!isShown) {
+                                    $('.job-info').slideDown(1000);
+                                    $('.btn-job-info').html('Hide job info <i class="fa fa-arrow-up" aria-hidden="true"></i>');
+
+                                } else {
+                                    $('.btn-job-info').html('Show job info <i class="fa fa-arrow-down" aria-hidden="true"></i>');
+                                    $('.job-info').slideUp(1000);
+                                }
+                                isShown = !isShown;
+                            })
+                        </script>

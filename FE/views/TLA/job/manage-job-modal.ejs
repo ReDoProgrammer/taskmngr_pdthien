@@ -486,14 +486,14 @@
           tr += '</td>';
 
           tr += '<td>';
-          if (t.remarks.length>0) {
+          if (t.remarks.length > 0) {
             tr += t.remarks[t.remarks.length - 1].content;
           }
           tr += '</td>';
 
 
           tr += '<td>';
-          if (t.editor.length>0)            
+          if (t.editor.length > 0)
             tr += t.editor[t.editor.length - 1].staff.fullname;
           tr += "</td>";
 
@@ -600,7 +600,7 @@
       success: function (data) {
         $('#slQA').empty();
         data.qas.forEach(q => {
-          let opt = '<option value="' + q._id + '">' + q.fullname +' ( '+q.username+ ' )</option>';
+          let opt = '<option value="' + q._id + '">' + q.fullname + ' ( ' + q.username + ' )</option>';
           $('#slQA').append(opt);
         })
         $('#slQA').selectpicker();
@@ -672,7 +672,7 @@
     }
   })
 
-  
+
   $("#ckbAssignEditor").change(function () {
     if (this.checked) {
       $('#colEditor').slideDown(500);
@@ -698,7 +698,7 @@
     let remark = $('#txtRemark').val();
     let editor = $("#ckbAssignEditor").is(':checked') ? $('#slEditor option:selected').val() : null;
     let qa = $("#ckbAssignQA").is(':checked') ? $('#slQA option:selected').val() : null;
-
+    let status = -1;
 
     // validateion component inputs
 
@@ -711,6 +711,23 @@
 
 
     if (taskId.trim().length == 0) {
+      Swal.fire({
+        title: 'What status do you want to choice?',
+        text: "Set task initial status!",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Start!',
+        cancelButtonText:'Pause'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          status = -10;          
+        }
+      })
+
+      return;
+
       $.ajax({
         url: '/tla/task',
         type: 'post',

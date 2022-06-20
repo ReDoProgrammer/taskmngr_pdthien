@@ -424,93 +424,9 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
     })
 })
 
-router.get('/all', authenticateTLAToken, (req, res) => {
+router.get('/all', authenticateTLAToken, async (req, res) => {
     let { page, search, status } = req.query;
-    if (status == 100) {
-        Task
-            .find(
-                {
-                    // $or: [
-                    //     { firstname: { "$regex": search, "$options": "i" } },
-                    // ]
-                }
-            )
-            .populate([
-                {
-                    path: 'basic.job',
-                    populate: {
-                        path: 'customer'
-                    }
-                },
-                {
-                    path: 'basic.level',
-                    select: 'name'
-                },
-                {
-                    path: 'editor.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'qa.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'dc.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'tla.created.by',
-                    select: 'fullname'
-                },
-                {
-                    path: 'remarks',
-                    options: { sort: { 'timestamp': -1 } }
-                },
-                {
-                    path: 'bp'
-                }
-            ])
-
-            .exec()
-            .then(tasks => {
-                return res.status(200).json({
-                    msg: 'Load tasks list successfully!',
-                    tasks
-                })
-            })
-            .catch(err => {
-                return res.status(500).json({
-                    msg: `Can not load taks list with error: ${new Error(err.message)}`
-                })
-            })
-    } else {
-        Task
-            .find(
-                {
-                    status
-                    // $or: [
-                    //     { firstname: { "$regex": search, "$options": "i" } },
-                    // ]
-                }
-            )
-            .populate('level')
-            .populate('job')
-            .populate('qa', 'fullname -_id')
-            .populate('editor', 'fullname -_id')
-            .exec()
-            .then(tasks => {
-                return res.status(200).json({
-                    msg: 'Load tasks list successfully!',
-                    tasks
-                })
-            })
-            .catch(err => {
-                return res.status(500).json({
-                    msg: `Can not load taks list with error: ${new Error(err.message)}`
-                })
-            })
-    }
-
+    
 
 })
 
@@ -730,7 +646,7 @@ router.post('/', authenticateTLAToken, async (req, res) => {
             })
     }
 
-    task.status = status;
+
     task.tla = {
         created: {
             by: req.user._id
