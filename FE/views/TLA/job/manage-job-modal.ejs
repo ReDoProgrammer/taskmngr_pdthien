@@ -599,9 +599,8 @@
       },
       success: function (data) {
         $('#slQA').empty();
-        $('#slQAInEditDiv').empty();
         data.qas.forEach(q => {
-          let opt = '<option value="' + q._id + '">' + q.fullname + '</option>';
+          let opt = '<option value="' + q._id + '">' + q.fullname +' ( '+q.username+ ' )</option>';
           $('#slQA').append(opt);
         })
         $('#slQA').selectpicker();
