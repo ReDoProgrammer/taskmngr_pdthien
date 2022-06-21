@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
-const Remark = require('../../models/remark-model');
 const CheckIn = require('../../models/staff-checkin');
 const { authenticateQAToken } = require("../../../middlewares/qa-middleware");
 const { getWage, getModule, getCustomer, getTaskDetail } = require('../common');

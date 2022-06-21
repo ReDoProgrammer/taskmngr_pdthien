@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
-const Remark = require('../../models/remark-model');
 const { authenticateDCToken } = require("../../../middlewares/dc-middleware");
 const { getCustomer, getTaskDetail, getModule, getWage } = require('../common');
 const _MODULE = 'DC';

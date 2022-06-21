@@ -1,7 +1,6 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
 const CheckIn = require('../../models/staff-checkin');
-const Remark = require('../../models/remark-model');
 
 const {
     getCustomer,

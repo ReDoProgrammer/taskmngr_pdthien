@@ -334,10 +334,18 @@ const taskSchema = new Schema({
     },
   
     remarks: [{
-        //phần ghi chú cho task/level
-        //cả tla, sale,admin,dc đều có thể can thiệp
-        type: Schema.Types.ObjectId,
-        ref: 'remark'
+       content: {
+            type:String
+        },
+        created:{
+            by:{
+                type:Schema.Types.ObjectId,
+                ref:'user'
+            },
+            at:{
+                type: Date
+            }
+        }
     }],
 
     fixible_task:{
