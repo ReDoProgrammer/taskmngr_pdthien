@@ -817,6 +817,8 @@ router.put('/cancel', authenticateTLAToken, (req, res) => {
 router.put('/', authenticateTLAToken, async (req, res) => {
     let {
         taskId,
+        level,
+        assigned_date,
         deadline,
         input_link,
         remark,
@@ -833,7 +835,6 @@ router.put('/', authenticateTLAToken, async (req, res) => {
         })
     }
     task.basic = {
-        job: jobId,
         level,
         deadline: {
             begin: assigned_date,
@@ -844,47 +845,80 @@ router.put('/', authenticateTLAToken, async (req, res) => {
         }
     }
     if (qa) {
-        getWage(qa, _QA, level)
-            .then(wage => {
-                task.qa = [
-                    {
+        if (task.qa.length == 0 || task.qa[task.qa.length - 1].staff !== qa) {
+            getWage(qa, _QA, level)
+                .then(wage => {
+                    task.qa.push({
                         staff: qa,
                         tla: req.user._id,
                         timestamp: new Date(),
                         wage
-                    }
-                ]
-            })
-            .catch(err => {
-                return res.status(err.code).json({
-                    msg: err.msg
+                    })
                 })
-            })
+                .catch(err => {
+                    return res.status(err.code).json({
+                        msg: err.msg
+                    })
+                })
 
+        }
+    } else {
+        task.qa = [];
     }
+
     if (editor) {
-        getWage(editor, _EDITOR, level)
-            .then(wage => {
-                task.editor = [
-                    {
-                        staff: editor,
-                        timestamp: new Date(),
-                        tla: req.user._id,
-                        wage
-                    }
-                ]
-            })
-            .catch(err => {
-                return res.status(err.code).json({
-                    msg: err.msg
+        if (task.editor.length == 0 || task.editor[task.editor.length - 1].staff !== editor) {
+            getWage(editor, _EDITOR, level)
+                .then(wage => {
+                    task.editor = [
+                        {
+                            staff: editor,
+                            timestamp: new Date(),
+                            tla: req.user._id,
+                            wage
+                        }
+                    ]
                 })
-            })
+                .catch(err => {
+                    return res.status(err.code).json({
+                        msg: err.msg
+                    })
+                })
+        }
+    } else {
+        task.editor = [];
     }
 
 
-    task.status = start == 'true' ? (editor ? 0 : -1) : -10;
 
+    task.status = start == 'true' ? (editor ? task.status : -1) : -10;
 
+    if(task.remarks[task.remarks.length-1].content !== remark){
+        task.remarks.push({
+            content:remark,
+            created:{
+                at:new Date(),
+                by:req.user._id
+            }
+        })
+    }
+
+    task.updated={
+        at: new Date(),
+        by:req.user._id
+    }
+
+    await task.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`Task has been updated!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not update task with error: ${new Error(err.message)}`
+        })
+    })
 
 })
 
