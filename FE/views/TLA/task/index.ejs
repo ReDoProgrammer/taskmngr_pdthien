@@ -1,6 +1,7 @@
 <div class="row mt-2">
     <div class="col-md-8 col-sm-8 col-xs-6">
         <select id="slStatus" class="selectpicker form-control" multiple title="Choose one of the following status">
+            <option value="-10">Pause</option>
             <option value="1">Editor submited</option>
             <option value="-1">Initial</option>
             <option value="0">Editing</option>
@@ -89,7 +90,7 @@
                                 var submitedLink = '';
 
                                 $(document).ready(function () {
-                                    $('#slStatus').val([-4,-3,-2,-1,0,1,2,3]).selectpicker('refresh');;
+                                    $('#slStatus').val([-10, -4, -3, -2, -1, 0, 1, 2, 3]).selectpicker('refresh');;
                                     LoadTasksList();
                                     setInterval(function () {
                                         LoadTasksList();
@@ -192,11 +193,13 @@
                                                 submitedLink = data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link;
                                             }
                                             switch (data.task.status) {
+                                                case -10:
+                                                    break;
                                                 case -1:
                                                     mn = '<li id="assign-editor"><a tabindex="-1" href="#"><i class="fa fa-user text-primary" aria-hidden="true"></i> Assign Editor </a></li>';
                                                     mn += '<li id="auto-assign-editor"><a tabindex="-1" href="#"><i class="fa fa-user text-primary" aria-hidden="true"></i> Auto assign Editor</a></li>';
 
-                                                    if (typeof data.task.qa === 'undefined' || data.task.qa === null) {
+                                                    if (typeof data.task.qa.length === 0) {
                                                         mn += '<li id="assign-qa"><a tabindex="-1" href="#"><i class="fa fa-user text-primary" aria-hidden="true"></i> Assign Q.A</a></li>';
                                                     }
                                                     mn += '<li id="edit-task"><a tabindex="-1" href="#"> <i class="fa fa-edit text-warning"></i> Edit</a></li>';
@@ -342,7 +345,11 @@
                                                     tr += '<span class="ml-2 text-danger font-weight-bold"><i class="fa fa-cc" aria-hidden="true"></i></span>'
                                                 }
                                                 tr += '</td>';
-                                                tr += '<td class="text-warning font-weight-bold">' + t.basic.level.name + '</td>';
+                                                tr += '<td class="text-warning font-weight-bold">';
+                                                if (t.status == -10) {
+                                                    tr += '<i class="fa fa-pause text-danger" aria-hidden="true" style="margin-right: 10px;"></i>';
+                                                }
+                                                tr += t.basic.level.name + '</td>';
                                                 tr += '<td>' + convertISODateToTimeFormat(t.basic.job.deadline.begin) + '</td>';
                                                 tr += '<td class="text-danger">';
                                                 if (t.basic.deadline.end) {
@@ -354,12 +361,12 @@
 
                                                 tr += '<td>';
                                                 if (t.editor.length > 0) {
-                                                    tr += t.editor[t.editor.length - 1].staff.fullname
+                                                    tr += t.editor[t.editor.length - 1].staff.username
                                                 }
                                                 tr += '</td>';
                                                 tr += '<td>';
                                                 if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
-                                                    tr += t.qa[t.qa.length - 1].staff.fullname
+                                                    tr += t.qa[t.qa.length - 1].staff.username
                                                 }
                                                 tr += '</td>';
 
