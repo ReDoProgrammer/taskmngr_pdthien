@@ -406,10 +406,6 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
                 select: 'name'
             },
             {
-                path: 'remarks',
-                select: 'content'
-            },
-            {
                 path: 'editor.staff',
                 select: 'fullname username'
             },
@@ -704,20 +700,10 @@ router.post('/', authenticateTLAToken, async (req, res) => {
     await task.save()
         .then(async _ => {
             PushTaskIntoJob(jobId, task._id)
-                .then(async rs => {
-                    task.remarks.push(rs[0]);
-                    await task.save()
-                        .then(_ => {
-                            return res.status(201).json({
-                                msg: `Task has been created!`
-                            })
-                        })
-                        .catch(err => {
-                            return res.status(err.code).json({
-                                msg: err.msg
-                            })
-                        })
-
+                .then(_async => {
+                    return res.status(201).json({
+                        msg: `Task has been created!`
+                    })
                 })
                 .catch(err => {
                     return res.status(err.code).json({
