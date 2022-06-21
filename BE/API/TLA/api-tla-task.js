@@ -395,6 +395,13 @@ router.get('/cc', authenticateTLAToken, async (req, res) => {
 
 router.get('/list', authenticateTLAToken, async (req, res) => {
     let { jobId } = req.query;
+    let job = await Job.findById(jobId);
+    if (!job) {
+        return res.status(404).json({
+            msg: `Job not found!`
+        })
+    }
+
     let tasks = await Task.find({ 'basic.job': jobId })
         .populate([
             {
@@ -412,8 +419,11 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
             {
                 path: 'qa.staff',
                 select: 'fullname username'
+
             }
         ]);
+
+
 
     return res.status(200).json({
         msg: `Load tasks based on job successfully!`,
@@ -834,91 +844,50 @@ router.put('/', authenticateTLAToken, async (req, res) => {
             msg: `Can not update task because it\'s not found!`
         })
     }
-    task.basic = {
-        level,
-        deadline: {
-            begin: assigned_date,
-            end: deadline
-        },
-        link: {
-            input: input_link
-        }
-    }
-    if (qa) {
-        if (task.qa.length == 0 || task.qa[task.qa.length - 1].staff !== qa) {
-            getWage(qa, _QA, level)
-                .then(wage => {
-                    task.qa.push({
-                        staff: qa,
-                        tla: req.user._id,
-                        timestamp: new Date(),
-                        wage
-                    })
-                })
-                .catch(err => {
-                    return res.status(err.code).json({
-                        msg: err.msg
-                    })
-                })
-
-        }
-    } else {
-        task.qa = [];
-    }
-
-    if (editor) {
-        if (task.editor.length == 0 || task.editor[task.editor.length - 1].staff !== editor) {
-            getWage(editor, _EDITOR, level)
-                .then(wage => {
-                    task.editor = [
-                        {
-                            staff: editor,
-                            timestamp: new Date(),
-                            tla: req.user._id,
-                            wage
-                        }
-                    ]
-                })
-                .catch(err => {
-                    return res.status(err.code).json({
-                        msg: err.msg
-                    })
-                })
-        }
-    } else {
-        task.editor = [];
-    }
-
+    task.basic.level = level;
+    task.basic.deadline = {
+        begin: assigned_date,
+        end: deadline
+    };
+    task.basic.link.input = input_link;
 
 
     task.status = start == 'true' ? (editor ? task.status : -1) : -10;
 
-    if(task.remarks[task.remarks.length-1].content !== remark){
+    if (task.remarks[task.remarks.length - 1].content !== remark) {
         task.remarks.push({
-            content:remark,
-            created:{
-                at:new Date(),
-                by:req.user._id
+            content: remark,
+            created: {
+                at: new Date(),
+                by: req.user._id
             }
         })
     }
 
-    task.updated={
+    task.updated = {
         at: new Date(),
-        by:req.user._id
+        by: req.user._id
     }
 
     await task.save()
-    .then(_=>{
-        return res.status(200).json({
-            msg:`Task has been updated!`
+        .then(_ => {
+            Promise.all([UpdateEditor(task._id, level, editor, req.user._id), UpdateQA(task._id, level, qa, req.user._id)])
+                .then(_ => {
+                    return res.status(200).json({
+                        msg: `The task has been updated!`
+                    })
+                })
+                .catch(err => {
+                    return res.status(err.code).json({
+                        msg: err.msg
+                    })
+                })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not update task with error: ${new Error(err.message)}`
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not update task with error: ${new Error(err.message)}`
+            })
         })
-    })
 
 })
 
@@ -1005,6 +974,116 @@ const PullTaskFromJob = (jobId, taskId) => {
     })
 }
 
+const UpdateEditor = (taskId, level, editor, tla) => {
+    return new Promise(async (resolve, reject) => {
+        let task = await Task.findById(taskId);
+        if (!task) {
+            return reject({
+                code: 404,
+                msg: `Can not change editor when task not found!`
+            })
+        }
 
+        if (!editor) {
+            task.editor = [];
+            await task.save()
+                .then(_ => {
+                    return resolve(task);
+                })
+                .catch(err => {
+                    console.log(`Can not reset editor list with error: ${new Error(err.message)}`)
+                    return reject({
+                        code: 500,
+                        msg: `Can not reset editor list with error: ${new Error(err.message)}`
+                    })
+                })
+        } else {
+            if (task.editor.length ==0 || (task.editor.length> 0 && task.editor[task.editor.length-1].staff !=editor)) {
+                getWage(editor, _EDITOR, level)
+                    .then(async wage => {
+                        task.editor.push({
+                            staff: editor,
+                            wage,
+                            tla,
+                        })
+
+                        await task.save()
+                            .then(_ => {
+                                return resolve(task)
+                            })
+                            .catch(err => {
+                                return reject({
+                                    code: 500,
+                                    msg: `Can not change task editor with error: ${new Error(err.message)}`
+                                })
+                            })
+
+                    })
+                    .catch(err => {
+                        return reject(err);
+                    })
+            }else{
+                return resolve(task);
+            }
+        }
+
+    })
+}
+
+const UpdateQA = (taskId, level, qa, tla) => {
+        return new Promise(async (resolve, reject) => {
+            let task = await Task.findById(taskId);
+            if (!task) {
+                return reject({
+                    code: 404,
+                    msg: `Can not change Q.A when task not found!`
+                })
+            }
+    
+            if (!qa) {
+                task.qa = [];
+                await task.save()
+                    .then(_ => {
+                        return resolve(task);
+                    })
+                    .catch(err => {
+                        console.log(`Can not reset Q.A list with error: ${new Error(err.message)}`)
+                        return reject({
+                            code: 500,
+                            msg: `Can not reset Q.A list with error: ${new Error(err.message)}`
+                        })
+                    })
+            } else {
+                if (task.qa.length ==0 || (task.qa.length> 0 && task.qa[task.qa.length-1].staff !=qa)) {
+                    getWage(qa, _QA, level)
+                        .then(async wage => {
+                            task.qa.push({
+                                staff: qa,
+                                wage,
+                                tla,
+                            })
+    
+                            await task.save()
+                                .then(_ => {
+                                    return resolve(task)
+                                })
+                                .catch(err => {
+                                    return reject({
+                                        code: 500,
+                                        msg: `Can not change task Q.A with error: ${new Error(err.message)}`
+                                    })
+                                })
+    
+                        })
+                        .catch(err => {
+                            return reject(err);
+                        })
+                }else{
+                    return resolve(task);
+                }
+            }
+    
+        })
+}
 
 
