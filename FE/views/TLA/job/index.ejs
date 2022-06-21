@@ -310,21 +310,7 @@
                                         data.jobs.forEach(job => {
                                             let cc = job.cc.filter(x => x.status == -1);
 
-                                            let tr = '<tr id="' + job._id + '" data-customer="' + job.customer._id + '"';
-                                            if (cc.length > 0) {
-                                                tr += 'data-cc="' + cc[0]._id + '"'
-                                            }
-                                            let deadline = GetDifferenceBetweenTwoDatesToHours(job.deadline.end);
-                                            if (deadline < 6 && deadline > 4) {
-                                                tr += 'style="background-color: rgba(245,0,0,0.1);"'
-                                            }
-                                            if (deadline <= 4 && deadline > 2) {
-                                                tr += 'style="background-color:rgba(245,0,0,0.5); color:white;"'
-                                            }
-                                            if (deadline <= 2) {
-                                                tr += 'style="background-color:rgba(245,0,0,0.8); color:white;"'
-                                            }
-                                            tr += '>';
+                                            let tr = '<tr id="' + job._id + '" data-customer="' + job.customer._id + '">';
                                             tr += '<td>';
                                             if (job.tasks.length > 0) {
                                                 tr += '<button class="btn btn-xs btn-info parents js-view-parents" name="js-view-parents"> (' + job.tasks.length + ') <i class="fa fa-plus"></i></button>';
@@ -360,7 +346,12 @@
                                             tr += templates;
                                             tr += '</td>';
                                             tr += "<td>" + convertISODateToTimeFormat(job.deadline.begin) + "</td>";
-                                            tr += "<td>" + convertISODateToTimeFormat(job.deadline.end) + "</td>";
+                                            tr += '<td ';
+                                            if (job.urgent || job.cc.length > 0) {
+                                                tr += 'style="background-color:rgba(245,0,0,0.5); color:white; font-weight: bold;"'
+                                            }
+
+                                            tr += '>' + convertISODateToTimeFormat(job.deadline.end) + '</td>';
                                             tr += '<td><i>';
                                             switch (job.status) {
                                                 case -1:
@@ -511,7 +502,7 @@
                                         $('.lblInputLink').html('<a href="' + data.job.link.input + '" target="_blank" rel="noopener noreferrer">Click here</a>');
 
                                         $('.tblComboLines').empty();
-                                        if (typeof data.job.cb !== 'undefined') {
+                                        if (typeof data.job.cb !== 'undefined' && data.job.cb) {
                                             let idx = 1;
                                             data.job.cb.lines.forEach(l => {
                                                 let name = l.root ? l.root.name : l.parents.name;

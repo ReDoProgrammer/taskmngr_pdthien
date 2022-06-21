@@ -147,6 +147,16 @@
             </div>
 
             <div class="row mt-2">
+              <div class="col-md-12 form-group">
+                <label for="">Initial status:</label>
+                <div>
+                  <label class="radio-inline"><input type="radio" name="optradio" checked id="rbtStart">Start</label>
+                  <label class="radio-inline"><input type="radio" name="optradio" id="rbtPause">Pause</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mt-2">
               <div class="col-md-12">
                 <label for="" class="font-weight-bold text-danger" id="lblError"></label>
               </div>
@@ -711,23 +721,6 @@
 
 
     if (taskId.trim().length == 0) {
-      Swal.fire({
-        title: 'What status do you want to choice?',
-        text: "Set task initial status!",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Start!',
-        cancelButtonText:'Pause'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          status = -10;          
-        }
-      })
-
-      return;
-
       $.ajax({
         url: '/tla/task',
         type: 'post',
@@ -742,7 +735,8 @@
           input_link,
           remark,
           qa,
-          editor
+          editor,
+          start: $('#rbtStart').is(':checked')
         },
         success: function (data) {
           alert(data.msg);
@@ -770,7 +764,8 @@
           input_link,
           remark,
           qa,
-          editor
+          editor,
+          start: $('#rbtStart').is(':checked')
         },
         success: function (data) {
           alert(data.msg);
