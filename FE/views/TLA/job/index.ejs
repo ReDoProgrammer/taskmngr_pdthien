@@ -133,7 +133,7 @@
                                                 newRow += '</td>';
                                                 newRow += '<td>';
                                                 if (t.editor.length > 0) {
-                                                    newRow += t.editor[t.editor.length - 1].staff.fullname;
+                                                    newRow += t.editor[t.editor.length - 1].staff.username;
                                                 }
                                                 newRow += '</td>';
 
@@ -145,13 +145,13 @@
 
                                                 newRow += '<td>';
                                                 if (t.qa.length > 0) {
-                                                    newRow += t.qa[t.qa.length - 1].staff.fullname;
+                                                    newRow += t.qa[t.qa.length - 1].staff.username;
                                                 }
                                                 newRow += '</td>';
 
                                                 newRow += '<td>';
                                                 if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
-                                                    newRow += t.dc[t.dc.length - 1].staff.fullname;
+                                                    newRow += t.dc[t.dc.length - 1].staff.username;
                                                 }
                                                 newRow += '</td>';
 
@@ -505,6 +505,7 @@
                                         $('.lblInputLink').html('<a href="' + data.job.link.input + '" target="_blank" rel="noopener noreferrer">Click here</a>');
 
                                         $('.tblComboLines').empty();
+
                                         if (typeof data.job.cb !== 'undefined' && data.job.cb) {
                                             let idx = 1;
                                             data.job.cb.lines.forEach(l => {
