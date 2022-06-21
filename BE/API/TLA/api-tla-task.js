@@ -691,6 +691,16 @@ router.post('/', authenticateTLAToken, async (req, res) => {
         }
     };
 
+    task.remarks = [
+        {
+            content: remark,
+            created: {
+                at: new Date(),
+                by: req.user._id
+            }
+        }
+    ]
+
     await task.save()
         .then(async _ => {
             PushTaskIntoJob(jobId, task._id)
@@ -907,7 +917,7 @@ router.delete('/', authenticateTLAToken, async (req, res) => {
 
     await task.delete()
         .then(_ => {
-            Promise.all([PullTaskFromJob(task.basic.job, task._id), DeleteRemarks(task._id)])
+            PullTaskFromJob(task.basic.job, task._id)
                 .then(_ => {
                     return res.status(200).json({
                         msg: `Task has been deleted!`
