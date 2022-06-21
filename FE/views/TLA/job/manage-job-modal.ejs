@@ -481,6 +481,9 @@
 
 
           tr += "<td class='font-weight-bold text-info'>";
+            if(t.status == -10){
+              tr+= '<i class="fa fa-pause text-danger" aria-hidden="true" style="margin-right: 10px;"></i>';
+            }
           tr += t.basic.level.name;
           if (t.fixible_task || t.additional_task) {
             tr += ' <span class="text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>';

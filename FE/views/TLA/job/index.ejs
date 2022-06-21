@@ -123,6 +123,9 @@
                                                 newRow += '<tr>';
                                                 newRow += '<td class="text-right">' + (idx++) + '</td>';
                                                 newRow += '<td class="font-weight-bold text-primary">';
+                                                if (t.status == -10) {
+                                                    newRow += '<i class="fa fa-pause text-danger" aria-hidden="true" style="margin-right: 10px;"></i>';
+                                                }
                                                 newRow += t.basic.level.name;
                                                 if (t.fixible_task || t.additional_task) {
                                                     newRow += '<span class="font-weight-bold text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>';
