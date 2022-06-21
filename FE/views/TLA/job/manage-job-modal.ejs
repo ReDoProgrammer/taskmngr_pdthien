@@ -739,7 +739,11 @@
           start: $('#rbtStart').is(':checked')
         },
         success: function (data) {
-          alert(data.msg);
+          Swal.fire({
+            icon: 'success',
+            title: 'Successfully!',
+            text: data.msg
+          })
           LoadTasks();
           $('#txtInputLink').val('');
           $('#txtRemark').val('');
@@ -768,7 +772,11 @@
           start: $('#rbtStart').is(':checked')
         },
         success: function (data) {
-          alert(data.msg);
+          Swal.fire({
+            icon: 'success',
+            title: 'Successfully!',
+            text: data.msg
+          })
           LoadTasks();
           LoadJob();
           $('#txtInputLink').val('');

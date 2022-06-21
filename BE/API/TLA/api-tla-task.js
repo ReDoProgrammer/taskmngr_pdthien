@@ -631,9 +631,7 @@ router.post('/', authenticateTLAToken, async (req, res) => {
     } = req.body;
 
 
-    console.log(start);
-    return;
-    
+
     let task = new Task();
 
     task.basic = {
@@ -685,6 +683,8 @@ router.post('/', authenticateTLAToken, async (req, res) => {
             })
     }
 
+
+    task.status = start=='true'? (editor?0:-1):-10;
 
     task.tla = {
         created: {
