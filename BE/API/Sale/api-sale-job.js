@@ -68,6 +68,8 @@ router.get("/list", authenticateSaleToken, async (req, res) => {
       { path: 'templates.root' },
       { path: 'templates.parents' }
     ])
+    .sort({urgent:-1})
+    .sort({'deadline.end':1})
     .skip((page - 1) * pageSize)
     .limit(pageSize);
 
