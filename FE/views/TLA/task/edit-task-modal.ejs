@@ -10,14 +10,18 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-md-4 col-sm-12 col-xs-12">
-                                <div class="form-group">
-                                    <label for="">Job level</label>
-                                    <select name="" id="slJobLevels" class="form-control"></select>
-                                </div>
-
+                            <div class="col-md-7 col-sm-6 col-xs-6 form-group">
+                                <label for="">Customer level</label>
+                                <select name="" id="slCustomerLevles" class="form-control"></select>
                             </div>
-                            <div class="col-md-3 col-sm-6 col-xs-6">
+                            <div class="col-md-5 col-sm-6 col-xs-6 form-group">
+                                <label for="">Local level</label>
+                                <select name="" id="slLocalLevels" class="form-control"></select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-5 col-sm-5 col-xs-5">
                                 <div class="form-group">
                                     <label for="">Assign Date<span class="text-danger font-weight-bold">(*)</span>:
                                     </label>
@@ -26,12 +30,12 @@
                             </div>
                             <div class="col-md-2 col-sm-2 col-xs-2">
                                 <div class="form-group">
-                                  <label for="">Hours:</label>
-                                  <input type="text" class="form-control text-right" id="txtDuration" value="0">
+                                    <label for="">Hours:</label>
+                                    <input type="text" class="form-control text-right" id="txtDuration" value="0">
                                 </div>
-                              </div>
+                            </div>
 
-                            <div class="col-md-3 col-sm-6 col-xs-6">
+                            <div class="col-md-5 col-sm-5 col-xs-5">
                                 <div class=" form-group">
                                     <label for="">Deadline<span class="text-danger font-weight-bold">(*)</span>:</label>
                                     <input type="text" class="inputDate form-control" id="txtDeadline">
@@ -77,12 +81,15 @@
                         <div class="row mt-2">
                             <div class="form-group mt-2 col-md-6 col-sm-6 col-xs-12">
                                 <div id="colEditor">
-                                    <select name="" id="slEditor" class="form-control"></select>
+                                    <select name="" id="slEditor" class="form-control selectpicker"
+                                        data-live-search="true"></select>
                                 </div>
                             </div>
+
                             <div class="form-group mt-2 col-md-6 col-sm-6 col-xs-12">
                                 <div id="colQA">
-                                    <select name="" id="slQA" class="form-control"></select>
+                                    <select name="" id="slQA" class="form-control  selectpicker"
+                                        data-live-search="true"></select>
                                 </div>
                             </div>
                         </div>
@@ -114,13 +121,80 @@
 <script type='text/javascript'
     src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
 <script>
-    $("#editTaskModal").on('shown.bs.modal', function (e) {
-        LoadJobLevels();
-        LoadTask();       
-        $('#colEditor').hide();
-        $('#colQA').hide();
+    $(document).ready(function () {
 
     })
+    $("#editTaskModal").on('shown.bs.modal', function (e) {
+        LoadCustomer();
+        LoadTask();
+        $('#colEditor').hide();
+        $('#colQA').hide();
+    })
+
+
+    function LoadTask() {
+        $.ajax({
+            url: '/tla/task/detail',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                taskId
+            },
+            success: function (data) {
+                levelId = data.task.basic.level._id;
+
+                console.log(data.task);
+                $('#name_case').text(data.task.basic.job.name);
+                $('#customer').text(data.customer.firstname + ' ' + data.customer.lastname);
+
+                $('#slJobLevels').val(data.task.basic.level._id);
+                $('#slJobLevels').attr("disabled", true);
+                $('#txtAssignDate').val(convertISODateToTimeFormat(data.task.basic.deadline.begin));
+                $('#txtAssignDate').prop('readonly', true);
+                if (data.task.basic.deadline.end) {
+                    $('#txtDeadline').val(convertISODateToTimeFormat(data.task.basic.deadline.end));
+                }
+
+                $('#txtInputLink').val(data.task.basic.link.input);
+                $('#txtRemark').val(data.task.remarks[0].content);
+
+                //xu ly checkbox va dropdown lien quan toi editor va qa
+
+                $('#ckbAssignEditor').prop('checked', data.task.editor.length > 0 ? true : false);
+                $('#ckbAssignQA').prop('checked', data.task.qa.length > 0 ? true : false);
+
+                if (data.task.editor.length > 0) {
+                    $('#colEditor').show();
+                    $('#slEditor').val(data.task.editor[data.task.editor.length - 1].staff._id);
+                    if (data.task.status > 0) {
+                        $('#ckbAssignEditor').attr("disabled", true);
+                        $('#slEditor').attr("disabled", true);
+                    } else {
+                        $('#ckbAssignEditor').attr("disabled", false);
+                        $('#slEditor').attr("disabled", false);
+                    }
+                } else {
+                    $('#colEditor').hide();
+                }
+
+                if (data.task.qa.length > 0) {
+                    $('#colQA').show();
+                    $('#slQA').val(data.task.qa[data.task.qa.length - 1].staff._id);
+                    if (data.task.status > 1) {
+                        $('#ckbAssignQA').attr("disabled", true);
+                        $('#slQA').attr("disabled", true);
+                    } else {
+                        $('#ckbAssignQA').attr("disabled", false);
+                        $('#slQA').attr("disabled", false);
+                    }
+                } else {
+                    $('#colQA').hide();
+                }
+            }
+        })
+    }
 
 
     $("#btnSubmit").click(function () {
@@ -190,9 +264,9 @@
             },
             success: function (data) {
                 alert(data.msg);
-                LoadTasksList();             
+                LoadTasksList();
                 $('#editTaskModal').modal('hide');
-                
+
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
@@ -202,73 +276,6 @@
 
 
     });
-
-    function LoadTask() {
-        $.ajax({
-            url: '/tla/task/detail',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-                taskId
-            },
-            success: function (data) {
-                levelId = data.task.basic.level._id;               
-                LoadEditors();
-                LoadQAs();
-
-                console.log(data.task);
-                $('#name_case').text(data.task.basic.job.name);
-                $('#customer').text(data.customer.firstname+' '+data.customer.lastname);
-
-                $('#slJobLevels').val(data.task.basic.level._id);
-                $('#slJobLevels').attr("disabled", true);
-                $('#txtAssignDate').val(convertISODateToTimeFormat(data.task.basic.deadline.begin));
-                $('#txtAssignDate').prop('readonly', true);
-                if(data.task.basic.deadline.end){
-                    $('#txtDeadline').val(convertISODateToTimeFormat(data.task.basic.deadline.end));
-                }
-               
-                $('#txtInputLink').val(data.task.basic.link.input);
-                $('#txtRemark').val(data.task.remarks[0].content);
-
-                //xu ly checkbox va dropdown lien quan toi editor va qa
-               
-                $('#ckbAssignEditor').prop('checked', data.task.editor.length>0?true:false);
-                $('#ckbAssignQA').prop('checked', data.task.qa.length>0?true:false);
-
-                if (data.task.editor.length>0) {
-                    $('#colEditor').show();
-                    $('#slEditor').val(data.task.editor[data.task.editor.length-1].staff._id);
-                    if (data.task.status > 0) {
-                        $('#ckbAssignEditor').attr("disabled", true);
-                        $('#slEditor').attr("disabled", true);
-                    } else {
-                        $('#ckbAssignEditor').attr("disabled", false);
-                        $('#slEditor').attr("disabled", false);
-                    }
-                } else {
-                    $('#colEditor').hide();
-                }
-
-                if (data.task.qa.length>0) {
-                    $('#colQA').show();
-                    $('#slQA').val(data.task.qa[data.task.qa.length-1].staff._id);
-                    if (data.task.status > 1) {
-                        $('#ckbAssignQA').attr("disabled", true);
-                        $('#slQA').attr("disabled", true);
-                    } else {
-                        $('#ckbAssignQA').attr("disabled", false);
-                        $('#slQA').attr("disabled", false);
-                    }
-                } else {
-                    $('#colQA').hide();
-                }
-            }
-        })
-    }
-
 
 
     $("#ckbAssignEditor").change(function () {
@@ -286,7 +293,7 @@
         }
     });
 
-   
+
 
 
 
@@ -296,33 +303,125 @@
         LoadQAs();
     });
 
-    function LoadJobLevels() {
 
+    function LoadCustomer() {
+        $('#slCustomerLevles').empty();
         $.ajax({
-            url: '/tla/job-level',
+            url: '/tla/customer/detail',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: { id: customerId },
+            success: function (data) {
+
+                data.customer.contracts[data.customer.contracts.length - 1].lines.forEach(l => {
+                    let opt = '';
+                    if (l.root) {
+                        opt = '<option value = "' + l.root._id + '" data-root="1">' + l.root.name + '</option>';
+                    } else {
+                        opt = '<option value = "' + l.parents._id + '" data-root="0">' + l.parents.name + '</option>';
+                    }
+                    $('#slCustomerLevles').append(opt);
+                })
+                LoadLocalLevel();
+
+
+
+                $('.divNationalStyle').html('<i class="text-warning font-weight-bold">' + data.customer.style.nation.name + '</i>');
+                $('.divColor').html('<i class="text-warning font-weight-bold">' + data.customer.style.color.name + '</i>');
+                $('.divSize').html('<i class="text-warning font-weight-bold">' + data.customer.style.size.name + '</i>');
+                $('.divOutput').html('<i class="text-warning font-weight-bold">' + data.customer.style.output.name + '</i>');
+                $('.divCloud').html('<i class="text-warning font-weight-bold">' + data.customer.style.cloud.name + '</i>')
+
+                if (data.customer.style.align.checked) {
+                    if (data.customer.style.align.note.trim().length > 0) {
+                        $('.divAlign').html(data.customer.style.align.note);
+                    } else {
+                        $('.divAlign').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                    }
+                } else {
+                    $('.divAlign').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+                }
+
+                if (data.customer.style.sky.checked) {
+                    if (data.customer.style.sky.note.trim().length > 0) {
+                        $('.divSky').html(data.customer.style.sky.note);
+                    } else {
+                        $('.divSky').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                    }
+                } else {
+                    $('.divSky').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+                }
+
+                if (data.customer.style.fire.checked) {
+                    if (data.customer.style.fire.note.trim().length > 0) {
+                        $('.divFire').html(data.customer.style.fire.note);
+                    } else {
+                        $('.divFire').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                    }
+                } else {
+                    $('.divFire').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+                }
+
+                if (data.customer.style.tv.checked) {
+                    if (data.customer.style.tv.note.trim().length > 0) {
+                        $('.divTV').html(data.customer.style.tv.note);
+                    } else {
+                        $('.divTV').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                    }
+                } else {
+                    $('.divTV').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+                }
+
+                if (data.customer.style.grass.checked) {
+                    if (data.customer.style.grass.note.trim().length > 0) {
+                        $('.divGrass').html(data.customer.style.grass.note);
+                    } else {
+                        $('.divGrass').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
+                    }
+                } else {
+                    $('.divGrass').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
+                }
+                $('.lblStyleNote').text(data.customer.style.style_note);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Opp.....!',
+                    text: jqXHR.responseJSON.msg
+                })
+            }
+        })
+    }
+
+    function LoadLocalLevel() {
+        $.ajax({
+            url: '/tla/job/local-level',
             type: 'get',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
             data: {
-                customerId
+                customer_level: $('#slCustomerLevles option:selected').val(),
+                is_root: $('#slCustomerLevles option:selected').data('root') == '1' ? true : false
             },
-
             success: function (data) {
-                $('#slJobLevels').empty();
-                data.jl.forEach(j => {
-                    let opt = '<option value="' + j._id + '" class="font-weight-bold text-danger">' + j.name + '</option>';
-                    $('#slJobLevels').append(opt);
-                })                
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                $('#msgError').text(jqXHR.responseJSON.msg);
-            },
+                $('#slLocalLevels').empty();
+                data.local_levels.forEach(l => {
+                    let opt = '<option value="' + l._id + '">' + l.name + '</option>';
+                    $('#slLocalLevels').append(opt);
+                })
+
+                LoadQA();
+                LoadEditor();
+            }
+
         })
     }
 
-    function LoadEditors() {
-        console.log('levelid: ',levelId);
+
+    function LoadEditor() {
         $.ajax({
             url: '/tla/user/list-editor',
             type: 'get',
@@ -334,25 +433,23 @@
             },
             success: function (data) {
                 $('#slEditor').empty();
-                $('#slEditorInEditDiv').empty();
                 data.editors.forEach(e => {
-                    let opt = '<option value="' + e._id + '">' + e.fullname + '</option>';
+                    let opt = '<option value="' + e._id + '">' + e.fullname + ' ( ' + e.username + ' )</option>';
                     $('#slEditor').append(opt);
-                    $('#slEditorInEditDiv').append(opt);
                 })
                 $('#slEditor').selectpicker();
-                $('#slEditorInEditDiv').selectpicker();
                 $('#slEditor').selectpicker('refresh');
-                $('#slEditorInEditDiv').selectpicker('refresh');
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 $('#msgError').text(jqXHR.responseJSON.msg);
+                $('#msgError').fadeIn().delay(3000).fadeOut();
             },
         })
     }
 
 
-    function LoadQAs() {
+    function LoadQA() {
+        console.log({ levelId })
         $.ajax({
             url: '/tla/user/list-qa',
             type: 'get',
@@ -364,34 +461,37 @@
             },
             success: function (data) {
                 $('#slQA').empty();
-                $('#slQAInEditDiv').empty();
                 data.qas.forEach(q => {
-                    let opt = '<option value="' + q._id + '">' + q.fullname + '</option>';
+                    let opt = '<option value="' + q._id + '">' + q.fullname + ' ( ' + q.username + ' )</option>';
                     $('#slQA').append(opt);
-                    $('#slQAInEditDiv').append(opt);
                 })
                 $('#slQA').selectpicker();
-                $('#slQAInEditDiv').selectpicker();
                 $('#slQA').selectpicker('refresh');
-                $('#slQAInEditDiv').selectpicker('refresh');
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 $('#msgError').text(jqXHR.responseJSON.msg);
+                $('#msgError').fadeIn().delay(3000).fadeOut();
             },
         })
     }
+    $("#slCustomerLevles").change(function () {
+        LoadLocalLevel();
+    });
+    $("#slLocalLevels").change(function () {
+        LoadQA();
+        LoadEditor();
+    });
 
     $('#txtDuration').keyup(function (e) {
-        console.log(111111111111);
-    if (/\D/g.test(this.value)) {
-      // Filter non-digits from input value.
-      this.value = this.value.replace(/\D/g, '');
-    }
-    let duration = parseInt($('#txtDuration').val());
-    let assigned_date = strToDate($('#txtAssignDate').val());
-    let deadline = assigned_date.addHours(duration);
-    $('#txtDeadline').val(convertISODateToTimeFormat(deadline));
-  });
+        if (/\D/g.test(this.value)) {
+            // Filter non-digits from input value.
+            this.value = this.value.replace(/\D/g, '');
+        }
+        let duration = parseInt($('#txtDuration').val());
+        let assigned_date = strToDate($('#txtAssignDate').val());
+        let deadline = assigned_date.addHours(duration);
+        $('#txtDeadline').val(convertISODateToTimeFormat(deadline));
+    });
 
 
     $('.inputDate').inputmask("datetime", {
