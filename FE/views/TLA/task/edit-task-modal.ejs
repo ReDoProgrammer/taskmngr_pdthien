@@ -325,65 +325,6 @@
                     $('#slCustomerLevles').append(opt);
                 })
                 LoadLocalLevel();
-
-
-
-                $('.divNationalStyle').html('<i class="text-warning font-weight-bold">' + data.customer.style.nation.name + '</i>');
-                $('.divColor').html('<i class="text-warning font-weight-bold">' + data.customer.style.color.name + '</i>');
-                $('.divSize').html('<i class="text-warning font-weight-bold">' + data.customer.style.size.name + '</i>');
-                $('.divOutput').html('<i class="text-warning font-weight-bold">' + data.customer.style.output.name + '</i>');
-                $('.divCloud').html('<i class="text-warning font-weight-bold">' + data.customer.style.cloud.name + '</i>')
-
-                if (data.customer.style.align.checked) {
-                    if (data.customer.style.align.note.trim().length > 0) {
-                        $('.divAlign').html(data.customer.style.align.note);
-                    } else {
-                        $('.divAlign').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                    }
-                } else {
-                    $('.divAlign').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-                }
-
-                if (data.customer.style.sky.checked) {
-                    if (data.customer.style.sky.note.trim().length > 0) {
-                        $('.divSky').html(data.customer.style.sky.note);
-                    } else {
-                        $('.divSky').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                    }
-                } else {
-                    $('.divSky').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-                }
-
-                if (data.customer.style.fire.checked) {
-                    if (data.customer.style.fire.note.trim().length > 0) {
-                        $('.divFire').html(data.customer.style.fire.note);
-                    } else {
-                        $('.divFire').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                    }
-                } else {
-                    $('.divFire').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-                }
-
-                if (data.customer.style.tv.checked) {
-                    if (data.customer.style.tv.note.trim().length > 0) {
-                        $('.divTV').html(data.customer.style.tv.note);
-                    } else {
-                        $('.divTV').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                    }
-                } else {
-                    $('.divTV').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-                }
-
-                if (data.customer.style.grass.checked) {
-                    if (data.customer.style.grass.note.trim().length > 0) {
-                        $('.divGrass').html(data.customer.style.grass.note);
-                    } else {
-                        $('.divGrass').html('<i class="fa fa-check-square-o text-success" aria-hidden="true"></i>');
-                    }
-                } else {
-                    $('.divGrass').html('<i class="fa fa-square-o" aria-hidden="true"></i>');
-                }
-                $('.lblStyleNote').text(data.customer.style.style_note);
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 Swal.fire({

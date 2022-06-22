@@ -185,18 +185,19 @@
                 taskId
             },
             success: function (data) {
-                $('#divNationalStyle').html(data.customer.nation.name)
-                $('#divColor').html(data.customer.color.name)
+                $('#divNationalStyle').html(data.customer.style.nation.name)
+                $('#divColor').html(data.customer.style.color.name)
 
-                $('#divOutput').html(data.customer.output.name)
+                $('#divOutput').html(data.customer.style.output.name)
 
-                $('#divSize').html(data.customer.size.name)
-                $('#lblNoteStyle').text(data.customer.remark);
+                $('#divSize').html(data.customer.style.size.name)
+                $('#lblNoteStyle').text(data.customer.style.style_note);
 
                 $('#lblJobName').text(data.task.basic.job.name);
+
                 $('#lblLevelName').text(data.task.basic.level.name);
                 $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.basic.deadline.begin));
-                if (!data.task.basic.deadline.end) {
+                if (data.task.basic.deadline.end) {                    
                     $('#lblDeadline').text(convertISODateToTimeFormat(data.task.basic.deadline.end));
                 } else {
                     $('#lblDeadline').text('');
@@ -208,7 +209,7 @@
                 $('#remarks').empty();
                 data.task.remarks.forEach(r => {
                     let item = '<div class="row mt-2">';
-                    item += '<div class="col-md-4 col-sm-4 col-xs-12"><span class="font-weight-bold text-primary">' + r.user.fullname + '</span>(' + convertISODateToTimeFormat(r.timestamp) + '):</div>';
+                    item += '<div class="col-md-4 col-sm-4 col-xs-12"><span class="font-weight-bold text-primary">' + r.created.by.fullname + '</span>(' + convertISODateToTimeFormat(r.created.at) + '):</div>';
                     item += '<div class="col-md-8 col-sm-8 col-xs-12 text-danger font-italic">' + r.content + '</div>';
                     item += '</div>';
 

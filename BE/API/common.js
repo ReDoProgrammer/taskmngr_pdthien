@@ -1,9 +1,6 @@
 const Module = require('../models/module-model');
 const User = require('../models/user-model');
 const jwt = require("jsonwebtoken");
-const Job = require('../models/job-model');
-const Task = require('../models/task-model');
-const Customer = require('../models/customer-model');
 
 const { ObjectId } = require('mongodb');
 
@@ -131,131 +128,16 @@ const getUser = (staffId) => {
 }
 
 
-const getCustomer = (customerId) => {
-    return new Promise((resolve, reject) => {
-        Customer.findById(customerId)
-            .populate({
-                path: 'levels',
-                populate: { path: 'level' }
-            })
-            .populate('output', 'name')
-            .populate('size', 'name')
-            .populate('color', 'name')
-            .populate('cloud', 'name')
-            .populate('nation', 'name')
-            .exec((err, customer) => {
-                if (err) {
-                    return reject({
-                        code: 500,
-                        msg: `Can not get customer by id with error: ${new Error(err.message)}`
-                    });
-                }
-                if (!customer) {
-                    return reject({
-                        code: 404,
-                        msg: `Customer not found!`
-                    });
-                }
 
-                return resolve(customer);
 
-            });
-    })
 
-}
 
-const getTaskDetail = (taskId) => {
-    return new Promise((resolve, reject) => {
-        Task
-            .findById(taskId)
-            .populate([
-                {
-                    path: 'basic.job',
-                    populate: {
-                        path: 'customer'
-                    }
-                },
-                {
-                    path: 'basic.level',
-                    select: 'name'
-                },
-                {
-                    path: 'editor.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'qa.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'dc.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'tla.created.by',
-                    select: 'fullname'
-                },
-                {
-                    path: 'remarks',
-                    populate: {
-                        path: 'user',
-                        select: 'fullname'                       
-                    }
-                }
-            ])
-            .exec()
-            .then(t => {
-                if (!t) {
-                    return reject({
-                        code: 404,
-                        msg: `Task not found!`
-                    })
-                }
-                return resolve(t);
-            })
-            .catch(err => {
-                return reject({
-                    code: 500,
-                    msg: `Can not get task detail with error: ${new Error(err.message)}`
-                })
-            })
-
-    })
-}
-
-const setJobStatus = (jobId, status, staff) => {
-    return new Promise((resolve, reject) => {
-        Job
-            .findByIdAndUpdate(jobId, {
-                status
-            }, { new: true }, (err, job) => {
-                if (err) {
-                    return reject({
-                        code: 500,
-                        msg: `Can not set job status with erorr: ${new Error(err.message)}`
-                    })
-                }
-
-                if (!job) {
-                    return reject({
-                        code: 404,
-                        msg: `Job not found so can not set status!`
-                    })
-                }
-
-                return resolve(job);
-            })
-    })
-}
 
 
 module.exports = {
     generateAccessToken,
     getModule,
     checkAccount,
-    getCustomer,
-    getTaskDetail,
-    setJobStatus,
     getUser,
     getWage
 }

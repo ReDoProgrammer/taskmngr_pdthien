@@ -3,6 +3,7 @@ const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const Task = require('../../models/task-model');
 const Job = require('../../models/job-model');
 const CC = require('../../models/cc-model');
+const Customer = require('../../models/customer-model');
 
 const {
     getTaskDetail,
@@ -547,24 +548,32 @@ router.get('/list-unuploaded', authenticateTLAToken, (req, res) => {
 })
 
 
-router.get('/detail', authenticateTLAToken, (req, res) => {
+router.get('/detail', authenticateTLAToken, async (req, res) => {
     let { taskId } = req.query;
-    getTaskDetail(taskId)
-        .then(async task => {
-            await getCustomer(task.basic.job.customer)
-                .then(customer => {
+    let task = await Task.findById(taskId)
+        .populate([
+            { path: 'basic.job' },
+            { path: 'basic.level' },
+            { path: 'editor.staff', select: 'username fullname' },
+            { path: 'qa.staff', select: 'username fullname' },
+            { path: 'dc.staff', select: 'username fullname' },
+            {path:'remarks.created.by', select: 'username fullname'}
+        ]);
+    if (!task) {
+        return res.status(404).json({
+            msg: `Task not found!`
+        })
+    }
 
-                    return res.status(200).json({
-                        msg: `Load task detail successfully!`,
-                        task,
-                        customer
-                    })
-                })
-                .catch(err => {
-                    return res.status(err.code).json({
-                        msg: err.msg
-                    })
-                })
+
+
+    GetCustomerById(task.basic.job.customer)
+        .then(customer => {
+            return res.status(200).json({
+                msg: `Get task detail successfully!`,
+                task,
+                customer
+            })
         })
         .catch(err => {
             return res.status(err.code).json({
@@ -574,51 +583,7 @@ router.get('/detail', authenticateTLAToken, (req, res) => {
 })
 
 
-router.get('/detail-to-edit', authenticateTLAToken, (req, res) => {
-    let { taskId } = req.query;
-    Task
-        .findById(taskId)
-        .populate('job')
-        .populate('level')
-        .populate({
-            path: 'remarks',
-            populate: {
-                path: 'user'
-            },
-            options: {
-                sort: { timestamp: -1 },
-                user: req.user._id
-            }
-        })
-        .exec()
-        .then(async task => {
-            if (!task) {
-                return res.status(404).json({
-                    msg: `Task not found!`
-                })
-            }
 
-            await getCustomer(task.job.customer)
-                .then(customer => {
-                    return res.status(200).json({
-                        msg: `Load task detail successfully!`,
-                        task,
-                        customer
-                    })
-                })
-                .catch(err => {
-                    return res.status(err.code).json({
-                        msg: err.msg
-                    })
-                })
-
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not get task detail with error: ${new Error(err.message)}`
-            })
-        })
-})
 
 
 
@@ -998,7 +963,7 @@ const UpdateEditor = (taskId, level, editor, tla) => {
                     })
                 })
         } else {
-            if (task.editor.length ==0 || (task.editor.length> 0 && task.editor[task.editor.length-1].staff !=editor)) {
+            if (task.editor.length == 0 || (task.editor.length > 0 && task.editor[task.editor.length - 1].staff != editor)) {
                 getWage(editor, _EDITOR, level)
                     .then(async wage => {
                         task.editor.push({
@@ -1022,7 +987,7 @@ const UpdateEditor = (taskId, level, editor, tla) => {
                     .catch(err => {
                         return reject(err);
                     })
-            }else{
+            } else {
                 return resolve(task);
             }
         }
@@ -1031,59 +996,82 @@ const UpdateEditor = (taskId, level, editor, tla) => {
 }
 
 const UpdateQA = (taskId, level, qa, tla) => {
-        return new Promise(async (resolve, reject) => {
-            let task = await Task.findById(taskId);
-            if (!task) {
-                return reject({
-                    code: 404,
-                    msg: `Can not change Q.A when task not found!`
+    return new Promise(async (resolve, reject) => {
+        let task = await Task.findById(taskId);
+        if (!task) {
+            return reject({
+                code: 404,
+                msg: `Can not change Q.A when task not found!`
+            })
+        }
+
+        if (!qa) {
+            task.qa = [];
+            await task.save()
+                .then(_ => {
+                    return resolve(task);
                 })
-            }
-    
-            if (!qa) {
-                task.qa = [];
-                await task.save()
-                    .then(_ => {
-                        return resolve(task);
+                .catch(err => {
+                    console.log(`Can not reset Q.A list with error: ${new Error(err.message)}`)
+                    return reject({
+                        code: 500,
+                        msg: `Can not reset Q.A list with error: ${new Error(err.message)}`
+                    })
+                })
+        } else {
+            if (task.qa.length == 0 || (task.qa.length > 0 && task.qa[task.qa.length - 1].staff != qa)) {
+                getWage(qa, _QA, level)
+                    .then(async wage => {
+                        task.qa.push({
+                            staff: qa,
+                            wage,
+                            tla,
+                        })
+
+                        await task.save()
+                            .then(_ => {
+                                return resolve(task)
+                            })
+                            .catch(err => {
+                                return reject({
+                                    code: 500,
+                                    msg: `Can not change task Q.A with error: ${new Error(err.message)}`
+                                })
+                            })
+
                     })
                     .catch(err => {
-                        console.log(`Can not reset Q.A list with error: ${new Error(err.message)}`)
-                        return reject({
-                            code: 500,
-                            msg: `Can not reset Q.A list with error: ${new Error(err.message)}`
-                        })
+                        return reject(err);
                     })
             } else {
-                if (task.qa.length ==0 || (task.qa.length> 0 && task.qa[task.qa.length-1].staff !=qa)) {
-                    getWage(qa, _QA, level)
-                        .then(async wage => {
-                            task.qa.push({
-                                staff: qa,
-                                wage,
-                                tla,
-                            })
-    
-                            await task.save()
-                                .then(_ => {
-                                    return resolve(task)
-                                })
-                                .catch(err => {
-                                    return reject({
-                                        code: 500,
-                                        msg: `Can not change task Q.A with error: ${new Error(err.message)}`
-                                    })
-                                })
-    
-                        })
-                        .catch(err => {
-                            return reject(err);
-                        })
-                }else{
-                    return resolve(task);
-                }
+                return resolve(task);
             }
-    
-        })
+        }
+
+    })
+}
+
+const GetCustomerById = customerId => {
+    return new Promise(async (resolve, recjt) => {
+        let customer = await Customer.findById(customerId)
+            .populate([
+                { path: 'group', select: 'name' },
+                { path: 'style.output', select: 'name' },
+                { path: 'style.size', select: 'name' },
+                { path: 'style.color', select: 'name' },
+                { path: 'style.cloud', select: 'name' },
+                { path: 'style.nation', select: 'name' },
+                { path: 'contracts.lines.root', select: 'name' },
+                { path: 'contracts.lines.parents', select: 'name' },
+            ]);
+        if (!customer) {
+            return reject({
+                code: 404,
+                msg: `Customer not found on this task!`
+            })
+        }
+        return resolve(customer);
+    })
 }
 
 

@@ -194,6 +194,13 @@
                                             }
                                             switch (data.task.status) {
                                                 case -10:
+                                                mn = '';
+                                                    if (typeof data.task.qa.length == 0) {
+                                                        mn += '<li id="assign-qa"><a tabindex="-1" href="#"><i class="fa fa-user text-primary" aria-hidden="true"></i> Assign Q.A</a></li>';
+                                                    }
+                                                    mn += '<li id="edit-task"><a tabindex="-1" href="#"> <i class="fa fa-edit text-warning"></i> Edit</a></li>';
+                                                    mn += '<li id="delete-task"><a tabindex="-1" href="#"> <i class="fa fa-trash text-danger" aria-hidden="true"></i> Delete</a></li>';
+                                                    $('#funcMenu').append(mn);
                                                     break;
                                                 case -1:
                                                     mn = '<li id="assign-editor"><a tabindex="-1" href="#"><i class="fa fa-user text-primary" aria-hidden="true"></i> Assign Editor </a></li>';
