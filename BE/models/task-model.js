@@ -87,11 +87,8 @@ const taskSchema = new Schema({
                 by: {
                     type: Schema.Types.ObjectId,
                     ref: 'user'
-                },
-                rm: {
-                    type: Schema.Types.ObjectId,
-                    ref: 'remark'
                 }
+               
             }
         ]
     }],

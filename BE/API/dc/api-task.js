@@ -156,8 +156,8 @@ router.put('/get-task', [authenticateDCToken, ValidateCheckIn], async (req, res)
         })
     }
 
-     getWage(req.user._id, _MODULE, task.basic.level.toString())
-        .then(async wage => {           
+    getWage(req.user._id, _MODULE, task.basic.level.toString())
+        .then(async wage => {
             task.dc.push({
                 staff: req.user._id,
                 got_at: new Date(),
@@ -175,10 +175,10 @@ router.put('/get-task', [authenticateDCToken, ValidateCheckIn], async (req, res)
                     })
                 })
         })
-        .catch(err=>{
+        .catch(err => {
             console.log(err)
             return res.status(err.code).json({
-                msg:err.msg
+                msg: err.msg
             })
         })
 
@@ -199,46 +199,35 @@ router.put('/reject', [authenticateDCToken, ValidateCheckIn], async (req, res) =
         })
     }
 
-    if (task.dc.length == 0) {
-        return res.status(404).json({
-            msg: `DC not found!`
+    if (task.status == -3) {
+        return res.status(403).json({
+            msg: `This task has been already rejected!`
         })
     }
 
-    let rm = new Remark({
-        user: req.user._id,
+    task.remarks.push({
         content: remark,
-        tid: taskId
-    });
+        by: req.user._id,
+        at: new Date()
+    })
 
-    await rm.save()
-        .then(async _ => {
-            task.remarks.push(rm);
-            task.dc[task.dc.length - 1].rejected.push({
-                at: new Date(),
-                by: req.user._id,
-                rm: rm._id
-            });
-            task.status = -3;
+    task.status = -3;
+    task.dc[task.dc.length - 1].rejected.push({
+        at: new Date(),
+        by: req.user._id
+    })
 
-            await task.save()
-                .then(_ => {
-                    return res.status(200).json({
-                        msg: `Task has been rejected!`
-                    })
-                })
-                .catch(err => {
-                    return res.status(500).json({
-                        msg: `Can not reject this task with error: ${new Error(err.message)}`
-                    })
-                })
+    await task.save()
+        .then(_ => {
+            return res.status(200).json({
+                msg: `The task has been rejected!`
+            })
         })
         .catch(err => {
             return res.status(500).json({
-                msg: `Can not created remark with error: ${new Error(err.message)}`
+                msg: `Can not reject this task with error: ${new Error(err.message)}`
             })
         })
-
 })
 
 
@@ -270,7 +259,7 @@ router.get('/personal-tasks', authenticateDCToken, async (req, res) => {
                 select: 'name'
             },
             { path: 'editor.staff' },
-            { path: 'qa.staff' }            
+            { path: 'qa.staff' }
         ]);
 
     let count = await Task.countDocuments({});
