@@ -136,8 +136,7 @@ const taskSchema = new Schema({
         rejected: [
             {
                 at: {
-                    type: Date,
-                    default: new Date()
+                    type: Date                   
                 },
                 by: {
                     type: Schema.Types.ObjectId,

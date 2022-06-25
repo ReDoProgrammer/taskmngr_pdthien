@@ -144,52 +144,42 @@ router.put('/reject', [authenticateQAToken, ValidateCheckIn], async (req, res) =
     let { taskId, remark } = req.body;
 
     let task = await Task.findById(taskId);
-
     if (!task) {
         return res.status(404).json({
             msg: `Task not found!`
         })
     }
 
-    if (task.qa.length == 0) {
-        return res.status(404).json({
-            msg: `Q.A not found!`
+    if(task.status>=2){
+        return res.status(403).json({
+            msg:`The task has been already submited!`
         })
     }
 
-    let rm = new Remark({
-        user: req.user._id,
+    task.remarks.push({
         content: remark,
-        tid: taskId
-    });
+        created: {
+            by: req.user._id,
+            at: new Date()
+        }
+    })
+    task.qa[task.qa.length-1].rejected.push({
+        at:new Date(),
+        by:req.user._id      
+    })
+    task.status = -2;
 
-    await rm.save()
-        .then(async _ => {
-            task.remarks.push(rm);
-            task.qa[task.qa.length - 1].rejected.push({
-                at: new Date(),
-                by: req.user._id,
-                rm: rm._id
-            });
-            task.status = -2;
-
-            await task.save()
-                .then(_ => {
-                    return res.status(200).json({
-                        msg: `The task has been rejected!`
-                    })
-                })
-                .catch(err => {
-                    return res.status(500).json({
-                        msg: `Can not reject this task with error: ${new Error(err.message)}`
-                    })
-                })
+    await task.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`You have rejected the task successfully!`
         })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not created remark with error: ${new Error(err.message)}`
-            })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not reject this task with error: ${new Error(err.message)}`
         })
+    })
 })
 
 router.get('/detail', authenticateQAToken, (req, res) => {

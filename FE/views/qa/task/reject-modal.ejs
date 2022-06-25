@@ -1,5 +1,5 @@
 <div class="modal" tabindex="-1" role="dialog" id="modalRejectTask">
-    <div class="modal-dialog modal-lg" role="document">       
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -39,7 +39,11 @@
                 remark
             },
             success: function (data) {
-                alert(data.msg);
+                Swal.fire(
+                    'Done!',
+                    data.msg,
+                    'success'
+                )
                 $('#modalRejectTask').modal('hide');
             },
             error: function (request, status, error) {
