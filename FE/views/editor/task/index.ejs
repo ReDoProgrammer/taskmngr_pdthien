@@ -281,9 +281,9 @@
 
 
                   tr += '<td>';
-                  if (typeof t.remarks[0] != 'undefined') {
-                    tr += t.remarks[0].content;
-                  }
+              
+                    tr += t.remarks[t.remarks.length - 1].content;
+                  
                   tr += '</td>';
 
 
