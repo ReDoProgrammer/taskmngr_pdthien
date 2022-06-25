@@ -40,6 +40,7 @@
                 <th scope="col">Customer</th>
                 <th scope="col">Job</th>
                 <th scope="col">Level</th>
+                <th scope="col" class="text-center">Urgent</th>
                 <th scope="col">Deadline</th>
                 <th scope="col">Remark</th>
                 <th scope="col" class="text-right">E-N</th>
@@ -230,19 +231,36 @@
                             tr += '</td>';
                             tr += '<td>' + (idx++) + '</td>';
 
-                            tr += '<td class="font-weight-bold text-primary">' + getFirstLetters(t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname) + getLastLetters(t.basic.job.customer._id) + '</td>';
+                            tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
                             tr += '<td class="font-weight-bold text-danger">' + t.basic.job.name + '</td>';
                             tr += '<td class="font-weight-bold">';
                             tr += t.basic.level.name
                             if (t.fixible_task || t.additional_task) {
                                 tr += '<span class="font-weight-bold text-danger ml-2"><i class="fa fa-cc" aria-hidden="true"></i></span>';
                             }
-                            tr += '</td>';
-                            tr += '<td class="text-danger">';
-                            if (t.basic.deadline.end) {
-                                tr += convertISODateToTimeFormat(t.basic.deadline.end);
+                            if (t.status === -10) {
+                                tr += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true"></i>'
                             }
                             tr += '</td>';
+                            tr += '<td class="text-center">';
+                            if (t.basic.job.urgent) {
+                                tr += '<i class="text-danger fa fa-exclamation-triangle" aria-hidden="true"></i>'
+                            }
+                            tr += '</td>';
+
+                            tr += '<td ';
+                            let dl = GetDifferenceBetweenTwoDatesToHours(t.basic.deadline.end)
+                            if (dl <= 6 && dl > 4) {
+                                tr += 'style="background-color:rgba(245,0,0,0.1); color:white; font-weight: bold;"'
+                            }
+                            if (dl <= 4 && dl > 2) {
+                                tr += 'style="background-color:rgba(245,0,0,0.4); color:white; font-weight: bold;"'
+                            }
+                            if (dl <= 2) {
+                                tr += 'style="background-color:rgba(245,0,0,0.6); color:white; font-weight: bold;"'
+                            }
+
+                            tr += '>' + convertISODateToTimeFormat(t.basic.deadline.end) + '</td>';
 
                             tr += '<td>';
                             if (typeof t.remarks[0] !== 'undefined') {
@@ -274,6 +292,8 @@
                             tr += '<td><i>';
 
                             switch (t.status) {
+                                case -10: tr += '<span class="text-danger font-weight-bold">Pause</span>';
+                                    break;
                                 case -1: tr += '<span class="text-info">Initial</span>';
                                     break;
                                 case 0: tr += '<span class="text-info">Processing</span>';
