@@ -1,9 +1,12 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
 const { authenticateDCToken } = require("../../../middlewares/dc-middleware");
-const { getCustomer, getTaskDetail, getModule, getWage } = require('../common');
-const _MODULE = 'DC';
+const {
+    GetTask,
+    GetCustomerById } = require('../common');
 
+const _MODULE = 'DC';
+const pageSize = 20;
 
 router.put('/mark', authenticateDCToken, async (req, res) => {
     let { taskId, bpId, remark } = req.body;
@@ -218,215 +221,101 @@ router.put('/reject', authenticateDCToken, async (req, res) => {
 })
 
 
-router.get('/personal-tasks', authenticateDCToken, (req, res) => {
+router.get('/personal-tasks', authenticateDCToken,async (req, res) => {
     let { page, search, status } = req.query;
-    if (status == 100) {
-        Task
-            .find({ 
-                'dc.staff': req.user._id,
-                'dc.unregisted':false
-             })   
-             .populate([
-                {
-                    path: 'basic.job',
-                    populate: {
-                        path: 'customer'
-                    }
-                },
-                {
-                    path: 'basic.level',
-                    select: 'name'
-                },
-                {
-                    path: 'editor.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'qa.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'dc.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'tla.created.by',
-                    select: 'fullname'
-                },
-                {
-                    path: 'tla.uploaded.by',
-                    select: 'fullname'
-                },
-                {
-                    path: 'remarks',
-                    options: { sort: { 'timestamp': -1 } }
-                }
-            ])           
-              
-            .exec()
-            .then(tasks => {
-                return res.status(200).json({
-                    msg: `Load tasks list successfully!`,
-                    tasks
-                })
-            })
-            .catch(err => {
-                console.log(`Can not get tasks list with error: ${new Error(err.message)}`);
-                return res.status(500).json({
-                    msg: `Can not get tasks list with error: ${new Error(err.message)}`
-                })
-            })
-    } else {
-        Task
-            .find({
-                status,
-                'dc.staff': req.user._id
-            })
-            .populate([
-                {
-                    path: 'basic.job',
-                    populate: {
-                        path: 'customer'
-                    }
-                },
-                {
-                    path: 'basic.level',
-                    select: 'name'
-                },
-                {
-                    path: 'editor.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'qa.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'dc.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'tla.created.by',
-                    select: 'fullname'
-                },
-                {
-                    path: 'tla.uploaded.by',
-                    select: 'fullname'
-                },
-                {
-                    path: 'remarks',
-                    options: { sort: { 'timestamp': -1 } }
-                }
-            ])
-            .then(tasks => {
-                return res.status(200).json({
-                    msg: `Load tasks list successfully!`,
-                    tasks
-                })
-            })
-            .catch(err => {
-                return res.status(500).json({
-                    msg: `Can not get tasks list with error: ${new Error(err.message)}`
-                })
-            })
-    }
+    let stt = (status.split(',')).map(x => {
+        return parseInt(x.trim());
+    })
 
+    let tasks = await Task
+        .find({
+            status: { $in: stt },
+            'dc.staff': req.user._id,
+            'dc.unregisted': false
+        })
+        .sort({ 'deadline.end': 1 })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .populate([
+            {
+                path: 'basic.job',
+                populate: {
+                    path: 'customer',
+                    select: 'name.firstname name.lastname'
+                }
+            },
+            {
+                path: 'basic.level',
+                select: 'name'
+            },
+            { path: 'editor.staff' },
+            { path: 'qa.staff' },
+            { path: 'remarks' }
+        ]);
+
+    let count = await Task.countDocuments({});
+
+    return res.status(200).json({
+        msg: `Load tasks list successfully!`,
+        tasks,
+        pageSize,
+        pages: count % pageSize == 0 ? count / pageSize : Math.floor(count / pageSize) + 1
+    })
 })
 
 
-router.get('/list', authenticateDCToken, (req, res) => {
+router.get('/list', authenticateDCToken,async (req, res) => {
     let { page, search, status } = req.query;
-    if (status == 100) {
-        Task
-            .find({})
-            .populate([
-                {
-                    path: 'basic.job',
-                    populate: {
-                        path: 'customer'
-                    }
-                },
-                {
-                    path: 'basic.level',
-                    select: 'name'
-                },
-                {
-                    path: 'editor.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'qa.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'dc.staff',
-                    select: 'fullname'
-                },
-                {
-                    path: 'tla.created.by',
-                    select: 'fullname'
-                },
-                {
-                    path: 'tla.uploaded.by',
-                    select: 'fullname'
-                },
-                {
-                    path: 'remarks',
-                    options: { sort: { 'timestamp': -1 } }
-                }
-            ])
-            .exec()
-            .then(tasks => {
-                return res.status(200).json({
-                    msg: `Load tasks list successfully!`,
-                    tasks
-                })
-            })
-            .catch(err => {
-                return res.status(500).json({
-                    msg: `Can not get tasks list with error: ${new Error(err.message)}`
-                })
-            })
-    } else {
-        Task
-            .find({
-                status
-            })
-            .populate({
-                path: 'job',
+    let stt = (status.split(',')).map(x => {
+        return parseInt(x.trim());
+    })
+
+    let tasks = await Task
+        .find({
+            status: { $in: stt }           
+        })
+        .sort({ 'deadline.end': 1 })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .populate([
+            {
+                path: 'basic.job',
                 populate: {
-                    path: 'customer'
+                    path: 'customer',
+                    select: 'name.firstname name.lastname'
                 }
-            })
-            .populate('level')
-            .populate('editor')
-            .populate('qa')
-            .exec()
-            .then(tasks => {
-                return res.status(200).json({
-                    msg: `Load tasks list successfully!`,
-                    tasks
-                })
-            })
-            .catch(err => {
-                return res.status(500).json({
-                    msg: `Can not get tasks list with error: ${new Error(err.message)}`
-                })
-            })
-    }
+            },
+            {
+                path: 'basic.level',
+                select: 'name'
+            },
+            { path: 'editor.staff',select: 'fullname username' },
+            { path: 'qa.staff' ,select: 'fullname username'},
+            { path: 'dc.staff' ,select: 'fullname username'},
+            { path: 'remarks' }
+        ]);
+
+    let count = await Task.countDocuments({});
+
+    return res.status(200).json({
+        msg: `Load tasks list successfully!`,
+        tasks,
+        pageSize,
+        pages: count % pageSize == 0 ? count / pageSize : Math.floor(count / pageSize) + 1
+    })
 
 })
 
 router.get('/detail', authenticateDCToken, (req, res) => {
     let { taskId } = req.query;
-    getTaskDetail(taskId)
-        .then(async task => {
-            await getCustomer(task.basic.job.customer)
+    GetTask(taskId)
+        .then(task => {
+            GetCustomerById(task.basic.job.customer)
                 .then(customer => {
                     return res.status(200).json({
-                        msg: `Get task info successfully!`,
-                        customer,
-                        task
+                        msg: `Get task detail successfully!`,
+                        task,
+                        customer
                     })
                 })
                 .catch(err => {
