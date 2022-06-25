@@ -8,7 +8,9 @@ const User = require('../../models/user-model');
 
 const {
     getModule,
-    getWage } = require('../common');
+    getWage,
+    GetTask,
+    GetCustomerById } = require('../common');
 const { log } = require('npm');
 
 
@@ -550,30 +552,21 @@ router.get('/list-unuploaded', authenticateTLAToken, (req, res) => {
 
 router.get('/detail', authenticateTLAToken, async (req, res) => {
     let { taskId } = req.query;
-    let task = await Task.findById(taskId)
-        .populate([
-            { path: 'basic.job' },
-            { path: 'basic.level' },
-            { path: 'editor.staff', select: 'username fullname' },
-            { path: 'qa.staff', select: 'username fullname' },
-            { path: 'dc.staff', select: 'username fullname' },
-            { path: 'remarks.created.by', select: 'username fullname' }
-        ]);
-    if (!task) {
-        return res.status(404).json({
-            msg: `Task not found!`
-        })
-    }
-
-
-
-    GetCustomerById(task.basic.job.customer)
-        .then(customer => {
-            return res.status(200).json({
-                msg: `Get task detail successfully!`,
-                task,
-                customer
-            })
+    GetTask(taskId)
+        .then(task => {
+            GetCustomerById(task.basic.job.customer)
+                .then(customer => {
+                    return res.status(200).json({
+                        msg: `Get task detail successfully!`,
+                        task,
+                        customer
+                    })
+                })
+                .catch(err => {
+                    return res.status(err.code).json({
+                        msg: err.msg
+                    })
+                })
         })
         .catch(err => {
             return res.status(err.code).json({
@@ -1041,32 +1034,10 @@ const UpdateQA = (taskId, level, qa, tla) => {
     })
 }
 
-const GetCustomerById = customerId => {
-    return new Promise(async (resolve, recjt) => {
-        let customer = await Customer.findById(customerId)
-            .populate([
-                { path: 'group', select: 'name' },
-                { path: 'style.output', select: 'name' },
-                { path: 'style.size', select: 'name' },
-                { path: 'style.color', select: 'name' },
-                { path: 'style.cloud', select: 'name' },
-                { path: 'style.nation', select: 'name' },
-                { path: 'contracts.lines.root', select: 'name' },
-                { path: 'contracts.lines.parents', select: 'name' },
-            ]);
-        if (!customer) {
-            return reject({
-                code: 404,
-                msg: `Customer not found on this task!`
-            })
-        }
-        return resolve(customer);
-    })
-}
 
 
 const ChangeVisibleEditor = (taskId, editor) => {
-    return new Promise(async (resolve, reject) => {      
+    return new Promise(async (resolve, reject) => {
         if (!editor) {
             return resolve();
         }
@@ -1077,7 +1048,7 @@ const ChangeVisibleEditor = (taskId, editor) => {
             return resolve();
         }
 
-        if(task.editor[task.editor.length-1].staff == editor){
+        if (task.editor[task.editor.length - 1].staff == editor) {
             return resolve();
         }
 
@@ -1104,7 +1075,7 @@ const ChangeVisibleQA = (taskId, qa) => {
         if (task.qa.length == 0) {
             return resolve();
         }
-        if(task.qa[task.qa.length-1].staff == qa){
+        if (task.qa[task.qa.length - 1].staff == qa) {
             return resolve();
         }
         task.qa[task.qa.length - 1].visible = false;

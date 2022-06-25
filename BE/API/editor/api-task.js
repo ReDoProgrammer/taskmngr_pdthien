@@ -58,7 +58,8 @@ router.get('/', authenticateEditorToken, async(req, res) => {
     let tasks = await Task
         .find({ 
             status: { $in: stt },
-            'editor.staff':req.user._id 
+            'editor.staff':req.user._id ,
+            'editor.visible':true
         })
         .sort({ 'deadline.end': 1 })
         .skip((page - 1) * pageSize)
