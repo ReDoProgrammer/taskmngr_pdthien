@@ -138,10 +138,6 @@ router.put('/submit', [authenticateQAToken, ValidateCheckIn], async (req, res) =
                 msg: `Can not submit this task with error: ${new Error(err.message)}`
             })
         })
-
-
-
-
 })
 
 router.put('/reject', [authenticateQAToken, ValidateCheckIn], async (req, res) => {
