@@ -270,12 +270,10 @@ router.get('/personal-tasks', authenticateDCToken, async (req, res) => {
                 select: 'name'
             },
             { path: 'editor.staff' },
-            { path: 'qa.staff' },
-            { path: 'remarks' }
+            { path: 'qa.staff' }            
         ]);
 
     let count = await Task.countDocuments({});
-
     return res.status(200).json({
         msg: `Load tasks list successfully!`,
         tasks,
