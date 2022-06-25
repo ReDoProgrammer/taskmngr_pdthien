@@ -12,7 +12,7 @@ const {
 const { getTask } = require('./get-task')
 
 const { authenticateEditorToken } = require("../../../middlewares/editor-middleware");
-
+const {ValidateCheckIn} = require('../../../middlewares/checkin-middleware');
 
 router.put('/reject',authenticateEditorToken,async (req,res)=>{
     let {taskId,remark} = req.body;
@@ -121,7 +121,7 @@ router.get('/statistic', authenticateEditorToken, (req, res) => {
 
 
 
-router.get('/', authenticateEditorToken, (req, res) => {
+router.get('/', [authenticateEditorToken,ValidateCheckIn], (req, res) => {
     let { page, search, status } = req.query;
     Task
         .find({ 
