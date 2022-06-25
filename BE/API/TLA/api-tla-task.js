@@ -4,10 +4,9 @@ const Task = require('../../models/task-model');
 const Job = require('../../models/job-model');
 const CC = require('../../models/cc-model');
 const Customer = require('../../models/customer-model');
+const User = require('../../models/user-model');
 
 const {
-    getTaskDetail,
-    getCustomer,
     getModule,
     getWage } = require('../common');
 const { log } = require('npm');
@@ -557,7 +556,7 @@ router.get('/detail', authenticateTLAToken, async (req, res) => {
             { path: 'editor.staff', select: 'username fullname' },
             { path: 'qa.staff', select: 'username fullname' },
             { path: 'dc.staff', select: 'username fullname' },
-            {path:'remarks.created.by', select: 'username fullname'}
+            { path: 'remarks.created.by', select: 'username fullname' }
         ]);
     if (!task) {
         return res.status(404).json({
@@ -615,43 +614,6 @@ router.post('/', authenticateTLAToken, async (req, res) => {
             input: input_link
         }
     }
-    if (qa) {
-        getWage(qa, _QA, level)
-            .then(wage => {
-                task.qa = [
-                    {
-                        staff: qa,
-                        tla: req.user._id,
-                        timestamp: new Date(),
-                        wage
-                    }
-                ]
-            })
-            .catch(err => {
-                return res.status(err.code).json({
-                    msg: err.msg
-                })
-            })
-
-    }
-    if (editor) {
-        getWage(editor, _EDITOR, level)
-            .then(wage => {
-                task.editor = [
-                    {
-                        staff: editor,
-                        timestamp: new Date(),
-                        tla: req.user._id,
-                        wage
-                    }
-                ]
-            })
-            .catch(err => {
-                return res.status(err.code).json({
-                    msg: err.msg
-                })
-            })
-    }
 
 
     task.status = start == 'true' ? (editor ? 0 : -1) : -10;
@@ -674,11 +636,19 @@ router.post('/', authenticateTLAToken, async (req, res) => {
 
     await task.save()
         .then(async _ => {
-            PushTaskIntoJob(jobId, task._id)
+            Promise.all([PushTaskIntoJob(jobId, task._id), UpdateEditor(task._id, level, editor, req.user._id)])
                 .then(_async => {
-                    return res.status(201).json({
-                        msg: `Task has been created!`
-                    })
+                    UpdateQA(task._id, level, qa, req.user._id)
+                        .then(_ => {
+                            return res.status(201).json({
+                                msg: `Task has been created!`
+                            })
+                        })
+                        .catch(err => {
+                            return res.status(err.code).json({
+                                msg: err.msg
+                            })
+                        })
                 })
                 .catch(err => {
                     return res.status(err.code).json({
@@ -691,11 +661,6 @@ router.post('/', authenticateTLAToken, async (req, res) => {
                 msg: `Can not add new task with error: ${new Error(err.message)}`
             })
         })
-
-
-
-
-
 })
 
 
@@ -836,11 +801,19 @@ router.put('/', authenticateTLAToken, async (req, res) => {
 
     await task.save()
         .then(_ => {
-            Promise.all([UpdateEditor(task._id, level, editor, req.user._id), UpdateQA(task._id, level, qa, req.user._id)])
+            UpdateEditor(task._id, level, editor, req.user._id)
                 .then(_ => {
-                    return res.status(200).json({
-                        msg: `The task has been updated!`
-                    })
+                    UpdateQA(task._id, level, qa, req.user._id)
+                        .then(_ => {
+                            return res.status(200).json({
+                                msg: `The task has been updated!`
+                            })
+                        })
+                        .catch(err => {
+                            return res.status(err.code).json({
+                                msg: err.msg
+                            })
+                        })
                 })
                 .catch(err => {
                     return res.status(err.code).json({
@@ -1026,6 +999,7 @@ const UpdateQA = (taskId, level, qa, tla) => {
                             staff: qa,
                             wage,
                             tla,
+                            timestamp: new Date()
                         })
 
                         await task.save()
