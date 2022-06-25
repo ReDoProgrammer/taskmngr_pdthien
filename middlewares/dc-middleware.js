@@ -1,13 +1,14 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const _MODULE = 'DC';
-const {getModuleId} = require('./common');
+const { getModule } = require('./common');
 
 function authenticateDCToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
   if (token == null) return res.status(401).json({
-    msg: `Lỗi xác thực tài khoản. token null`
+    msg: `Token null`,
+    url: '/dc/login'
   });
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
@@ -15,23 +16,30 @@ function authenticateDCToken(req, res, next) {
       console.log('got an error when veryfy account: ', new Error(err.message));
 
       return res.status(403).json({
-        msg: `Lỗi xác thực tài khoản ${err.message}`
+        msg: `Can not authenticate this account with error:  ${err.message}`
       });
 
     }
 
-    getModuleId(_MODULE)
-      .then(result => {       
-        
-
+    getModule(_MODULE)
+      .then(m => {
+        if (m.users.includes(user._id)) {
+          req.user = user;
+          next();
+        } else {
+          return res.status(403).json({
+            msg: `You can not access this module!`,
+            url: '/dc/login'
+          })
+        }
       })
       .catch(err => {
         console.log(err);
         return res.status(err.code).json({
-          msg: err.msg
+          msg: err.msg,
+          url: '/dc/login'
         })
       })
-
   });
 }
 
