@@ -3,13 +3,15 @@ const Task = require("../../models/task-model");
 const CheckIn = require('../../models/staff-checkin');
 const { authenticateQAToken } = require("../../../middlewares/qa-middleware");
 const { ValidateCheckIn } = require('../../../middlewares/checkin-middleware');
-const { getCustomer, getTaskDetail } = require('../common');
+const {
+    GetTask,
+    GetCustomerById } = require('../common');
 const _MODULE = 'QA';
 
 const { getTask } = require('./get-task')
 
 
-router.put('/unregister', [authenticateQAToken,ValidateCheckIn], async (req, res) => {
+router.put('/unregister', [authenticateQAToken, ValidateCheckIn], async (req, res) => {
     let { taskId } = req.body;
     let task = await Task.findById(taskId);
     if (!task) {
@@ -20,7 +22,7 @@ router.put('/unregister', [authenticateQAToken,ValidateCheckIn], async (req, res
 
     task.qa[task.qa.length - 1].unregisted = true;
 
-    console.log('task ne: ',task)
+    console.log('task ne: ', task)
 
     // await task.save()
     //     .then(_ => {
@@ -36,7 +38,7 @@ router.put('/unregister', [authenticateQAToken,ValidateCheckIn], async (req, res
 
 })
 
-router.put('/get-task',  [authenticateQAToken,ValidateCheckIn], (req, res) => {
+router.put('/get-task', [authenticateQAToken, ValidateCheckIn], (req, res) => {
     CheckIn
         .findOne({ staff: req.user._id })
         .then(chk => {
@@ -46,58 +48,58 @@ router.put('/get-task',  [authenticateQAToken,ValidateCheckIn], (req, res) => {
                 })
             }
 
-           
+
 
             if (chk.check[chk.check.length - 1].out == undefined) {
                 Task
-                .countDocuments({
-                    status: 1,
-                    'qa.staff':req.user._id,
-                    'qa.unregisted':false
-                })
-                .then(count=>{
-                    if(count>0){
-                        return res.status(403).json({
-                            msg:`Can not get more tasks when your current tasks have been not submited!`
-                        })
-                    }else{
-                        getTask(req.user._id)
-                        .then(async rs => {
-    
-                            let task = rs.task;
-    
-                            task.qa.push({
-                                staff: req.user._id,
-                                timestamp: new Date(),
-                                wage: rs.wage.wage
+                    .countDocuments({
+                        status: 1,
+                        'qa.staff': req.user._id,
+                        'qa.unregisted': false
+                    })
+                    .then(count => {
+                        if (count > 0) {
+                            return res.status(403).json({
+                                msg: `Can not get more tasks when your current tasks have been not submited!`
                             })
-                            await task.save()
-                                .then(_ => {
-                                    return res.status(200).json({
-                                        msg: `You have gotten more task successfully!`,
-                                        task
+                        } else {
+                            getTask(req.user._id)
+                                .then(async rs => {
+
+                                    let task = rs.task;
+
+                                    task.qa.push({
+                                        staff: req.user._id,
+                                        timestamp: new Date(),
+                                        wage: rs.wage.wage
                                     })
+                                    await task.save()
+                                        .then(_ => {
+                                            return res.status(200).json({
+                                                msg: `You have gotten more task successfully!`,
+                                                task
+                                            })
+                                        })
+                                        .catch(err => {
+                                            return res.status(500).json({
+                                                msg: `Get more task failed with error: ${new Error(err.message)}`
+                                            })
+                                        })
                                 })
                                 .catch(err => {
-                                    return res.status(500).json({
-                                        msg: `Get more task failed with error: ${new Error(err.message)}`
+                                    console.log(err)
+                                    return res.status(err.code).json({
+                                        msg: err.msg
                                     })
                                 })
-                        })
-                        .catch(err => {
-                            console.log(err)
-                            return res.status(err.code).json({
-                                msg: err.msg
-                            })
-                        })
-                    }
-                })
-                .catch(err=>{
-                    return res.status(500).json({
-                        msg:`Can not count processing tasks with error: ${new Error(err.message)}`
+                        }
                     })
-                })    
-               
+                    .catch(err => {
+                        return res.status(500).json({
+                            msg: `Can not count processing tasks with error: ${new Error(err.message)}`
+                        })
+                    })
+
             } else {
                 return res.status(403).json({
                     msg: `You can not get more task when you are not in office!`
@@ -111,7 +113,7 @@ router.put('/get-task',  [authenticateQAToken,ValidateCheckIn], (req, res) => {
         })
 })
 
-router.put('/submit',  [authenticateQAToken,ValidateCheckIn], async (req, res) => {
+router.put('/submit', [authenticateQAToken, ValidateCheckIn], async (req, res) => {
     let { taskId } = req.body;
 
     let task = await Task.findById(taskId);
@@ -142,7 +144,7 @@ router.put('/submit',  [authenticateQAToken,ValidateCheckIn], async (req, res) =
 
 })
 
-router.put('/reject',  [authenticateQAToken,ValidateCheckIn], async (req, res) => {
+router.put('/reject', [authenticateQAToken, ValidateCheckIn], async (req, res) => {
     let { taskId, remark } = req.body;
 
     let task = await Task.findById(taskId);
@@ -197,14 +199,14 @@ router.put('/reject',  [authenticateQAToken,ValidateCheckIn], async (req, res) =
 router.get('/detail', authenticateQAToken, (req, res) => {
     let { taskId } = req.query;
 
-    getTaskDetail(taskId)
-        .then(async t => {
-            await getCustomer(t.basic.job.customer)
+    GetTask(taskId)
+        .then(task => {
+            GetCustomerById(task.basic.job.customer)
                 .then(customer => {
                     return res.status(200).json({
-                        msg: `Get task info successfully!`,
-                        customer,
-                        task: t
+                        msg: `Get task detail successfully!`,
+                        task,
+                        customer
                     })
                 })
                 .catch(err => {
@@ -264,7 +266,7 @@ router.get('/personal', authenticateQAToken, (req, res) => {
                     options: { sort: { 'timestamp': -1 } }
                 }
             ])
-            .sort({status:1})
+            .sort({ status: 1 })
             .exec()
             .then(tasks => {
                 let rs = tasks.filter(x => x.qa[x.qa.length - 1].unregisted == false);
