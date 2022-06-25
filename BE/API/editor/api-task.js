@@ -4,7 +4,6 @@ const CheckIn = require('../../models/staff-checkin');
 
 const {
     getCustomer,
-    getUser,
     getTaskDetail } = require('../common');
 
 
@@ -14,79 +13,8 @@ const { getTask } = require('./get-task')
 const { authenticateEditorToken } = require("../../../middlewares/editor-middleware");
 const {ValidateCheckIn} = require('../../../middlewares/checkin-middleware');
 
-router.put('/reject',authenticateEditorToken,async (req,res)=>{
-    let {taskId,remark} = req.body;
-    let task = await Task.findById(taskId);
-    if(!task){
-        return res.status(404).json({
-            msg:`Task not found!`
-        })
-    }
+const pageSize = 20;
 
-    task.status = -1;
-
-    let rm = new Remark({
-        tid:task._id,
-        content:remark,
-        user:req.user._id
-    });
-    await rm.save()
-    .then(async _=>{
-        task.remarks.push(rm);
-        task.editor[task.editor.length-1].rejected.push({
-            at:new Date(),
-            reason:rm._id
-        });
-        await task.save()
-        .then(_=>{
-            return res.status(200).json({
-                msg:`You have rejected task successfully!`
-            })
-        })
-        .catch(err=>{
-            return res.status(500).json({
-                msg:`You can not reject this task with error: ${new Error(err.message)}`
-            })
-        })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not set remark into this task with error: ${new Error(err.message)}`
-        })
-    })
-
-    
-})
-
-router.put('/change-amount', authenticateEditorToken, async (req, res) => {
-    let { amount, taskId } = req.body;
-    let task = await Task.findById(taskId);
-    if (!task) {
-        return res.status(404).json({
-            msg: `Task not found!`
-        })
-    }
-
-    if (task.status !== 1) {
-        return res.status(403).json({
-            msg: `Can not change amount of image when task status different from 1`
-        })
-    }
-
-    let editor = task.editor.filter(x => x.staff == req.user._id);
-    editor[(editor.length - 1)].submited[editor[(editor.length - 1)].submited.length - 1].amount = amount;
-    await task.save()
-        .then(t => {
-            return res.status(200).json({
-                msg: `Task has been changed amount successfully!`
-            })
-        })
-        .catch(err => {
-            msg: `Can not change image amount with error: ${new Error(err.message)}`
-        })
-
-
-})
 
 router.get('/statistic', authenticateEditorToken, (req, res) => {
     Task
@@ -121,68 +49,46 @@ router.get('/statistic', authenticateEditorToken, (req, res) => {
 
 
 
-router.get('/', [authenticateEditorToken,ValidateCheckIn], (req, res) => {
+router.get('/', authenticateEditorToken, async(req, res) => {
     let { page, search, status } = req.query;
-    Task
+    let stt = (status.split(',')).map(x => {
+        return parseInt(x.trim());
+    })
+
+    let tasks = await Task
         .find({ 
-            'editor.staff': req.user._id,
-            // status: {$gt:-1}
-        })//chỉ load những task đã được TLA gán hoặc editor đã nhận được        
+            status: { $in: stt },
+            'editor.staff':req.user._id 
+        })
+        .sort({ 'deadline.end': 1 })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
         .populate([
             {
                 path: 'basic.job',
                 populate: {
-                    path: 'customer'
+                    path: 'customer',
+                    select: 'name.firstname name.lastname'
                 }
             },
             {
                 path: 'basic.level',
                 select: 'name'
             },
-            {
-                path: 'editor.staff',
-                select: 'fullname'
-            },
-            {
-                path: 'qa.staff',
-                select: 'fullname'
-            },
-            {
-                path: 'dc.staff',
-                select: 'fullname'
-            },
-            {
-                path: 'tla.created.by',
-                select: 'fullname'
-            },
-            {
-                path: 'tla.uploaded.by',
-                select: 'fullname'
-            },
-            {
-                path: 'remarks',
-                options: { sort: { 'timestamp': -1 } }
-            }
-        ])
-        .sort({ 'editor.timestamp': -1 })//sắp xếp giảm dần thời gian đăng ký của editor
-        .sort({ status: 1 })//sắp xếp tăng dần theo trạng thái của task
+            { path: 'editor.staff' },
+            { path: 'qa.staff' },
+            { path: 'remarks' }
+        ]);
 
-        .exec()
-        .then(tasks => {
-            var rs = tasks.slice((page-1)*10,10);           
-            var pages = tasks.length%10==0?tasks.length/10:Math.floor(tasks.length/10)+1;           
-          
-            return res.status(200).json({
-                msg: `Load your tasks list successfully!`,
-                tasks: rs,
-                pages
-            })
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not load your tasks list with error: ${new Error(err.message)}`
-            })
-        })
+    let count = await Task.countDocuments({});
+
+    return res.status(200).json({
+        msg: `Load tasks list successfully!`,
+        tasks,
+        pageSize,
+        pages: count % pageSize == 0 ? count / pageSize : Math.floor(count / pageSize) + 1
+    })
+    
 })
 
 
@@ -215,7 +121,7 @@ router.get('/detail', authenticateEditorToken, (req, res) => {
 })
 
 
-router.put('/submit', authenticateEditorToken, async (req, res) => {
+router.put('/submit', [authenticateEditorToken,ValidateCheckIn], async (req, res) => {
     let { taskId, output_link, amount } = req.body;
 
     let task = await Task.findById(taskId);
@@ -250,11 +156,41 @@ router.put('/submit', authenticateEditorToken, async (req, res) => {
 })
 
 
+router.put('/change-amount', [authenticateEditorToken,ValidateCheckIn], async (req, res) => {
+    let { amount, taskId } = req.body;
+    let task = await Task.findById(taskId);
+    if (!task) {
+        return res.status(404).json({
+            msg: `Task not found!`
+        })
+    }
+
+    if (task.status !== 1) {
+        return res.status(403).json({
+            msg: `Can not change amount of image when task status different from 1`
+        })
+    }
+
+    let editor = task.editor.filter(x => x.staff == req.user._id);
+    editor[(editor.length - 1)].submited[editor[(editor.length - 1)].submited.length - 1].amount = amount;
+    await task.save()
+        .then(t => {
+            return res.status(200).json({
+                msg: `Task has been changed amount successfully!`
+            })
+        })
+        .catch(err => {
+            msg: `Can not change image amount with error: ${new Error(err.message)}`
+        })
+
+
+})
 
 
 
 
-router.put('/get-more', authenticateEditorToken, async (req, res) => {
+
+router.put('/get-more', [authenticateEditorToken,ValidateCheckIn], async (req, res) => {
     //----------TÁC VỤ NHẬN task MỚI ---------------//
     /*
       Tại một thời điểm, editor có thể nhận tối đa 2 job ( không tính số lượng task)

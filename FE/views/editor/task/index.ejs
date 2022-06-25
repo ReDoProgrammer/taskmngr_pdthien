@@ -1,7 +1,7 @@
 <div class="row mt-2">
-  <div class="col-md-offset-4 col-md-2 col-sm-offset-4 col-sm-2 col-xs-4">
-    <select name="" id="slStatus" class="form-control">
-      <option value="100">All</option>
+  <div class="col-md-8 col-sm-8 col-xs-6">
+    <select id="slStatus" class="selectpicker form-control" multiple title="Choose one of the following status">
+      <option value="-10">Wait</option>
       <option value="1">Editor submited</option>
       <option value="-1">Initial</option>
       <option value="0">Editing</option>
@@ -12,21 +12,17 @@
       <option value="-4">Canceled</option>
     </select>
   </div>
-  <div class="col-md-6 col-sm-6 col-xs-8  text-right">
+  <div class="col-md-4 col-sm-4 col-xs-6  text-right">
     <div class="input-group">
       <input type="text" class="form-control" placeholder="Seach task..." id="txtSearchTask" />
       <div class="input-group-btn">
         <button class="btn btn-info" type="submit" id="btnSearchTask">
           <i class="fa fa-search" aria-hidden="true"></i>
         </button>
-        <button class="btn btn-primary" id="btnGetTask">
-          <i class="fa fa-plus" aria-hidden="true"></i> Get task
-        </button>
       </div>
     </div>
   </div>
 </div>
-
 <div class="table-responsive mt-2">
   <table class="table table-striped text-nowrap">
     <thead class="thead-dark">
@@ -36,6 +32,7 @@
         <th scope="col">Customer</th>
         <th scope="col">Job</th>
         <th scope="col">Level</th>
+        <th scope="col" class="text-center">Urgent</th>
         <th scope="col">Deadline</th>
         <th scope="col" class="text-right">E-T</th>
         <th scope="col" class="text-right">I-N</th>
@@ -65,7 +62,9 @@
     <%-include('modal_change')%>
       <%-include('modal_reject')%>
 
+        <script src="/js/bootstrap-select.min.js"></script>
         <script src="/js/common.js"></script>
+        <link href="/css/bootstrap-select.min.css" rel="stylesheet" />
         <script>
           var page = 1;
           var search = '';
@@ -73,21 +72,22 @@
           var status = 100;
 
           $(document).ready(function () {
-            LoadTask();
+            $('#slStatus').val([-10, -4, -3, -2, -1, 0, 1, 2, 3]).selectpicker('refresh');
+            LoadTasks();
             setInterval(function () {
-              LoadTask();
+              LoadTasks();
             }, 10000);//run this thang every 10 seconds
           })
 
           $(document).on("click", "ul.pagination li a", function (e) {
             e.preventDefault();
             page = parseInt($(this).text());
-            LoadTask();
+            LoadTasks();
           });
 
 
           $('#slStatus').on('change', function () {
-            LoadTask();
+            LoadTasks();
           })
 
 
@@ -100,7 +100,7 @@
               },
               success: function (data) {
                 alert(data.msg);
-                LoadTask();
+                LoadTasks();
                 taskId = data.newTask;
                 $('#modalTaskDetail').modal();
                 $('#btn-task-info').click();
@@ -136,7 +136,7 @@
 
 
 
-          function LoadTask() {
+          function LoadTasks() {
             $.ajax({
               url: '/editor/task',
               type: 'get',
@@ -146,7 +146,7 @@
               data: {
                 page,
                 search: $('#txtSearch').val(),
-                status: $('#slStatus option:selected').val()
+                status: ($("#slStatus").val() || []).join(',')
               },
               success: function (data) {
 
@@ -172,7 +172,7 @@
                   tr += '</button>';
                   tr += '</td>';
                   tr += '<td>' + (++idx) + '</td>';
-                  tr += '<td class="font-weight-bold text-primary">' + getFirstLetters(t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname) + getLastLetters(t.basic.job.customer._id) + '</td>';
+                  tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
                   tr += '<td class="font-weight-bold">' + t.basic.job.name + '</td>';
                   tr += '<td class="font-weight-bold">';
                   tr += t.basic.level.name
@@ -180,12 +180,24 @@
                     tr += '<span class="font-weight-bold text-danger ml-2"><i class="fa fa-cc" aria-hidden="true"></i></span>';
                   }
                   tr += '</td>';
-                  tr += '<td class="text-danger">';
-
-                  if (t.basic.deadline.end) {
-                    tr += convertISODateToTimeFormat(t.basic.deadline.end);
+                  tr += '<td class="text-center">';
+                  if (t.basic.job.urgent) {
+                    tr += '<i class="text-danger fa fa-exclamation-triangle" aria-hidden="true"></i>'
                   }
                   tr += '</td>';
+                  tr += '<td ';
+                  let dl = GetDifferenceBetweenTwoDatesToHours(t.basic.deadline.end)
+                  if (dl <= 6 && dl > 4) {
+                    tr += 'style="background-color:rgba(245,0,0,0.1); color:white; font-weight: bold;"'
+                  }
+                  if (dl <= 4 && dl > 2) {
+                    tr += 'style="background-color:rgba(245,0,0,0.4); color:white; font-weight: bold;"'
+                  }
+                  if (dl <= 2) {
+                    tr += 'style="background-color:rgba(245,0,0,0.6); color:white; font-weight: bold;"'
+                  }
+
+                  tr += '>' + convertISODateToTimeFormat(t.basic.deadline.end) + '</td>';
 
                   tr += '<td class="text-right">';
                   if (t.editor[t.editor.length - 1].submited !== null && t.editor[t.editor.length - 1].submited.length > 0) {
@@ -214,6 +226,8 @@
                   tr += '<td><i>';
 
                   switch (t.status) {
+                    case -10: tr += '<span class="text-danger font-weight-bold">Wait</span>';
+                      break;
                     case -1: tr += '<span class="text-info">Initial</span>';
                       break;
                     case 0: tr += '<span class="text-info">Processing</span>';
