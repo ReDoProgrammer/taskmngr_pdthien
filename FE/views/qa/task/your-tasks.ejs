@@ -1,12 +1,15 @@
 <div class="row">
-    <div class="col-md-2 col-md-offset-6 col-sm-2 col-xs-4 mt-2">
-        <select name="" id="slStatus" class="form-control">
-            <option value="100">All</option>
+    <div class="col-md-8 col-sm-8 col-xs-6">
+        <select id="slStatus" class="selectpicker form-control" multiple title="Choose one of the following status">
+            <option value="-10">Wait</option>
             <option value="1">Editor submited</option>
             <option value="-1">Initial</option>
             <option value="0">Editing</option>
-            <option value="2">Submited</option>
-            <option value="-2">Rejected</option>
+            <option value="2">Q.A submited</option>
+            <option value="3">DC submited</option>
+            <option value="-2">Q.A rejected</option>
+            <option value="-3">DC rejected</option>
+            <option value="-4">Canceled</option>
         </select>
     </div>
     <div class="col-md-4 col-sm-4 col-xs-12 mt-2">
@@ -61,7 +64,9 @@
 <%-include('task_detail')%>
     <%-include('reject-modal')%>
 
+        <script src="/js/bootstrap-select.min.js"></script>
         <script src="/js/common.js"></script>
+        <link href="/css/bootstrap-select.min.css" rel="stylesheet" />
 
         <script>
             var page = 1;
@@ -71,6 +76,7 @@
             var levelId = '';
             var taskId = '';
             $(document).ready(function () {
+                $('#slStatus').val([-10, -4, -3, -2, -1, 0, 1, 2, 3]).selectpicker('refresh');
                 LoadTasks();
                 setInterval(function () {
                     LoadTasks();
@@ -158,7 +164,7 @@
 
                         $('#funcMenu').empty();
                         let mn = '';
-                        switch (data.task.status) {                          
+                        switch (data.task.status) {
                             case 1:
                                 mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Q.A ok</a></li>';
                                 mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
@@ -209,9 +215,9 @@
                         authorization: "Bearer " + localStorage.getItem("accessToken"),
                     },
                     data: {
-                        search,
                         page,
-                        status
+                        search: $('#txtSearch').val(),
+                        status: ($("#slStatus").val() || []).join(',')
                     },
                     success: function (data) {
                         $('#tbdTasks').empty();
