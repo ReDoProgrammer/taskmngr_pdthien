@@ -67,7 +67,9 @@
             }
         })
     });
-
+    $('#modalSubmitTask').on('hidden.bs.modal', function () {
+        LoadTasks(); 
+    });
 
     $('#btnSubmitTaskDone').click(function () {
         let output_link = $('#txtLink').val();
@@ -98,8 +100,7 @@
                     title: 'Successfully!',
                     text: data.msg
                 });
-                $('#modalSubmitTask').modal('hide');
-                LoadTask();
+                $('#modalSubmitTask').modal('hide');             
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 alert(jqXHR.responseJSON.msg);

@@ -15,111 +15,104 @@ const getTask = (staffId) => {
 
                 //Bước 2: Lấy danh sách những job mà user đang xử lý và những local job level mà user có thể đảm nhận
                 Promise.all([GetProcessingJobs(staffId), GetAccessingLevels(u.user_level._id)])
-                    .then(rs => {
-                                let jobLevels = rs[1];
-
-                                switch (rs[0].length) {
-                                    case 0:
-                                        NoJOB(jobLevels)
-                                            .then(task => {
-                                                getWage(staffId,_EDITOR, task.basic.level)
-                                                    .then(wage => {
-                                                        return resolve({
-                                                            task,
-                                                            wage
-                                                        });
-                                                    })
-                                                    .catch(err => {
-                                                        return reject(err);
-                                                    })
-
+                    .then(rs => {                     
+                        let jobLevels = rs[1];
+                        switch (rs[0].length) {
+                            case 0:
+                                NoJOB(jobLevels)
+                                    .then(task => {
+                                        getWage(staffId, _EDITOR, task.basic.level.toString())
+                                            .then(wage => {
+                                                return resolve({
+                                                    task,
+                                                    wage
+                                                });
                                             })
                                             .catch(err => {
                                                 return reject(err);
                                             })
-                                        break;
-                                    case 1:
-                                        HaveJOB(rs[0], jobLevels)
-                                            .then(task => {
-                                               
-                                                getWage(staffId,_EDITOR, task.basic.level)
-                                                    .then(wage => {
-                                                        console.log(wage)
-                                                        return resolve({
-                                                            task,
-                                                            wage
-                                                        });
-                                                    })
-                                                    .catch(err => {
-                                                        return reject(err);
-                                                    })
+                                    })
+                                    .catch(err => {
+                                        return reject(err);
+                                    })
+                                break;
+                            case 1:
+                                HaveJOB(rs[0], jobLevels)
+                                    .then(task => {
+                                        getWage(staffId, _EDITOR, task.basic.level.toString())
+                                            .then(wage => {
+                                                console.log(wage)
+                                                return resolve({
+                                                    task,
+                                                    wage
+                                                });
                                             })
                                             .catch(err => {
-                                                if (err.code == 404) {
-                                                    NoJOB(jobLevels)
-                                                        .then(task => {
-                                                            getWage(staffId,_EDITOR, task.basic.level)
-                                                                .then(wage => {
-                                                                    return resolve({
-                                                                        task,
-                                                                        wage
-                                                                    });
-                                                                })
-                                                                .catch(err => {
-                                                                    return reject(err);
-                                                                })
-
-                                                        })
-                                                        .catch(err => {
-                                                            return reject(err);
-                                                        })
-                                                } else {
-                                                    return reject(err);
-                                                }
-
+                                                return reject(err);
                                             })
-                                        break;
-                                    case 2:
-                                        rs[0].forEach(j => {//duyệt các job hiện tại đang xử lý
-                                            GetTaskByJobId(j._id)//lấy task thuộc 1 trong các job phía trên
-                                                .then(async tasks => {
-
-                                                    HaveJOB(rs[0], jobLevels)
-                                                        .then(task => {
-                                                            getWage(staffId,_EDITOR, task.basic.level)
-                                                                .then(wage => {
-                                                                    return resolve({
-                                                                        task,
-                                                                        wage
-                                                                    });
-                                                                })
-                                                                .catch(err => {
-                                                                    return reject(err);
-                                                                })
+                                    })
+                                    .catch(err => {
+                                        if (err.code == 404) {
+                                            NoJOB(jobLevels)
+                                                .then(task => {
+                                                    getWage(staffId, _EDITOR, task.basic.level.toString())
+                                                        .then(wage => {
+                                                            return resolve({
+                                                                task,
+                                                                wage
+                                                            });
                                                         })
                                                         .catch(err => {
-                                                            if (err.code == 404) {
-                                                                return reject({
-                                                                    code: 404,
-                                                                    msg: `You can not get task more than two jobs`
-                                                                })
-                                                            }
                                                             return reject(err);
                                                         })
                                                 })
                                                 .catch(err => {
                                                     return reject(err);
                                                 })
-                                        })
+                                        } else {
+                                            return reject(err);
+                                        }
 
-                                        break;
-                                    default:
-                                        return reject({
-                                            code: 403,
-                                            msg: `You can not get more task ultil Q.A submit your current tasks!`
+                                    })
+                                break;
+                            case 2:
+                                rs[0].forEach(j => {//duyệt các job hiện tại đang xử lý
+                                    GetTaskByJobId(j._id)//lấy task thuộc 1 trong các job phía trên
+                                        .then(async tasks => {
+                                            HaveJOB(rs[0], jobLevels)
+                                                .then(task => {
+                                                    getWage(staffId, _EDITOR, task.basic.level.toString())
+                                                        .then(wage => {
+                                                            return resolve({
+                                                                task,
+                                                                wage
+                                                            });
+                                                        })
+                                                        .catch(err => {
+                                                            return reject(err);
+                                                        })
+                                                })
+                                                .catch(err => {
+                                                    if (err.code == 404) {
+                                                        return reject({
+                                                            code: 404,
+                                                            msg: `You can not get task more than two jobs`
+                                                        })
+                                                    }
+                                                    return reject(err);
+                                                })
                                         })
-
-                                }
+                                        .catch(err => {
+                                            return reject(err);
+                                        })
+                                })
+                                break;
+                            default:
+                                return reject({
+                                    code: 403,
+                                    msg: `You can not get more task ultil Q.A submit your current tasks!`
+                                })
+                        }
                     })
                     .catch(err => {
                         return reject(err)
@@ -128,9 +121,6 @@ const getTask = (staffId) => {
             .catch(err => {
                 return resolve(err)
             })
-
-
-
     })
 }
 
@@ -227,12 +217,12 @@ const GetProcessingJobs = (staffId) => {
                     $match: {
                         'editor.staff': ObjectId(staffId),
                         'editor.visible': true,
-                        status: { $lt: 2 }
+                        status: {$lte:2,$ne:-10}                        
                     }
                 },
                 { $group: { _id: '$basic.job' } }
             ])
-            .then(jobs => {
+            .then(jobs => {              
                 return resolve(jobs)
             })
             .catch(err => {

@@ -198,7 +198,7 @@ router.put('/get-more', [authenticateEditorToken, ValidateCheckIn], async (req, 
     let count = await Task.countDocuments({
         'editor.staff': req.user._id,
         'editor.visible': true,
-        status: { $lte: 0 }
+        status: { $lte: 0, $ne:-10 }
     })
 
     if(count>0){
@@ -207,28 +207,27 @@ router.put('/get-more', [authenticateEditorToken, ValidateCheckIn], async (req, 
         })
     }
     getTask(req.user._id)
-        .then(async rs => {
-            console.log(rs);
-            // let task = rs.task;
-            // task.status = 0;
-            // task.editor.push({
-            //     staff: req.user._id,
-            //     timestamp: new Date(),
-            //     wage: rs.wage.wage
-            // })
-            // await task.save()
-            //     .then(async t => {
-            //         return res.status(200).json({
-            //             msg: `You have gotten more task successfully!`,
-            //             newTask: t._id
-            //         })
-            //     })
-            //     .catch(err => {
-            //         console.log(`Get more task failed with error: ${new Error(err.message)}`)
-            //         return res.status(500).json({
-            //             msg: `Get more task failed with error: ${new Error(err.message)}`
-            //         })
-            //     })
+        .then(async rs => {            
+            let task = rs.task;
+            task.status = 0;
+            task.editor.push({
+                staff: req.user._id,
+                timestamp: new Date(),
+                wage: rs.wage
+            })
+            await task.save()
+                .then(async t => {
+                    return res.status(200).json({
+                        msg: `You have gotten more task successfully!`,
+                        newTask: t._id
+                    })
+                })
+                .catch(err => {
+                    console.log(`Get more task failed with error: ${new Error(err.message)}`)
+                    return res.status(500).json({
+                        msg: `Get more task failed with error: ${new Error(err.message)}`
+                    })
+                })
         })
         .catch(err => {
             console.log(err)

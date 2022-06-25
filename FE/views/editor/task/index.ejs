@@ -19,7 +19,7 @@
         <button class="btn btn-info" id="btnSearchTask">
           <i class="fa fa-search" aria-hidden="true"></i>
         </button>
-        <button class="btn btn-primary"  id="btnGetTask">
+        <button class="btn btn-primary" id="btnGetTask">
           <i class="fa fa-plus" aria-hidden="true"></i>
           Get more
         </button>
@@ -103,18 +103,21 @@
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
               },
               success: function (data) {
-                alert(data.msg);
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Successfully!',
+                  text: data.msg
+                });
                 LoadTasks();
                 taskId = data.newTask;
                 $('#modalTaskDetail').modal();
                 $('#btn-task-info').click();
               }, error: function (request, status, error) {
-
-                if (request.status === 404) {
-                  alert(request.responseJSON.msg);
-                } else {
-                  alert(request.responseJSON.msg)
-                }
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Oop!..!',
+                  text: request.responseJSON.msg
+                });
 
               }
             })
@@ -217,13 +220,13 @@
 
                   tr += '<td>';
                   if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
-                    tr += t.qa[t.qa.length - 1].staff.fullname;
+                    tr += t.qa[t.qa.length - 1].staff.username;
                   }
                   tr += '</td>';
 
                   tr += '<td>';
                   if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
-                    tr += t.dc[t.dc.length - 1].staff.fullname;
+                    tr += t.dc[t.dc.length - 1].staff.username;
                   }
                   tr += '</td>';
 

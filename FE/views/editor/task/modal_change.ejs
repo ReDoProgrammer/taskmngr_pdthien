@@ -38,12 +38,14 @@
             data: {
                 taskId
             },
-            success: function (data) {   
-                console.log(data.task);             
+            success: function (data) {
                 $('#txtNumberOfImage').val(data.task.editor[data.task.editor.length - 1].submited[(data.task.editor[data.task.editor.length - 1].submited.length - 1)].amount);
-
             }, error: function (request, status, error) {
-                alert(request.responseJSON.msg);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oo0pppp! ....',
+                    text: request.responseJSON.msg
+                });
             }
         })
     });
@@ -66,16 +68,25 @@
                 amount
             },
             success: function (data) {
-                alert(data.msg);
-                $('#modalChangeNumber').modal('hide');
-                LoadTask();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Deleted',
+                    text: data.msg
+                });
+                $('#modalChangeNumber').modal('hide');               
             },
             error: function (request, status, error) {
-                alert(request.responseJSON.msg)
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oo0pppp! ....',
+                    text: request.responseJSON.msg
+                });
             }
 
         })
     })
-
+    $('#modalChangeNumber').on('hidden.bs.modal', function () {
+        LoadTasks(); 
+    });
 
 </script>
