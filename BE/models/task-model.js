@@ -148,7 +148,11 @@ const taskSchema = new Schema({
                     ref: 'remark'
                 }
             }
-        ]
+        ],
+        effect:{
+            type:Boolean,
+            default:true
+        }
     }],
 
     editor: [{
@@ -197,23 +201,10 @@ const taskSchema = new Schema({
                 default: ''
             }
         }],
-        timeline: [
-            {
-                unregisted: {
-                    //lưu trạng thái task có bị DC hủy đăng ký hay không
-                    type: Boolean,
-                    default: false
-                },
-                at: {
-                    type: Date
-                },
-                reason: {
-                    type: Schema.Types.ObjectId,
-                    ref: 'remark'
-                }
-            }
-        ]
-
+        effect:{
+            type:Boolean,
+            default:true
+        }
 
     }],
 
