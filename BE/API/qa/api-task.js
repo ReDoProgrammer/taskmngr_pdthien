@@ -2,13 +2,14 @@ const router = require("express").Router();
 const Task = require("../../models/task-model");
 const CheckIn = require('../../models/staff-checkin');
 const { authenticateQAToken } = require("../../../middlewares/qa-middleware");
-const { getWage, getModule, getCustomer, getTaskDetail } = require('../common');
+const { ValidateCheckIn } = require('../../../middlewares/checkin-middleware');
+const { getCustomer, getTaskDetail } = require('../common');
 const _MODULE = 'QA';
 
 const { getTask } = require('./get-task')
 
 
-router.put('/unregister', authenticateQAToken, async (req, res) => {
+router.put('/unregister', [authenticateQAToken,ValidateCheckIn], async (req, res) => {
     let { taskId } = req.body;
     let task = await Task.findById(taskId);
     if (!task) {
@@ -35,7 +36,7 @@ router.put('/unregister', authenticateQAToken, async (req, res) => {
 
 })
 
-router.put('/get-task', authenticateQAToken, (req, res) => {
+router.put('/get-task',  [authenticateQAToken,ValidateCheckIn], (req, res) => {
     CheckIn
         .findOne({ staff: req.user._id })
         .then(chk => {
@@ -110,7 +111,7 @@ router.put('/get-task', authenticateQAToken, (req, res) => {
         })
 })
 
-router.put('/submit', authenticateQAToken, async (req, res) => {
+router.put('/submit',  [authenticateQAToken,ValidateCheckIn], async (req, res) => {
     let { taskId } = req.body;
 
     let task = await Task.findById(taskId);
@@ -141,7 +142,7 @@ router.put('/submit', authenticateQAToken, async (req, res) => {
 
 })
 
-router.put('/reject', authenticateQAToken, async (req, res) => {
+router.put('/reject',  [authenticateQAToken,ValidateCheckIn], async (req, res) => {
     let { taskId, remark } = req.body;
 
     let task = await Task.findById(taskId);
