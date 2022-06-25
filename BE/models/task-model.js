@@ -149,7 +149,7 @@ const taskSchema = new Schema({
                 }
             }
         ],
-        effect:{
+        visible:{
             type:Boolean,
             default:true
         }
@@ -201,7 +201,7 @@ const taskSchema = new Schema({
                 default: ''
             }
         }],
-        effect:{
+        visible:{
             type:Boolean,
             default:true
         }

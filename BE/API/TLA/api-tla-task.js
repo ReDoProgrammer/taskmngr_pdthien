@@ -421,7 +421,7 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
                 select: 'fullname username'
 
             }
-            
+
         ]);
 
 
@@ -782,7 +782,6 @@ router.put('/', authenticateTLAToken, async (req, res) => {
     };
     task.basic.link.input = input_link;
 
-
     task.status = start == 'true' ? (editor ? task.status : -1) : -10;
 
     if (task.remarks[task.remarks.length - 1].content !== remark) {
@@ -802,13 +801,29 @@ router.put('/', authenticateTLAToken, async (req, res) => {
 
     await task.save()
         .then(_ => {
-            UpdateEditor(task._id, level, editor, req.user._id)
+            ChangeVisibleEditor(task._id, editor)
                 .then(_ => {
-                    UpdateQA(task._id, level, qa, req.user._id)
+                    ChangeVisibleQA(task._id, qa)
                         .then(_ => {
-                            return res.status(200).json({
-                                msg: `The task has been updated!`
-                            })
+                            UpdateEditor(task._id, level, editor, req.user._id)
+                                .then(_ => {
+                                    UpdateQA(task._id, level, qa, req.user._id)
+                                        .then(_ => {
+                                            return res.status(200).json({
+                                                msg: `The task has been updated!`
+                                            })
+                                        })
+                                        .catch(err => {
+                                            return res.status(err.code).json({
+                                                msg: err.msg
+                                            })
+                                        })
+                                })
+                                .catch(err => {
+                                    return res.status(err.code).json({
+                                        msg: err.msg
+                                    })
+                                })
                         })
                         .catch(err => {
                             return res.status(err.code).json({
@@ -1046,6 +1061,63 @@ const GetCustomerById = customerId => {
             })
         }
         return resolve(customer);
+    })
+}
+
+
+const ChangeVisibleEditor = (taskId, editor) => {
+    return new Promise(async (resolve, reject) => {      
+        if (!editor) {
+            return resolve();
+        }
+
+        let task = await Task.findById(taskId);
+
+        if (task.editor.length == 0) {
+            return resolve();
+        }
+
+        if(task.editor[task.editor.length-1].staff == editor){
+            return resolve();
+        }
+
+        task.editor[task.editor.length - 1].visible = false;
+        await task.save()
+            .then(_ => {
+                return resolve(task);
+            })
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not update visible other Editor with error: ${new Error(err.message)}`
+                })
+            })
+    })
+}
+
+const ChangeVisibleQA = (taskId, qa) => {
+    return new Promise(async (resolve, reject) => {
+        if (!qa) {
+            return resolve();
+        }
+        let task = await Task.findById(taskId);
+        if (task.qa.length == 0) {
+            return resolve();
+        }
+        if(task.qa[task.qa.length-1].staff == qa){
+            return resolve();
+        }
+        task.qa[task.qa.length - 1].visible = false;
+        await task.save()
+            .then(_ => {
+                return resolve(task);
+            })
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not update visible other Q.A with error: ${new Error(err.message)}`
+                })
+            })
     })
 }
 
