@@ -282,9 +282,9 @@
                             tr += '>' + convertISODateToTimeFormat(t.basic.deadline.end) + '</td>';
 
                             tr += '<td>';
-                            if (typeof t.remarks[0] !== 'undefined') {
-                                tr += t.remarks[0].content;
-                            }
+                         
+                                tr += t.remarks[t.remarks.length - 1].content;
+                           
                             tr += '</td>';
 
                             tr += '<td class="text-right">';
