@@ -15,16 +15,16 @@ router.put('/', authenticateTLAToken, async (req, res) => {
             check: {
                 in: new Date()
             }
-        })       
+        })
     } else {
-        
+
         if (!chk.check[chk.check.length - 1].out) {
             chk.check[chk.check.length - 1].out = new Date();
         } else {
             chk.check.push({
                 in: new Date()
             })
-        }       
+        }
     }
     console.log(chk)
     await chk.save()
@@ -45,40 +45,23 @@ router.put('/', authenticateTLAToken, async (req, res) => {
 
 })
 
-router.get('/list-staffs-by-module', authenticateTLAToken, (req, res) => {
+router.get('/list-staffs-by-module', authenticateTLAToken, async (req, res) => {
     let { moduleId } = req.query;
-
-    GetUsersByModule(moduleId)
-        .then(userIds => {          
-            GetUsersInRange(userIds)
-                .then(users => {                  
-                    CheckIn
-                        .find({ staff: { $in: users.map(x => x._id) } })
-                        .then(staffs => {
-                         
-                           let staffIds = staffs.map(x=>{return x.staff.toString();})
-                           let outList = users.filter(x=>!staffIds.includes(x._id.toString()));
-
-                            Promise.all([GetCheckInList(staffIds),GetCheckOutList(staffIds)])
-                           .then(rs=>{                             
-                               return res.status(200).json({
-                                   msg:`Get checkin and checkout staff successfully!`,
-                                   checkIn:rs[0],
-                                   checkOut:rs[1].concat(outList)
-                               })
-                           })
-                           .catch(err=>{
-                               return res.status(err.code).json({
-                                   msg:err.msg
-                               })
-                           })
-                        })
-                        .catch(err => {
-                            console.log(`Can not get checkin staffs with error: ${new Error(err.message)}`);
-                            return res.status(500).json({
-                                msg: `Can not get checkin staffs with error: ${new Error(err.message)}`
-                            })
-                        })
+    let module = await Module.findById(moduleId).populate('users', 'fullname username');
+    if (!module) {
+        return res.status(404).json({
+            msg: `Module not found!`
+        })
+    }
+    GetCheckInList(module.users)
+        .then(checkIn => {
+            GetCheckOutList(module.users, checkIn)
+                .then(checkOut => {
+                    return res.status(200).json({
+                        msg:`Load checkin and checkout list by module successfully!`,
+                        checkIn,
+                        checkOut
+                    })
                 })
                 .catch(err => {
                     return res.status(err.code).json({
@@ -91,6 +74,7 @@ router.get('/list-staffs-by-module', authenticateTLAToken, (req, res) => {
                 msg: err.msg
             })
         })
+
 })
 
 router.get('/list-modules', authenticateTLAToken, (req, res) => {
@@ -112,23 +96,11 @@ router.get('/list-modules', authenticateTLAToken, (req, res) => {
 
 module.exports = router;
 
-const GetCheckOutList = (users) => {
+const GetCheckOutList = (users, checkIn) => {
     return new Promise((resolve, reject) => {
-        CheckIn
-            .find({
-                staff: { $in: users },
-                'check.out': { $ne: null }
-            })
-            .populate('staff', 'username fullname')
-            .then(ci => {
-                return resolve(ci.map(x => x.staff));
-            })
-            .catch(err => {
-                return reject({
-                    code: 500,
-                    msg: `Can not load checkin list with err: ${new Error(err.message)}`
-                })
-            })
+       let m = checkIn.map(x=>x._id);
+        const results = users.filter(({ _id: id1 }) => !m.some(id2 => id2.toString() === id1.toString()));
+        return resolve(results);        
     })
 }
 
@@ -152,26 +124,5 @@ const GetCheckInList = (users) => {
     })
 }
 
-const GetUsersByModule = (moduleId) => {
-    return new Promise((resolve, reject) => {
-   
-    })
-}
 
-const GetUsersInRange = (userIds) => {
-    return new Promise((resolve, reject) => {
-        User
-            .find({ _id: { $in: userIds } })
-            .select('username fullname username')
-            .then(users => {               
-                return resolve(users);
-            })
-            .catch(err => {
-                console.log(`Can not get users based on module with error: ${new Error(err.message)}`)
-                return reject({
-                    code: 500,
-                    msg: `Can not get users based on module with error: ${new Error(err.message)}`
-                })
-            })
-    })
-}
+
