@@ -1,5 +1,6 @@
-const Customer = require('../models/customer-model');
+const Customer = require('../models/customer-model')
 const Module = require('../models/module-model');
+const StaffLevel = require('../models/staff-level-model');
 const User = require('../models/user-model');
 const Task = require('../models/task-model');
 const jwt = require("jsonwebtoken");
@@ -63,9 +64,9 @@ const checkAccount = (username, password) => {
 }
 
 
-const getWage = (user, _module, levelId) => {
+const getWage = (userId, moduleName, levelId) => {
     return new Promise(async (resolve, reject) => {
-        Promise.all([getModule(_module), getUser(user)].map(p => p.catch(e => e)))
+        Promise.all([getModule(moduleName), getUser(userId)].map(p => p.catch(e => e)))
             .then(async rs => {
                 let user = rs[1];
                 let m = rs[0];
@@ -174,7 +175,18 @@ const GetCustomerById = customerId => {
 }
 
 
-
+const GetAccessingLevels = staff_level =>{
+    return new Promise(async (resolve,reject)=>{
+        let sl = await StaffLevel.findById(staff_level);
+        if(sl.levels.length==0){
+            return reject({
+                code:403,
+                msg:`You can not access any job level`
+            })
+        }
+        return resolve(sl.levels);
+    })
+}
 
 
 
@@ -186,5 +198,6 @@ module.exports = {
     getUser,
     getWage,
     GetTask,
-    GetCustomerById
+    GetCustomerById,
+    GetAccessingLevels
 }

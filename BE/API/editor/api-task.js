@@ -3,8 +3,6 @@ const Task = require("../../models/task-model");
 const CheckIn = require('../../models/staff-checkin');
 
 const {
-    getModule,
-    getWage,
     GetTask,
     GetCustomerById } = require('../common');
 
@@ -12,7 +10,7 @@ const {
 const { getTask } = require('./get-task')
 
 const { authenticateEditorToken } = require("../../../middlewares/editor-middleware");
-const {ValidateCheckIn} = require('../../../middlewares/checkin-middleware');
+const { ValidateCheckIn } = require('../../../middlewares/checkin-middleware');
 
 const pageSize = 20;
 
@@ -50,17 +48,17 @@ router.get('/statistic', authenticateEditorToken, (req, res) => {
 
 
 
-router.get('/', authenticateEditorToken, async(req, res) => {
+router.get('/', authenticateEditorToken, async (req, res) => {
     let { page, search, status } = req.query;
     let stt = (status.split(',')).map(x => {
         return parseInt(x.trim());
     })
 
     let tasks = await Task
-        .find({ 
+        .find({
             status: { $in: stt },
-            'editor.staff':req.user._id ,
-            'editor.visible':true
+            'editor.staff': req.user._id,
+            'editor.visible': true
         })
         .sort({ 'deadline.end': 1 })
         .skip((page - 1) * pageSize)
@@ -90,37 +88,37 @@ router.get('/', authenticateEditorToken, async(req, res) => {
         pageSize,
         pages: count % pageSize == 0 ? count / pageSize : Math.floor(count / pageSize) + 1
     })
-    
+
 })
 
 
 router.get('/detail', authenticateEditorToken, (req, res) => {
     let { taskId } = req.query;
     GetTask(taskId)
-    .then(task => {
-        GetCustomerById(task.basic.job.customer)
-            .then(customer => {
-                return res.status(200).json({
-                    msg: `Get task detail successfully!`,
-                    task,
-                    customer
+        .then(task => {
+            GetCustomerById(task.basic.job.customer)
+                .then(customer => {
+                    return res.status(200).json({
+                        msg: `Get task detail successfully!`,
+                        task,
+                        customer
+                    })
                 })
-            })
-            .catch(err => {
-                return res.status(err.code).json({
-                    msg: err.msg
+                .catch(err => {
+                    return res.status(err.code).json({
+                        msg: err.msg
+                    })
                 })
-            })
-    })
-    .catch(err => {
-        return res.status(err.code).json({
-            msg: err.msg
         })
-    })
+        .catch(err => {
+            return res.status(err.code).json({
+                msg: err.msg
+            })
+        })
 })
 
 
-router.put('/submit', [authenticateEditorToken,ValidateCheckIn], async (req, res) => {
+router.put('/submit', [authenticateEditorToken, ValidateCheckIn], async (req, res) => {
     let { taskId, output_link, amount } = req.body;
 
     let task = await Task.findById(taskId);
@@ -155,7 +153,7 @@ router.put('/submit', [authenticateEditorToken,ValidateCheckIn], async (req, res
 })
 
 
-router.put('/change-amount', [authenticateEditorToken,ValidateCheckIn], async (req, res) => {
+router.put('/change-amount', [authenticateEditorToken, ValidateCheckIn], async (req, res) => {
     let { amount, taskId } = req.body;
     let task = await Task.findById(taskId);
     if (!task) {
@@ -189,7 +187,7 @@ router.put('/change-amount', [authenticateEditorToken,ValidateCheckIn], async (r
 
 
 
-router.put('/get-more', [authenticateEditorToken,ValidateCheckIn], async (req, res) => {
+router.put('/get-more', [authenticateEditorToken, ValidateCheckIn], async (req, res) => {
     //----------TÁC VỤ NHẬN task MỚI ---------------//
     /*
       Tại một thời điểm, editor có thể nhận tối đa 2 job ( không tính số lượng task)
@@ -197,79 +195,45 @@ router.put('/get-more', [authenticateEditorToken,ValidateCheckIn], async (req, r
     
     */
 
-    CheckIn
-        .findOne({ staff: req.user._id })
-        .then(chk => {
-            if (!chk) {
-                return res.status(404).json({
-                    msg: `Staff check in not found!`
-                })
-            }
+    let count = await Task.countDocuments({
+        'editor.staff': req.user._id,
+        'editor.visible': true,
+        status: { $lte: 0 }
+    })
 
-            if (chk.check[chk.check.length - 1].out == undefined) {
-
-                Task
-                .countDocuments({
-                    'editor.staff':req.user._id,
-                    status: {$lte:0}
-                })
-                .then(c=>{
-                    console.log({c})
-                    if(c>0){
-                        return res.status(403).json({
-                            msg:`You can not get more task before submiting current tasks!`
-                        })
-                    }else{
-                        getTask(req.user._id)
-                        .then(async rs => {
-                            let task = rs.task;
-                            task.status = 0;
-                            task.editor.push({
-                                staff: req.user._id,
-                                timestamp: new Date(),
-                                wage: rs.wage.wage
-                            })
-                            await task.save()
-                                .then(async t => {                               
-                                    return res.status(200).json({
-                                        msg: `You have gotten more task successfully!`,
-                                        newTask: t._id
-                                    })
-                                })
-                                .catch(err => {
-                                    console.log(`Get more task failed with error: ${new Error(err.message)}`)
-                                    return res.status(500).json({
-                                        msg: `Get more task failed with error: ${new Error(err.message)}`
-                                    })
-                                })
-                        })
-                        .catch(err => {
-                            console.log(err)
-                            return res.status(err.code).json({
-                                msg: err.msg
-                            })
-                        })
-                    }
-                })
-                .catch(err=>{
-                    console.log(`Can not count current processing tasks with error: ${new Error(err.message)}`)
-                    return res.status(500).json({
-                        msg:`Can not count current processing tasks with error: ${new Error(err.message)}`
-                    })
-                })
-
-               
-            } else {
-                console.log(`You can not get more task when you are not in office!`)
-                return res.status(403).json({
-                    msg: `You can not get more task when you are not in office!`
-                })
-            }
+    if(count>0){
+        return res.status(403).json({
+            msg:`You can not get more task until your current tasks have been submited!`
+        })
+    }
+    getTask(req.user._id)
+        .then(async rs => {
+            console.log(rs);
+            // let task = rs.task;
+            // task.status = 0;
+            // task.editor.push({
+            //     staff: req.user._id,
+            //     timestamp: new Date(),
+            //     wage: rs.wage.wage
+            // })
+            // await task.save()
+            //     .then(async t => {
+            //         return res.status(200).json({
+            //             msg: `You have gotten more task successfully!`,
+            //             newTask: t._id
+            //         })
+            //     })
+            //     .catch(err => {
+            //         console.log(`Get more task failed with error: ${new Error(err.message)}`)
+            //         return res.status(500).json({
+            //             msg: `Get more task failed with error: ${new Error(err.message)}`
+            //         })
+            //     })
         })
         .catch(err => {
-            console.log(`Can not load staff checkin with error: ${new Error(err.message)}`)
-            return res.status(500).json({
-                msg: `Can not load staff checkin with error: ${new Error(err.message)}`
+            console.log(err)
+            return res.status(err.code).json({
+                msg: err.msg
             })
         })
 })
