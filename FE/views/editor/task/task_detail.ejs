@@ -48,7 +48,6 @@
                         </div>
 
 
-
                         <hr />
                         <div class="row mt-2">
                             <div class="col-md-2 col-sm-2 col-xs-4">Source:</div>
@@ -81,6 +80,7 @@
                                 </div>
                             </div>
                         </div>
+
 
 
                         <div class="panel panel-info mt-2">
@@ -121,25 +121,18 @@
                                     <div id="divTV" class=" font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1"></div>
                                 </div>
 
-                                <hr />
-                                <div class="row mt-2">
-                                    <div class="col-md-2 col-sm-2 col-xs-4">
-                                        Style note:
-                                    </div>
-                                    <div class="col-md-10 col-sm-10 col-xs-8">
-                                        <label id="lblNoteStyle" class="text-danger font-weight-bold"></label>
-                                    </div>
-                                </div>
-
 
                             </div>
                         </div>
 
+
+
                     </div>
                     <div class="panel panel-warning mt-2">
-                        <div class="panel-heading font-weight-bold">Remarks:</div>
+                        <div class="panel-heading font-weight-bold">Remark:</div>
                         <div class="panel-body" id="remarks"></div>
                     </div>
+
                     <div class="panel-footer">
                         <div class="form-group text-right">
                             <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
@@ -166,11 +159,23 @@
         }
     })
 
-
-    $("#modalTaskDetail").on('shown.bs.modal', function (e) {
+    $("#modalTaskDetail").on('shown.bs.modal',async function (e) {
         $('#job-info').hide();
+       await LoadTaskDetail();
+    });
 
-        $.ajax({
+    $('#btnCopyToClipboard').click(function () {
+        $("#inputLink").select();
+        document.execCommand('copy');
+        Swal.fire(
+            'Great!!',
+            'Local url copied to clipboard',
+            'success'
+        )
+    })
+
+    function LoadTaskDetail(){
+       return $.ajax({
             url: '/editor/task/detail',
             type: 'get',
             headers: {
@@ -180,29 +185,31 @@
                 taskId
             },
             success: function (data) {
+                $('#divNationalStyle').html(data.customer.style.nation.name)
+                $('#divColor').html(data.customer.style.color.name)
 
+                $('#divOutput').html(data.customer.style.output.name)
 
-                $('#divNationalStyle').html(data.customer.nation.name)
-                $('#divColor').html(data.customer.color.name)
-                $('#divOutput').html(data.customer.output.name)
-
-                $('#divSize').html(data.customer.size.name)
-                $('#lblNoteStyle').text(data.customer.remark);
+                $('#divSize').html(data.customer.style.size.name)
+                $('#lblNoteStyle').text(data.customer.style.style_note);
 
                 $('#lblJobName').text(data.task.basic.job.name);
+
                 $('#lblLevelName').text(data.task.basic.level.name);
                 $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.basic.deadline.begin));
-                if (data.task.basic.deadline.end) {
+                if (data.task.basic.deadline.end) {                    
                     $('#lblDeadline').text(convertISODateToTimeFormat(data.task.basic.deadline.end));
+                } else {
+                    $('#lblDeadline').text('');
                 }
 
                 $('#lblIntruction').text(data.task.basic.job.intruction);
 
-                $('#remarks').empty();
 
+                $('#remarks').empty();
                 data.task.remarks.forEach(r => {
                     let item = '<div class="row mt-2">';
-                    item += '<div class="col-md-4 col-sm-4 col-xs-12"><span class="font-weight-bold text-primary">' + r.user.fullname + '</span>(' + convertISODateToTimeFormat(r.timestamp) + '):</div>';
+                    item += '<div class="col-md-4 col-sm-4 col-xs-12"><span class="font-weight-bold text-primary">' + r.created.by.fullname + '</span>(' + convertISODateToTimeFormat(r.created.at) + '):</div>';
                     item += '<div class="col-md-8 col-sm-8 col-xs-12 text-danger font-italic">' + r.content + '</div>';
                     item += '</div>';
 
@@ -219,14 +226,18 @@
                     $('#inputLink').val(data.task.basic.link.input);
                 }
 
-                if (data.task.editor && data.task.editor.length > 0) {
-                    if (data.task.editor[data.task.editor.length - 1].submited.length>0 && data.task.editor[data.task.editor.length - 1].submited) {
-                        if (isValidHttpUrl(data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length-1].link)) {
-                            $('#divFolderOutput').slideUp();
-                            $('#divOutputLink').html('<a href="' + data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length-1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
-                        } else {
-                            $('#divFolderOutput').slideDown(200);
-                            $('#outputLink').val(data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length-1].link);
+                if (data.task.status === 4) {//uploaded
+                    $('#divOutputLink').html('<a href="' + data.task.tla.uploaded[data.task.tla.uploaded.length-1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                } else {
+                    if (data.task.editor && data.task.editor.length > 0) {
+                        if (data.task.editor[data.task.editor.length - 1].submited.length > 0 && data.task.editor[data.task.editor.length - 1].submited) {
+                            if (isValidHttpUrl(data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link)) {
+                                $('#divFolderOutput').slideUp();
+                                $('#divOutputLink').html('<a href="' + data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                            } else {
+                                $('#divFolderOutput').slideDown(200);
+                                $('#outputLink').val(data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link);
+                            }
                         }
                     }
                 }
@@ -262,27 +273,7 @@
                 }
             }, error: function (request, status, error) {
                 alert(request.responseJSON.msg)
-                window.location.href = '/editor/default';
             }
         })
-    });
-
-    $('#btnCopyToClipboard').click(function () {
-        $("#inputLink").select();
-        document.execCommand('copy');
-        Swal.fire(
-            'Great!!',
-            'Local url copied to clipboard',
-            'success'
-        )
-    })
-    $('#btnCopyToClipboardOutput').click(function () {
-        $("#outputLink").select();
-        document.execCommand('copy');
-        Swal.fire(
-            'Great!!',
-            'Local url copied to clipboard',
-            'success'
-        )
-    })
+    }
 </script>
