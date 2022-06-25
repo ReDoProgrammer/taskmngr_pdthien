@@ -207,6 +207,8 @@
                                                 newRow += '<td><i>';
 
                                                 switch (t.status) {
+                                                    case -10: newRow += '<span class="text-danger">Pause</span>';
+                                                        break;
                                                     case -1: newRow += '<span class="text-info">Initial</span>';
                                                         break;
                                                     case 0: newRow += '<span class="text-info">Processing</span>';

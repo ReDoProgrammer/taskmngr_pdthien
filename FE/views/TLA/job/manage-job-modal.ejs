@@ -419,6 +419,9 @@
           tr += '<td class="text-left">' + cc.remark + '</td>';
           tr += '<td class="text-left font-italic text-right">';
           switch (cc.status) {
+            case -10:
+              tr += '<span class="text-danger">Pause</span>';
+              break;
             case -1:
               tr += '<span class="text-info">Initial</span>';
               break;
@@ -498,7 +501,7 @@
           tr += '</td>';
 
           tr += '<td>';
-          if (t.remarks.length > 0) {            
+          if (t.remarks.length > 0) {
             tr += t.remarks[t.remarks.length - 1].content;
           }
           tr += '</td>';
@@ -527,7 +530,9 @@
 
           tr += '<td class="font-italic">';
           switch (t.status) {
-
+            case -10:
+              tr += '<span class="text-danger">Pause</span>';
+              break;            
             case 0: tr += '<span class="text-info">Processing</span>'; break;
             case 1: {
               if (t.editor[0].submited.times > 1) {
