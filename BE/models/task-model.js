@@ -128,11 +128,7 @@ const taskSchema = new Schema({
         submited_at: [{
             type: Date
         }],
-        unregisted: {
-            //lưu trạng thái task có bị DC hủy đăng ký hay không
-            type: Boolean,
-            default: false
-        },
+        
         rejected: [
             {
                 at: {
@@ -141,11 +137,7 @@ const taskSchema = new Schema({
                 by: {
                     type: Schema.Types.ObjectId,
                     ref: 'user'
-                },
-                rm: {
-                    type: Schema.Types.ObjectId,
-                    ref: 'remark'
-                }
+                }               
             }
         ],
         visible:{
