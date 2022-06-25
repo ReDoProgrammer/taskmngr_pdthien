@@ -406,7 +406,7 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
         .populate([
             {
                 path: 'basic.job',
-                select: 'name'
+                select: 'name urgent'
             },
             {
                 path: 'basic.level',
@@ -421,6 +421,7 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
                 select: 'fullname username'
 
             }
+            
         ]);
 
 
