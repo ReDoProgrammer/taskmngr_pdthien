@@ -202,6 +202,12 @@
                 }
 
 
+                if (data.customer.style.align.checked) {
+                    $('#divAlign').html('<i class="fa fa-check-square-o"></i>  <span class="text-warning">' + data.customer.style.align.note + '</span>');
+                } else {
+                    $('#divAlign').html('<i class="fa fa-square-o"></i>');
+                }
+                
                 if (data.customer.style.sky.checked) {
                     $('#divSky').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.style.sky.note + '</span>');
                 } else {
