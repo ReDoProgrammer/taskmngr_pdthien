@@ -33,6 +33,7 @@
     <thead class="thead-dark">
       <tr>
         <th scope="col">#</th>
+        <th scope="col" class="text-center">BP</th>
         <th scope="col">Customer</th>
         <th scope="col">Job</th>
         <th scope="col">Level</th>
@@ -162,6 +163,15 @@
               }
 
               tr += '<td>' + (idx++) + '</td>';
+              tr += '<td class="text-center">';
+                let p = t.bp.filter(x => x.bpId.is_bonus);
+                if (p.length > 0) {
+                  tr += '<button class="btn btn-xs btn-danger ml-1"><i class="fa fa-ban" aria-hidden="true"></i></button>';
+                }
+                if (t.bp.length > 0 && t.bp.length - p.length > 0) {
+                  tr += '<button class="btn btn-xs btn-success ml-1"><i class="fa fa-trophy" aria-hidden="true"></i></button>';
+                }
+                tr += '</td>';
 
               tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.name.firstname + ' ' + t.basic.job.customer.name.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
               tr += '<td class="font-weight-bold text-danger">' + t.basic.job.name + '</td>';
