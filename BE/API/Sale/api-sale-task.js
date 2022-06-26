@@ -3,7 +3,7 @@ const { authenticateSaleToken } = require("../../../middlewares/sale-middleware"
 const Task = require('../../models/task-model');
 const { getCustomer, getTaskDetail, getModule, getWage } = require('../common');
 
-
+const pageSize = 20;
 
 router.get('/list', authenticateSaleToken, (req, res) => {
     let { jobId } = req.query;
@@ -62,60 +62,41 @@ router.get('/list', authenticateSaleToken, (req, res) => {
 })
 
 
-router.get('/all', authenticateSaleToken, (req, res) => {
+router.get('/all', authenticateSaleToken, async (req, res) => {
     let { page, search, status } = req.query;
-    Task
-        .find({})
+    let stt = (status.split(',')).map(x => {
+        return parseInt(x.trim());
+    })
+
+    let tasks = await Task
+        .find({ status: { $in: stt } })
+        .sort({ 'deadline.end': 1 })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
         .populate([
             {
                 path: 'basic.job',
                 populate: {
-                    path: 'customer'
+                    path: 'customer',
+                    select: 'name.firstname name.lastname'
                 }
             },
-            {
-                path: 'basic.level',
-                select: 'name'
-            },
-            {
-                path: 'editor.staff',
-                select: 'fullname'
-            },
-            {
-                path: 'qa.staff',
-                select: 'fullname'
-            },
-            {
-                path: 'dc.staff',
-                select: 'fullname'
-            },
-            {
-                path: 'tla.created.by',
-                select: 'fullname'
-            },
-            {
-                path: 'tla.uploaded.by',
-                select: 'fullname'
-            },
-            {
-                path: 'remarks',
-                options: { sort: { 'timestamp': -1 } }
-            }
-        ])
-        .exec()
-        .then(tasks => {
-            return res.status(200).json({
-                tasks,
-                msg: 'Load taskslist successfully!'
-            })
-        })
-        .catch(err => {
-            console.log(`Can not load tasks list with error:  ${jobId}`);
-            return res.status(500).json({
-                msg: `Can not load tasks list with error: ${jobId}`,
-                error: new Error(err.message)
-            })
-        })
+            { path: 'basic.level', select: 'name' },
+            { path: 'editor.staff', select: 'username fullname' },
+            { path: 'qa.staff', select: 'username fullname' },
+            { path: 'dc.staff', select: 'username fullname' },
+            { path: 'tla.uploaded.by', select: 'username fullname' },
+            { path: 'remarks' }
+        ]);
+
+    let count = await Task.countDocuments({});
+
+    return res.status(200).json({
+        msg: `Load tasks list successfully!`,
+        tasks,
+        pageSize,
+        pages: count % pageSize == 0 ? count / pageSize : Math.floor(count / pageSize) + 1
+    })
 })
 
 router.get('/detail', authenticateSaleToken, (req, res) => {
@@ -146,29 +127,29 @@ router.get('/detail', authenticateSaleToken, (req, res) => {
 router.put('/submit', authenticateSaleToken, async (req, res) => {
     let { taskId } = req.body;
     let task = await Task.findById(taskId);
-    if(!task){
+    if (!task) {
         return res.status(404).json({
-            msg:`Task not found!`
+            msg: `Task not found!`
         })
     }
     task.status = 5;
     task.done.push({
         at: new Date(),
-        by:req.user._id
+        by: req.user._id
     })
 
     await task.save()
-    .then(_=>{
-        return res.status(200).json({
-            msg:`Task has been submited!`
+        .then(_ => {
+            return res.status(200).json({
+                msg: `Task has been submited!`
+            })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not submit this task with error: ${new Error(err.message)}`
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not submit this task with error: ${new Error(err.message)}`
+            })
         })
-    })
-   
+
 })
 
 

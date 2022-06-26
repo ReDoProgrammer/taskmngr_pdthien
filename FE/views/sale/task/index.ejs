@@ -1,26 +1,19 @@
 <div class="row">
-    <div class="col-md-6 col-sm-6 col-xs-8 mt-2">
-        <label for=""></label>
-    </div>
-    <div class="col-md-2 col-sm-2 col-xs-4 mt-2">
-        <select name="" id="slStatus" class="form-control">
-            <option value="100">All</option>
+    <div class="col-md-8 col-sm-8 col-xs-6">
+        <select id="slStatus" class="selectpicker form-control" multiple title="Choose one of the following status">
+            <option value="-10">Wait</option>
+            <option value="1">Editor submited</option>
             <option value="-1">Initial</option>
             <option value="0">Editing</option>
-            <option value="1">Edited</option>
-            <option value="2">Q.A ok</option>
-            <option value="3">DC ok</option>
+            <option value="2">Q.A submited</option>
+            <option value="3">DC submited</option>
             <option value="4">Uploaded</option>
-            <option value="5">Done</option>
-            <option value="6">Finish</option>
-
-
-            <option value="-2">Q.A reject</option>
-            <option value="-3">DC reject</option>
-            <option value="-4">Cancel</option>
+            <option value="-2">Q.A rejected</option>
+            <option value="-3">DC rejected</option>
+            <option value="-4">Canceled</option>
         </select>
     </div>
-    <div class="col-md-4 col-sm-4 col-xs-12 mt-2">
+    <div class="col-md-4 col-sm-4 col-xs-6">
         <!-- Another variation with a button -->
         <div class="input-group">
             <input type="text" class="form-control" placeholder="Seach your job..." id="txtSearch" />
@@ -44,6 +37,7 @@
                 <th scope="col">Short name</th>
                 <th scope="col">Job</th>
                 <th scope="col">Level</th>
+                <th scope="col" class="text-center">Urgent</th>
                 <th scope="col">Deadline</th>
                 <th scope="col">Remark</th>
                 <th scope="col" class="text-right">E-N</th>
@@ -77,7 +71,9 @@
 <%-include('task_detail')%>
     <%-include('reject-modal')%>
 
+        <script src="/js/bootstrap-select.min.js"></script>
         <script src="/js/common.js"></script>
+        <link href="/css/bootstrap-select.min.css" rel="stylesheet" />
 
         <script>
             var page = 1;
@@ -85,6 +81,7 @@
             var status = 100;
             var taskId = '';
             $(document).ready(function () {
+                $('#slStatus').val([-10, -4, -3, -2, -1, 0, 1, 2, 3, 4]).selectpicker('refresh');
                 LoadTasks();
                 setInterval(function () {
                     LoadTasks();
@@ -202,9 +199,9 @@
                         authorization: "Bearer " + localStorage.getItem("accessToken"),
                     },
                     data: {
-                        search,
+                        search: $('#txtSearch').val(),
                         page,
-                        status
+                        status: ($("#slStatus").val() || []).join(',')
                     },
                     success: function (data) {
                         $('#tbdTasks').empty();
@@ -222,16 +219,36 @@
 
                             tr += '<td>' + (idx++) + '</td>';
 
-                           tr += '<td class="font-weight-bold text-info">' + `${t.basic.job.customer.name.firstname} ${t.basic.job.customer.name.lastname}` + '</td>';
-                           tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.name.firstname + ' ' + t.basic.job.customer.name.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
+                            tr += '<td class="font-weight-bold text-info">' + `${t.basic.job.customer.name.firstname} ${t.basic.job.customer.name.lastname}` + '</td>';
+                            tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.name.firstname + ' ' + t.basic.job.customer.name.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
                             tr += '<td class="font-weight-bold text-info">' + t.basic.job.name + '</td>';
-                            tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';
-
-                            tr += '<td>';
-                            if (typeof t.basic.deadline.end !== 'undefined') {
-                                tr += convertISODateToTimeFormat(t.basic.deadline.end);
+                            tr += '<td class="font-weight-bold">' + t.basic.level.name;
+                            if (t.status == -10) {
+                                tr += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true"></i>';
                             }
                             tr += '</td>';
+
+                            tr += '<td class="text-center">';
+                            if (t.basic.job.urgent) {
+                                tr += '<i class="text-danger fa fa-exclamation-triangle" aria-hidden="true"></i>'
+                            }
+                            tr += '</td>';
+
+                            tr += '<td ';
+                            if (t.status < 4) {
+                                let dl = GetDifferenceBetweenTwoDatesToHours(t.basic.deadline.end)
+                                if (dl <= 6 && dl > 4) {
+                                    tr += 'style="background-color:rgba(245,0,0,0.1); color:white; font-weight: bold;"'
+                                }
+                                if (dl <= 4 && dl > 2) {
+                                    tr += 'style="background-color:rgba(245,0,0,0.4); color:white; font-weight: bold;"'
+                                }
+                                if (dl <= 2) {
+                                    tr += 'style="background-color:rgba(245,0,0,0.6); color:white; font-weight: bold;"'
+                                }
+                            }
+
+                            tr += '>' + convertISODateToTimeFormat(t.basic.deadline.end) + '</td>';
 
 
 
@@ -260,7 +277,7 @@
 
                             tr += '<td>';
                             if (t.status !== -1) {
-                                tr += t.editor[t.editor.length - 1].staff.fullname
+                                tr += t.editor[t.editor.length - 1].staff.username
                             }
                             tr += '</td>';
 
@@ -268,14 +285,14 @@
 
                             tr += '<td>';
                             if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
-                                tr += t.qa[t.qa.length - 1].staff.fullname
+                                tr += t.qa[t.qa.length - 1].staff.username
                             }
                             tr += '</td>';
 
 
                             tr += '<td>';
                             if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
-                                tr += t.dc[t.dc.length - 1].staff.fullname
+                                tr += t.dc[t.dc.length - 1].staff.username
                             }
                             tr += '</td>';
 
@@ -284,7 +301,7 @@
 
                             tr += '<td>';
                             if (t.tla.uploaded.length > 0) {
-                                tr += t.tla.uploaded[t.tla.uploaded.length - 1].by.fullname
+                                tr += t.tla.uploaded[t.tla.uploaded.length - 1].by.username
                             }
                             tr += '</td>';
 
@@ -304,10 +321,9 @@
                             tr += '<td><i>';
 
                             switch (t.status) {
-                                case -1: tr += '<span class="text-info">Initial</span>';
-                                    break;
-                                case 0: tr += '<span class="text-info">Processing</span>';
-                                    break;
+                                case -10: tr += '<span class="text-danger font-weight-bold">Wait</span>'; break;
+                                case -1: tr += '<span class="text-info">Initial</span>'; break;
+                                case 0: tr += '<span class="text-info">Processing</span>'; break;
                                 case 1:
                                     {
                                         if (t.editor[t.editor.length - 1].submited.length > 1) {
@@ -317,27 +333,16 @@
                                         }
                                         break;
                                     }
-                                case 2:
-                                    tr += '<span class="text-success">Q.A ok!</span>';
-                                    break;
-                                case 3:
-                                    tr += '<span class="text-success">DC ok!</span>'
-                                    break;
-                                case -2:
-                                    tr += '<span class="text-danger">Q.A rejected</span>';
-                                    break;
-                                case -3:
-                                    tr += '<span class="text-danger">DC rejected</span>';
-                                    break;
-                                case -4:
-                                    tr += '<span class="text-danger">Sale rejected</span>';
-                                    break;
-                                case -5:
-                                    tr += '<span class="text-danger">Canceled</span>';
-                                    break;
-                                case 4: tr += '<span class="text-success font-weight-bold">Upload</span>'; break;
+                                case 2: tr += '<span class="text-success">Q.A ok!</span>'; break;
+                                case 3: tr += '<span class="text-success">DC ok!</span>'; break;
+                                case 4: tr += '<span class="text-info font-weight-bold">Uploaded</span>'; break;
                                 case 5: tr += '<span class="text-success font-weight-bold">Done</span>'; break;
                                 case 6: tr += '<span class="text-success font-weight-bold">Finish</span>'; break;
+                                case -2: tr += '<span class="text-danger">Q.A rejected</span>'; break;
+                                case -3: tr += '<span class="text-danger">DC rejected</span>'; break;
+                                case -4: tr += '<span class="text-danger">Sale rejected</span>'; break;
+                                case -5: tr += '<span class="text-danger">Canceled</span>'; break;
+                                case -6: tr += '<span class="text-danger font-weight-bold">Customer CC</span>'; break;
 
                             }
                             tr += '</i></td>';
