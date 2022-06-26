@@ -52,6 +52,8 @@
     </ul>
 </nav>
 
+
+
 <script src="/js/common.js"></script>
 
 <script type='text/javascript'
@@ -109,7 +111,7 @@
                                     jobId = $(this).closest('tr').attr('id');
 
                                     await $.ajax({
-                                        url: '/tla/task/list',
+                                        url: '/tla/job/list-tasks',
                                         type: 'get',
                                         headers: {
                                             authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -119,142 +121,103 @@
                                         },
                                         success: function (data) {
                                             let idx = 1;
-                                            data.tasks.forEach(t => {
+
+                                            data.children.forEach(c => {
                                                 newRow += '<tr>';
-                                                newRow += '<td class="text-right">' + (idx++) + '</td>';
-                                                newRow += '<td class="font-weight-bold text-primary">';
-                                                if (t.status == -10) {
-                                                    newRow += '<i class="fa fa-pause text-danger" aria-hidden="true" style="margin-right: 10px;"></i>';
-                                                }
-                                                newRow += t.basic.level.name;
-                                                if (t.fixible_task || t.additional_task) {
-                                                    newRow += '<span class="font-weight-bold text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>';
-                                                }
-                                                newRow += '</td>';
-                                                newRow += '<td>';
-                                                if (t.editor.length > 0) {
-                                                    newRow += t.editor[t.editor.length - 1].staff.username;
-                                                }
-                                                newRow += '</td>';
-
-                                                newRow += '<td class="text-center">';
-                                                if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                                                    newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount;
-                                                }
-                                                newRow += '</td>';
-
-                                                newRow += '<td>';
-                                                if (t.qa.length > 0) {
-                                                    newRow += t.qa[t.qa.length - 1].staff.username;
-                                                }
-                                                newRow += '</td>';
-
-                                                newRow += '<td>';
-                                                if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
-                                                    newRow += t.dc[t.dc.length - 1].staff.username;
-                                                }
-                                                newRow += '</td>';
-
-
-
-                                                newRow += '<td>';
-                                                if (t.tla.uploaded.length > 0) {
-                                                    newRow += t.tla.uploaded[t.tla.uploaded.length - 1].by.fullname;
-                                                }
-                                                newRow += '</td>';
-
-                                                newRow += '<td>';
-                                                if (t.tla.uploaded.length > 0) {
-                                                    newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
-                                                }
-                                                newRow += '</td>';
-
-                                                newRow += '<td  class="text-center">';
-                                                if (isValidHttpUrl(t.basic.link.input)) {
-                                                    newRow += '<a href="' + t.basic.link.input + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
-                                                } else {
-                                                    newRow += t.basic.link.input;
-                                                }
-                                                newRow += '</td>';
-
-                                                newRow += '<td class="text-center">';
-                                                if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                                                    if (isValidHttpUrl(t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link)) {
-                                                        newRow += '<a href="' + t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
-                                                    } else {
-                                                        newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link;
-                                                    }
-                                                }
-
-                                                newRow += '</td>';
-
-
-
-                                                newRow += '<td  class="text-center">';
-
-                                                if (t.tla.uploaded.length > 0) {
-                                                    if (isValidHttpUrl(t.tla.uploaded[t.tla.uploaded.length - 1].link)) {
-                                                        newRow += '<a href="' + t.tla.uploaded[t.tla.uploaded.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
-                                                    } else {
-                                                        newRow += t.tla.uploaded[t.tla.uploaded.length - 1].link
-                                                    }
-                                                }
-
-                                                newRow += '</td>';
-
-
-
-                                                newRow += '<td><i>';
-
-                                                switch (t.status) {
-                                                    case -10: newRow += '<span class="text-danger font-weight-bold">Wait</span>';
-                                                        break;
-                                                    case -1: newRow += '<span class="text-info">Initial</span>';
-                                                        break;
-                                                    case 0: newRow += '<span class="text-info">Processing</span>';
-                                                        break;
-                                                    case 1:
-                                                        {
-                                                            if (t.editor[t.editor.length - 1].submited.length > 1) {
-                                                                newRow += '<span class="text-primary">Fixed</span>';
-                                                            } else {
-                                                                newRow += '<span class="text-primary">Edited</span>';
-                                                            }
-                                                            break;
-                                                        }
-                                                    case 2:
-                                                        newRow += '<span class="text-success">Q.A ok!</span>';
-                                                        break;
-                                                    case 3:
-                                                        newRow += '<span class="text-success">DC ok!</span>'
-                                                        break;
-                                                    case -2:
-                                                        newRow += '<span class="text-danger">Q.A rejected</span>';
-                                                        break;
-                                                    case -3:
-                                                        newRow += '<span class="text-danger">DC rejected</span>';
-                                                        break;
-                                                    case -4:
-                                                        newRow += '<span class="text-danger">Sale rejected</span>';
-                                                        break;
-                                                    case -5:
-                                                        newRow += '<span class="text-danger">Canceled</span>';
-                                                        break;
-                                                    case -6:
-                                                        newRow += '<span class="text-danger">Customer Rejected</span>';
-                                                        break;
-                                                    case 4: newRow += '<span class="text-success font-weight-bold">Upload</span>'; break;
-                                                    case 5: newRow += '<span class="text-success font-weight-bold">Done</span>'; break;
-                                                    case 6: newRow += '<span class="text-success font-weight-bold">Finish</span>'; break;
+                                               
+                                                if (c.parents.tasks.length > 0) {
 
                                                 }
-                                                newRow += '</i></td>';
-
-
-                                                // newRow += '<td class="text-center">';
-                                                // newRow += '<input type="checkbox" name="check_task">'
-                                                // newRow += '</td>';
+                                                if (c.root.tasks.length > 0) {
+                                                    newRow += '<td rowspan="'+(c.root.tasks.length + 1)+'" class="text-danger font-weight-bold">'+c.root.ref.name + '</td>'
+                                                }
+                                               
                                                 newRow += '</tr>';
+
+                                                c.root.tasks.forEach(t => {                                                   
+                                                    newRow += '<tr>';
+                                                    newRow += '<td class="font-weight-bold text-primary">';
+                                                        newRow += t.basic.level.name;
+                                                        if(t.status === -10){
+                                                            newRow += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true" ></i>';
+                                                        }
+                                                        newRow += '</td>';
+
+                                                    newRow += '<td>';
+                                                    if (t.editor.length > 0) {
+                                                        newRow += t.editor[t.editor.length - 1].staff.username;
+                                                    }
+                                                    newRow += '</td>';
+
+                                                    newRow += '<td>';
+                                                    if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                                                        newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount;
+                                                    }
+                                                    newRow += '</td>';
+
+                                                    newRow += '<td>';
+                                                    if (t.qa.length > 0) {
+                                                        newRow += t.qa[t.qa.length - 1].staff.username;
+                                                    }
+                                                    newRow += '</td>';
+
+                                                    newRow += '<td>';
+                                                    if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
+                                                        t.dc[t.dc.length - 1].staff.username;
+                                                    }
+                                                    newRow += '</td>';
+
+                                                    newRow += '<td>';
+                                                    if (t.tla.uploaded.length > 0) {
+                                                        newRow += t.tla.uploaded[t.tla.uploaded.length - 1].by.username;
+                                                    }
+                                                    newRow += '</td>';
+
+                                                    newRow += '<td>';
+                                                    if (t.tla.uploaded.length > 0) {
+                                                        newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
+                                                    }
+                                                    newRow += '</td>';
+
+                                                    newRow += '<td>';
+                                                    newRow += '</td>';
+
+                                                    newRow += '<td>';
+                                                    newRow += '</td>';
+
+                                                    newRow += '<td>';
+                                                    newRow += '</td>';
+
+                                                    newRow += '<td>';
+                                                    switch (t.status) {
+                                                        case -10: newRow += '<span class="text-danger font-weight-bold">Wait</span>'; break;
+                                                        case -1: newRow += '<span class="text-info">Initial</span>'; break;
+                                                        case 0: newRow += '<span class="text-info">Processing</span>'; break;
+                                                        case 1:
+                                                            {
+                                                                if (t.editor[t.editor.length - 1].submited.length > 1) {
+                                                                    newRow += '<span class="text-primary">Fixed</span>';
+                                                                } else {
+                                                                    newRow += '<span class="text-primary">Edited</span>';
+                                                                }
+                                                                break;
+                                                            }
+                                                        case 2: newRow += '<span class="text-success">Q.A ok!</span>'; break;
+                                                        case 3: newRow += '<span class="text-success">DC ok!</span>'; break;
+                                                        case 4: newRow += '<span class="text-info font-weight-bold">Uploaded</span>'; break;
+                                                        case 5: newRow += '<span class="text-success font-weight-bold">Done</span>'; break;
+                                                        case 6: newRow += '<span class="text-success font-weight-bold">Finish</span>'; break;
+                                                        case -2: newRow += '<span class="text-danger">Q.A rejected</span>'; break;
+                                                        case -3: newRow += '<span class="text-danger">DC rejected</span>'; break;
+                                                        case -4: newRow += '<span class="text-danger">Sale rejected</span>'; break;
+                                                        case -5: newRow += '<span class="text-danger">Canceled</span>'; break;
+                                                        case -6: newRow += '<span class="text-danger font-weight-bold">Customer CC</span>'; break;
+                                                    }
+                                                    newRow += '</td>';
+
+                                                    newRow += '</tr>';
+                                                })
+
                                             })
                                         }
                                     })
@@ -317,8 +280,10 @@
 
                                             let tr = '<tr id="' + job._id + '" data-customer="' + job.customer._id + '">';
                                             tr += '<td>';
-                                            if (job.tasks.length > 0) {
-                                                tr += '<button class="btn btn-xs btn-info parents js-view-parents" name="js-view-parents"> (' + job.tasks.length + ') <i class="fa fa-plus"></i></button>';
+                                            if (job.details.length > 0) {
+                                                tr += '<button class="btn btn-xs btn-info parents js-view-parents" name="js-view-parents"> (';
+                                                tr += job.details[job.details.length - 1].root ? job.details[job.details.length - 1].root.tasks.length : job.details[job.details.length - 1].parents.tasks.length;
+                                                tr += ') <i class="fa fa-plus"></i></button>';
                                             }
                                             tr += '</td>';
                                             tr += '<td>' + (++idx) + '</td>'

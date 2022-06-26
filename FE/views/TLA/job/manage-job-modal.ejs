@@ -721,8 +721,9 @@
   });
 
   $("#btnSubmit").click(function () {
+    let customer_level = $('#slCustomerLevles option:selected').val();
+    let is_root =  ($('#slCustomerLevles option:selected').data('root'))=='1'?true:false;
     let level = $("#slLocalLevels option:selected").val();
-    let name = $("#slJobLevels option:selected").text();
 
     let assigned_date = strToDate($('#txtAssignDate').val());
     let deadline = strToDate($('#txtDeadline').val());
@@ -751,6 +752,8 @@
         },
         data: {
           jobId,
+          customer_level,
+          is_root,
           level,
           assigned_date,
           deadline,

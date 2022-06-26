@@ -49,6 +49,37 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
     })
 })
 
+router.get('/list-tasks',authenticateTLAToken,async (req,res)=>{
+    let {jobId} = req.query;
+    let job = await Job.findById(jobId)
+    .populate([
+        {
+            path:'details.root.ref'  ,
+            select:'name'            
+        },
+        {
+            path:'details.root.tasks',
+            populate:[
+               { path:'basic.level'},
+               {path:'editor.staff'},
+               {path:'qa.staff'},
+               {path:'dc.staff'},
+               {path:'tla.uploaded.by'},
+            ]
+        },
+        {path:'details.parents.ref'}
+    ]);
+    if(!job){
+        return res.status(404).json({
+            msg:`Can not list task belong to job cause job not found!`
+        })
+    }
+    return res.status(200).json({
+        msg:`List tasks based on job successfully!`,
+        children: job.details
+    })
+})
+
 router.get('/detail', authenticateTLAToken, async (req, res) => {
 
     let { jobId } = req.query;

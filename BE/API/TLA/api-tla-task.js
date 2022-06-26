@@ -438,9 +438,9 @@ router.get('/all', authenticateTLAToken, async (req, res) => {
                 }
             },
             { path: 'basic.level', select: 'name' },
-            { path: 'editor.staff', select: 'username fullname'},
-            { path: 'qa.staff' , select: 'username fullname'},
-            { path: 'dc.staff' , select: 'username fullname'},
+            { path: 'editor.staff', select: 'username fullname' },
+            { path: 'qa.staff', select: 'username fullname' },
+            { path: 'dc.staff', select: 'username fullname' },
             { path: 'remarks' },
             { path: 'bp.bpId', select: 'is_bonus' }
         ]);
@@ -566,6 +566,8 @@ router.get('/detail', authenticateTLAToken, async (req, res) => {
 router.post('/', authenticateTLAToken, async (req, res) => {
     let {
         jobId,
+        customer_level,
+        is_root,
         level,
         assigned_date,
         deadline,
@@ -575,7 +577,6 @@ router.post('/', authenticateTLAToken, async (req, res) => {
         editor,
         start
     } = req.body;
-
 
 
     let task = new Task();
@@ -613,7 +614,7 @@ router.post('/', authenticateTLAToken, async (req, res) => {
 
     await task.save()
         .then(async _ => {
-            Promise.all([PushTaskIntoJob(jobId, task._id), UpdateEditor(task._id, level, editor, req.user._id)])
+            Promise.all([PushTaskIntoJob(jobId, task._id, customer_level, is_root), UpdateEditor(task._id, level, editor, req.user._id)])
                 .then(_async => {
                     UpdateQA(task._id, level, qa, req.user._id)
                         .then(_ => {
@@ -652,31 +653,31 @@ router.put('/upload', authenticateTLAToken, async (req, res) => {
     }
 
     task.remarks.push({
-        content:remark,
-        created:{
-            at:new Date(),
-            by:req.user._id
+        content: remark,
+        created: {
+            at: new Date(),
+            by: req.user._id
         }
     })
     task.status = 4;
 
     task.tla.uploaded.push({
         at: new Date(),
-        by:req.user._id,
-        link:uploaded_link
+        by: req.user._id,
+        link: uploaded_link
     });
 
     await task.save()
-    .then(_=>{
-        return res.status(200).json({
-            msg:`The task has been uploaded!`
+        .then(_ => {
+            return res.status(200).json({
+                msg: `The task has been uploaded!`
+            })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not upload this task with error: ${new Error(err.message)}`
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not upload this task with error: ${new Error(err.message)}`
+            })
         })
-    })
 })
 
 router.put('/cancel', authenticateTLAToken, (req, res) => {
@@ -837,7 +838,7 @@ router.delete('/', authenticateTLAToken, async (req, res) => {
 
 module.exports = router;
 
-const PushTaskIntoJob = (jobId, taskId) => {
+const PushTaskIntoJob = (jobId, taskId, customer_level, is_root) => {
     return new Promise(async (resolve, reject) => {
         let job = await Job.findById(jobId);
         if (!job) {
@@ -846,7 +847,33 @@ const PushTaskIntoJob = (jobId, taskId) => {
                 msg: `Job not found!`
             })
         }
-        job.tasks.push(taskId);
+
+        if (job.details.length == 0) {
+            if (is_root == 'true') {
+                job.details.push({
+                    root: {
+                        ref: customer_level,
+                        tasks: [taskId]
+                    }
+                })
+            } else {
+                job.details.push({
+                    parents: {
+                        ref: customer_level,
+                        tasks: [taskId]
+                    }
+                })
+            }
+        } else {
+            if(is_root == 'true'){
+                let chk  = job.details.filter(x=>x.root.ref == customer_level);
+                chk[0].root.tasks.push(taskId);
+
+            }else{
+                let chk  = job.details.filter(x=>x.parents.ref == customer_level);
+                chk[0].parents.tasks.push(taskId);
+            }
+        }
         await job.save()
             .then(_ => {
                 return resolve(job);
