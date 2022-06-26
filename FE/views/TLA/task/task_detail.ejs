@@ -245,29 +245,22 @@
 
 
 
-                if (data.customer.is_align) {
-                    $('#divAlign').html('<i class="fa fa-check-square-o"></i>  <span class="text-warning">' + data.customer.align_note + '</span>');
-                } else {
-                    $('#divAlign').html('<i class="fa fa-square-o"></i>');
-                }
-
-
-                if (data.customer.has_sky) {
-                    $('#divSky').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.sky_note + '</span>');
+                if (data.customer.style.sky.checked) {
+                    $('#divSky').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.style.sky.note + '</span>');
                 } else {
                     $('#divSky').html('<i class="fa fa-square-o"></i>');
                 }
 
 
-                if (data.customer.has_TV) {
-                    $('#divTV').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.TV_note + '</span>');
+                if (data.customer.style.tv.checked) {
+                    $('#divTV').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.style.tv.note + '</span>');
                 } else {
                     $('#divTV').html('<i class="fa fa-square-o"></i>');
                 }
 
 
-                if (data.customer.has_fire) {
-                    $('#divFire').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.fire_note + '</span>');
+                if (data.customer.style.fire.checked) {
+                    $('#divFire').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.style.fire.note + '</span>');
                 } else {
                     $('#divFire').html('<i class="fa fa-square-o"></i>');
                 }

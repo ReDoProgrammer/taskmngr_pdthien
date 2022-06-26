@@ -159,9 +159,9 @@
         }
     })
 
-    $("#modalTaskDetail").on('shown.bs.modal',async function (e) {
+    $("#modalTaskDetail").on('shown.bs.modal', async function (e) {
         $('#job-info').hide();
-       await LoadTaskDetail();
+        await LoadTaskDetail();
     });
 
     $('#btnCopyToClipboard').click(function () {
@@ -174,8 +174,8 @@
         )
     })
 
-    function LoadTaskDetail(){
-       return $.ajax({
+    function LoadTaskDetail() {
+        return $.ajax({
             url: '/editor/task/detail',
             type: 'get',
             headers: {
@@ -197,7 +197,7 @@
 
                 $('#lblLevelName').text(data.task.basic.level.name);
                 $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.basic.deadline.begin));
-                if (data.task.basic.deadline.end) {                    
+                if (data.task.basic.deadline.end) {
                     $('#lblDeadline').text(convertISODateToTimeFormat(data.task.basic.deadline.end));
                 } else {
                     $('#lblDeadline').text('');
@@ -227,7 +227,7 @@
                 }
 
                 if (data.task.status === 4) {//uploaded
-                    $('#divOutputLink').html('<a href="' + data.task.tla.uploaded[data.task.tla.uploaded.length-1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                    $('#divOutputLink').html('<a href="' + data.task.tla.uploaded[data.task.tla.uploaded.length - 1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
                 } else {
                     if (data.task.editor && data.task.editor.length > 0) {
                         if (data.task.editor[data.task.editor.length - 1].submited.length > 0 && data.task.editor[data.task.editor.length - 1].submited) {
@@ -245,29 +245,29 @@
 
 
 
-                if (data.customer.is_align) {
-                    $('#divAlign').html('<i class="fa fa-check-square-o"></i>  <span class="text-warning">' + data.customer.align_note + '</span>');
+                if (data.customer.style.align.checked) {
+                    $('#divAlign').html('<i class="fa fa-check-square-o"></i>  <span class="text-warning">' + data.customer.style.align.note + '</span>');
                 } else {
                     $('#divAlign').html('<i class="fa fa-square-o"></i>');
                 }
 
 
-                if (data.customer.has_sky) {
-                    $('#divSky').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.sky_note + '</span>');
+                if (data.customer.style.sky.checked) {
+                    $('#divSky').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.style.sky.note + '</span>');
                 } else {
                     $('#divSky').html('<i class="fa fa-square-o"></i>');
                 }
 
 
-                if (data.customer.has_TV) {
-                    $('#divTV').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.TV_note + '</span>');
+                if (data.customer.style.tv.checked) {
+                    $('#divTV').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.style.tv.note + '</span>');
                 } else {
                     $('#divTV').html('<i class="fa fa-square-o"></i>');
                 }
 
 
-                if (data.customer.has_fire) {
-                    $('#divFire').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.fire_note + '</span>');
+                if (data.customer.style.fire.checked) {
+                    $('#divFire').html('<i class="fa fa-check-square-o"></i>   <span class="text-warning">' + data.customer.style.fire.note + '</span>');
                 } else {
                     $('#divFire').html('<i class="fa fa-square-o"></i>');
                 }
