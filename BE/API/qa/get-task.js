@@ -136,14 +136,14 @@ const HaveJOB = (jobIds, jobLevelIds) => {
         Task
             //lấy những task chưa có qa nào nhận
             .findOne({
-                'basic.job': { $in: jobIds },              
+                'basic.job': { $in: jobIds },
                 status: 1// đã được editor submit
             })
             .or([
-                { 
+                {
                     qa: { $size: 0 },
-                    dc:{$size:0} 
-                },               
+                    dc: { $size: 0 }
+                },
                 { 'qa.visible': false }
             ])
             .sort({ 'basic.deadline.end': 1 })// sắp xếp tăng dần theo deadline
@@ -175,10 +175,10 @@ const NoJOB = (jobLevelIds) => {
                 status: 1// đã được editor submited
             })
             .or([
-                { 
+                {
                     qa: { $size: 0 },
-                    dc:{$size:0} 
-                },               
+                    dc: { $size: 0 }
+                },
                 { 'qa.visible': false }
             ])
             .sort({ 'basic.deadline.end': 1 })
