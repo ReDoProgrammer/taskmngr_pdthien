@@ -207,8 +207,10 @@ router.put('/reject', [authenticateDCToken, ValidateCheckIn], async (req, res) =
 
     task.remarks.push({
         content: remark,
-        by: req.user._id,
-        at: new Date()
+        created: {
+            by: req.user._id,
+            at: new Date()
+        }
     })
 
     task.status = -3;
