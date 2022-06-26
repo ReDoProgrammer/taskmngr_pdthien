@@ -61,13 +61,66 @@ const jobSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'combo'
     },
-    tasks: [{
-        type: Schema.Types.ObjectId,
-        ref: 'task'
+    details: [{
+        root:{
+            ref:{
+                type:Schema.Types.ObjectId,
+                ref:'root_level'
+            },
+            tasks:[{
+                type:Schema.Types.ObjectId,
+                ref:'task'
+            }]
+        },
+        parents:{
+            ref:{
+                type:Schema.Types.ObjectId,
+                ref:'parents_level'
+            },
+            tasks:[{
+                type:Schema.Types.ObjectId,
+                ref:'task'
+            }]
+        }
     }],
     cc: [{
-        type: Schema.Types.ObjectId,
-        ref: 'cc'
+        request: {
+            type: String
+        },
+        root:{
+            type:Schema.Types.ObjectId,
+            ref:'root_level'
+        },
+        parents:{
+            type:Schema.Types.ObjectId,
+            ref:'parents_level'
+        },
+        fee:{ 
+            type:Boolean,
+            default:false
+        },
+        tasks:[{
+            type:Schema.Types.ObjectId,
+            ref:'task'
+        }],
+        created:{
+            at: {
+                type: Schema.Types.ObjectId                
+            },
+            by:{
+                type: Schema.Types.ObjectId,
+                ref:'user'
+            }
+        },
+        requested:{
+            at:{
+                type: Date,
+            },
+            by:{
+                type:Schema.Types.ObjectId,
+                ref:'customer'
+            }
+        }
     }],
 
     created: {
@@ -130,9 +183,9 @@ const jobSchema = new Schema({
     ],
 
     //thuộc tính đánh dấu mức độ ưu tiên của job
-    urgent:{
-        type:Boolean,
-        default:false
+    urgent: {
+        type: Boolean,
+        default: false
     }
 });
 
