@@ -34,6 +34,7 @@
       <tr>
         <th scope="col">#</th>
         <th scope="col"></th>
+        <th scope="col" class="text-center">BP</th>
         <th scope="col">Customer</th>
         <th scope="col">Job</th>
         <th scope="col">Level</th>
@@ -307,6 +308,16 @@
                 tr += '<button class="btn btn-xs btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
                 tr += '</td>';
 
+                tr += '<td class="text-center">';
+                let p = t.bp.filter(x => x.bpId.is_bonus);
+                if (p.length > 0) {
+                  tr += '<button class="btn btn-xs btn-danger ml-1"><i class="fa fa-ban" aria-hidden="true"></i></button>';
+                }
+                if (t.bp.length > 0 && t.bp.length - p.length > 0) {
+                  tr += '<button class="btn btn-xs btn-success ml-1"><i class="fa fa-trophy" aria-hidden="true"></i></button>';
+                }
+                tr += '</td>';
+
                 tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.name.firstname + ' ' + t.basic.job.customer.name.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
 
                 tr += '<td class="font-weight-bold">';
@@ -314,6 +325,7 @@
                 if (t.fixible_task || t.additional_task) {
                   tr += '<span class="font-weight-bold text-danger ml-2"><i class="fa fa-cc" aria-hidden="true"></i></span>';
                 }
+
                 tr += '</td>';
 
                 tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';

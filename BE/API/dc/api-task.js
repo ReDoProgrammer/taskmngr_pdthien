@@ -12,7 +12,7 @@ const _MODULE = 'DC';
 const pageSize = 20;
 
 router.put('/mark', [authenticateDCToken, ValidateCheckIn], async (req, res) => {
-    let { taskId, bpId, remark } = req.body;
+    let { taskId, bpId, costs, remark } = req.body;
     let task = await Task.findById(taskId);
     if (!task) {
         return res.status(404).json({
@@ -20,40 +20,27 @@ router.put('/mark', [authenticateDCToken, ValidateCheckIn], async (req, res) => 
         });
     }
 
-    let rmk = new Remark({
-        user: req.user._id,
-        content: remark,
-        tid: taskId
+    task.bp.push({
+        bpId,
+        costs,
+        remark,
+        created: {
+            at: new Date(),
+            by: req.user._id
+        }
     });
 
-    await rmk.save()
-        .then(async r => {
-            task.bp.push(bpId);
-            task.updated_at = new Date();
-            task.updated_by = req.user._id;
-            task.remarks.push(r);
-
-            await task.save()
-                .then(_ => {
-                    return res.status(200).json({
-                        msg: `Mark task successfully!`
-                    })
-                })
-                .catch(err => {
-                    return res.status(500).json({
-                        msg: `Can not set mark into this task with error: ${new Error(err.message)}`
-                    })
-                })
+    await task.save()
+        .then(_ => {
+            return res.status(200).json({
+                msg: `Bonus/Penalty has been set successfully!`
+            })
         })
         .catch(err => {
             return res.status(500).json({
-                msg: `Can not create bonus penalty remark with error: ${new Error(err.message)}`
+                msg: `Can not set bonus/penalty with error: ${new Error(err.message)}`
             })
         })
-
-
-
-
 })
 
 router.put('/submit', [authenticateDCToken, ValidateCheckIn], async (req, res) => {
@@ -260,8 +247,9 @@ router.get('/personal-tasks', authenticateDCToken, async (req, res) => {
                 path: 'basic.level',
                 select: 'name'
             },
-            { path: 'editor.staff' },
-            { path: 'qa.staff' }
+            { path: 'editor.staff', select: 'username fullname' },
+            { path: 'qa.staff', select: 'username fullname' },
+            { path: 'bp.bpId', select: 'is_bonus' }
         ]);
 
     let count = await Task.countDocuments({});
@@ -302,7 +290,8 @@ router.get('/list', authenticateDCToken, async (req, res) => {
             { path: 'editor.staff', select: 'fullname username' },
             { path: 'qa.staff', select: 'fullname username' },
             { path: 'dc.staff', select: 'fullname username' },
-            { path: 'remarks' }
+            { path: 'remarks' },
+            { path: 'bp.bpId', select: 'is_bonus' }
         ]);
 
     let count = await Task.countDocuments({});
