@@ -187,8 +187,8 @@
                   if (t.fixible_task || t.additional_task) {
                     tr += '<span class="font-weight-bold text-danger ml-2"><i class="fa fa-cc" aria-hidden="true"></i></span>';
                   }
-                  if(t.status === -10){
-                    tr+='<i class="fa fa-pause text-danger ml-2" aria-hidden="true"></i>'
+                  if (t.status === -10) {
+                    tr += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true"></i>'
                   }
                   tr += '</td>';
                   tr += '<td class="text-center">';
@@ -237,12 +237,9 @@
                   tr += '<td><i>';
 
                   switch (t.status) {
-                    case -10: tr += '<span class="text-danger font-weight-bold">Wait</span>';
-                      break;
-                    case -1: tr += '<span class="text-info">Initial</span>';
-                      break;
-                    case 0: tr += '<span class="text-info">Processing</span>';
-                      break;
+                    case -10: tr += '<span class="text-danger font-weight-bold">Wait</span>'; break;
+                    case -1: tr += '<span class="text-info">Initial</span>'; break;
+                    case 0: tr += '<span class="text-info">Processing</span>'; break;
                     case 1:
                       {
                         if (t.editor[t.editor.length - 1].submited.length > 1) {
@@ -252,39 +249,25 @@
                         }
                         break;
                       }
-                    case 2:
-                      tr += '<span class="text-success">Q.A ok!</span>';
-                      break;
-                    case 3:
-                      tr += '<span class="text-success">DC ok!</span>'
-                      break;
-                    case -2:
-                      tr += '<span class="text-danger">Q.A rejected</span>';
-                      break;
-                    case -3:
-                      tr += '<span class="text-danger">DC rejected</span>';
-                      break;
-                    case -4:
-                      tr += '<span class="text-danger">Sale rejected</span>';
-                      break;
-                    case -5:
-                      tr += '<span class="text-danger">Canceled</span>';
-                    case -6:
-                      tr += '<span class="text-danger font-weight-bold">Customer CC</span>';
-                      break;
-                    case 4: tr += '<span class="text-success font-weight-bold">Upload</span>'; break;
+                    case 2: tr += '<span class="text-success">Q.A ok!</span>'; break;
+                    case 3: tr += '<span class="text-success">DC ok!</span>'; break;
+                    case 4: tr += '<span class="text-info font-weight-bold">Uploaded</span>'; break;
                     case 5: tr += '<span class="text-success font-weight-bold">Done</span>'; break;
                     case 6: tr += '<span class="text-success font-weight-bold">Finish</span>'; break;
-
+                    case -2: tr += '<span class="text-danger">Q.A rejected</span>'; break;
+                    case -3: tr += '<span class="text-danger">DC rejected</span>'; break;
+                    case -4: tr += '<span class="text-danger">Sale rejected</span>'; break;
+                    case -5: tr += '<span class="text-danger">Canceled</span>'; break;
+                    case -6: tr += '<span class="text-danger font-weight-bold">Customer CC</span>'; break;
                   }
                   tr += '</i></td>';
 
 
 
                   tr += '<td>';
-              
-                    tr += t.remarks[t.remarks.length - 1].content;
-                  
+
+                  tr += t.remarks[t.remarks.length - 1].content;
+
                   tr += '</td>';
 
 
