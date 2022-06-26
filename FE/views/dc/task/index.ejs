@@ -154,24 +154,16 @@
 
               let tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '">';
 
-              if (typeof t.bp !== 'undefined' && t.bp !== null && t.bp.length > 0) {
-                if (t.bp[0].is_bonus) {
-                  tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '" style="background-color: #E0F8E0">';
-                } else {
-                  tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '" style="background-color:#FBEFEF">';
-                }
-              }
-
               tr += '<td>' + (idx++) + '</td>';
               tr += '<td class="text-center">';
-                let p = t.bp.filter(x => x.bpId.is_bonus);
-                if (p.length > 0) {
-                  tr += '<button class="btn btn-xs btn-danger ml-1"><i class="fa fa-ban" aria-hidden="true"></i></button>';
-                }
-                if (t.bp.length > 0 && t.bp.length - p.length > 0) {
-                  tr += '<button class="btn btn-xs btn-success ml-1"><i class="fa fa-trophy" aria-hidden="true"></i></button>';
-                }
-                tr += '</td>';
+              let p = t.bp.filter(x => x.bpId.is_bonus);
+              if (p.length > 0) {
+                tr += '<button class="btn btn-xs btn-danger ml-1"><i class="fa fa-ban" aria-hidden="true"></i></button>';
+              }
+              if (t.bp.length > 0 && t.bp.length - p.length > 0) {
+                tr += '<button class="btn btn-xs btn-success ml-1"><i class="fa fa-trophy" aria-hidden="true"></i></button>';
+              }
+              tr += '</td>';
 
               tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.name.firstname + ' ' + t.basic.job.customer.name.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
               tr += '<td class="font-weight-bold text-danger">' + t.basic.job.name + '</td>';

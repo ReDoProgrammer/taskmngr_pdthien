@@ -34,11 +34,11 @@
 
                 <th scope="col">#</th>
                 <th scope="col"></th>
-                <th scope="col"></th>
+                <th scope="col" class="text-center">BP</th>
                 <th scope="col">Customer</th>
                 <th scope="col">Job</th>
                 <th scope="col">Level</th>
-                <th scope="col" class="text-center">Urgent</th>              
+                <th scope="col" class="text-center">Urgent</th>
                 <th scope="col">Begin date</th>
                 <th scope="col">Deadline</th>
                 <th scope="col">Editor</th>
@@ -304,28 +304,21 @@
                                             let idx = ((page - 1) * data.pageSize);
                                             data.tasks.forEach(t => {
                                                 let tr = '<tr id="' + t._id + '"  data-level="' + t.basic.level._id + '">';
-                                                // if (t.bp.length > 0) {
-                                                //     if (t.bp[t.bp.length - 1].is_bonus) {
-                                                //         tr = '<tr id="' + t._id + '" data-customer = "' + t.basic.job.customer + '" data-level="' + t.basic.level._id + '" style="background-color: #A9F5F2">';
-                                                //     } else {
-                                                //         tr = '<tr id="' + t._id + '" data-customer = "' + t.basic.job.customer + '" data-level="' + t.basic.level._id + '" style="background-color: #F6E3CE">';
-                                                //     }
-                                                // }
+                                                
                                                 tr += '<td>' + (++idx) + '</td>';
 
                                                 tr += '<td>';
-                                                // if (t.bp.length > 0) {
-                                                //     if (t.bp[t.bp.length - 1].is_bonus) {
-                                                //         tr += '<span class="text-success"><i class="fa fa-trophy" aria-hidden="true"></i></span>'
-
-                                                //     } else {
-                                                //         tr += '<span class="text-danger"><i class="fa fa-credit-card" aria-hidden="true"></i></span>'
-                                                //     }
-                                                // }
-                                                tr += '</td>'
-
-                                                tr += '<td>';
                                                 tr += '<button class="btn btn-xs btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
+                                                tr += '</td>';
+
+                                                tr += '<td class="text-center">';
+                                                let p = t.bp.filter(x => x.bpId.is_bonus);
+                                                if (p.length > 0) {
+                                                    tr += '<button class="btn btn-xs btn-danger ml-1"><i class="fa fa-ban" aria-hidden="true"></i></button>';
+                                                }
+                                                if (t.bp.length > 0 && t.bp.length - p.length > 0) {
+                                                    tr += '<button class="btn btn-xs btn-success ml-1"><i class="fa fa-trophy" aria-hidden="true"></i></button>';
+                                                }
                                                 tr += '</td>';
 
                                                 tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.name.firstname + ' ' + t.basic.job.customer.name.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
@@ -336,7 +329,7 @@
                                                     tr += '<span class="ml-2 text-danger font-weight-bold"><i class="fa fa-cc" aria-hidden="true"></i></span>'
                                                 }
                                                 tr += '</td>';
-                                                tr += '<td class="text-warning font-weight-bold">';                                             
+                                                tr += '<td class="text-warning font-weight-bold">';
 
                                                 tr += t.basic.level.name;
                                                 if (t.status == -10) {

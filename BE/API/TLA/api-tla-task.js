@@ -441,7 +441,8 @@ router.get('/all', authenticateTLAToken, async (req, res) => {
             { path: 'editor.staff', select: 'username fullname'},
             { path: 'qa.staff' , select: 'username fullname'},
             { path: 'dc.staff' , select: 'username fullname'},
-            { path: 'remarks' }
+            { path: 'remarks' },
+            { path: 'bp.bpId', select: 'is_bonus' }
         ]);
 
     let count = await Task.countDocuments({});
