@@ -406,28 +406,12 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
 
     let tasks = await Task.find({ 'basic.job': jobId })
         .populate([
-            {
-                path: 'basic.job',
-                select: 'name urgent'
-            },
-            {
-                path: 'basic.level',
-                select: 'name'
-            },
-            {
-                path: 'editor.staff',
-                select: 'fullname username'
-            },
-            {
-                path: 'qa.staff',
-                select: 'fullname username'
-
-            }
-
+            { path: 'basic.job', select: 'name urgent' },
+            { path: 'basic.level', select: 'name' },
+            { path: 'editor.staff', select: 'fullname username' },
+            { path: 'qa.staff', select: 'fullname username' },
+            { path: 'dc.staff' }
         ]);
-
-
-
     return res.status(200).json({
         msg: `Load tasks based on job successfully!`,
         tasks
@@ -453,12 +437,10 @@ router.get('/all', authenticateTLAToken, async (req, res) => {
                     select: 'name.firstname name.lastname'
                 }
             },
-            {
-                path: 'basic.level',
-                select: 'name'
-            },
-            { path: 'editor.staff' },
-            { path: 'qa.staff' },
+            { path: 'basic.level', select: 'name' },
+            { path: 'editor.staff', select: 'username fullname'},
+            { path: 'qa.staff' , select: 'username fullname'},
+            { path: 'dc.staff' , select: 'username fullname'},
             { path: 'remarks' }
         ]);
 
@@ -668,53 +650,32 @@ router.put('/upload', authenticateTLAToken, async (req, res) => {
         })
     }
 
-    if (task.status == 1 && task.qa.length > 0) {
-        return res.status(403).json({
-            msg: `You can not upload this task ultil Q.A submit it!`
-        })
-    }
+    task.remarks.push({
+        content:remark,
+        created:{
+            at:new Date(),
+            by:req.user._id
+        }
+    })
+    task.status = 4;
 
-    if (task.status == 2 && task.dc.length > 0) {
-        return res.status(403).json({
-            msg: `You can not upload this task ultil DC submit it!`
-        })
-    }
-
-    let rmk = new Remark({
-        user: req.user._id,
-        content: remark,
-        tid: task._id
+    task.tla.uploaded.push({
+        at: new Date(),
+        by:req.user._id,
+        link:uploaded_link
     });
 
-    await rmk.save()
-        .then(async r => {
-            task.status = 4;
-            let up = {
-                at: new Date(),
-                by: req.user._id,
-                link: uploaded_link
-            };
-
-            task.tla.uploaded.push(up);
-            task.remarks.push(r);
-
-            await task.save()
-                .then(_ => {
-                    return res.status(200).json({
-                        msg: `The task has been uploaded!`
-                    })
-                })
-                .catch(err => {
-                    return res.status(500).json({
-                        msg: `Can not upload this task with error: ${new Error(err.message)}`
-                    })
-                })
+    await task.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`The task has been uploaded!`
         })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not create remark when upload this task with error: ${new Error(err.message)}`
-            })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not upload this task with error: ${new Error(err.message)}`
         })
+    })
 })
 
 router.put('/cancel', authenticateTLAToken, (req, res) => {

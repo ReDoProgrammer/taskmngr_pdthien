@@ -7,6 +7,7 @@
       <option value="0">Editing</option>
       <option value="2">Q.A submited</option>
       <option value="3">DC submited</option>
+      <option value="4">Uploaded</option>
       <option value="-2">Q.A rejected</option>
       <option value="-3">DC rejected</option>
       <option value="-4">Canceled</option>
@@ -70,7 +71,7 @@
       var taskId = '';
 
       $(document).ready(function () {
-        $('#slStatus').val([-10, -4, -3, -2, -1, 0, 1, 2, 3]).selectpicker('refresh');
+        $('#slStatus').val([-10, -4, -3, -2, -1, 0, 1, 2, 3, 4]).selectpicker('refresh');
         LoadTasks();
         setInterval(function () {
           LoadTasks();
@@ -192,14 +193,14 @@
 
               tr += '<td>';
               if (typeof t.remarks[0] !== 'undefined') {
-                tr += t.remarks[t.remarks.length-1].content;
+                tr += t.remarks[t.remarks.length - 1].content;
               }
               tr += '</td>';
 
 
               tr += '<td class="text-right">';
               if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                tr += t.editor[t.editor.length-1].submited.length;
+                tr += t.editor[t.editor.length - 1].submited.length;
               }
               tr += '</td>';
 
@@ -212,7 +213,7 @@
 
 
               tr += '<td>';
-              if (t.editor.length>0) {
+              if (t.editor.length > 0) {
                 tr += t.editor[t.editor.length - 1].staff.username;
               }
               tr += '</td>';
@@ -254,6 +255,11 @@
                 case 3:
                   tr += '<span class="text-success">DC ok!</span>'
                   break;
+                case 4:
+                  tr += '<span class="text-success">Uploaded</span>'
+                  break;
+                case 5: tr += '<span class="text-success font-weight-bold">Done</span>'; break;
+                case 6: tr += '<span class="text-success font-weight-bold">Finish</span>'; break;
                 case -2:
                   tr += '<span class="text-danger">Q.A rejected</span>';
                   break;
@@ -269,9 +275,7 @@
                 case -6:
                   tr += '<span class="text-danger font-weight-bold">CC reject</span>';
                   break;
-                case 4: tr += '<span class="text-success font-weight-bold">Upload</span>'; break;
-                case 5: tr += '<span class="text-success font-weight-bold">Done</span>'; break;
-                case 6: tr += '<span class="text-success font-weight-bold">Finish</span>'; break;
+
 
               }
               tr += '</i></td>';
