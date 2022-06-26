@@ -221,8 +221,6 @@ const taskSchema = new Schema({
 
     },
 
-
-
     tla: {
         created: {
             at: {
@@ -260,19 +258,6 @@ const taskSchema = new Schema({
 
     },
 
-    //thông tin liên quan tới Sale submit
-    done: [
-        {
-            at: {
-                type: Date
-            },
-            by: {
-                type: Schema.Types.ObjectId,
-                ref: 'user'
-            }
-        }
-    ],
-
 
     //thông tin liên quan tới kế toán
     finished: {
@@ -288,8 +273,6 @@ const taskSchema = new Schema({
             default: false
         }
     },
-
-
 
     canceled: {
         reason: {
@@ -336,7 +319,26 @@ const taskSchema = new Schema({
         //thuộc tính tham chiếu tới cột additional_tasks trong cc model
         type:Schema.Types.ObjectId,
         ref:'cc'
+    },
+
+    //thong tinh danh dau thuong/phat tu Sale
+    bonus:{
+        type:Boolean,
+        default:false,
+        marker: {
+            type: Schema.Types.ObjectId,
+            ref:'user'
+        }
+    },
+    penalty:{
+        type:Boolean,
+        default:false,
+        marker: {
+            type: Schema.Types.ObjectId,
+            ref:'user'
+        }
     }
+
 
 });
 
