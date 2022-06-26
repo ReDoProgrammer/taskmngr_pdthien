@@ -75,13 +75,17 @@
                 remark: $('#txtUploadRemark').val()
             },
             success: function (data) {
-                alert(data.msg);
+                Swal.fire(
+                    'Done!',
+                    data.msg,
+                    'success'
+                )
                 $("#uploadTaskModal").modal('hide');
             }
         })
     })
 
     $('#uploadTaskModal').on('hidden.bs.modal', function () {
-        LoadTasksList();
+        LoadTasks();
     })
 </script>

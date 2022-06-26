@@ -51,7 +51,11 @@
                 remark
             },
             success: function (data) {
-                alert(data.msg);
+                Swal.fire(
+                    'Done!',
+                    data.msg,
+                    'success'
+                )
                 $('#modalRejectTask').modal('hide');
                 LoadTasks();
             },

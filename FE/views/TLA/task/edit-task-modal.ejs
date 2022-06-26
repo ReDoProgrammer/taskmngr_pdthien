@@ -144,8 +144,7 @@
             },
             success: function (data) {
                 levelId = data.task.basic.level._id;
-
-                console.log(data.task);
+               
                 $('#name_case').text(data.task.basic.job.name);
                 $('#customer').text(data.customer.firstname + ' ' + data.customer.lastname);
 
@@ -263,7 +262,11 @@
                 editor
             },
             success: function (data) {
-                alert(data.msg);
+                Swal.fire(
+                    'Done!',
+                    data.msg,
+                    'success'
+                )
                 LoadTasksList();
                 $('#editTaskModal').modal('hide');
 
