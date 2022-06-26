@@ -173,7 +173,10 @@ const NoJOB = (jobLevelIds) => {
                 status: 1// đã được editor submited
             })
             .or([
-                { qa: { $size: 0 } },               
+                { 
+                    qa: { $size: 0 },
+                    dc:{$size:0} 
+                },               
                 { 'qa.visible': false }
             ])
             .sort({ 'basic.deadline.end': 1 })

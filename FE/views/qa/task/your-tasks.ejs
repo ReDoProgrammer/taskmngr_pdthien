@@ -46,6 +46,7 @@
                 <th scope="col" class="text-right">E-N</th>
                 <th scope="col" class="text-right">E-T</th>
                 <th scope="col">Editor</th>
+                <th scope="col">DC</th>
                 <th scope="col">Status</th>
                 <th scope="col"></th>
             </tr>
@@ -307,9 +308,15 @@
                             tr += '<td>';
 
                             if (t.status !== -1) {
-                                tr += t.editor[t.editor.length - 1].staff.fullname;
+                                tr += t.editor[t.editor.length - 1].staff.username;
                             }
                             tr += '</td>';
+
+                            tr+='<td>';
+                                if(t.dc.length>0 && !t.dc[t.dc.length-1].unregisted){
+                                   tr+= t.dc[t.dc.length-1].staff.username;
+                                }
+                                tr+='</td>';
 
 
                             tr += '<td><i>';

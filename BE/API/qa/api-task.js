@@ -206,8 +206,9 @@ router.get('/personal', authenticateQAToken, async (req, res) => {
                 path: 'basic.level',
                 select: 'name'
             },
-            { path: 'editor.staff' },
-            { path: 'qa.staff' },
+            { path: 'editor.staff', select:'username fullname' },
+            { path: 'qa.staff', select:'username fullname' },
+            { path: 'dc.staff', select:'username fullname' },
             { path: 'remarks' }
         ]);
 
