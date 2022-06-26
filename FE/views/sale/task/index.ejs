@@ -253,14 +253,12 @@
 
 
                             tr += '<td>';
-                            if (typeof t.remarks[0] !== 'undefined') {
-                                tr += t.remarks[0].content;
-                            }
+                            tr += t.remarks[t.remarks.length - 1].content;
                             tr += '</td>';
 
                             tr += '<td class="text-right">';
                             if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                                tr += t.editor[0].submited.length;
+                                tr += t.editor[t.editor.length - 1].submited.length;
                             }
                             tr += '</td>';
 
@@ -284,7 +282,7 @@
 
 
                             tr += '<td>';
-                            if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
+                            if (t.qa.length > 0) {
                                 tr += t.qa[t.qa.length - 1].staff.username
                             }
                             tr += '</td>';

@@ -1,7 +1,9 @@
 const router = require('express').Router();
 const { authenticateSaleToken } = require("../../../middlewares/sale-middleware");
 const Task = require('../../models/task-model');
-const { getCustomer, getTaskDetail, getModule, getWage } = require('../common');
+const {
+    GetTask,
+    GetCustomerById } = require('../common');
 
 const pageSize = 20;
 
@@ -101,14 +103,14 @@ router.get('/all', authenticateSaleToken, async (req, res) => {
 
 router.get('/detail', authenticateSaleToken, (req, res) => {
     let { taskId } = req.query;
-    getTaskDetail(taskId)
-        .then(async task => {
-            await getCustomer(task.basic.job.customer)
+    GetTask(taskId)
+        .then(task => {
+            GetCustomerById(task.basic.job.customer)
                 .then(customer => {
                     return res.status(200).json({
-                        msg: `Get task info successfully!`,
-                        customer,
-                        task
+                        msg: `Get task detail successfully!`,
+                        task,
+                        customer
                     })
                 })
                 .catch(err => {
