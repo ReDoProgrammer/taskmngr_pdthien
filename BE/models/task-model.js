@@ -322,23 +322,24 @@ const taskSchema = new Schema({
     },
 
     //thong tinh danh dau thuong/phat tu Sale
-    bonus:{
-        type:Boolean,
-        default:false,
-        marker: {
+    bp:[{
+        bpId:{
+            type: Schema.Types.ObjectId,
+            ref:'bonus_penalty'
+        },
+        costs:{
+            type:Number
+        },
+        remark:{
+            type:String,
+            default:''
+        },
+        staffs:[{
             type: Schema.Types.ObjectId,
             ref:'user'
-        }
-    },
-    penalty:{
-        type:Boolean,
-        default:false,
-        marker: {
-            type: Schema.Types.ObjectId,
-            ref:'user'
-        }
-    }
-
+        }]
+    }]
+   
 
 });
 
