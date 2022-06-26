@@ -328,7 +328,7 @@
                                                 tr += '<button class="btn btn-xs btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
                                                 tr += '</td>';
 
-                                                tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
+                                                tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.name.firstname + ' ' + t.basic.job.customer.name.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
 
                                                 tr += '<td class="text-primary font-weight-bold">';
                                                 tr += t.basic.job.name;
@@ -337,12 +337,12 @@
                                                 }
                                                 tr += '</td>';
                                                 tr += '<td class="text-warning font-weight-bold">';
-                                                if (t.status == -10) {
-                                                    tr += '<i class="fa fa-pause text-danger" aria-hidden="true" style="margin-right: 10px;"></i>';
-                                                }
+                                               
 
                                                 tr += t.basic.level.name;
-
+                                                if (t.status == -10) {
+                                                    tr += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true"></i>';
+                                                }
                                                 tr += '</td>';
                                                 tr += '<td class="text-center">';
                                                 if (t.basic.job.urgent) {

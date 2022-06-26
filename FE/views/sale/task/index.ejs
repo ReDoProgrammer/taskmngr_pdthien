@@ -10,7 +10,7 @@
             <option value="1">Edited</option>
             <option value="2">Q.A ok</option>
             <option value="3">DC ok</option>
-            <option value="4">Upload</option>
+            <option value="4">Uploaded</option>
             <option value="5">Done</option>
             <option value="6">Finish</option>
 
@@ -210,7 +210,7 @@
                         $('#tbdTasks').empty();
                         let idx = 1;
 
-console.log(data)
+
                         data.tasks.forEach(t => {
                             let tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '">';
 
@@ -222,8 +222,8 @@ console.log(data)
 
                             tr += '<td>' + (idx++) + '</td>';
 
-                            tr += '<td class="font-weight-bold text-primary">' + t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname + '</td>';
-                            tr += '<td class="font-weight-bold text-danger">' + getFirstLetters(t.basic.job.customer.firstname + ' ' + t.basic.job.customer.lastname) + getLastLetters(t.basic.job.customer._id) + '</td>';
+                           tr += '<td class="font-weight-bold text-info">' + `${t.basic.job.customer.name.firstname} ${t.basic.job.customer.name.lastname}` + '</td>';
+                           tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.name.firstname + ' ' + t.basic.job.customer.name.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
                             tr += '<td class="font-weight-bold text-info">' + t.basic.job.name + '</td>';
                             tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';
 
