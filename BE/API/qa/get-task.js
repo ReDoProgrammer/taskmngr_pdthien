@@ -140,8 +140,10 @@ const HaveJOB = (jobIds, jobLevelIds) => {
                 status: 1// đã được editor submit
             })
             .or([
-                { qa: { $size: 0 } },
-                { 'qa.unregisted': true },
+                { 
+                    qa: { $size: 0 },
+                    dc:{$size:0} 
+                },               
                 { 'qa.visible': false }
             ])
             .sort({ 'basic.deadline.end': 1 })// sắp xếp tăng dần theo deadline
