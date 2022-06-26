@@ -18,34 +18,14 @@ router.get('/list', authenticateSaleToken, (req, res) => {
                     path: 'customer'
                 }
             },
-            {
-                path: 'basic.level',
-                select: 'name'
-            },
-            {
-                path: 'editor.staff',
-                select: 'fullname username'
-            },
-            {
-                path: 'qa.staff',
-                select: 'fullname'
-            },
-            {
-                path: 'dc.staff',
-                select: 'fullname'
-            },
-            {
-                path: 'tla.created.by',
-                select: 'fullname'
-            },
-            {
-                path: 'tla.uploaded.by',
-                select: 'fullname'
-            },
-            {
-                path: 'remarks',
-                options: { sort: { 'timestamp': -1 } }
-            }
+            { path: 'basic.level', select: 'name'},
+            { path: 'editor.staff', select: 'fullname username' },
+            { path: 'qa.staff', select: 'fullname username' },
+            { path: 'dc.staff', select: 'fullname username' },
+            { path: 'tla.created.by', select: 'fullname username' },
+            { path: 'tla.uploaded.by', select: 'fullname username' },
+            { path: 'remarks.created.by' }
+
         ])
         .exec()
         .then(tasks => {

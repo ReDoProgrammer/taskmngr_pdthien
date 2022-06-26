@@ -196,7 +196,7 @@
             $nextRow.toggle($btn.hasClass('fa-minus'));
           } else {
             var newRow = '<tr class="expand-child" id="collapse' + $btn.data('id') + '">' +
-              '<td colspan="10">' +
+              '<td colspan="11">' +
               '<table class="table table-condensed table-bordered table-striped" width=100% >' +
               '<thead>' +
               '<tr>' +
@@ -234,7 +234,7 @@
                   newRow += '<td class="font-weight-bold text-primary">' + t.basic.level.name + '</td>';
                   newRow += '<td>';
                   if (t.status !== -1) {
-                    newRow += t.editor[t.editor.length - 1].staff.fullname;
+                    newRow += t.editor[t.editor.length - 1].staff.username;
                   }
                   newRow += '</td>';
 
@@ -246,19 +246,19 @@
 
                   newRow += '<td>';
                   if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
-                    newRow += t.qa[t.qa.length - 1].staff.fullname
+                    newRow += t.qa[t.qa.length - 1].staff.username
                   }
                   newRow += '</td>';
 
                   newRow += '<td>';
                   if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
-                    newRow += t.dc[t.dc.length - 1].staff.fullname
+                    newRow += t.dc[t.dc.length - 1].staff.username
                   }
                   newRow += '</td>';
 
                   newRow += '<td>';
                   if (t.tla.uploaded.length > 0) {
-                    newRow += t.tla.uploaded[t.tla.uploaded.length - 1].by.fullname;
+                    newRow += t.tla.uploaded[t.tla.uploaded.length - 1].by.username;
                   }
                   newRow += '</td>';
 
