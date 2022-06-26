@@ -60,17 +60,17 @@ const taskSchema = new Schema({
             //Tiền công của DC
             type: Number
         },
-        bp:{
-            ref:{
+        bp: {
+            ref: {
                 type: Schema.Types.ObjectId,
-                ref:'bonus_penalty'
+                ref: 'bonus_penalty'
             },
-            is_bonus:{
-                type:Boolean                
+            is_bonus: {
+                type: Boolean
             },
-            costs:{
-                type:Number,
-                default:0
+            costs: {
+                type: Number,
+                default: 0
             }
         },
         unregisted: {
@@ -88,7 +88,7 @@ const taskSchema = new Schema({
                     type: Schema.Types.ObjectId,
                     ref: 'user'
                 }
-               
+
             }
         ]
     }],
@@ -101,17 +101,17 @@ const taskSchema = new Schema({
             type: Number,
             default: 0
         },
-        bp:{
-            ref:{
+        bp: {
+            ref: {
                 type: Schema.Types.ObjectId,
-                ref:'bonus_penalty'
+                ref: 'bonus_penalty'
             },
-            is_bonus:{
-                type:Boolean                
+            is_bonus: {
+                type: Boolean
             },
-            costs:{
-                type:Number,
-                default:0
+            costs: {
+                type: Number,
+                default: 0
             }
         },
         tla: {
@@ -125,21 +125,21 @@ const taskSchema = new Schema({
         submited_at: [{
             type: Date
         }],
-        
+
         rejected: [
             {
                 at: {
-                    type: Date                   
+                    type: Date
                 },
                 by: {
                     type: Schema.Types.ObjectId,
                     ref: 'user'
-                }               
+                }
             }
         ],
-        visible:{
-            type:Boolean,
-            default:true
+        visible: {
+            type: Boolean,
+            default: true
         }
     }],
 
@@ -161,17 +161,17 @@ const taskSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'user'
         },
-        bp:{
-            ref:{
+        bp: {
+            ref: {
                 type: Schema.Types.ObjectId,
-                ref:'bonus_penalty'
+                ref: 'bonus_penalty'
             },
-            is_bonus:{
-                type:Boolean                
+            is_bonus: {
+                type: Boolean
             },
-            costs:{
-                type:Number,
-                default:0
+            costs: {
+                type: Number,
+                default: 0
             }
         },
         submited: [{
@@ -189,9 +189,9 @@ const taskSchema = new Schema({
                 default: ''
             }
         }],
-        visible:{
-            type:Boolean,
-            default:true
+        visible: {
+            type: Boolean,
+            default: true
         }
 
     }],
@@ -294,53 +294,72 @@ const taskSchema = new Schema({
             ref: 'user'
         }
     },
-  
+
     remarks: [{
-       content: {
-            type:String
+        content: {
+            type: String
         },
-        created:{
-            by:{
-                type:Schema.Types.ObjectId,
-                ref:'user'
+        created: {
+            by: {
+                type: Schema.Types.ObjectId,
+                ref: 'user'
             },
-            at:{
+            at: {
                 type: Date
             }
         }
     }],
 
-    fixible_task:{
+    fixible_task: {
         //thuộc tính tham chiếu tới cột fixible_tasks trong cc model
-        type:Schema.Types.ObjectId,
-        ref:'cc'
+        type: Schema.Types.ObjectId,
+        ref: 'cc'
     },
-    additional_task:{
+    additional_task: {
         //thuộc tính tham chiếu tới cột additional_tasks trong cc model
-        type:Schema.Types.ObjectId,
-        ref:'cc'
+        type: Schema.Types.ObjectId,
+        ref: 'cc'
     },
 
-    //thong tinh danh dau thuong/phat tu Sale
-    bp:[{
-        bpId:{
+    //thong tinh danh dau thuong/phat tu Sale or TLA
+    bp: [{
+        bpId: {
             type: Schema.Types.ObjectId,
-            ref:'bonus_penalty'
+            ref: 'bonus_penalty'
+        },      
+        costs: {
+            type: Number
         },
-        costs:{
-            type:Number
+        remark: {
+            type: String,
+            default: ''
         },
-        remark:{
-            type:String,
-            default:''
+        created: {
+            at: {
+                type: Date,
+                default: new Date()
+            },
+            by: {
+                type: Schema.Types.ObjectId,
+                ref: 'user'
+            }
         },
-        staffs:[{
-            type: Schema.Types.ObjectId,
-            ref:'user'
+        details: [{
+            added: {
+                at: {
+                    type: Date
+                },
+                by: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'user'
+                }
+            },
+            staffs: [{
+                type: Schema.Types.ObjectId,
+                ref: 'user'
+            }]
         }]
     }]
-   
-
 });
 
 
