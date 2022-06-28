@@ -1,12 +1,12 @@
 <div class="row mt-2">
-    <div class="col-md-offset-6 col-md-2 col-sm-offset-5 col-sm-3 col-xs-6">
+    <div class="col-md-8 col-sm-8 col-xs-6">
         <select id="slJobStatus" class="selectpicker form-control" multiple title="Choose one of the following status">
-            <option value="">Open</option>
-            <option value="">Processing</option>
-            <option value="">Upload</option>
-            <option value="">Reject</option>
-            <option value="">Cancel</option>
-            <option value="">Done</option>
+            <option value="-1">Open</option>
+            <option value="-2">Canceled</option>
+            <option value="0">Processing</option>
+            <option value="1">Uploaded</option>
+            <option value="2">Done</option>
+            <option value="3">Finished</option>
         </select>
     </div>
 
@@ -73,6 +73,7 @@
                             var jobId = '';
                             var customerId = '';
                             $(document).ready(function () {
+                                $('#slJobStatus').val([-2,-1, 0, 1, 2, 3]).selectpicker('refresh');
                                 LoadJobs();
                                 setInterval(function () {
                                     LoadJobs();
@@ -124,24 +125,24 @@
 
                                             data.children.forEach(c => {
                                                 newRow += '<tr>';
-                                               
+
                                                 if (c.parents.tasks.length > 0) {
 
                                                 }
                                                 if (c.root.tasks.length > 0) {
-                                                    newRow += '<td rowspan="'+(c.root.tasks.length + 1)+'" class="text-danger font-weight-bold">'+c.root.ref.name + '</td>'
+                                                    newRow += '<td rowspan="' + (c.root.tasks.length + 1) + '" class="text-danger font-weight-bold">' + c.root.ref.name + '</td>'
                                                 }
-                                               
+
                                                 newRow += '</tr>';
 
-                                                c.root.tasks.forEach(t => {                                                   
+                                                c.root.tasks.forEach(t => {
                                                     newRow += '<tr>';
                                                     newRow += '<td class="font-weight-bold text-primary">';
-                                                        newRow += t.basic.level.name;
-                                                        if(t.status === -10){
-                                                            newRow += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true" ></i>';
-                                                        }
-                                                        newRow += '</td>';
+                                                    newRow += t.basic.level.name;
+                                                    if (t.status === -10) {
+                                                        newRow += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true" ></i>';
+                                                    }
+                                                    newRow += '</td>';
 
                                                     newRow += '<td>';
                                                     if (t.editor.length > 0) {

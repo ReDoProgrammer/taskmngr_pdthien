@@ -896,7 +896,11 @@ const PullTaskFromJob = (jobId, taskId) => {
                 msg: `Job not found!`
             })
         }
-        job.tasks.pull(taskId);
+        job.details[job.details.length-1].root.tasks.pull(taskId);
+       
+        job.details[job.details.length-1].parents.tasks.pull(taskId);
+        
+
         await job.save()
             .then(_ => {
                 return resolve(job);
