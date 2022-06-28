@@ -54,11 +54,11 @@ router.get('/list-tasks',authenticateTLAToken,async (req,res)=>{
     let job = await Job.findById(jobId)
     .populate([
         {
-            path:'details.root.ref'  ,
+            path:'root.ref'  ,
             select:'name'            
         },
         {
-            path:'details.root.tasks',
+            path:'root.tasks',
             populate:[
                { path:'basic.level'},
                {path:'editor.staff'},
@@ -67,7 +67,20 @@ router.get('/list-tasks',authenticateTLAToken,async (req,res)=>{
                {path:'tla.uploaded.by'},
             ]
         },
-        {path:'details.parents.ref'}
+        {
+            path:'parents.ref'  ,
+            select:'name'            
+        },
+        {
+            path:'parents.tasks',
+            populate:[
+               { path:'basic.level'},
+               {path:'editor.staff'},
+               {path:'qa.staff'},
+               {path:'dc.staff'},
+               {path:'tla.uploaded.by'},
+            ]
+        }
     ]);
     if(!job){
         return res.status(404).json({
@@ -76,7 +89,7 @@ router.get('/list-tasks',authenticateTLAToken,async (req,res)=>{
     }
     return res.status(200).json({
         msg:`List tasks based on job successfully!`,
-        children: job.details
+        job
     })
 })
 

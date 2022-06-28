@@ -814,6 +814,7 @@ router.delete('/', authenticateTLAToken, async (req, res) => {
         })
     }
 
+
     await task.delete()
         .then(_ => {
             PullTaskFromJob(task.basic.job, task._id)
@@ -838,7 +839,7 @@ router.delete('/', authenticateTLAToken, async (req, res) => {
 
 module.exports = router;
 
-const PushTaskIntoJob = (jobId, taskId, customer_level, is_root) => {
+const PushTaskIntoJob = (jobId, taskId, customer_job_level, is_root) => {
     return new Promise(async (resolve, reject) => {
         let job = await Job.findById(jobId);
         if (!job) {
@@ -848,32 +849,28 @@ const PushTaskIntoJob = (jobId, taskId, customer_level, is_root) => {
             })
         }
 
-        if (job.details.length == 0) {
-            if (is_root == 'true') {
-                job.details.push({
-                    root: {
-                        ref: customer_level,
-                        tasks: [taskId]
-                    }
-                })
+        if (is_root == 'true') {
+            let chk = job.root.filter(x => x.ref == customer_job_level);
+            if (chk.length > 0) {
+                chk[0].tasks.push(taskId);
             } else {
-                job.details.push({
-                    parents: {
-                        ref: customer_level,
-                        tasks: [taskId]
-                    }
-                })
+                job.root.push({
+                    ref: customer_job_level,
+                    tasks: [taskId]
+                });
             }
         } else {
-            if(is_root == 'true'){
-                let chk  = job.details.filter(x=>x.root.ref == customer_level);
-                chk[0].root.tasks.push(taskId);
-
-            }else{
-                let chk  = job.details.filter(x=>x.parents.ref == customer_level);
-                chk[0].parents.tasks.push(taskId);
+            let chk = job.parents.filter(x => x.ref == customer_job_level);
+            if (chk.length > 0) {
+                chk[0].tasks.push(taskId);
+            } else {
+                job.parents.push({
+                    ref: customer_job_level,
+                    tasks: [taskId]
+                });
             }
         }
+
         await job.save()
             .then(_ => {
                 return resolve(job);
@@ -896,10 +893,13 @@ const PullTaskFromJob = (jobId, taskId) => {
                 msg: `Job not found!`
             })
         }
-        job.details[job.details.length-1].root.tasks.pull(taskId);
-       
-        job.details[job.details.length-1].parents.tasks.pull(taskId);
-        
+
+        job.root.forEach(r => {
+            r.tasks = r.tasks.filter(x => x!= taskId);
+        });
+        job.parents.forEach(p => {
+            p.tasks = p.tasks.filter(x => x!= taskId);
+        });
 
         await job.save()
             .then(_ => {

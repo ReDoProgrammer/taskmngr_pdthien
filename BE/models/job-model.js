@@ -35,9 +35,8 @@ const jobSchema = new Schema({
             3: finish
 
             -1: initial
-            -2:cancel
-                        
-            - 3: Canceled           
+                       
+            - 2: Canceled           
         */
         type: Number,
         default: -1
@@ -61,64 +60,43 @@ const jobSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'combo'
     },
-    details: [{
-        root:{
-            ref:{
-                type:Schema.Types.ObjectId,
-                ref:'root_level'
-            },
-            tasks:[{
-                type:Schema.Types.ObjectId,
-                ref:'task'
-            }]
-        },
-        parents:{
-            ref:{
-                type:Schema.Types.ObjectId,
-                ref:'parents_level'
-            },
-            tasks:[{
-                type:Schema.Types.ObjectId,
-                ref:'task'
-            }]
-        }
-    }],
+
     cc: [{
         request: {
             type: String
         },
-        root:{
-            type:Schema.Types.ObjectId,
-            ref:'root_level'
+        root: {
+            type: Schema.Types.ObjectId,
+            ref: 'root_level'
         },
-        parents:{
-            type:Schema.Types.ObjectId,
-            ref:'parents_level'
+        parents: {
+            type: Schema.Types.ObjectId,
+            ref: 'parents_level'
         },
-        fee:{ 
-            type:Boolean,
-            default:false
+        fee: {
+            type: Boolean,
+            default: false
         },
-        tasks:[{
-            type:Schema.Types.ObjectId,
-            ref:'task'
+        tasks: [{
+            type: Schema.Types.ObjectId,
+            ref: 'task'
         }],
-        created:{
+        created: {
             at: {
-                type: Schema.Types.ObjectId                
+                type: Schema.Types.ObjectId
             },
-            by:{
+            by: {
                 type: Schema.Types.ObjectId,
-                ref:'user'
+                ref: 'user'
             }
         },
-        requested:{
-            at:{
+        requested: {
+            at: {
                 type: Date,
             },
-            by:{
-                type:Schema.Types.ObjectId,
-                ref:'customer'
+            by: {
+                type: Schema.Types.ObjectId,
+                ref: 'customer'
             }
         }
     }],
@@ -142,7 +120,6 @@ const jobSchema = new Schema({
             type: Date
         }
     },
-
 
     //phan lien quan toi nhan vien chup anh
     captured: {
@@ -186,7 +163,29 @@ const jobSchema = new Schema({
     urgent: {
         type: Boolean,
         default: false
-    }
+    },
+
+    root: [{
+        ref: {
+            type: Schema.Types.ObjectId,
+            ref: 'root_level'
+        },
+        tasks: [{
+            type: Schema.Types.ObjectId,
+            ref: 'task'
+        }]
+    }],
+
+    parents: [{
+        ref: {
+            type: Schema.Types.ObjectId,
+            ref: 'parents_level'
+        },
+        tasks: [{
+            type: Schema.Types.ObjectId,
+            ref: 'task'
+        }]
+    }]
 });
 
 
