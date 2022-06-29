@@ -62,7 +62,7 @@ const jobSchema = new Schema({
     },
 
     cc: [{
-        request: {
+        remark: {
             type: String
         },
         root: {
@@ -83,7 +83,7 @@ const jobSchema = new Schema({
         }],
         created: {
             at: {
-                type: Schema.Types.ObjectId
+                type: Date
             },
             by: {
                 type: Schema.Types.ObjectId,

@@ -2,6 +2,7 @@ const router = require("express").Router();
 const Job = require("../../models/job-model");
 const Task = require('../../models/task-model');
 const { authenticateSaleToken } = require("../../../middlewares/sale-middleware");
+const { ValidateCheckIn } = require('../../../middlewares/checkin-middleware');
 const Material = require('../../models/material-model');
 const Combo = require('../../models/combo-model');
 const Customer = require('../../models/customer-model');
@@ -10,7 +11,23 @@ const { ObjectId } = require('mongodb');
 
 const pageSize = 20;
 
-
+router.get('/list-cc', authenticateSaleToken, async (req, res) => {
+  let {jobId} = req.query;
+  let job = await Job.findById(jobId)
+  .populate('cc.root')
+  .populate('cc.parents');
+  
+  if(!job){
+    return res.status(404).json({
+      msg:`Job not found!`
+    })
+  }
+  console.log(job)
+  return res.status(200).json({
+    msg:`Load CC list successfully!`,
+    cc:job.cc
+  })
+})
 
 router.get('/check-contract', authenticateSaleToken, async (req, res) => {
   let { customerId } = req.query;
@@ -160,7 +177,7 @@ router.get('/list-by-customer', authenticateSaleToken, async (req, res) => {
 
 
 
-router.delete('/', authenticateSaleToken, async (req, res) => {
+router.delete('/', [authenticateSaleToken, ValidateCheckIn], async (req, res) => {
   let { jobId } = req.body;
   let countTask = await Task.countDocuments({ 'basic.job': jobId });
   if (countTask > 0) {
@@ -205,7 +222,7 @@ router.delete('/', authenticateSaleToken, async (req, res) => {
     })
 })
 
-router.put("/", authenticateSaleToken, async (req, res) => {
+router.put("/", [authenticateSaleToken, ValidateCheckIn], async (req, res) => {
   let {
     jobId,
     name,
@@ -300,9 +317,12 @@ router.put("/", authenticateSaleToken, async (req, res) => {
       })
     })
 });
+router.put('/cc', [authenticateSaleToken, ValidateCheckIn], async (req, res) => {
+
+})
 
 
-router.post("/", authenticateSaleToken, async (req, res) => {
+router.post("/", [authenticateSaleToken, ValidateCheckIn], async (req, res) => {
   let {
     customer,
     name,
@@ -382,6 +402,71 @@ router.post("/", authenticateSaleToken, async (req, res) => {
     })
 
 });
+
+router.post('/cc', [authenticateSaleToken, ValidateCheckIn], async (req, res) => {
+  let {
+    jobId,
+    ccType,
+    rootId,
+    is_root,
+    remark
+  } = req.body;
+
+  let job = await Job.findById(jobId);
+  if (!job) {
+    return res.status(404).json({
+      msg: `Job not found!`
+    })
+  }
+
+
+  if (rootId == null || rootId.length == 0) {
+    job.cc.push({
+      remark,
+      fee: ccType == 'false' ? false : true,
+      created: {
+        at: new Date(),
+        by: req.user._id
+      }
+    })
+  }
+
+  if (rootId.length > 0) {
+    if (is_root == true) {
+      job.cc.push({
+        root: rootId,
+        remark,
+        fee: ccType == 'false' ? false : true,
+        created: {
+          at: new Date(),
+          by: req.user._id
+        }
+      })
+    } else {
+      job.cc.push({
+        parents: rootId,
+        remark,
+        fee: ccType == 'false' ? false : true,
+        created: {
+          at: new Date(),
+          by: req.user._id
+        }
+      })
+    }
+  }
+
+  await job.save()
+    .then(_ => {
+      return res.status(201).json({
+        msg: `CC has been created!`
+      })
+    })
+    .catch(err => {
+      return res.status(500).json({
+        msg: `Cannot create CC with error: ${new Error(err.message)}`
+      })
+    })
+})
 
 module.exports = router;
 

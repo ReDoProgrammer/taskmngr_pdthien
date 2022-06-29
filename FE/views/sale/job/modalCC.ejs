@@ -54,7 +54,7 @@
                 <table class="table table-striped table-hover js-table mt-2">
                     <thead>
                         <th>#</th>
-                        <th>Task</th>
+                        <th>Level</th>
                         <th>Remark</th>
                         <th>Status</th>
                         <th></th>
@@ -147,7 +147,8 @@
 
     $('#btnSubmitCC').click(function () {
         ccType = $('#rbtMoreTask').is(':checked') ? true : false;
-        taskId = $('#ckbChooseTask').is(':checked') ? $('#slTasks option:selected').val() : null;
+        rootId = $('#ckbChooseTask').is(':checked') ? $('#slTasks option:selected').val() : null;
+        is_root = $('#ckbChooseTask').is(':checked') ? $('#slTasks option:selected').data('is_root') : 0;
         remark = $('#txtRemark').val();
 
         if (remark.trim().length == 0) {
@@ -157,7 +158,7 @@
         }
         if (ccId.length === 0) {
             $.ajax({
-                url: '/sale/cc',
+                url: '/sale/job/cc',
                 type: 'post',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -165,7 +166,8 @@
                 data: {
                     jobId,
                     ccType,
-                    taskId,
+                    rootId,
+                    is_root,
                     remark
                 },
                 success: function (data) {
@@ -183,7 +185,7 @@
             })
         } else {
             $.ajax({
-                url: '/sale/cc',
+                url: '/sale/job/cc',
                 type: 'put',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -192,7 +194,8 @@
                     ccId,
                     jobId,
                     ccType,
-                    taskId,
+                    rootId,
+                    is_root,
                     remark
                 },
                 success: function (data) {
@@ -230,7 +233,7 @@
 
     function LoadCC() {
         $.ajax({
-            url: '/sale/cc',
+            url: '/sale/job/list-cc',
             type: 'get',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -241,50 +244,21 @@
             success: function (data) {
                 $('#tblCCList').empty();
                 let idx = 1;
-                data.ccList.forEach(cc => {
-                    let tr = '<tr id="' + cc._id + '">';
+                data.cc.forEach(c => {
+                    let tr = '<tr id="' + c._id + '">';
                     tr += '<td>' + (idx++) + '</td>';
-                    tr += '<td class="font-weight-bold text-danger text-left">';
-                    if (cc.fixible_task) {
-                        tr += cc.fixible_task.basic.level.name
+                     
+                    tr+= '<td>';
+                    if(c.root){
+                        tr+= c.root.name;
                     }
-                    tr += '</td>';
-
-                    tr += '<td class="text-left">' + cc.remark + '</td>';
-                    tr += '<td class="text-left font-italic">';
-                    switch (cc.status) {
-                        case -1:
-                            tr += '<span class="text-info">Initial</span>';
-                            break;
-                        case 0:
-                            tr += '<span class="text-info">Processing</span>';
-                            break;
-                        case 1:
-                            tr += '<span class="text-success">Edited</span>';
-                            break;
-                        case 2:
-                            tr += '<span class="text-primary">Q.A OK</span>';
-                            break;
-                        case 3:
-                            tr += '<span class="text-primary">DC OK</span>';
-                            break;
-                        case 4:
-                            tr += '<span class="text-primary">SALE OK</span>';
-                            break;
-                        case 5:
-                            tr += '<span class="text-primary">Uploaded</span>';
-                            break;
-                        case 6:
-                            tr += '<span class="text-warning">Paid</span>';
-                            break;
+                    console.log(c)
+                    if(c.parents){
+                        tr+= c.parents.name;
                     }
-                    tr += '</td>';
-
-                    tr += '<td>';
-                    tr += '<button class="btn btn-xs btn-warning" name="btnUpdateCC"><i class="fa fa-edit"></i></button>'
-                    tr += '<button class="btn btn-xs btn-danger" name="btnDelCC"><i class="fa fa-trash" aria-hidden="true"></i></button>'
-                    tr += '</td>';
-                    tr += '</tr>';
+                    tr+= '</td>';
+                    tr+= '</tr>';
+                    
                     $('#tblCCList').append(tr);
                 })
             },
@@ -296,7 +270,7 @@
 
     function LoadTasks() {
         $.ajax({
-            url: '/sale/task/list',
+            url: '/sale/job/list-task',
             type: 'get',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -306,17 +280,17 @@
             },
             success: function (data) {
                 $('#slTasks').empty();
-                data.tasks.forEach(task => {
-                    if (task.status > 0) {
-                        let opt = '<option value="' + task._id + '"';
-                        opt += '<span class="font-weight-bold text-danger">[ ' + task.basic.level.name + ' ]</span>';
-                        if (task.editor.length > 0) {
-                            opt += ' - ' + task.editor[task.editor.length - 1].staff.fullname + ' (' + task.editor[task.editor.length - 1].staff.username + ' )';
-                        }
-                        opt += '</option>';
-                        $('#slTasks').append(opt);
-                    }
-
+                data.job.root.forEach(r => {
+                    let opt = '<option value="' + r._id + '" dat-root="0">' + r.ref.name + '  - [ ';
+                    opt += r.tasks.map(x => ' ' + x.basic.level.name);
+                    opt += ' ]</option>';
+                    $('#slTasks').append(opt);
+                })
+                data.job.parents.forEach(p => {
+                    let opt = '<option value="' + p._id + '" dat-root="0">' + p.ref.name + '  - [ ';
+                    opt += p.tasks.map(x => ' ' + x.basic.level.name);
+                    opt += ' ]</option>';
+                    $('#slTasks').append(opt);
                 })
             }
         })
