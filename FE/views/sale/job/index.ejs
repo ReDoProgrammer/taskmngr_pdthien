@@ -218,7 +218,7 @@
             jobId = $(this).closest('tr').attr('id');
 
             await $.ajax({
-              url: '/sale/task/list',
+              url: '/sale/job/list-task',
               type: 'get',
               headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -228,126 +228,222 @@
               },
               success: function (data) {
                 let idx = 1;
-                data.tasks.forEach(t => {
+
+
+                data.job.root.forEach(r => {
                   newRow += '<tr>';
-                  newRow += '<td class="text-right">' + (idx++) + '</td>';
-                  newRow += '<td class="font-weight-bold text-primary">' + t.basic.level.name + '</td>';
-                  newRow += '<td>';
-                  if (t.status !== -1) {
-                    newRow += t.editor[t.editor.length - 1].staff.username;
-                  }
-                  newRow += '</td>';
 
-                  newRow += '<td class="text-center">';
-                  if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                    newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount
-                  }
-                  newRow += '</td>';
-
-                  newRow += '<td>';
-                  if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
-                    newRow += t.qa[t.qa.length - 1].staff.username
-                  }
-                  newRow += '</td>';
-
-                  newRow += '<td>';
-                  if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
-                    newRow += t.dc[t.dc.length - 1].staff.username
-                  }
-                  newRow += '</td>';
-
-                  newRow += '<td>';
-                  if (t.tla.uploaded.length > 0) {
-                    newRow += t.tla.uploaded[t.tla.uploaded.length - 1].by.username;
-                  }
-                  newRow += '</td>';
-
-                  newRow += '<td>';
-                  if (t.tla.uploaded.length > 0) {
-                    newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
-                  }
-                  newRow += '</td>';
-
-                  newRow += '<td  class="text-center">';
-                  if (isValidHttpUrl(t.basic.link.input)) {
-                    newRow += '<a href="' + t.basic.link.input + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
-                  } else {
-                    newRow += t.basic.link.input;
-                  }
-                  newRow += '</td>';
-
-                  newRow += '<td class="text-center">';
-                  if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                    if (isValidHttpUrl(t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link)) {
-                      newRow += '<a href="' + t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
-                    } else {
-                      newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link;
-                    }
+                  if (r.tasks.length > 0) {
+                    newRow += '<td rowspan="' + (r.tasks.length + 1) + '" class="text-danger font-weight-bold" > ';
+                    newRow += '<div class="v-middle">';
+                    newRow += r.ref.name;
+                    newRow += '</div>';
+                    newRow += '</td>';
                   }
 
-                  newRow += '</td>';
-
-
-
-                  newRow += '<td  class="text-center">';
-
-                  if (t.tla.uploaded.length > 0) {
-                    if (isValidHttpUrl(t.tla.uploaded[t.tla.uploaded.length - 1].link)) {
-                      newRow += '<a href="' + t.tla.uploaded[t.tla.uploaded.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>';
-                    } else {
-                      newRow += t.tla.uploaded[t.tla.uploaded.length - 1].link
-                    }
-                  }
-
-                  newRow += '</td>';
-
-
-                  newRow += '<td><i>';
-
-                  switch (t.status) {
-                    case -1: newRow += '<span class="text-info">Initial</span>';
-                      break;
-                    case 0: newRow += '<span class="text-info">Processing</span>';
-                      break;
-                    case 1:
-                      {
-                        if (t.edited_time > 1) {
-                          newRow += '<span class="text-primary">Fixed</span>';
-                        } else {
-                          newRow += '<span class="text-primary">Edited</span>';
-                        }
-                        break;
-                      }
-                    case 2:
-                      newRow += '<span class="text-success">Q.A ok!</span>';
-                      break;
-                    case 3:
-                      newRow += '<span class="text-success">DC ok!</span>'
-                      break;
-                    case -2:
-                      newRow += '<span class="text-danger">Q.A rejected</span>';
-                      break;
-                    case -3:
-                      newRow += '<span class="text-danger">DC rejected</span>';
-                      break;
-                    case -4:
-                      newRow += '<span class="text-danger">Sale rejected</span>';
-                      break;
-                    case -5:
-                      newRow += '<span class="text-danger">Canceled</span>';
-                      break;
-                    case 4: newRow += '<span class="text-success font-weight-bold">Upload</span>'; break;
-                    case 5: newRow += '<span class="text-success font-weight-bold">Done</span>'; break;
-                    case 6: newRow += '<span class="text-success font-weight-bold">Finish</span>'; break;
-
-                  }
-                  newRow += '</i></td>';
-
-
-                  // newRow += '<td class="text-center">';
-                  // newRow += '<input type="checkbox" name="check_task">'
-                  // newRow += '</td>';
                   newRow += '</tr>';
+
+                  r.tasks.forEach(t => {
+                    newRow += '<tr id="' + t._id + '" data-root="' + r._id + '">';
+                    newRow += '<td class="font-weight-bold text-primary">';
+                    newRow += t.basic.level.name;
+                    if (t.status === -10) {
+                      newRow += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true" ></i>';
+                    }
+                    newRow += '</td>';
+
+                    newRow += '<td>';
+                    if (t.editor.length > 0) {
+                      newRow += t.editor[t.editor.length - 1].staff.username;
+                    }
+                    newRow += '</td>';
+
+                    newRow += '<td>';
+                    if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                      newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount;
+                    }
+                    newRow += '</td>';
+
+                    newRow += '<td>';
+                    if (t.qa.length > 0) {
+                      newRow += t.qa[t.qa.length - 1].staff.username;
+                    }
+                    newRow += '</td>';
+
+                    newRow += '<td>';
+                    if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
+                      t.dc[t.dc.length - 1].staff.username;
+                    }
+                    newRow += '</td>';
+
+                    newRow += '<td>';
+                    if (t.tla.uploaded.length > 0) {
+                      newRow += t.tla.uploaded[t.tla.uploaded.length - 1].by.username;
+                    }
+                    newRow += '</td>';
+
+                    newRow += '<td>';
+                    if (t.tla.uploaded.length > 0) {
+                      newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
+                    }
+                    newRow += '</td>';
+
+                    newRow += '<td>';
+                    newRow += '</td>';
+
+                    newRow += '<td>';
+                    newRow += '</td>';
+
+                    newRow += '<td>';
+                    newRow += '</td>';
+
+                    newRow += '<td>';
+                    switch (t.status) {
+                      case -10: newRow += '<span class="text-danger font-weight-bold">Wait</span>'; break;
+                      case -1: newRow += '<span class="text-info">Initial</span>'; break;
+                      case 0: newRow += '<span class="text-info">Processing</span>'; break;
+                      case 1:
+                        {
+                          if (t.editor[t.editor.length - 1].submited.length > 1) {
+                            newRow += '<span class="text-primary">Fixed</span>';
+                          } else {
+                            newRow += '<span class="text-primary">Edited</span>';
+                          }
+                          break;
+                        }
+                      case 2: newRow += '<span class="text-success">Q.A ok!</span>'; break;
+                      case 3: newRow += '<span class="text-success">DC ok!</span>'; break;
+                      case 4: newRow += '<span class="text-info font-weight-bold">Uploaded</span>'; break;
+                      case 5: newRow += '<span class="text-success font-weight-bold">Done</span>'; break;
+                      case 6: newRow += '<span class="text-success font-weight-bold">Finish</span>'; break;
+                      case -2: newRow += '<span class="text-danger">Q.A rejected</span>'; break;
+                      case -3: newRow += '<span class="text-danger">DC rejected</span>'; break;
+                      case -4: newRow += '<span class="text-danger">Sale rejected</span>'; break;
+                      case -5: newRow += '<span class="text-danger">Canceled</span>'; break;
+                      case -6: newRow += '<span class="text-danger font-weight-bold">Customer CC</span>'; break;
+                    }
+                    newRow += '</td>';
+
+                    newRow += '</tr>';
+                  })
+
+                })
+
+
+                data.job.parents.forEach(p => {
+                  newRow += '<tr>';
+
+                  if (p.tasks.length > 0) {
+                    newRow += '<td rowspan="' + (p.tasks.length + 1) + '" class="text-danger font-weight-bold" > ';
+                    newRow += '<div class="v-middle">';
+                    newRow += p.ref.name;
+                    newRow += '</div>';
+                    newRow += '</td>';
+                  }
+
+                  newRow += '</tr>';
+
+                  p.tasks.forEach(t => {
+                    newRow += '<tr id="' + t._id + '" data-parents="' + p._id + '">';
+                    newRow += '<td class="font-weight-bold text-primary">';
+                    newRow += t.basic.level.name;
+                    if (t.status === -10) {
+                      newRow += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true" ></i>';
+                    }
+                    newRow += '</td>';
+
+                    newRow += '<td>';
+                    if (t.editor.length > 0) {
+                      newRow += t.editor[t.editor.length - 1].staff.username;
+                    }
+                    newRow += '</td>';
+
+                    newRow += '<td>';
+                    if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                      newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount;
+                    }
+                    newRow += '</td>';
+
+                    newRow += '<td>';
+                    if (t.qa.length > 0) {
+                      newRow += t.qa[t.qa.length - 1].staff.username;
+                    }
+                    newRow += '</td>';
+
+                    newRow += '<td>';
+
+                    if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
+                      newRow += t.dc[t.dc.length - 1].staff.username;
+                    }
+                    newRow += '</td>';
+
+                    newRow += '<td>';
+                    if (t.tla.uploaded.length > 0) {
+                      newRow += t.tla.uploaded[t.tla.uploaded.length - 1].by.username;
+                    }
+                    newRow += '</td>';
+
+                    newRow += '<td>';
+                    if (t.tla.uploaded.length > 0) {
+                      newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
+                    }
+                    newRow += '</td>';
+
+                    newRow += '<td class="text-center">';
+                    if (isValidHttpUrl(t.basic.link.input)) {
+                      newRow += '    <a href="' + t.basic.link.input + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>'
+                    } else {
+                      newRow += '<button class="btn btn-xs" name="copyInputToClipboard"><i class="fa fa-clipboard" aria-hidden="true"></i></button>'
+                    }
+                    newRow += '</td>';
+
+                    newRow += '<td class="text-center">';
+                    if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                      if (isValidHttpUrl(t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link)) {
+                        newRow += '    <a href="' + t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-link" aria-hidden="true"></i></a>'
+                      } else {
+                        newRow += '<button class="btn btn-xs" name="copyOutputToClipboard"><i class="fa fa-clipboard" aria-hidden="true"></i></button>'
+                      }
+                    }
+
+                    newRow += '</td>';
+
+                    newRow += '<td class="text-center">';
+                    if (t.tla.uploaded.length > 0) {
+                      newRow += '    <a href="' + t.tla.uploaded[t.tla.uploaded.length - 1].link + '" target="_blank" rel="noopener noreferrer"><i class="fa fa-upload text-info" aria-hidden="true"></i></a>'
+                    }
+                    newRow += '</td>';
+
+                    newRow += '<td>';
+                    switch (t.status) {
+                      case -10: newRow += '<span class="text-danger font-weight-bold">Wait</span>'; break;
+                      case -1: newRow += '<span class="text-info">Initial</span>'; break;
+                      case 0: newRow += '<span class="text-info">Processing</span>'; break;
+                      case 1:
+                        {
+                          if (t.editor[t.editor.length - 1].submited.length > 1) {
+                            newRow += '<span class="text-primary">Fixed</span>';
+                          } else {
+                            newRow += '<span class="text-primary">Edited</span>';
+                          }
+                          break;
+                        }
+                      case 2: newRow += '<span class="text-success">Q.A ok!</span>'; break;
+                      case 3: newRow += '<span class="text-success">DC ok!</span>'; break;
+                      case 4: newRow += '<span class="text-info font-weight-bold">Uploaded</span>'; break;
+                      case 5: newRow += '<span class="text-success font-weight-bold">Done</span>'; break;
+                      case 6: newRow += '<span class="text-success font-weight-bold">Finish</span>'; break;
+                      case -2: newRow += '<span class="text-danger">Q.A rejected</span>'; break;
+                      case -3: newRow += '<span class="text-danger">DC rejected</span>'; break;
+                      case -4: newRow += '<span class="text-danger">Sale rejected</span>'; break;
+                      case -5: newRow += '<span class="text-danger">Canceled</span>'; break;
+                      case -6: newRow += '<span class="text-danger font-weight-bold">Customer CC</span>'; break;
+                    }
+                    newRow += '</td>';
+
+                    newRow += '</tr>';
+                  })
+
                 })
               }
             })
@@ -377,17 +473,16 @@
             success: function (data) {
               $('#tblJobs').empty();
               let idx = (page - 1) * data.pageSize;
-              data.jobs.forEach(j => {             
-
+              data.jobs.forEach(j => {
                 let tr = '<tr id="' + j._id + '" data-customer="' + j.customer._id + '">';
                 tr += '<td>';
-                  let size = 0;
-                  j.root.forEach(r=>{
-                    size += r.tasks.length;
-                  })
-                  j.parents.forEach(p=>{
-                    size += p.tasks.length;
-                  })
+                let size = 0;
+                j.root.forEach(r => {
+                  size += r.tasks.length;
+                })
+                j.parents.forEach(p => {
+                  size += p.tasks.length;
+                })
                 if (size > 0) {
                   tr += '<button class="btn btn-xs parents js-view-parents " name="js-view-parents">(';
                   tr += size + ') <i class="fa fa-plus"></i>'
@@ -444,8 +539,8 @@
 
                 tr += '<td class="text-right">';
                 tr += '<button class="btn btn-xs btn-info" name="btn-job-info"><i class="fa fa-info-circle" aria-hidden="true" ></i></button>';
-                  
-                
+
+
                 // let isInit = j.tasks.filter(x => x.status !== 0);
                 // if (isInit.length === 0) {
                 //   tr += '<button class="btn btn-xs btn-warning ml-2" name="edit-job"><i class="fa fa-refresh" aria-hidden="true"></i></button>';
