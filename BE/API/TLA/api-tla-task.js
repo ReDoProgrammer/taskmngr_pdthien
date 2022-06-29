@@ -895,10 +895,16 @@ const PullTaskFromJob = (jobId, taskId) => {
         }
 
         job.root.forEach(r => {
-            r.tasks = r.tasks.filter(x => x!= taskId);
+            r.tasks = r.tasks.filter(x => x!= taskId.toString());
+            if(r.tasks.length == 0){
+                job.root = job.root.filter(x=>x!=r);
+            }
         });
         job.parents.forEach(p => {
-            p.tasks = p.tasks.filter(x => x!= taskId);
+            p.tasks = p.tasks.filter(x => x!= taskId.toString());
+            if(p.tasks.length == 0){
+                job.parents = job.parents.filter(x=>x!=p);
+            }            
         });
 
         await job.save()
