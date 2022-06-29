@@ -391,9 +391,12 @@
                                                 size += p.tasks.length;
                                             })
 
-                                            tr += '<button class="btn btn-xs btn-info parents js-view-parents" name="js-view-parents"> (';
-                                            tr += size;
-                                            tr += ') <i class="fa fa-plus"></i></button>';
+                                            if (size > 0) {
+                                                tr += '<button class="btn btn-xs btn-info parents js-view-parents" name="js-view-parents"> (';
+                                                tr += size;
+                                                tr += ') <i class="fa fa-plus"></i></button>';
+
+                                            }
 
                                             tr += '</td>';
                                             tr += '<td>' + (++idx) + '</td>'

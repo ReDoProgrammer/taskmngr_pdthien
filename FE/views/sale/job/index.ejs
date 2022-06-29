@@ -377,14 +377,20 @@
             success: function (data) {
               $('#tblJobs').empty();
               let idx = (page - 1) * data.pageSize;
-              data.jobs.forEach(j => {
-                let isInit = j.tasks.filter(x => x.status !== 0);
+              data.jobs.forEach(j => {             
 
                 let tr = '<tr id="' + j._id + '" data-customer="' + j.customer._id + '">';
                 tr += '<td>';
-                if (j.tasks.length > 0) {
+                  let size = 0;
+                  j.root.forEach(r=>{
+                    size += r.tasks.length;
+                  })
+                  j.parents.forEach(p=>{
+                    size += p.tasks.length;
+                  })
+                if (size > 0) {
                   tr += '<button class="btn btn-xs parents js-view-parents " name="js-view-parents">(';
-                  tr += j.tasks.length + ') <i class="fa fa-plus"></i>'
+                  tr += size + ') <i class="fa fa-plus"></i>'
                   tr += '</button>';
                 }
 
@@ -438,10 +444,13 @@
 
                 tr += '<td class="text-right">';
                 tr += '<button class="btn btn-xs btn-info" name="btn-job-info"><i class="fa fa-info-circle" aria-hidden="true" ></i></button>';
-                if (isInit.length === 0) {
-                  tr += '<button class="btn btn-xs btn-warning ml-2" name="edit-job"><i class="fa fa-refresh" aria-hidden="true"></i></button>';
-                  tr += '<button class="btn btn-xs btn-danger ml-2" name="delete-job"><i class="fa fa-trash" aria-hidden="true"></i></button>';
-                }
+                  
+                
+                // let isInit = j.tasks.filter(x => x.status !== 0);
+                // if (isInit.length === 0) {
+                //   tr += '<button class="btn btn-xs btn-warning ml-2" name="edit-job"><i class="fa fa-refresh" aria-hidden="true"></i></button>';
+                //   tr += '<button class="btn btn-xs btn-danger ml-2" name="delete-job"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                // }
                 tr += '<button class="btn btn-xs btn-warning ml-1" name="btnCC"><i class="fa fa-cc" aria-hidden="true"></i></button>'
 
                 tr += '</td>';
