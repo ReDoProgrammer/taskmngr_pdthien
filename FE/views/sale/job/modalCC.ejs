@@ -246,19 +246,31 @@
                 let idx = 1;
                 data.cc.forEach(c => {
                     let tr = '<tr id="' + c._id + '">';
-                    tr += '<td>' + (idx++) + '</td>';
-                     
-                    tr+= '<td>';
-                    if(c.root){
-                        tr+= c.root.name;
+                    tr += '<td class="text-left">' + (idx++) + '</td>';
+
+                    tr += '<td class="text-left text-danger font-weight-bold">';
+                    if (c.root) {
+                        tr += c.root.name;
                     }
-                    console.log(c)
-                    if(c.parents){
-                        tr+= c.parents.name;
+
+                    if (c.parents) {
+                        tr += c.parents.name;
                     }
-                    tr+= '</td>';
-                    tr+= '</tr>';
-                    
+                    tr += '</td>';
+
+                    tr += '<td class="text-left">' + c.remark + '</td>';
+
+                    tr += '<td class="text-left">';
+                        if(c.root){
+                            tr+= c.root.tasks.length == 0?'Initial':'Processing';
+                        }
+                        if(c.parents){
+                            tr+= c.parents.tasks.length == 0?'Initial':'Processing';
+                        }
+                    tr += '</td>'
+
+                    tr += '</tr>';
+
                     $('#tblCCList').append(tr);
                 })
             },
@@ -281,13 +293,13 @@
             success: function (data) {
                 $('#slTasks').empty();
                 data.job.root.forEach(r => {
-                    let opt = '<option value="' + r._id + '" dat-root="0">' + r.ref.name + '  - [ ';
+                    let opt = '<option value="' + r.ref._id + '" dat-root="0">' + r.ref.name + '  - [ ';
                     opt += r.tasks.map(x => ' ' + x.basic.level.name);
                     opt += ' ]</option>';
                     $('#slTasks').append(opt);
                 })
                 data.job.parents.forEach(p => {
-                    let opt = '<option value="' + p._id + '" dat-root="0">' + p.ref.name + '  - [ ';
+                    let opt = '<option value="' + p.ref._id + '" dat-root="0">' + p.ref.name + '  - [ ';
                     opt += p.tasks.map(x => ' ' + x.basic.level.name);
                     opt += ' ]</option>';
                     $('#slTasks').append(opt);
