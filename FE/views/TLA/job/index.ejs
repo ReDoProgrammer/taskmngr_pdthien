@@ -378,8 +378,7 @@
 
                                         $('#tblJobs').empty();
                                         idx = (page - 1) * data.pageSize;
-                                        data.jobs.forEach(job => {
-                                            let cc = job.cc.filter(x => x.status == -1);
+                                        data.jobs.forEach(job => {                                      
 
                                             let tr = '<tr id="' + job._id + '" data-customer="' + job.customer._id + '">';
                                             tr += '<td>';
@@ -412,7 +411,7 @@
                                             if (job.captured && job.captured.user) {
                                                 tr += '<i class="fa fa-camera text-info ml-2" aria-hidden="true"></i>'
                                             }
-                                            if (cc.length > 0) {
+                                            if (job.cc.length > 0) {
                                                 tr += '<span class="ml-2 text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>'
                                             }
                                             tr += '</td>';
