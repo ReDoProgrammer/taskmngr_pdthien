@@ -408,27 +408,38 @@
         $('.tblCCList').empty();
         let idx = 1;
         data.cc.forEach(c => {
-          let tr = '<tr id="' + c._id + '">';
+          let tr = '<tr id="' + c._id + '"';
+          if (c.root) {
+            tr += ' data-root="' + c.root._id + '"';
+            tr += 'data-type = "1"';
+          }
+          if (c.parents) {
+            tr += ' data-root="' + c.parents._id + '"';
+            tr += 'data-type = "0"';
+          }
+
+          if (!c.root && !c.parents) {
+            tr += 'data-type = "-1"';
+          }
+
+          tr += '>';
+
           tr += '<td>' + (idx++) + '</td>';
           tr += '<td class="font-weight-bold text-danger text-left">';
-            if(c.root){             
-              tr+= c.root.name;
-            }
-            if(c.parents){            
-              tr+= c.parents.name;
-            }
+          if (c.root) {
+            tr += c.root.name;
+          }
+          if (c.parents) {
+            tr += c.parents.name;
+          }
           tr += '</td>';
 
           tr += '<td class="text-left">' + c.remark + '</td>';
           tr += '<td class="text-left font-italic text-right">';
-           
+
           tr += '</td>';
           tr += '<td class="text-right">';
-          if (c.type) {
-            tr += '<button class="btn btn-xs btn-primary" name="btnCC"><i class="fa fa-plus" aria-hidden="true"></i></button>'
-          } else {
-            tr += '<button class="btn btn-xs btn-danger" name="btnCC"><i class="fa fa-edit"></i></button>'
-          }
+          tr += '<button class="btn btn-xs btn-danger" name="btnCC"><i class="fa fa-play" aria-hidden="true"></i></button>';
           tr += '</td>'
           tr += '</tr>';
           $('.tblCCList').append(tr);
@@ -507,7 +518,7 @@
           switch (t.status) {
             case -10:
               tr += '<span class="text-danger font-weight-bold">Wait</span>';
-              break;            
+              break;
             case 0: tr += '<span class="text-info">Processing</span>'; break;
             case 1: {
               if (t.editor[0].submited.times > 1) {
@@ -608,26 +619,22 @@
 
 
   $(document).on("click", "button[name='btnCC']", function () {
-    ccId = $(this).closest('tr').attr('id');
+    let ccId = $(this).closest('tr').attr('id');
+    let rootId = $(this).closest('tr').data('root');
+    let ccType = $(this).closest('tr').data('type');
+
     $.ajax({
-      url: '/tla/cc/detail',
+      url: '/tla/job/detail',
       type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: {
-        ccId
-      },
+      data: { jobId},
       success: function (data) {
-        $('.btn-job-info').click();
-        $('#JobMngrModal').modal('hide');
-        if (data.cc.type) {
-          $('#modalCCNewTask').modal(200);
-        } else {
-          $('#modalCCRejectTask').modal(200);
-        }
+        console.log(data)
       }
     })
+
   })
 
 
@@ -697,7 +704,7 @@
 
   $("#btnSubmit").click(function () {
     let customer_level = $('#slCustomerLevles option:selected').val();
-    let is_root =  ($('#slCustomerLevles option:selected').data('root'))=='1'?true:false;
+    let is_root = ($('#slCustomerLevles option:selected').data('root')) == '1' ? true : false;
     let level = $("#slLocalLevels option:selected").val();
 
     let assigned_date = strToDate($('#txtAssignDate').val());
