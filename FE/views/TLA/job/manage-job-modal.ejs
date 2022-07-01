@@ -169,14 +169,8 @@
                 </button>
               </div>
             </div>
-
-
           </div>
-
         </div>
-
-
-
         <div class="form-row">
           <div class="col-sm-12">
             <label class="font-weight-bold text-danger mt-3" id="msgError"></label>
@@ -629,9 +623,23 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { jobId},
+      data: { jobId },
       success: function (data) {
-        console.log(data)
+        switch (ccType) {
+          case -1:
+            let parents = data.job.parents.map(x=>{
+              let obj = {};
+              obj._id = x.ref._id;
+              obj.name = x.ref.name;
+              return obj;
+            });
+            console.log(parents)
+            break;
+          case 0:
+            break;
+          case 1:
+            break;
+        }
       }
     })
 
