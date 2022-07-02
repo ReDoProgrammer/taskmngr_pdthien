@@ -168,10 +168,14 @@
               tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.name.firstname + ' ' + t.basic.job.customer.name.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
               tr += '<td class="font-weight-bold text-danger">' + t.basic.job.name + '</td>';
               tr += '<td class="font-weight-bold">';
-              tr += t.basic.level.name
-              if (t.fixible_task || t.additional_task) {
-                tr += '<span class="font-weight-bold text-danger ml-2"><i class="fa fa-cc" aria-hidden="true"></i></span>';
+              tr += t.basic.level.name            
+              
+
+              let chk = (t.basic.job.cc.filter(x=>x.tasks.includes(t._id))).length>0?true:false;
+              if(chk){
+                tr+= '<i class="fa fa-cc text-danger ml-2" aria-hidden="true"></i>'
               }
+              
               if (t.status === -10) {
                 tr += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true"></i>'
               }

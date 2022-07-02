@@ -259,8 +259,10 @@
                             tr += '<td class="font-weight-bold text-danger">' + t.basic.job.name + '</td>';
                             tr += '<td class="font-weight-bold">';
                             tr += t.basic.level.name
-                            if (t.fixible_task || t.additional_task) {
-                                tr += '<span class="font-weight-bold text-danger ml-2"><i class="fa fa-cc" aria-hidden="true"></i></span>';
+
+                            let chk = (t.basic.job.cc.filter(x => x.tasks.includes(t._id))).length > 0 ? true : false;
+                            if (chk) {
+                                tr += '<i class="fa fa-cc text-danger ml-2" aria-hidden="true"></i>'
                             }
                             if (t.status === -10) {
                                 tr += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true"></i>'
@@ -312,11 +314,11 @@
                             }
                             tr += '</td>';
 
-                            tr+='<td>';
-                                if(t.dc.length>0 && !t.dc[t.dc.length-1].unregisted){
-                                   tr+= t.dc[t.dc.length-1].staff.username;
-                                }
-                                tr+='</td>';
+                            tr += '<td>';
+                            if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
+                                tr += t.dc[t.dc.length - 1].staff.username;
+                            }
+                            tr += '</td>';
 
 
                             tr += '<td><i>';

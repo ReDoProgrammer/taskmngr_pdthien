@@ -17,10 +17,10 @@
         <div class="input-group">
             <input type="text" class="form-control" placeholder="Seach task..." id="txtSearchTask" />
             <div class="input-group-btn">
-                <button class="btn btn-info"  id="btnSearchTask">
+                <button class="btn btn-info" id="btnSearchTask">
                     <i class="fa fa-search" aria-hidden="true"></i>
                 </button>
-                <button class="btn btn-success"  id="btnExportExcel">
+                <button class="btn btn-success" id="btnExportExcel">
                     <i class="fa fa-file-excel-o" aria-hidden="true"></i>
                 </button>
             </div>
@@ -325,14 +325,15 @@
                                         tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.name.firstname + ' ' + t.basic.job.customer.name.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
 
                                         tr += '<td class="text-primary font-weight-bold">';
-                                        tr += t.basic.job.name;
-                                        if (t.fixible_task || t.additional_task) {
-                                            tr += '<span class="ml-2 text-danger font-weight-bold"><i class="fa fa-cc" aria-hidden="true"></i></span>'
-                                        }
+                                        tr += t.basic.job.name;                                                                             
                                         tr += '</td>';
                                         tr += '<td class="text-warning font-weight-bold">';
 
                                         tr += t.basic.level.name;
+                                        let chk = (t.basic.job.cc.filter(x => x.tasks.includes(t._id))).length > 0 ? true : false;
+                                        if (chk) {
+                                            tr += '<i class="fa fa-cc text-danger ml-2" aria-hidden="true"></i>'
+                                        }  
                                         if (t.status == -10) {
                                             tr += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true"></i>';
                                         }
