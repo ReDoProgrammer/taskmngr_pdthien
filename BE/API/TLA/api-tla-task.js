@@ -732,8 +732,6 @@ const PushCC = (jobId,ccId,taskId)=>{
         let cc = (job.cc.filter(x=>x._id == ccId))[0];
         
         cc.tasks.push(taskId);
-        console.log({cc});
-        
         await job.save()
         .then(_=>{
             return resolve(job);

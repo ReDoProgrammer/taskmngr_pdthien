@@ -624,6 +624,7 @@
   $(document).on("click", "button[name='btnCC']", function () {
     cc = $(this).closest('tr').attr('id');   
     let ccType= $(this).closest('tr').data('type');
+    let rootId=  $(this).closest('tr').data('root');
     $.ajax({
       url: '/tla/job/detail',
       type: 'get',
