@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
     làm đầu vào cho job
 */
 
-const saleMaterialSchema = new Schema({
+const materialSchema = new Schema({
     name:{
         type:String,
         required: [true, 'Please input sale material name']
@@ -21,6 +21,6 @@ const saleMaterialSchema = new Schema({
 });
 
 
-module.exports = mongoose.model('sale_material',saleMaterialSchema);
+module.exports = mongoose.model('material',materialSchema);
 
 

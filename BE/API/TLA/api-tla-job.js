@@ -148,6 +148,8 @@ router.get('/detail', authenticateTLAToken, async (req, res) => {
             msg: `Job not found!`
         })
     }
+
+    console.log(job)
     return res.status(200).json({
         msg: `Get job detail successfully!`,
         job

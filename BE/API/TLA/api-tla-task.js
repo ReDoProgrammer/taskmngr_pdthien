@@ -29,14 +29,14 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
     }
 
     let tasks = await Task.find({ 'basic.job': jobId })
-        .populate([           
-            { path: 'basic.job', select: 'name urgent cc' },
+        .populate([
+            { path: 'basic.job', select: 'name urgent' },
             { path: 'basic.level', select: 'name' },
             { path: 'editor.staff', select: 'fullname username' },
             { path: 'qa.staff', select: 'fullname username' },
             { path: 'dc.staff' }
         ]);
-        
+      
     return res.status(200).json({
         msg: `Load tasks based on job successfully!`,
         tasks
@@ -239,7 +239,7 @@ router.post('/', authenticateTLAToken, async (req, res) => {
 
     await task.save()
         .then(async _ => {
-            Promise.all([PushTaskIntoJob(jobId, task._id, customer_level, is_root), UpdateEditor(task._id, level, editor, req.user._id),PushCC(jobId,cc,task._id)])
+            Promise.all([PushTaskIntoJob(jobId, task._id, customer_level, is_root), UpdateEditor(task._id, level, editor, req.user._id), PushCC(jobId, cc, task._id, customer_level, is_root)])
                 .then(_async => {
                     UpdateQA(task._id, level, qa, req.user._id)
                         .then(_ => {
@@ -520,16 +520,16 @@ const PullTaskFromJob = (jobId, taskId) => {
         }
 
         job.root.forEach(r => {
-            r.tasks = r.tasks.filter(x => x!= taskId.toString());
-            if(r.tasks.length == 0){
-                job.root = job.root.filter(x=>x!=r);
+            r.tasks = r.tasks.filter(x => x != taskId.toString());
+            if (r.tasks.length == 0) {
+                job.root = job.root.filter(x => x != r);
             }
         });
         job.parents.forEach(p => {
-            p.tasks = p.tasks.filter(x => x!= taskId.toString());
-            if(p.tasks.length == 0){
-                job.parents = job.parents.filter(x=>x!=p);
-            }            
+            p.tasks = p.tasks.filter(x => x != taskId.toString());
+            if (p.tasks.length == 0) {
+                job.parents = job.parents.filter(x => x != p);
+            }
         });
 
         await job.save()
@@ -716,33 +716,45 @@ const ChangeVisibleQA = (taskId, qa) => {
     })
 }
 
-const PushCC = (jobId,ccId,taskId)=>{
-    return new Promise(async (resolve,reject)=>{
-        if(!ccId){
+const PushCC = (jobId, ccId, taskId, rootId, is_root) => {
+    return new Promise(async (resolve, reject) => {
+        if (!ccId) {
             return resolve();
         }
 
         let job = await Job.findById(jobId);
-        if(!job){
+        if (!job) {
             return reject({
-                code:404,
-                msg:`Can not push CC into job cause job not found!`
+                code: 404,
+                msg: `Can not push CC into job cause job not found!`
             })
         }
 
-        let cc = (job.cc.filter(x=>x._id == ccId))[0];
-        
+
+
+        let cc = (job.cc.filter(x => x._id == ccId))[0];
+
+        if (is_root && !cc.root) {
+            cc.root = rootId;
+        }
+
+        if (!is_root && !cc.parents) {
+            cc.parents = rootId;
+        }
+
+        console.log(cc)
+
         cc.tasks.push(taskId);
         await job.save()
-        .then(_=>{
-            return resolve(job);
-        })
-        .catch(err=>{
-            return reject({
-                code:500,
-                msg:`Can not push task in to CC with error: ${new Error(err.message)}`
+            .then(_ => {
+                return resolve(job);
             })
-        })
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not push task in to CC with error: ${new Error(err.message)}`
+                })
+            })
 
     })
 }
