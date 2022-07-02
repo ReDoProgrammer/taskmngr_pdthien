@@ -287,6 +287,12 @@
     var templates = ($("#slTemplates").val() || []).join(', ');
     let urgent = $('#ckbUrgent').is(':checked');
 
+    if(name.trim().length === 0){
+      $('#lblError').text('(*) Job name can not be blank!');
+      $('#lblError').show().delay(3000).fadeOut();
+      return;
+    }
+
     if (isNaN(delivery_date) || delivery_date === null || isNaN(received_date) || received_date == null) {
       $('#lblError').text('(*) Received date or delivery date is  invalid!');
       $('#lblError').show().delay(3000).fadeOut();
