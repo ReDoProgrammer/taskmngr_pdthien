@@ -39,7 +39,11 @@
 
                 <div class="form-group mt-2">
                     <label for="">Remark:</label>
-                    <input type="text" name="" id="txtRemark" class="form-control" placeholder="Input CC remark">
+                    <textarea class="form-control" id="txaRemark" rows="3"  placeholder="Input CC remark"></textarea>                   
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-success" id="btnSubmitCC">Submit</button>
+                    <button type="button" class="btn btn-default" id="btnCancelCC">Cancel</button>
                 </div>
                 <label class="font-weight-bold text-danger" id="ccMsg"></label>
 
@@ -49,8 +53,7 @@
 
             </div>
             <div class="modal-footer">
-                <button class="btn btn-success" id="btnSubmitCC">Submit</button>
-                <button type="button" class="btn btn-default" id="btnCancelCC">Cancel</button>
+               
                 <table class="table table-striped table-hover js-table mt-2">
                     <thead>
                         <th>#</th>
@@ -118,7 +121,7 @@
                 ccId
             },
             success: function (data) {
-                $('#txtRemark').val(data.cc.remark);
+                $('#txaRemark').val(data.cc.remark);
 
                 if (data.cc.type) {
                     $('#rbtMoreTask').prop('checked', true);
@@ -149,7 +152,7 @@
         ccType = $('#rbtMoreTask').is(':checked') ? true : false;
         rootId = $('#ckbChooseTask').is(':checked') ? $('#slTasks option:selected').val() : null;
         is_root = $('#ckbChooseTask').is(':checked') ? $('#slTasks option:selected').data('is_root') : 0;
-        remark = $('#txtRemark').val();
+        remark = $('#txaRemark').val();
 
         if (remark.trim().length == 0) {
             $('#ccMsg').text('(!) Please input CC remark');
@@ -313,7 +316,7 @@
         $('#rRefix').slideUp(200);
         $('#ckbChooseTask').prop('checked', false);
         $('#slTasks').attr("disabled", false);
-        $('#txtRemark').val('');
+        $('#txaRemark').val('');
         $('#divTasksList').slideUp(500);
     }
 
