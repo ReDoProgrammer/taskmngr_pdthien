@@ -193,7 +193,8 @@
   let idx = 1;
   var taskId = '';
   var levelId = '';
-  var ccId = '';
+  var cc = {};
+  var CustomerLevels = [];
 
 
   $("#slCustomerLevles").change(function () {
@@ -312,6 +313,9 @@
 
 
   $('#btnAddTask').click(function () {
+
+    cc = {};
+
     $('#txtInputLink').val('');
     $('#txtRemark').val('');
     $('#divAddOrUpdateTask').slideUp(500);
@@ -350,8 +354,6 @@
     LoadCCList();
     LoadCustomer();
 
-
-
     $('.job-info').hide();
     $('#divLevel').hide();
     $('#divEditTask').hide();
@@ -360,6 +362,13 @@
     $('#txtAssignDate').val(getCurrentTime())
   });
 
+  function LoadContract() {
+    $('#slCustomerLevles').empty();
+    CustomerLevels.forEach(l => {
+      $('#slCustomerLevles').append('<option value="' + l._id + '" data-root="' + l.is_root + '">' + l.name + '</option>');
+    })
+    LoadLocalLevel();
+  }
 
   function LoadLocalLevel() {
     $.ajax({
@@ -627,19 +636,38 @@
       success: function (data) {
         switch (ccType) {
           case -1:
-            let parents = data.job.parents.map(x=>{
+            CustomerLevels = data.job.parents.map(x => {
               let obj = {};
               obj._id = x.ref._id;
               obj.name = x.ref.name;
+              obj.is_root = 0;
               return obj;
             });
-            console.log(parents)
             break;
           case 0:
+            CustomerLevels = (data.job.parents.filter(p => p.ref._id === rootId)).map(x => {
+              let obj = {};
+              obj._id = x.ref._id;
+              obj.name = x.ref.name;
+              obj.is_root = 0;
+              return obj;
+            });
+
+            console.log({ CustomerLevels })
+
             break;
           case 1:
             break;
         }
+        cc = {
+          ccId,
+          rootId,
+          ccType
+        }
+
+        $('.job-info').slideUp(500);
+        $('#divAddOrUpdateTask').slideDown(500);
+        LoadContract();
       }
     })
 
@@ -732,7 +760,6 @@
     }
 
 
-
     if (taskId.trim().length == 0) {
       $.ajax({
         url: '/tla/task',
@@ -751,7 +778,8 @@
           remark,
           qa,
           editor,
-          start: $('#rbtStart').is(':checked')
+          start: $('#rbtStart').is(':checked'),
+          cc
         },
         success: function (data) {
           Swal.fire({
@@ -785,7 +813,8 @@
           remark,
           qa,
           editor,
-          start: $('#rbtStart').is(':checked')
+          start: $('#rbtStart').is(':checked'),
+          cc
         },
         success: function (data) {
           Swal.fire({
@@ -807,10 +836,6 @@
     }
 
   });
-
-
-
-
 
   $('.inputDate').inputmask("datetime", {
     mask: "1/2/y h:s",

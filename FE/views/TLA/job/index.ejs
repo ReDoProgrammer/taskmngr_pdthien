@@ -484,16 +484,18 @@
                                     data: { id: customerId },
                                     success: function (data) {
 
-                                        data.customer.contracts[data.customer.contracts.length - 1].lines.forEach(l => {
-                                            let opt = '';
-                                            if (l.root) {
-                                                opt = '<option value = "' + l.root._id + '" data-root="1">' + l.root.name + '</option>';
-                                            } else {
-                                                opt = '<option value = "' + l.parents._id + '" data-root="0">' + l.parents.name + '</option>';
-                                            }
-                                            $('#slCustomerLevles').append(opt);
+                                        CustomerLevels =  data.customer.contracts[data.customer.contracts.length - 1].lines.map(x=>{
+                                            let obj = {};
+                                            obj._id = x.root?x.root._id:x.parents._id;
+                                            obj.name = x.root?x.root.name:x.parents.name;
+                                            obj.is_root = x.root?1:0;
+                                            return obj;
                                         })
-                                        LoadLocalLevel();
+
+                                       LoadContract();
+
+                                      
+                                       
 
 
 

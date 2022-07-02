@@ -17,381 +17,7 @@ const _QA = 'QA';
 
 const pageSize = 20;
 
-router.put('/cc', authenticateTLAToken, async (req, res) => {
-    let { taskId, remark, editor, qa, ccId } = req.body;
 
-
-    let task = await Task.findById(taskId);
-
-    if (!task) {
-        return res.status(404).json({
-            msg: `Task not found!`
-        })
-    }
-
-
-    let rm = new Remark({
-        content: remark,
-        tid: taskId,
-        user: req.user._id
-    });
-    await rm.save()
-        .then(async _ => {
-
-            let cc = await CC.findById(ccId);
-            if (!cc) {
-                return res.status(404).json({
-                    msg: `CC not found!`
-                })
-            }
-
-
-            task.remarks.push(rm);
-            task.status = -6;
-            task.tasks_cc = cc._id;
-
-
-            task.tla.updated.push({
-                at: new Date(),
-                by: req.user._id
-            });
-
-            /*
-                Vì chức năng CC reject task chỉ áp dụng cho những task ít nhất đã được editor submit trước đó
-                -- nên chỉ cần quan tâm tới trường hợp có editor truyền vào
-                -- và khác editor hiện đang xử lý task đó
-            */
-
-
-            if (editor.length > 0 && task.editor[task.editor.length - 1].staff !== editor) {
-                await getModule(_EDITOR)
-                    .then(async m => {
-
-                        await getWage(editor, task.basic.level, m._id)
-                            .then(async w => {
-
-                                let ed = {
-                                    staff: editor,
-                                    wage: w.wage,
-                                    tla: req.user._id, //TLA gán task cho editor
-                                    timestamp: new Date() //thời điểm được gán task
-                                };
-
-
-                                //xử lý liên quan tới timeline của editor hiện tại
-                                if (task.editor[task.editor.length - 1].timeline && task.editor[task.editor.length - 1].timeline.length > 0) {
-                                    task.editor[task.editor.length - 1].timeline[task.editor[task.editor.length - 1].timeline.length - 1].unregisted = true;
-                                }
-
-
-                                task.editor.push(ed);//thêm editor mới vào
-                            })
-                            .catch(err => {
-                                console.log(err.msg);
-                                return res.status(err.code).json({
-                                    msg: err.msg
-                                })
-                            })
-                    })
-                    .catch(err => {
-                        console.log(err.msg);
-                        return res.status(err.code).json({
-                            msg: err.msg
-                        })
-                    })
-            }
-
-
-            /*
-                gán Q.A cần quan tâm tới
-                1: qa được truyền vào phải là 1 id Q.A cụ thể
-                2: thiết lập các thông số  cần thiết đối với các Q.A đã xử lý trước đó(nếu có)
-            */
-
-            console.log(qa)
-            if (qa && qa.length > 0) {
-                await getModule(_QA)
-                    .then(async m => {
-                        await getWage(qa, task.basic.level, m._id)
-                            .then(async w => {
-                                let q = {
-                                    staff: qa,
-                                    wage: w.wage,
-                                    tla: req.user._id,
-                                    timestamp: new Date()
-                                };
-
-                                if (task.qa.length > 0) {//nếu trước đó đã có Q.A xử lý
-                                    if (task.qa[task.qa.length - 1].staff !== qa) {//chỉ cần xử lý trường hợp Q.A được truyền vào khác Q.A hiện đang xử lý task
-                                        task.qa[task.qa.length].unregisted = true;//cập nhật lại trạng thái hủy nhận task đối với Q.A hiện tại
-                                        task.qa.push(q);//thêm q.a mới vào
-                                    }
-                                } else {
-                                    task.qa.push(q);//thêm q.a mới vào
-                                }
-
-                            })
-                            .catch(err => {
-                                console.log(err.msg);
-                                return res.status(err.code).json({
-                                    msg: err.msg
-                                })
-                            })
-                    })
-                    .catch(err => {
-                        console.log(err.msg);
-                        return res.status(err.code).json({
-                            msg: err.msg
-                        })
-                    })
-            }
-
-
-            await task.save()
-                .then(async _ => {
-                    console.log(cc)
-                    cc.status = 0;
-                    await cc.save();
-                    return res.status(200).json({
-                        msg: `CC reject task successfully!`
-                    })
-                })
-                .catch(err => {
-                    console.log(`Can not CC reject task with error: ${new Error(err.message)}`)
-                    return res.status(500).json({
-                        msg: `Can not CC reject task with error: ${new Error(err.message)}`
-                    })
-                })
-        })
-        .catch(err => {
-            console.log(`Can not create remark with error: ${new Error(err.message)}`)
-            return res.status(500).json({
-                msg: `Can not create remark with error: ${new Error(err.message)}`
-            })
-        })
-
-})
-
-
-router.post('/cc', authenticateTLAToken, async (req, res) => {
-    let { level, assigned_date, deadline, input_link, remark, editor, qa, jobId, customerId, ccId } = req.body;
-
-
-
-    let job = await Job.findById(jobId);
-    if (!job) {
-        console.log(`Job not found!`)
-        return res.status(404).json({
-            msg: `Job not found!`
-        })
-    }
-
-    let cc = await CC.findById(ccId);
-    if (!cc) {
-        console.log(`CC not found!`)
-        return res.status(404).json({
-            msg: `CC not found!`
-        })
-    }
-
-
-    await getCustomerLevelPrice(customerId, level)
-        .then(async p => {
-
-            if (p.price == 0) {
-                return res.status(403).json({
-                    msg: `Customer level price unit not available!`
-                })
-            }
-
-
-
-            let task = new Task();
-
-
-            task.additional_task = ccId;//gán thông tin tham chiếu tới cc
-
-            //THIẾT LẬP CÁC THÔNG TIN CƠ BẢN CỦA TASK
-            let bs = {
-                job: job,
-                level: level,
-                price: p.price
-            };
-
-            //deadline
-            let dl = {};
-            dl.begin = assigned_date;
-            if (deadline.length !== 0) {
-                dl.end = deadline;
-            }
-            bs.deadline = dl;
-
-            let link = {};
-            link.input = input_link;
-            bs.link = link;
-
-            task.basic = bs;
-
-
-
-            //THÔNG TIN LIÊN QUAN TỚI TLA
-            let tla = {};
-            tla.created = {
-                at: new Date(),
-                by: req.user._id
-            };
-
-            task.tla = tla;
-
-
-
-
-
-
-
-
-
-            // THÔNG TIN LIÊN QUAN TỚI GÁN EDITOR
-            if (editor.length > 0) {
-                await getModule(_EDITOR)
-                    .then(async m => {
-                        await getWage(editor, level, m._id)
-                            .then(async w => {
-                                let ed = {
-                                    staff: editor,
-                                    wage: w.wage,
-                                    tla: req.user._id,
-                                    timestamp: new Date()
-                                };
-
-                                task.editor = ed;
-                                task.status = 0;
-
-                            })
-                            .catch(err => {
-                                return res.status(err.code).json({
-                                    msg: err.msg
-                                })
-                            })
-                    })
-                    .catch(err => {
-                        return res.status(err.code).json({
-                            msg: err.msg
-                        })
-                    })
-
-            }
-
-            //THÔNG TIN LIÊN QUAN TỚI GÁN Q.A
-            if (qa.length > 0) {
-                await getModule(_QA)
-                    .then(async m => {
-                        await getWage(qa, level, m._id)
-                            .then(async w => {
-                                let q = {
-                                    staff: qa,
-                                    wage: w.wage,
-                                    tla: req.user._id,
-                                    timestamp: new Date()
-                                };
-                                task.qa = q;
-                            })
-                            .catch(err => {
-                                return res.status(err.code).json({
-                                    msg: err.msg
-                                })
-                            })
-                    })
-                    .catch(err => {
-                        return res.status(err.code).json({
-                            msg: err.msg
-                        })
-                    })
-
-            }
-
-
-
-            let rm = new Remark({
-                user: req.user._id,
-                content: remark,
-                tid: task._id
-            });
-
-            await rm.save()
-                .then(async r => {
-                    task.remarks.push(r);
-
-                    await task.save()
-                        .then(async _ => {
-                            job.tasks.push(task);
-                            job.cc.push(cc);
-                            await job.save()
-                                .then(async _ => {
-                                    cc.status = 0;// trạng thái đang xử lý
-                                    cc.additional_tasks.push(task);//thêm taskid vào danh sách CC task tạo mới
-                                    await cc.save()
-                                        .then(_ => {
-                                            return res.status(201).json({
-                                                msg: `New CC task has been created!`
-                                            })
-                                        })
-                                })
-                                .catch(err => {
-                                    console.log(`Can not update tasks list into job with error: ${new Error(err.message)}`)
-                                    return res.status(500).json({
-                                        msg: `Can not update tasks list into job with error: ${new Error(err.message)}`
-                                    })
-                                })
-                        })
-                        .catch(err => {
-                            console.log(`Can not create task with error: ${new Error(err.message)}`)
-                            return res.status(500).json({
-                                msg: `Can not create task with error: ${new Error(err.message)}`
-                            })
-                        })
-                })
-                .catch(err => {
-                    console.log(`Can not create remark with error: ${new Error(err.message)}`)
-                    return res.status(500).json({
-                        msg: `Can not create remark with error: ${new Error(err.message)}`
-                    })
-                })
-        })
-        .catch(err => {
-            console.log(err);
-            return res.status(err.code).json({
-                msg: err.msg
-            })
-        })
-
-
-})
-
-router.get('/cc', authenticateTLAToken, async (req, res) => {
-    let { jobId } = req.query;
-    await CC.find({ job: jobId })
-        .populate('created.by', 'fullname')
-        .populate('update.by', 'fullname')
-        .populate({
-            path: 'fix_task',
-            populate: {
-                path: 'basic.level'
-            }
-        })
-        .exec()
-        .then(ccList => {
-            return res.status(200).json({
-                msg: 'Load CC list by job successfully!',
-                ccList
-            })
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not load CC list by job with error: ${new Error(err.message)}`
-            })
-        })
-})
 
 router.get('/list', authenticateTLAToken, async (req, res) => {
     let { jobId } = req.query;
@@ -573,9 +199,12 @@ router.post('/', authenticateTLAToken, async (req, res) => {
         remark,
         qa,
         editor,
-        start
+        start,
+        cc
     } = req.body;
 
+console.log(cc);
+return;
 
     let task = new Task();
 
@@ -1089,4 +718,22 @@ const ChangeVisibleQA = (taskId, qa) => {
     })
 }
 
+const PushCC = (jobId,taskId,rootId,is_root)=>{
+    return new Promise(async (resolve,reject)=>{
+        let job = await Job.findById(jobId);
+        if(!job){
+            return reject({
+                code:404,
+                msg:`Can not push CC into job cause job not found!`
+            })
+        }
+
+        if(is_root == 'true'){
+            let chk = job.cc.filter(x=>x.root == rootId);
+            console.log(chk)
+        }else{
+
+        }
+    })
+}
 
