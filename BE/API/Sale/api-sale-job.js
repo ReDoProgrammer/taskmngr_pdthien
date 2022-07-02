@@ -179,17 +179,17 @@ router.get('/list-by-customer', authenticateSaleToken, async (req, res) => {
 
 router.delete('/', [authenticateSaleToken, ValidateCheckIn], async (req, res) => {
   let { jobId } = req.body;
-  let countTask = await Task.countDocuments({ 'basic.job': jobId });
-  if (countTask > 0) {
-    return res.status(403).json({
-      msg: `Can not delete this job when having tasks based on it!`
-    })
-  }
 
   let job = await Job.findById(jobId);
   if (!job) {
     return res.status(500).json({
       msg: `Job not found!`
+    })
+  }
+
+  if(job.root.length > 0 || job.parents.length>0){
+    return res.status(403).json({
+      msg:`Cannot delete this job when having tasks belong to it!`
     })
   }
 
