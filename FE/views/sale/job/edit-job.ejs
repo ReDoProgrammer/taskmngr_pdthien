@@ -244,7 +244,7 @@
       $('#lblError').show().delay(3000).fadeOut();
       return;
     }
-    
+
     if (isNaN(delivery_date) || delivery_date === null || isNaN(received_date) || received_date == null) {
       $('#lblError').text('(*) Received date or delivery date is  invalid!');
       $('#lblError').show().delay(3000).fadeOut();
@@ -272,6 +272,12 @@
 
     if ($('#ckbMaterial').is(':checked') && (typeof material === 'undefined' || material === null)) {
       $('#lblError').text('(*) Please set material when it has choosen to continue');
+      $('#lblError').show().delay(3000).fadeOut();
+      return;
+    }
+
+    if ($('#ckbMaterial').is(':checked') && quantity<=0) {
+      $('#lblError').text('(*) Material quantity is invalid!');
       $('#lblError').show().delay(3000).fadeOut();
       return;
     }

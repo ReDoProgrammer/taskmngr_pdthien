@@ -234,7 +234,6 @@ router.put("/", [authenticateSaleToken, ValidateCheckIn], async (req, res) => {
     material,
     captureder,
     quantity,
-    price,
     urgent,
     templates
   } = req.body;
