@@ -107,6 +107,7 @@ router.get('/list-tasks', authenticateTLAToken, async (req, res) => {
             msg: `Can not list task belong to job cause job not found!`
         })
     }
+
     return res.status(200).json({
         msg: `List tasks based on job successfully!`,
         job

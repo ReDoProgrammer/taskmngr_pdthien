@@ -123,7 +123,6 @@
                                         success: function (data) {
                                             let idx = 1;
 
-
                                             data.job.root.forEach(r => {
                                                 newRow += '<tr>';
 
@@ -141,6 +140,12 @@
                                                     newRow += '<tr id="' + t._id + '" data-root="' + r._id + '">';
                                                     newRow += '<td class="font-weight-bold text-primary">';
                                                     newRow += t.basic.level.name;
+
+                                                    let chk = (data.job.cc.filter(x => x.tasks.includes(t._id))).length > 0 ? true : false;
+                                                    if (chk) {
+                                                        newRow += '<i class="fa fa-cc text-danger ml-2" aria-hidden="true"></i>'
+                                                    }
+
                                                     if (t.status === -10) {
                                                         newRow += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true" ></i>';
                                                     }
@@ -237,10 +242,17 @@
 
                                                 newRow += '</tr>';
 
+
                                                 p.tasks.forEach(t => {
                                                     newRow += '<tr id="' + t._id + '" data-parents="' + p._id + '">';
                                                     newRow += '<td class="font-weight-bold text-primary">';
                                                     newRow += t.basic.level.name;
+
+                                                    let chk = (data.job.cc.filter(x => x.tasks.includes(t._id))).length > 0 ? true : false;
+                                                    if (chk) {
+                                                        newRow += '<i class="fa fa-cc text-danger ml-2" aria-hidden="true"></i>'
+                                                    }
+
                                                     if (t.status === -10) {
                                                         newRow += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true" ></i>';
                                                     }
@@ -378,7 +390,7 @@
 
                                         $('#tblJobs').empty();
                                         idx = (page - 1) * data.pageSize;
-                                        data.jobs.forEach(job => {                                      
+                                        data.jobs.forEach(job => {
 
                                             let tr = '<tr id="' + job._id + '" data-customer="' + job.customer._id + '">';
                                             tr += '<td>';
@@ -484,18 +496,18 @@
                                     data: { id: customerId },
                                     success: function (data) {
 
-                                        CustomerLevels =  data.customer.contracts[data.customer.contracts.length - 1].lines.map(x=>{
+                                        CustomerLevels = data.customer.contracts[data.customer.contracts.length - 1].lines.map(x => {
                                             let obj = {};
-                                            obj._id = x.root?x.root._id:x.parents._id;
-                                            obj.name = x.root?x.root.name:x.parents.name;
-                                            obj.is_root = x.root?1:0;
+                                            obj._id = x.root ? x.root._id : x.parents._id;
+                                            obj.name = x.root ? x.root.name : x.parents.name;
+                                            obj.is_root = x.root ? 1 : 0;
                                             return obj;
                                         })
 
-                                       LoadContract();
+                                        LoadContract();
 
-                                      
-                                       
+
+
 
 
 
@@ -623,5 +635,3 @@
                                 isShown = !isShown;
                             })
                         </script>
-
-               

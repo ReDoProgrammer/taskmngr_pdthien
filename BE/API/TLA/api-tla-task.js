@@ -29,13 +29,14 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
     }
 
     let tasks = await Task.find({ 'basic.job': jobId })
-        .populate([
-            { path: 'basic.job', select: 'name urgent' },
+        .populate([           
+            { path: 'basic.job', select: 'name urgent cc' },
             { path: 'basic.level', select: 'name' },
             { path: 'editor.staff', select: 'fullname username' },
             { path: 'qa.staff', select: 'fullname username' },
             { path: 'dc.staff' }
         ]);
+        
     return res.status(200).json({
         msg: `Load tasks based on job successfully!`,
         tasks
