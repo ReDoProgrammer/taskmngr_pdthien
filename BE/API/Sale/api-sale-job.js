@@ -294,6 +294,7 @@ router.put("/", [authenticateSaleToken, ValidateCheckIn], async (req, res) => {
   }
   job.urgent = urgent;
 
+
   await job.save()
     .then(_ => {
       ChangeTemplate(templates, job._id)
