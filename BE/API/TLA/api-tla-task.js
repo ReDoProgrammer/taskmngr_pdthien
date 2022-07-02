@@ -203,9 +203,6 @@ router.post('/', authenticateTLAToken, async (req, res) => {
         cc
     } = req.body;
 
-console.log(cc);
-return;
-
     let task = new Task();
 
     task.basic = {
@@ -241,7 +238,7 @@ return;
 
     await task.save()
         .then(async _ => {
-            Promise.all([PushTaskIntoJob(jobId, task._id, customer_level, is_root), UpdateEditor(task._id, level, editor, req.user._id)])
+            Promise.all([PushTaskIntoJob(jobId, task._id, customer_level, is_root), UpdateEditor(task._id, level, editor, req.user._id),PushCC(jobId,cc,task._id)])
                 .then(_async => {
                     UpdateQA(task._id, level, qa, req.user._id)
                         .then(_ => {
@@ -718,8 +715,12 @@ const ChangeVisibleQA = (taskId, qa) => {
     })
 }
 
-const PushCC = (jobId,taskId,rootId,is_root)=>{
+const PushCC = (jobId,ccId,taskId)=>{
     return new Promise(async (resolve,reject)=>{
+        if(!ccId){
+            return resolve();
+        }
+
         let job = await Job.findById(jobId);
         if(!job){
             return reject({
@@ -728,12 +729,22 @@ const PushCC = (jobId,taskId,rootId,is_root)=>{
             })
         }
 
-        if(is_root == 'true'){
-            let chk = job.cc.filter(x=>x.root == rootId);
-            console.log(chk)
-        }else{
+        let cc = (job.cc.filter(x=>x._id == ccId))[0];
+        
+        cc.tasks.push(taskId);
+        console.log({cc});
+        
+        await job.save()
+        .then(_=>{
+            return resolve(job);
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not push task in to CC with error: ${new Error(err.message)}`
+            })
+        })
 
-        }
     })
 }
 
