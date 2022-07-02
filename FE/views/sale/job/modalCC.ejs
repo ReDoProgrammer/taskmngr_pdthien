@@ -264,7 +264,7 @@
                         if(c.root){
                             tr+= c.root.tasks.length == 0?'Initial':'Processing';
                         }
-                        if(c.parents){
+                        if(c.parents && c.parents.tasks){
                             tr+= c.parents.tasks.length == 0?'Initial':'Processing';
                         }
                     tr += '</td>'
