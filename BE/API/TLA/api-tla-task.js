@@ -5,7 +5,6 @@ const Job = require('../../models/job-model');
 
 
 const {
-    getModule,
     getWage,
     GetTask,
     GetCustomerById } = require('../common');
@@ -731,8 +730,10 @@ const PushCC = (jobId, ccId, taskId, rootId, is_root) => {
         }
 
 
-
+        
         let cc = (job.cc.filter(x => x._id == ccId))[0];
+
+        console.log(cc)
 
         if (is_root && !cc.root) {
             cc.root = rootId;
@@ -742,7 +743,7 @@ const PushCC = (jobId, ccId, taskId, rootId, is_root) => {
             cc.parents = rootId;
         }
 
-        console.log(cc)
+       
 
         cc.tasks.push(taskId);
         await job.save()

@@ -437,7 +437,7 @@
           }
           tr += '</td>';
 
-          tr += '<td class="text-left">' + c.remark + '</td>';
+          tr += '<td class="text-left" name="remark">' + c.remark + '</td>';
           tr += '<td class="text-left font-italic text-right">';
 
           tr += '</td>';
@@ -625,6 +625,10 @@
     cc = $(this).closest('tr').attr('id');   
     let ccType= $(this).closest('tr').data('type');
     let rootId=  $(this).closest('tr').data('root');
+    let remark = $(this).closest('tr').find('td[name="remark"]').text();
+    
+   $('#txtRemark').val(remark);
+
     $.ajax({
       url: '/tla/job/detail',
       type: 'get',
