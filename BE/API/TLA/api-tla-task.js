@@ -729,34 +729,29 @@ const PushCC = (jobId, ccId, taskId, rootId, is_root) => {
             })
         }
 
-
-        
-        let cc = (job.cc.filter(x => x._id == ccId))[0];
-
-        console.log(cc)
-
-        if (is_root && !cc.root) {
-            cc.root = rootId;
+        let cc = (job.cc.filter(x=>x._id ==ccId))[0];
+        if(is_root =='true'){
+            if(cc.root){
+                cc.root = rootId;
+            }
+        }else{
+            if(cc.parents){
+                cc.parents = rootId;
+            }
         }
-
-        if (!is_root && !cc.parents) {
-            cc.parents = rootId;
-        }
-
-       
 
         cc.tasks.push(taskId);
-        await job.save()
-            .then(_ => {
-                return resolve(job);
-            })
-            .catch(err => {
-                return reject({
-                    code: 500,
-                    msg: `Can not push task in to CC with error: ${new Error(err.message)}`
-                })
-            })
 
+        await job.save()
+        .then(_=>{
+            return resolve(job)
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not push task into job cc with error: ${new Error(err.message)}`
+            })
+        })      
     })
 }
 

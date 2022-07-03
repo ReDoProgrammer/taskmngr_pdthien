@@ -151,8 +151,9 @@
     $('#btnSubmitCC').click(function () {
         ccType = $('#rbtMoreTask').is(':checked') ? true : false;
         rootId = $('#ckbChooseTask').is(':checked') ? $('#slTasks option:selected').val() : null;
-        is_root = $('#ckbChooseTask').is(':checked') ? $('#slTasks option:selected').data('is_root') : 0;
+        is_root = $('#ckbChooseTask').is(':checked') ? parseInt($('#slTasks option:selected').data('root')) : 0;
         remark = $('#txaRemark').val();
+
 
         if (remark.trim().length == 0) {
             $('#ccMsg').text('(!) Please input CC remark');
@@ -248,6 +249,7 @@
                 $('#tblCCList').empty();
                 let idx = 1;
                 data.cc.forEach(c => {
+                    console.log(c)
                     let tr = '<tr id="' + c._id + '">';
                     tr += '<td class="text-left">' + (idx++) + '</td>';
 
@@ -296,13 +298,13 @@
             success: function (data) {
                 $('#slTasks').empty();
                 data.job.root.forEach(r => {
-                    let opt = '<option value="' + r.ref._id + '" dat-root="0">' + r.ref.name + '  - [ ';
+                    let opt = '<option value="' + r.ref._id + '" data-root="1">' + r.ref.name + '  - [ ';
                     opt += r.tasks.map(x => ' ' + x.basic.level.name);
                     opt += ' ]</option>';
                     $('#slTasks').append(opt);
                 })
                 data.job.parents.forEach(p => {
-                    let opt = '<option value="' + p.ref._id + '" dat-root="0">' + p.ref.name + '  - [ ';
+                    let opt = '<option value="' + p.ref._id + '" data-root="0">' + p.ref.name + '  - [ ';
                     opt += p.tasks.map(x => ' ' + x.basic.level.name);
                     opt += ' ]</option>';
                     $('#slTasks').append(opt);

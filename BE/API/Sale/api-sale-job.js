@@ -12,20 +12,22 @@ const { ObjectId } = require('mongodb');
 const pageSize = 20;
 
 router.get('/list-cc', authenticateSaleToken, async (req, res) => {
-  let {jobId} = req.query;
+  let { jobId } = req.query;
   let job = await Job.findById(jobId)
-  .populate('cc.root')
-  .populate('cc.parents');
-  
-  if(!job){
+    .populate([
+      { path: 'cc.root' },
+      { path: 'cc.parents' }
+    ])
+
+  if (!job) {
     return res.status(404).json({
-      msg:`Job not found!`
+      msg: `Job not found!`
     })
   }
   console.log(job)
   return res.status(200).json({
-    msg:`Load CC list successfully!`,
-    cc:job.cc
+    msg: `Load CC list successfully!`,
+    cc: job.cc
   })
 })
 
@@ -187,9 +189,9 @@ router.delete('/', [authenticateSaleToken, ValidateCheckIn], async (req, res) =>
     })
   }
 
-  if(job.root.length > 0 || job.parents.length>0){
+  if (job.root.length > 0 || job.parents.length > 0) {
     return res.status(403).json({
-      msg:`Cannot delete this job when having tasks belong to it!`
+      msg: `Cannot delete this job when having tasks belong to it!`
     })
   }
 
@@ -432,7 +434,7 @@ router.post('/cc', [authenticateSaleToken, ValidateCheckIn], async (req, res) =>
   }
 
   if (rootId.length > 0) {
-    if (is_root == true) {
+    if (is_root == 1) {
       job.cc.push({
         root: rootId,
         remark,
