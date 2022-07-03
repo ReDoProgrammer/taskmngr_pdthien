@@ -119,8 +119,14 @@
 
                                     <div class="col-md-1 col-sm-1 col-xs-2 mt-1">TV:</div>
                                     <div id="divTV" class=" font-weight-bold col-md-5 col-sm-5 col-xs-10 mt-1"></div>
+                                </div>   
+                                <hr/>
+                                <div class="row mt-2">
+                                    <div class="col-md-12">
+                                        <label for="">Style note:</label>
+                                        <label id="lblStyleNote" class="text-danger font-italic"></label>
+                                    </div>
                                 </div>
-
 
                             </div>
                         </div>
@@ -128,12 +134,11 @@
 
 
                     </div>
-                    <div class="panel panel-warning mt-2">
-                        <div class="panel-heading font-weight-bold">Remark:</div>
-                        <div class="panel-body" id="remarks"></div>
-                    </div>
+
 
                     <div class="panel-footer">
+                        <div class="panel-heading font-weight-bold">Remark:</div>
+                        <div class="panel-body" id="remarks"></div>
                         <div class="form-group text-right">
                             <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
                         </div>
@@ -159,9 +164,9 @@
         }
     })
 
-    $("#modalTaskDetail").on('shown.bs.modal',async function (e) {
+    $("#modalTaskDetail").on('shown.bs.modal', async function (e) {
         $('#job-info').hide();
-       await LoadTaskDetail();
+        await LoadTaskDetail();
     });
 
     $('#btnCopyToClipboard').click(function () {
@@ -174,8 +179,8 @@
         )
     })
 
-    function LoadTaskDetail(){
-       return $.ajax({
+    function LoadTaskDetail() {
+        return $.ajax({
             url: '/dc/task/detail',
             type: 'get',
             headers: {
@@ -191,13 +196,12 @@
                 $('#divOutput').html(data.customer.style.output.name)
 
                 $('#divSize').html(data.customer.style.size.name)
-                $('#lblNoteStyle').text(data.customer.style.style_note);
-
+                $('#lblStyleNote').text(data.customer.style.style_note);
                 $('#lblJobName').text(data.task.basic.job.name);
 
                 $('#lblLevelName').text(data.task.basic.level.name);
                 $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.basic.deadline.begin));
-                if (data.task.basic.deadline.end) {                    
+                if (data.task.basic.deadline.end) {
                     $('#lblDeadline').text(convertISODateToTimeFormat(data.task.basic.deadline.end));
                 } else {
                     $('#lblDeadline').text('');
@@ -227,7 +231,7 @@
                 }
 
                 if (data.task.status === 4) {//uploaded
-                    $('#divOutputLink').html('<a href="' + data.task.tla.uploaded[data.task.tla.uploaded.length-1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
+                    $('#divOutputLink').html('<a href="' + data.task.tla.uploaded[data.task.tla.uploaded.length - 1].link + '" target="_blank" rel="noopener noreferrer">Link</a>')
                 } else {
                     if (data.task.editor && data.task.editor.length > 0) {
                         if (data.task.editor[data.task.editor.length - 1].submited.length > 0 && data.task.editor[data.task.editor.length - 1].submited) {
