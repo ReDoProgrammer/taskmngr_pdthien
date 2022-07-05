@@ -441,7 +441,7 @@ router.delete('/', authenticateTLAToken, async (req, res) => {
 
     await task.delete()
         .then(_ => {
-            PullTaskFromJob(task.basic.job, task._id)
+           Promise.all([ PullTaskFromJob(task.basic.job, task._id),PullTaskFromCC(task.basic.job,task._id)])
                 .then(_ => {
                     return res.status(200).json({
                         msg: `Task has been deleted!`
@@ -755,3 +755,29 @@ const PushCC = (jobId, ccId, taskId, rootId, is_root) => {
     })
 }
 
+const PullTaskFromCC = (jobId,taskId)=>{
+    return new Promise(async (resolve,reject)=>{
+        let job = await Job.findById(jobId);
+        if(!job){
+            return reject({
+                code:404,
+                msg:`Job not found to pull task from CC!`
+            })
+        }
+        
+        job.cc.forEach(c=>{
+            c.tasks = c.tasks.filter(x=>x._id != taskId);
+        })
+
+        await job.save()
+        .then(_=>{
+            return resolve(job);
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not pull task from CC with error: ${new Error(err.message)}`
+            })
+        })
+    })
+}
