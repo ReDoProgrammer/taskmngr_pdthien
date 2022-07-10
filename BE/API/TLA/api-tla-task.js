@@ -16,7 +16,31 @@ const _QA = 'QA';
 
 const pageSize = 20;
 
+router.get('/list-based-on-root', authenticateTLAToken, async (req, res) => {
+    let { jobId, rootId, is_root } = req.query;
+    let job = await Job.findById(jobId);
+    let taskIds = [];
+    if (is_root == 1) {
+        let root = (job.root.filter(x => x.ref == rootId))[0];
+        taskIds = root.tasks;
+    } else {
+        let parents = (job.parents.filter(x => x.ref == rootId))[0];
+        taskIds = parents.tasks;
+    }
+    let tasks = await Task.find({
+        'basic.job': jobId,
+        _id: { $in: taskIds }
+    }).populate('basic.level');
 
+    let levels = tasks.map(x => {
+        return x.basic.level;
+    })
+    return res.status(200).json({
+        msg: `List tasks based on root and job successfully!`,
+        levels
+    })
+
+})
 
 router.get('/list', authenticateTLAToken, async (req, res) => {
     let { jobId } = req.query;
@@ -35,7 +59,7 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
             { path: 'qa.staff', select: 'fullname username' },
             { path: 'dc.staff' }
         ]);
-      
+
     return res.status(200).json({
         msg: `Load tasks based on job successfully!`,
         tasks
@@ -441,7 +465,7 @@ router.delete('/', authenticateTLAToken, async (req, res) => {
 
     await task.delete()
         .then(_ => {
-           Promise.all([ PullTaskFromJob(task.basic.job, task._id),PullTaskFromCC(task.basic.job,task._id)])
+            Promise.all([PullTaskFromJob(task.basic.job, task._id), PullTaskFromCC(task.basic.job, task._id)])
                 .then(_ => {
                     return res.status(200).json({
                         msg: `Task has been deleted!`
@@ -729,13 +753,13 @@ const PushCC = (jobId, ccId, taskId, rootId, is_root) => {
             })
         }
 
-        let cc = (job.cc.filter(x=>x._id ==ccId))[0];
-        if(is_root =='true'){
-            if(cc.root){
+        let cc = (job.cc.filter(x => x._id == ccId))[0];
+        if (is_root == 'true') {
+            if (cc.root) {
                 cc.root = rootId;
             }
-        }else{
-            if(cc.parents){
+        } else {
+            if (cc.parents) {
                 cc.parents = rootId;
             }
         }
@@ -743,41 +767,41 @@ const PushCC = (jobId, ccId, taskId, rootId, is_root) => {
         cc.tasks.push(taskId);
 
         await job.save()
-        .then(_=>{
-            return resolve(job)
-        })
-        .catch(err=>{
-            return reject({
-                code:500,
-                msg:`Can not push task into job cc with error: ${new Error(err.message)}`
+            .then(_ => {
+                return resolve(job)
             })
-        })      
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not push task into job cc with error: ${new Error(err.message)}`
+                })
+            })
     })
 }
 
-const PullTaskFromCC = (jobId,taskId)=>{
-    return new Promise(async (resolve,reject)=>{
+const PullTaskFromCC = (jobId, taskId) => {
+    return new Promise(async (resolve, reject) => {
         let job = await Job.findById(jobId);
-        if(!job){
+        if (!job) {
             return reject({
-                code:404,
-                msg:`Job not found to pull task from CC!`
+                code: 404,
+                msg: `Job not found to pull task from CC!`
             })
         }
-        
-        job.cc.forEach(c=>{
-            c.tasks = c.tasks.filter(x=>x._id != taskId);
+
+        job.cc.forEach(c => {
+            c.tasks = c.tasks.filter(x => x._id != taskId);
         })
 
         await job.save()
-        .then(_=>{
-            return resolve(job);
-        })
-        .catch(err=>{
-            return reject({
-                code:500,
-                msg:`Can not pull task from CC with error: ${new Error(err.message)}`
+            .then(_ => {
+                return resolve(job);
             })
-        })
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not pull task from CC with error: ${new Error(err.message)}`
+                })
+            })
     })
 }

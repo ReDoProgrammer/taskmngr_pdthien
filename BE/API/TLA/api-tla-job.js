@@ -7,6 +7,8 @@ const LocalLevel = require('../../models/job-level-model');
 
 const pageSize = 20;
 
+
+
 router.get('/list', authenticateTLAToken, async (req, res) => {
     let { page, search } = req.query;
     let jobs = await Job

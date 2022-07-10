@@ -293,6 +293,25 @@
     })
   })
 
+
+  $("#JobMngrModal").on('shown.bs.modal', function (e) {
+
+    LoadTasks();
+    LoadJob();
+    LoadCCList();
+    LoadCustomer();
+
+
+    $('.job-info').hide();
+    $('#divLevel').hide();
+    $('#divEditTask').hide();
+    $('#divAssign').hide();
+    $('#divAddOrUpdateTask').hide();
+    $('#txtAssignDate').val(getCurrentTime())
+  });
+
+
+
   $("#JobMngrModal").on('hide.bs.modal', function () {
     LoadJobs();
   });
@@ -336,7 +355,7 @@
     $('#colQA').hide();
     $('#ckbAssignEditor').prop('checked', false);
     $('#ckbAssignQA').prop('checked', false);
-    BindContract();
+
   })
 
   $('.btnCancel').on('click', function () {
@@ -345,21 +364,6 @@
     $("button[name='btnDelTask']").show(100);
     taskId = '';
   })
-
-  $("#JobMngrModal").on('shown.bs.modal', function (e) {
-    LoadTasks();
-    LoadJob();
-    LoadCCList();
-    LoadCustomer();
-
-    $('.job-info').hide();
-    $('#divLevel').hide();
-    $('#divEditTask').hide();
-    $('#divAssign').hide();
-    $('#divAddOrUpdateTask').hide();
-    $('#txtAssignDate').val(getCurrentTime())
-  });
-
 
   function LoadLocalLevel() {
     $.ajax({
@@ -617,6 +621,30 @@
     })
   }
 
+  function LoadAvailableTasks() {
+    $.ajax({
+      url: '/tla/task/list-based-on-root',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        jobId,
+        rootId: $('#slCustomerLevles option:selected').val(),
+        is_root: parseInt($('#slCustomerLevles option:selected').data('root'))
+      },
+      success: function (data) {
+        $('#slLocalLevels').empty();
+        data.levels.forEach(l => {
+          let opt = '<option value="' + l._id + '">' + l.name + '</option>';
+          $('#slLocalLevels').append(opt);
+        })
+
+        LoadQA();
+        LoadEditor();
+      }
+    })
+  }
 
 
   $(document).on("click", "button[name='btnCC']", function () {
@@ -627,24 +655,11 @@
 
     $('#txtRemark').val(remark);
 
-    $.ajax({
-      url: '/tla/job/detail',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: { jobId },
-      success: function (data) {
-        CustomerLevels = [];
-        data.job.parents.forEach(p => {
-          console.log(p)
-        })
-
-        // $('.btn-job-info').click();
-        $('#divAddOrUpdateTask').slideDown(500);
-      }
-    })
-
+    if (rootId) {
+      $('#slCustomerLevles').val(rootId);
+      LoadAvailableTasks();
+    }
+    $('#divAddOrUpdateTask').slideDown(500);
   })
 
 
