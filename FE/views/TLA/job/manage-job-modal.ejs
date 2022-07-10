@@ -194,6 +194,7 @@
   var taskId = '';
   var levelId = '';
   var cc = '';
+  var ccRemark = '';
   var CustomerLevels = [];
 
 
@@ -635,15 +636,83 @@
       },
       success: function (data) {
         $('#slLocalLevels').empty();
-        data.levels.forEach(l => {
-          let opt = '<option value="' + l._id + '">' + l.name + '</option>';
+
+        data.tasks.forEach(t => {
+          let opt = '<option value="' + t.basic.level._id + '" data-task="' + t._id + '">' + t.basic.level.name + '</option>';
           $('#slLocalLevels').append(opt);
         })
 
         LoadQA();
         LoadEditor();
+
+        $.ajax({
+          url: '/tla/task/detail',
+          type: 'get',
+          headers: {
+            authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+          data: {
+            taskId: $('#slLocalLevels option:selected').data('task')
+          },
+          success: function (data) {
+            levelId = data.task.basic.level._id;
+
+            $('#divAddOrUpdateTask').slideUp(200);
+            $('#divAddOrUpdateTask').slideDown(1000);
+
+            $('#slJobLevels').val(data.task.basic.level._id);
+            $('#slJobLevels').attr("disabled", true);
+
+            $('#txtAssignDate').val(convertISODateToTimeFormat(data.task.basic.deadline.begin));
+            if (data.task.basic.deadline.end) {
+              $('#txtDeadline').val(convertISODateToTimeFormat(data.task.basic.deadline.end));
+            }
+
+            $('#txtInputLink').val(data.task.basic.link.input);
+
+            $('#txtRemark').val(ccRemark);
+
+            $('#ckbAssignQA').prop('checked', (data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla !== 'undefined') ? true : false);
+
+            if (data.task.editor.length === 0) {
+              $('#ckbAssignEditor').show();
+              $('#ckbAssignEditor').prop('checked', false);
+              $('#colEditor').slideUp();
+            } else {
+              $('#ckbAssignEditor').prop('checked', true);
+              $('#ckbAssignEditor').show();
+              $('#colEditor').show();
+              $('#slEditor').val(data.task.editor[data.task.editor.length - 1].staff._id).selectpicker('refresh');
+            }
+
+
+            if ((data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla !== 'undefined')) {
+              $('#colQA').show();
+
+              $('#slQA').val(data.task.qa[data.task.qa.length - 1].staff._id).selectpicker('refresh');
+              if (data.task.status > 1) {
+                $('#ckbAssignQA').attr("disabled", true);
+                $('#slQA').attr("disabled", true);
+              } else {
+                $('#ckbAssignQA').attr("disabled", false);
+                $('#slQA').attr("disabled", false);
+              }
+            } else {
+              $('#colQA').hide();
+            }
+
+            if (data.task.status == -10) {
+              $('#rbtPause').prop('checked', true);
+            } else {
+              $('#rbtStart').prop('checked', true);
+            }
+          }
+        })
       }
     })
+
+
+
   }
 
 
@@ -651,9 +720,9 @@
     cc = $(this).closest('tr').attr('id');
     let ccType = $(this).closest('tr').data('type');
     let rootId = $(this).closest('tr').data('root');
-    let remark = $(this).closest('tr').find('td[name="remark"]').text();
+    ccRemark = $(this).closest('tr').find('td[name="remark"]').text();
+    $('.job-info').slideUp(500);
 
-    $('#txtRemark').val(remark);
 
     if (rootId) {
       $('#slCustomerLevles').val(rootId);
@@ -663,12 +732,6 @@
   })
 
 
-
-  $(document).on("click", "button[name='btnEditTask']", function () {
-    $('#divAssign').hide(100);
-    $('#divLevel').hide(100);
-    $('#divEditTask').slideDown(1000);
-  })
 
   $(document).on("click", "button[name='btnDelTask']", function () {
 
@@ -749,52 +812,90 @@
     }
 
 
-    if (taskId.trim().length == 0) {
-      $.ajax({
-        url: '/tla/task',
-        type: 'post',
-        headers: {
-          authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-        data: {
-          jobId,
-          customer_level,
-          is_root,
-          level,
-          assigned_date,
-          deadline,
-          input_link,
-          remark,
-          qa,
-          editor,
-          start: $('#rbtStart').is(':checked'),
-          cc
-        },
-        success: function (data) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Successfully!',
-            text: data.msg
-          })
-          LoadTasks();
-          $('#txtInputLink').val('');
-          $('#txtRemark').val('');
-          $('#divAddOrUpdateTask').slideUp(500);
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
-          $('#msgError').show().delay(10000).fadeOut();
-        },
-      })
+    if (cc.length == 0) {
+      if (taskId.trim().length == 0) {
+        $.ajax({
+          url: '/tla/task',
+          type: 'post',
+          headers: {
+            authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+          data: {
+            jobId,
+            customer_level,
+            is_root,
+            level,
+            assigned_date,
+            deadline,
+            input_link,
+            remark,
+            qa,
+            editor,
+            start: $('#rbtStart').is(':checked'),
+            cc
+          },
+          success: function (data) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Successfully!',
+              text: data.msg
+            })
+            LoadTasks();
+            $('#txtInputLink').val('');
+            $('#txtRemark').val('');
+            $('#divAddOrUpdateTask').slideUp(500);
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
+            $('#msgError').show().delay(10000).fadeOut();
+          },
+        })
+      } else {
+        $.ajax({
+          url: '/tla/task',
+          type: 'put',
+          headers: {
+            authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+          data: {
+            taskId,
+            level,
+            assigned_date,
+            deadline,
+            input_link,
+            remark,
+            qa,
+            editor,
+            start: $('#rbtStart').is(':checked'),
+            cc
+          },
+          success: function (data) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Successfully!',
+              text: data.msg
+            })
+            LoadTasks();
+            LoadJob();
+            $('#txtInputLink').val('');
+            $('#txtRemark').val('');
+            $('#divAddOrUpdateTask').slideUp(500);
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
+            $('#msgError').show().delay(3000).fadeOut();
+          },
+        })
+      }
     } else {
       $.ajax({
-        url: '/tla/task',
+        url: '/tla/task/cc',
         type: 'put',
         headers: {
           authorization: "Bearer " + localStorage.getItem("accessToken"),
         },
         data: {
-          taskId,
+          taskId: $('#slLocalLevels option:selected').data('task'),
           level,
           assigned_date,
           deadline,
@@ -820,10 +921,9 @@
         error: function (jqXHR, textStatus, errorThrown) {
           $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
           $('#msgError').show().delay(3000).fadeOut();
-        },
+        }
       })
     }
-
   });
 
   $('.inputDate').inputmask("datetime", {
