@@ -337,8 +337,6 @@
     $('#ckbAssignEditor').prop('checked', false);
     $('#ckbAssignQA').prop('checked', false);
     BindContract();
-    LoadEditor();
-    LoadQA();
   })
 
   $('.btnCancel').on('click', function () {
@@ -388,10 +386,10 @@
     })
   }
 
-  function BindContract(){
+  function BindContract() {
     $('#slCustomerLevles').empty();
-    CustomerLevels.forEach(l=>{
-      $('#slCustomerLevles').append('<option value="'+l._id+'" data-root="'+l.is_root+'">'+l.name+'</option>')
+    CustomerLevels.forEach(l => {
+      $('#slCustomerLevles').append('<option value="' + l._id + '" data-root="' + l.is_root + '">' + l.name + '</option>')
     })
     LoadLocalLevel();
   }
@@ -636,7 +634,7 @@
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       data: { jobId },
-      success: function (data) {       
+      success: function (data) {
         CustomerLevels = [];
         data.job.parents.forEach(p => {
           console.log(p)

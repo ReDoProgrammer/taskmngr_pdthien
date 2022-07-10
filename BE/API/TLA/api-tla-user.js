@@ -14,6 +14,7 @@ const _QA = 'QA';
 
 router.get('/list-editor', authenticateTLAToken, async (req, res) => {
     let { levelId } = req.query;
+    console.log({levelId})
 
     Promise.all([getModule(_EDITOR),GetStaffLevelsFromLocalJobLevel(levelId)])
     .then(async rs=>{
