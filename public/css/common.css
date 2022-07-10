@@ -48,3 +48,8 @@
       padding-left: 10px;
   }
 
+  td {
+    vertical-align: middle;
+    display: table-cell;
+}
+

@@ -119,7 +119,7 @@ router.get('/detail', authenticateTLAToken, async (req, res) => {
     let { jobId } = req.query;
     let job = await Job.findById(jobId)
         .populate([
-            {path:'created.by', select:'username fullname'},
+            { path: 'created.by', select: 'username fullname' },
             { path: 'customer' },
             {
                 path: 'cb',
@@ -158,33 +158,58 @@ router.get('/detail', authenticateTLAToken, async (req, res) => {
 router.get('/local-level', authenticateTLAToken, async (req, res) => {
     let { customer_level, is_root } = req.query;
     let levels = [];
-    if (is_root == 'true') {
-        let root = await Root.findById(customer_level);
-        let parents = await Parents.find({ _id: { $in: root.parents } })
 
-        for (const p of parents) {
-            for (const l of p.job_levels) {
-                if (!levels.includes(l)) {
-                    levels.push(l);
+    if (is_root == 'true') {
+        let root = await Root.findById(customer_level)
+            .populate({
+                path: 'parents',
+                populate: {
+                    path: 'job_levels'
                 }
-            }
+            });
+
+        if (root) {
+            root.parents.forEach(p => {
+                p.job_levels.forEach(l => {
+                    const isFound = levels.some(x => {
+                        if (x._id == l._id) {
+                            return true;
+                        }
+                        return false;
+                    })
+                    if (!isFound) {
+                        levels.push({
+                            _id: l._id,
+                            name: l.name
+                        })
+                    }
+                })
+
+            })
+            return res.status(200).json({
+                msg: `Load local levels successfully!`,
+                levels
+            })
         }
 
-        let local_levels = await LocalLevel.find({ _id: levels });
-
-        return res.status(200).json({
-            msg: `Load local levels successfully!`,
-            local_levels
-        })
-
     } else {
-        let parents = await Parents.findById(customer_level);
-        let ll = await LocalLevel.find({ _id: { $in: parents.job_levels } });
-        return res.status(200).json({
-            msg: `Load local levels successfully!`,
-            local_levels: ll
-        })
+        let parents = await Parents.findById(customer_level).populate('job_levels');
+        if (parents) {
+            levels = parents.job_levels.map(x => {
+                let obj = {};
+                obj._id = x._id;
+                obj.name = x.name;
+                return obj;
+            })
+            return res.status(200).json({
+                msg: `Load local levels successfully!`,
+                levels
+            })
+        }
     }
+
+
+
 })
 
 router.put('/submit', authenticateTLAToken, (req, res) => {

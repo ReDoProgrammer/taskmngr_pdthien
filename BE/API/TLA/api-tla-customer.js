@@ -34,9 +34,9 @@ router.get('/list',authenticateTLAToken,(req,res)=>{
     })
 })
 
-router.get('/detail',async (req,res)=>{
-    let {id} = req.query;
-    let customer  = await Customer.findById(id)
+router.get('/detail',authenticateTLAToken,async (req,res)=>{
+    let {customerId} = req.query;
+    let customer  = await Customer.findById(customerId)
     .populate([
         {path:'style.output'},
         {path:'style.size'},

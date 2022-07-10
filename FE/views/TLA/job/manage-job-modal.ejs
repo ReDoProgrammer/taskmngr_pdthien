@@ -336,7 +336,7 @@
     $('#colQA').hide();
     $('#ckbAssignEditor').prop('checked', false);
     $('#ckbAssignQA').prop('checked', false);
-
+    BindContract();
     LoadEditor();
     LoadQA();
   })
@@ -362,13 +362,6 @@
     $('#txtAssignDate').val(getCurrentTime())
   });
 
-  function LoadContract() {
-    $('#slCustomerLevles').empty();
-    CustomerLevels.forEach(l => {
-      $('#slCustomerLevles').append('<option value="' + l._id + '" data-root="' + l.is_root + '">' + l.name + '</option>');
-    })
-    LoadLocalLevel();
-  }
 
   function LoadLocalLevel() {
     $.ajax({
@@ -383,7 +376,7 @@
       },
       success: function (data) {
         $('#slLocalLevels').empty();
-        data.local_levels.forEach(l => {
+        data.levels.forEach(l => {
           let opt = '<option value="' + l._id + '">' + l.name + '</option>';
           $('#slLocalLevels').append(opt);
         })
@@ -395,6 +388,13 @@
     })
   }
 
+  function BindContract(){
+    $('#slCustomerLevles').empty();
+    CustomerLevels.forEach(l=>{
+      $('#slCustomerLevles').append('<option value="'+l._id+'" data-root="'+l.is_root+'">'+l.name+'</option>')
+    })
+    LoadLocalLevel();
+  }
 
 
   function LoadCCList() {
@@ -423,7 +423,7 @@
 
           if (!c.root && !c.parents) {
             tr += 'data-type = "-1"';
-          }         
+          }
 
           tr += '>';
 
@@ -622,12 +622,12 @@
 
 
   $(document).on("click", "button[name='btnCC']", function () {
-    cc = $(this).closest('tr').attr('id');   
-    let ccType= $(this).closest('tr').data('type');
-    let rootId=  $(this).closest('tr').data('root');
+    cc = $(this).closest('tr').attr('id');
+    let ccType = $(this).closest('tr').data('type');
+    let rootId = $(this).closest('tr').data('root');
     let remark = $(this).closest('tr').find('td[name="remark"]').text();
-    
-   $('#txtRemark').val(remark);
+
+    $('#txtRemark').val(remark);
 
     $.ajax({
       url: '/tla/job/detail',
@@ -636,46 +636,14 @@
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       data: { jobId },
-      success: function (data) {
+      success: function (data) {       
         CustomerLevels = [];
-        switch (ccType) {
-          case -1:
-            console.log(data.job.parents)
-            data.job.parents.forEach(p => {
-              CustomerLevels.push({
-                _id: p.ref._id,
-                name: p.ref.name              
-              })
-            })
-
-            data.job.root.forEach(r => {
-              CustomerLevels.push({
-                _id: r.ref._id,
-                name: r.ref.name,
-              })
-            })
-            break;
-          case 0:
-            CustomerLevels = (data.job.parents.filter(p => p.ref._id === rootId)).map(x => {
-              let obj = {};
-              obj._id = x.ref._id;
-              obj.name = x.ref.name;
-              return obj;
-            });
-            break;
-          case 1:
-            CustomerLevels = (data.job.root.filter(r => r.ref._id === rootId)).map(x => {
-              let obj = {};
-              obj._id = x.ref._id;
-              obj.name = x.ref.name;
-              return obj;
-            });
-            break;
-        }        
+        data.job.parents.forEach(p => {
+          console.log(p)
+        })
 
         // $('.btn-job-info').click();
         $('#divAddOrUpdateTask').slideDown(500);
-        LoadContract();
       }
     })
 
