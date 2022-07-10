@@ -917,6 +917,8 @@
           $('#txtInputLink').val('');
           $('#txtRemark').val('');
           $('#divAddOrUpdateTask').slideUp(500);
+          cc = '';
+          
         },
         error: function (jqXHR, textStatus, errorThrown) {
           $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
