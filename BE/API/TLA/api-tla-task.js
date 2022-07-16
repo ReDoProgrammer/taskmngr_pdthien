@@ -227,6 +227,7 @@ router.post('/', authenticateTLAToken, async (req, res) => {
         cc
     } = req.body;
 
+
     let task = new Task();
 
     task.basic = {
@@ -299,21 +300,12 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
         remark,
         qa,
         editor,
-        start
+        cc,
+        root_id,
+        is_root
     } = req.body;
 
-    console.log({
-        taskId,
-        level,
-        assigned_date,
-        deadline,
-        input_link,
-        remark,
-        qa,
-        editor,
-        start
-    })
-
+    
     let task = await Task.findById(taskId);
 
     if (!task) {
@@ -345,9 +337,10 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
         by: req.user._id
     }
 
+
     await task.save()
         .then(_ => {
-            ChangeVisibleEditor(task._id, editor)
+           Promise.all([ChangeVisibleEditor(task._id, editor), PushCC(task.basic.job, cc, task._id, root_id, is_root)])
                 .then(_ => {
                     ChangeVisibleQA(task._id, qa)
                         .then(_ => {
@@ -355,6 +348,7 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
                                 .then(_ => {
                                     UpdateQA(task._id, level, qa, req.user._id)
                                         .then(_ => {
+                                            
                                             return res.status(200).json({
                                                 msg: `The task has been updated!`
                                             })
@@ -853,7 +847,7 @@ const PushCC = (jobId, ccId, taskId, rootId, is_root) => {
         }
 
         let cc = (job.cc.filter(x => x._id == ccId))[0];
-        if (is_root == 'true') {
+        if (is_root == 1) {
             if (cc.root) {
                 cc.root = rootId;
             }
@@ -863,8 +857,8 @@ const PushCC = (jobId, ccId, taskId, rootId, is_root) => {
             }
         }
 
-        cc.tasks.push(taskId);
 
+        cc.tasks.push(taskId);
         await job.save()
             .then(_ => {
                 return resolve(job)
