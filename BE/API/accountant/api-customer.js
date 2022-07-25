@@ -348,6 +348,51 @@ router.put('/', authenticateAccountantToken, async (req, res) => {
 
 })
 
+router.put('/contract',authenticateAccountantToken,async(req,res)=>{
+    let {customer,contract,line,price} = req.body;
+    
+    if(price <=0){
+        return res.status(403).json({
+            msg:`Price is invalid!`
+        })
+    }
+
+    let c = await Customer.findById(customer);
+
+    if(!c){
+        return res.status(404).json({
+            msg:`Customer not found to update contract line!`
+        })
+    }
+
+    let ctr = c.contracts.filter(x=>x._id == contract);
+    if(ctr.length == 0){
+        return res.status(404).json({
+            msg:`Can not update contract line when contract not found!`
+        })
+    }
+
+
+    let l = ctr[0].lines.filter(x=>x._id == line);
+    if(l.length == 0){
+        return res.status(404).json({
+            msg:`Contract line not found!`
+        })
+    }
+    l[0].price = price;
+    await c.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`Contract line has been updated!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not update contract line with error: ${new Error(err.message)}`
+        })
+    })
+})
+
 
 router.put('/change-state', authenticateAccountantToken, async (req, res) => {
     let { customerId } = req.body;

@@ -231,9 +231,12 @@
                                         newRow += '<tr>';
 
                                         if (p.tasks.length > 0) {
+                                            console.log(p)
                                             newRow += '<td rowspan="' + (p.tasks.length + 1) + '" class="text-danger font-weight-bold" > ';
                                             newRow += '<div class="v-middle">';
-                                            newRow += p.ref.name;
+                                            if (p.ref !== null) {
+                                                newRow += p.ref.name
+                                            }
                                             newRow += '</div>';
                                             newRow += '</td>';
                                         }
@@ -628,5 +631,3 @@
                         isShown = !isShown;
                     })
                 </script>
-
- 

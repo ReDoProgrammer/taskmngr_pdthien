@@ -56,146 +56,359 @@
 
 
 <%-include('modal')%>
-  <%-include('modal_contract')%>
 
-    <script>
-      var search = "";
-      var page = 1;
-      var customerId = '';
-      $(document).ready(() => {
-        LoadCustomers();
-      });
+  <script>
+    var search = "";
+    var page = 1;
+    var customerId = '';
+    $(document).ready(() => {
+      
+      LoadCustomers();
+    });
+    $(document).on("change", "input[name='line-price']", function () {
+      let price = $(this).val();
+      let customer = $(this).closest("tr").data("customer");
+      let contract = $(this).closest("tr").data("contract");
+      let line = $(this).closest("tr").attr("id");
+      if (!$.isNumeric(price)) {
+        $.toast({
+          heading: 'Error',
+          text: 'Price is invalid. Can not update contract line!',
+          showHideTransition: 'fade',
+          icon: 'error'
+        });
+        return;
+      }
 
-      $(document).on("click", "button[name='contract']", function () {
-        customerId = $(this).closest("tr").attr("id");
-        $('#modalContract').modal();
-      });
-
-
-
-      $('#btnSearch').click(function () {
-        search = $('#txtSearch').val();
-        LoadCustomers();
+      $.ajax({
+        url: '/accountant/customer/contract',
+        type: 'put',
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: { customer, contract, line, price },
+        success: function (data) {
+          $.toast({
+            heading: 'Information',
+            text: data.msg,
+            showHideTransition: 'slide',
+            icon: 'info'
+          })
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          $.toast({
+            heading: 'Error',
+            text: jqXHR.responseJSON.msg,
+            showHideTransition: 'fade',
+            icon: 'error'
+          });
+        }
       })
 
-      $("#btnAddNew").click(function () {
-        customerId = '';
-        $('#txtFirstname').val('');
-        $('#txtLastname').val('');
-        $('#txtEmail').val('');
-        $('#txtPhone').val('');
-        $('#txtAddress').val('');
-        $('#ckbCustomerStatus').prop('checked', true);
+    });
+
+    $(document).on("click", "button[name='contract']", function () {
+      customerId = $(this).closest("tr").attr("id");
+      $('#modalContract').modal();
+    });
 
 
 
-        $('#ckbAlign').prop('checked', false);
-        $('#txtAlign').val('');
-        $('#txtAlign').prop('readonly', true);
+    $('#btnSearch').click(function () {
+      search = $('#txtSearch').val();
+      LoadCustomers();
+    })
 
-        $('#ckbTV').prop('checked', false);
-        $('#txtTV').val('');
-        $('#txtTV').prop('readonly', true);
-
-        $('#ckbGrass').prop('checked', false);
-        $('#txtGrass').val('');
-        $('#txtGrass').prop('readonly', true);
-
-        $('#ckbSky').prop('checked', false);
-        $('#txtSky').val('');
-        $('#txtSky').prop('readonly', true);
-
-        $('#ckbFire').prop('checked', false);
-        $('#txtFire').val('');
-        $('#txtFire').prop('readonly', true);
-
-        $('#txtStyleNote').val('');
-        $('#btnSubmit').show();
-        $("#modalCustomer").modal();
-      });
+    $("#btnAddNew").click(function () {
+      customerId = '';
+      $('#txtFirstname').val('');
+      $('#txtLastname').val('');
+      $('#txtEmail').val('');
+      $('#txtPhone').val('');
+      $('#txtAddress').val('');
+      $('#ckbCustomerStatus').prop('checked', true);
 
 
-      $(document).on("click", "input[name='ckbActive']", function () {
-        customerId = $(this).closest("tr").attr("id");
 
-        $.ajax({
-          url: '/accountant/customer/change-state',
-          type: 'put',
-          headers: {
-            authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-          data: { customerId },
-          success: function (data) {
-            LoadCustomers();
-            $('#lblSuccessMsg').text(data.msg);
-            $('#lblSuccessMsg').show().delay(2000).fadeOut();
+      $('#ckbAlign').prop('checked', false);
+      $('#txtAlign').val('');
+      $('#txtAlign').prop('readonly', true);
+
+      $('#ckbTV').prop('checked', false);
+      $('#txtTV').val('');
+      $('#txtTV').prop('readonly', true);
+
+      $('#ckbGrass').prop('checked', false);
+      $('#txtGrass').val('');
+      $('#txtGrass').prop('readonly', true);
+
+      $('#ckbSky').prop('checked', false);
+      $('#txtSky').val('');
+      $('#txtSky').prop('readonly', true);
+
+      $('#ckbFire').prop('checked', false);
+      $('#txtFire').val('');
+      $('#txtFire').prop('readonly', true);
+
+      $('#txtStyleNote').val('');
+      $('#btnSubmit').show();
+      $("#modalCustomer").modal();
+    });
+
+
+    $(document).on("click", "input[name='ckbActive']", function () {
+      customerId = $(this).closest("tr").attr("id");
+
+      $.ajax({
+        url: '/accountant/customer/change-state',
+        type: 'put',
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: { customerId },
+        success: function (data) {
+          LoadCustomers();
+          $('#lblSuccessMsg').text(data.msg);
+          $('#lblSuccessMsg').show().delay(2000).fadeOut();
+        }
+      })
+    })
+
+    $(document).on("click", "button[name='delete']", function () {
+      customerId = $(this).closest("tr").attr("id");
+      Swal.fire({
+        icon: 'question',
+        title: 'Do you want to delete this customer?',
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        denyButtonText: `No`,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: '/accountant/customer',
+            type: 'delete',
+            headers: {
+              authorization: "Bearer " + localStorage.getItem('accessToken'),
+            },
+            data: {
+              customerId
+            },
+            success: function (data) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Congratulation',
+                text: data.msg
+              });
+              LoadCustomers();
+            }
+            , error: function (jqXHR, textStatus, errorThrown) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Opp..',
+                text: jqXHR.responseJSON.msg
+              });
+            }
+          })
+        }
+      })
+    })
+
+    $(document).on("click", "button[name='view']", function () {
+      customerId = $(this).closest("tr").attr("id");
+      LoadCustomer();
+      $('#btnSubmit').hide();
+    });
+
+    $(document).on("click", "button[name='update']", function () {
+      customerId = $(this).closest("tr").attr("id");
+      LoadCustomer();
+      $('#btnSubmit').show();
+    });
+
+    $(document).on("click", ".pagination li", function (e) {
+      e.preventDefault();
+      page = $(this).find('a').text();
+      LoadCustomers();
+    })
+
+
+    function LoadCustomer() {
+      $.ajax({
+        url: "/accountant/customer/detail",
+        type: "get",
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: {
+          customerId
+        },
+        success: function (data) {
+          $('#slCustomerGroups').val(data.customer.group);
+          $('#txtFirstname').val(data.customer.name.firstname);
+          $('#txtLastname').val(data.customer.name.lastname);
+          $('#txtEmail').val(data.customer.contact.email);
+          $('#txtPhone').val(data.customer.contact.phone);
+          $('#txtAddress').val(data.customer.contact.address);
+          $('#ckbCustomerStatus').prop('checked', data.customer.status);
+
+          $('#slNationalStyle').val(data.customer.style.nation);
+          $('#slOutput').val(data.customer.style.output);
+          $('#slSize').val(data.customer.style.size);
+          $('#slColorMode').val(data.customer.style.color);
+          $('#slCloud').val(data.customer.style.cloud);
+
+          $('#ckbAlign').prop('checked', data.customer.style.align.checked);
+
+          if (data.customer.style.align.checked) {
+            $('#txtAlign').val(data.customer.style.align.note);
+            $('#txtAlign').prop('readonly', false);
+          } else {
+            $('#txtAlign').val('');
+            $('#txtAlign').prop('readonly', true);
           }
-        })
-      })
 
-      $(document).on("click", "button[name='delete']", function () {
-        customerId = $(this).closest("tr").attr("id");
-        Swal.fire({
-          icon: 'question',
-          title: 'Do you want to delete this customer?',
-          showDenyButton: true,
-          showCancelButton: true,
-          confirmButtonText: 'Yes',
-          denyButtonText: `No`,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            $.ajax({
-              url: '/accountant/customer',
-              type: 'delete',
-              headers: {
-                authorization: "Bearer " + localStorage.getItem('accessToken'),
-              },
-              data: {
-                customerId
-              },
-              success: function (data) {
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Congratulation',
-                  text: data.msg
-                });
-                LoadCustomers();
-              }
-              , error: function (jqXHR, textStatus, errorThrown) {
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Opp..',
-                  text: jqXHR.responseJSON.msg
-                });
-              }
-            })
+          $('#ckbTV').prop('checked', data.customer.style.tv.checked);
+          if (data.customer.style.tv.checked) {
+            $('#txtTV').val(data.customer.style.tv.note);
+            $('#txtTV').prop('readonly', false);
+          } else {
+            $('#txtTV').val('');
+            $('#txtTV').prop('readonly', true);
           }
-        })
+
+          $('#ckbGrass').prop('checked', data.customer.style.grass.checked);
+          if (data.customer.style.grass.checked) {
+            $('#txtGrass').val(data.customer.style.grass.note);
+            $('#txtGrass').prop('readonly', false);
+          } else {
+            $('#txtGrass').val('');
+            $('#txtGrass').prop('readonly', true);
+          }
+
+          $('#ckbSky').prop('checked', data.customer.style.sky.checked);
+          if (data.customer.style.sky.checked) {
+            $('#txtSky').val(data.customer.style.sky.note);
+            $('#txtSky').prop('readonly', false);
+          } else {
+            $('#txtSky').val('');
+            $('#txtSky').prop('readonly', true);
+          }
+
+
+          $('#ckbFire').prop('checked', data.customer.style.fire.checked);
+          if (data.customer.style.fire.checked) {
+            $('#txtFire').val(data.customer.style.fire.note);
+            $('#txtFire').prop('readonly', false);
+          } else {
+            $('#txtFire').val('');
+            $('#txtFire').prop('readonly', true);
+          }
+
+
+          $('#txtStyleNote').val(data.customer.style.style_note);
+
+          $('#modalCustomer').modal();
+
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
+        }
       })
+    }
 
-      $(document).on("click", "button[name='view']", function () {
-        customerId = $(this).closest("tr").attr("id");
-        LoadCustomer();
-        $('#btnSubmit').hide();
+    function LoadCustomers() {
+      $.ajax({
+        url: "/accountant/customer/list",
+        type: "get",
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: {
+          search,
+          page,
+          status: $("#ckbStatus").is(":checked")
+        },
+        success: function (data) {
+          $('#tblData').empty();
+          $('#pagination').empty();
+          let idx = (page - 1) * data.pageSize;
+          data.customers.forEach((customer) => {
+            let tr = "  <tr id='" + customer._id + "'>";
+            tr += '<td>';
+            tr += '<button class="btn btn-success btn-xs" name="js-view-parents">Contract</button>'
+            // if (customer.contracts.length > 0 && customer.contracts[customer.contracts.length - 1].lines.length > 0) {
+            //   tr += '<button class="btn btn-xs btn-default ml-1 parents js-view-parents" name="js-view-parents"> (' + customer.contracts[customer.contracts.length - 1].lines.length + ') <i class="fa fa-plus"></i></button>';
+            // }
+            tr += '</td>';
+            tr += '<td scope="row">' + (++idx) + '</td>';
+            tr += '<td class="font-weight-bold text-danger">' + customer.group.name + '</td>';
+            tr += " <td class='font-weight-bold text-info'>" + customer.name.firstname + " " + customer.name.lastname + "</td>";
+            tr += "<td>" + customer.contact.phone + "</td>";
+            tr += "<td>" + customer.contact.email + "</td>";
+
+            tr += '<td class="text-center">';
+            if (customer.status) {
+              tr += ' <input type="checkbox" name="ckbActive" checked>';
+            } else {
+              tr += ' <input type="checkbox" name="ckbActive">';
+            }
+            tr += '</td>';
+
+            tr += "<td class='text-right'>";
+            tr +=
+              '<button class="btn btn-xs btn-info" name="view"><i class="fa fa-eye" aria-hidden="true"></i></button>';
+            tr +=
+              '<button class="btn btn-xs btn-warning ml-2" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
+            tr +=
+              '<button class="btn btn-xs btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+            tr += "</td>";
+            $('#tblData').append(tr);
+          });
+
+          for (let i = 1; i <= data.pages; i++) {
+            let li = '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>';
+            $('#pagination').append(li);
+          }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
+        },
       });
-
-      $(document).on("click", "button[name='update']", function () {
-        customerId = $(this).closest("tr").attr("id");
-        LoadCustomer();
-        $('#btnSubmit').show();
-      });
-
-      $(document).on("click", ".pagination li", function (e) {
-        e.preventDefault();
-        page = $(this).find('a').text();
-        LoadCustomers();
-      })
+    }
 
 
-      function LoadCustomer() {
-        $.ajax({
-          url: "/accountant/customer/detail",
-          type: "get",
+
+    $(document).on("click", "button[name='js-view-parents']", async function (e) {
+
+      var $btn = $(e.target),
+        $row = $btn.closest('tr'),
+        $nextRow = $row.next('tr.expand-child');
+
+      $btn.toggleClass('fa-window-minimize');
+
+      if ($nextRow.length) {
+        $nextRow.toggle($btn.hasClass('fa-window-minimize'));
+      } else {
+
+        var newRow = '<tr class="expand-child" id="collapse' + $btn.data('id') + '">' +
+          '<td colspan="8">' +
+          '<table class="table table-condensed table-bordered table-striped" width=100% >' +
+          '<thead>' +
+          '<tr>' +
+          '<th class="text-right  ">#</th>' +
+          '<th>Level</th>' +
+          '<th class="text-right">Price</th>' +
+          '</tr>' +
+          '</thead>' +
+          '<tbody>';
+        customerId = $(this).closest('tr').attr('id');
+
+
+        let idx = 1;
+        await $.ajax({
+          url: '/accountant/customer/contract',
+          type: 'get',
           headers: {
             authorization: "Bearer " + localStorage.getItem("accessToken"),
           },
@@ -203,197 +416,92 @@
             customerId
           },
           success: function (data) {
-            $('#slCustomerGroups').val(data.customer.group);
-            $('#txtFirstname').val(data.customer.name.firstname);
-            $('#txtLastname').val(data.customer.name.lastname);
-            $('#txtEmail').val(data.customer.contact.email);
-            $('#txtPhone').val(data.customer.contact.phone);
-            $('#txtAddress').val(data.customer.contact.address);
-            $('#ckbCustomerStatus').prop('checked', data.customer.status);
-
-            $('#slNationalStyle').val(data.customer.style.nation);
-            $('#slOutput').val(data.customer.style.output);
-            $('#slSize').val(data.customer.style.size);
-            $('#slColorMode').val(data.customer.style.color);
-            $('#slCloud').val(data.customer.style.cloud);
-
-            $('#ckbAlign').prop('checked', data.customer.style.align.checked);
-
-            if (data.customer.style.align.checked) {
-              $('#txtAlign').val(data.customer.style.align.note);
-              $('#txtAlign').prop('readonly', false);
-            } else {
-              $('#txtAlign').val('');
-              $('#txtAlign').prop('readonly', true);
-            }
-
-            $('#ckbTV').prop('checked', data.customer.style.tv.checked);
-            if (data.customer.style.tv.checked) {
-              $('#txtTV').val(data.customer.style.tv.note);
-              $('#txtTV').prop('readonly', false);
-            } else {
-              $('#txtTV').val('');
-              $('#txtTV').prop('readonly', true);
-            }
-
-            $('#ckbGrass').prop('checked', data.customer.style.grass.checked);
-            if (data.customer.style.grass.checked) {
-              $('#txtGrass').val(data.customer.style.grass.note);
-              $('#txtGrass').prop('readonly', false);
-            } else {
-              $('#txtGrass').val('');
-              $('#txtGrass').prop('readonly', true);
-            }
-
-            $('#ckbSky').prop('checked', data.customer.style.sky.checked);
-            if (data.customer.style.sky.checked) {
-              $('#txtSky').val(data.customer.style.sky.note);
-              $('#txtSky').prop('readonly', false);
-            } else {
-              $('#txtSky').val('');
-              $('#txtSky').prop('readonly', true);
-            }
 
 
-            $('#ckbFire').prop('checked', data.customer.style.fire.checked);
-            if (data.customer.style.fire.checked) {
-              $('#txtFire').val(data.customer.style.fire.note);
-              $('#txtFire').prop('readonly', false);
-            } else {
-              $('#txtFire').val('');
-              $('#txtFire').prop('readonly', true);
-            }
+            data.contract.lines.forEach(l => {
+              newRow += '<tr id = "' + l._id + '" data-contract="' + data.contract._id + '" data-customer="' + customerId + '">';
+              newRow += '<td class="text-right col-md-1">' + (idx++) + '</td>';
+              newRow += '<td class="font-weight-bold text-danger col-md-10">';
+              newRow += l.parents ? l.parents.name : l.root.name;
+              newRow += '</td>';
+              newRow += '<td class="text-right col-md-1" >';
+              newRow += "<input type:text class='form-control text-right' name='line-price' value='" + l.price + "'/>"
+              newRow += '</td>';
+              newRow += '</tr>';
+            })
 
-
-            $('#txtStyleNote').val(data.customer.style.style_note);
-
-            $('#modalCustomer').modal();
-
-          },
-          error: function (jqXHR, textStatus, errorThrown) {
-            alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
           }
         })
-      }
+        newRow += '<tr>';
+        newRow += '<td class="text-right col-md-1">' + (idx++) + '</td>';
+        newRow += '<td class="font-weight-bold text-danger col-md-10">';
 
-      function LoadCustomers() {
-        $.ajax({
-          url: "/accountant/customer/list",
-          type: "get",
+        newRow += ' <div class="dropdown">'
+        newRow += '<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Level'
+        newRow += '<span class="caret"></span></button>'
+        newRow += '<ul class="dropdown-menu"> '
+        await $.ajax({
+          url: '/accountant/root-level',
+          type: 'get',
           headers: {
             authorization: "Bearer " + localStorage.getItem("accessToken"),
           },
-          data: {
-            search,
-            page,
-            status: $("#ckbStatus").is(":checked")
-          },
           success: function (data) {
-            $('#tblData').empty();
-            $('#pagination').empty();
-            let idx = (page - 1) * data.pageSize;
-            data.customers.forEach((customer) => {
-              let tr = "  <tr id='" + customer._id + "'>";
-              tr += '<td>';
-              tr += '<button class="btn btn-success btn-xs" name="contract"><i class="fa fa-file" aria-hidden="true"></i> Contract</button>'
-              if (customer.contracts.length > 0 && customer.contracts[customer.contracts.length - 1].lines.length > 0) {
-                tr += '<button class="btn btn-xs btn-default ml-1 parents js-view-parents" name="js-view-parents"> (' + customer.contracts[customer.contracts.length - 1].lines.length + ') <i class="fa fa-plus"></i></button>';
+             data.roots.forEach(r => {             
+              newRow += '<li class="dropdown-submenu">'
+              newRow += '<a class="test" tabindex="-1" href="#" data-root="' + r._id + '">' + r.name;
+              if (r.parents.length > 0) {               
+                newRow + ' <span class="caret"></span>';
               }
-              tr += '</td>';
-              tr += '<td scope="row">' + (++idx) + '</td>';
-              tr+= '<td class="font-weight-bold text-danger">'+customer.group.name+'</td>';
-              tr += " <td class='font-weight-bold text-info'>" + customer.name.firstname + " " + customer.name.lastname + "</td>";
-              tr += "<td>" + customer.contact.phone + "</td>";
-              tr += "<td>" + customer.contact.email + "</td>";
-
-              tr += '<td class="text-center">';
-              if (customer.status) {
-                tr += ' <input type="checkbox" name="ckbActive" checked>';
-              } else {
-                tr += ' <input type="checkbox" name="ckbActive">';
+              newRow += '</a>';
+              if (r.parents.length > 0) {
+                newRow += '<ul class="dropdown-menu">'
+                newRow += '<li><a tabindex="-1" href="#">2nd level dropdown</a></li>'
+                newRow += '<li><a tabindex="-1" href="#">2nd level dropdown</a></li>'
+                newRow += ' </ul>'
               }
-              tr += '</td>';
 
-              tr += "<td class='text-right'>";
-              tr +=
-                '<button class="btn btn-xs btn-info" name="view"><i class="fa fa-eye" aria-hidden="true"></i></button>';
-              tr +=
-                '<button class="btn btn-xs btn-warning ml-2" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>';
-              tr +=
-                '<button class="btn btn-xs btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button>';
-              tr += "</td>";
-              $('#tblData').append(tr);
-            });
+              newRow += '</li>'
 
-            for (let i = 1; i <= data.pages; i++) {
-              let li = '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>';
-              $('#pagination').append(li);
-            }
-          },
-          error: function (jqXHR, textStatus, errorThrown) {
-            alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
-          },
-        });
+
+            })
+          }
+        })
+        newRow += '</ul>';
+        newRow += '</div>';
+        newRow += '</td>';
+        newRow += '<td class="text-right col-md-1" >';
+        newRow += "<input type:text class='form-control text-right' name='line-price' value='0'/>"
+        newRow += '</td>';
+        newRow += '</tr>';
+        newRow += '</tbody></table></td></tr>';
+        // set next row
+        $nextRow = $(newRow).insertAfter($row);
+
+
+        /*}
+            });*/
       }
-
-
-
-      $(document).on("click", "button[name='js-view-parents']", async function (e) {
-
-        var $btn = $(e.target), $row = $btn.closest('tr'), $nextRow = $row.next('tr.expand-child');
-
-        $btn.toggleClass('fa-minus');
-
-        if ($nextRow.length) {
-          $nextRow.toggle($btn.hasClass('fa-minus'));
-        } else {
-          var newRow = '<tr class="expand-child" id="collapse' + $btn.data('id') + '">' +
-            '<td colspan="8">' +
-            '<table class="table table-condensed table-bordered table-striped" width=100% >' +
-            '<thead>' +
-            '<tr>' +
-            '<th class="text-right  ">#</th>' +
-            '<th>Level</th>' +
-            '<th class="text-right">Price</th>' +
-            '</tr>' +
-            '</thead>' +
-            '<tbody>';
-          customerId = $(this).closest('tr').attr('id');
-
-          await $.ajax({
-            url: '/accountant/customer/contract',
-            type: 'get',
-            headers: {
-              authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-              customerId
-            },
-            success: function (data) {
-              console.log(data)
-              let idx = 1;
-              data.contract.lines.forEach(l => {
-                newRow += '<tr>';
-                newRow += '<td class="text-right">' + (idx++) + '</td>';
-                newRow += '<td class="font-weight-bold text-danger">';
-                newRow += l.parents ? l.parents.name : l.root.name;
-                newRow += '</td>';
-                newRow += '<td class="text-right">' + l.price + '</td>';
-                newRow += '</tr>';
-              })
-            }
-          })
-          newRow += '</tbody></table></td></tr>';
-          // set next row
-          $nextRow = $(newRow).insertAfter($row);
-
-
-          /*}
-              });*/
-        }
+      $('.dropdown-submenu a.test').on("click", function (e) {
+        $(this).next('ul').toggle();
+        e.stopPropagation();
+        e.preventDefault();
       });
+    });
 
 
 
 
-    </script>
+  </script>
+
+  <style>
+    .dropdown-submenu {
+      position: relative;
+    }
+
+    .dropdown-submenu .dropdown-menu {
+      top: 0;
+      left: 100%;
+      margin-top: -1px;
+    }
+  </style>
