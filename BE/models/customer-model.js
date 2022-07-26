@@ -26,9 +26,9 @@ const customerSchema = new Schema({
         }
     },
 
-    group:{
-        type:Schema.Types.ObjectId,
-        ref:'customer_group',
+    group: {
+        type: Schema.Types.ObjectId,
+        ref: 'customer_group',
         require
     },
     name: {
@@ -145,47 +145,33 @@ const customerSchema = new Schema({
         }
     ],
     contracts: [
-        {           
-            lines: [
-                {
-                    root: {
-                        type: Schema.Types.ObjectId,
-                        ref: 'root_level'
-                    },
-                    parents: {
-                        type: Schema.Types.ObjectId,
-                        ref: 'parents_level'
-                    },
-                    price: {
-                        type: Number,
-                        required: [
-                            true,
-                            `Please input price as number`
-                        ],
-                        min: [
-                            0.001,
-                            `Price is invalid!`
-                        ]
-                    }
-                }
-            ],
-            created: {
-                at: {
-                    type: Date,
-                    default: new Date()
-                },
-                by: {
-                    type: Schema.Types.ObjectId,
-                    ref: 'user'
-                }
-            }          
-           
+        {
+            root: {
+                type: Schema.Types.ObjectId,
+                ref: 'root_level'
+            },
+            parents: {
+                type: Schema.Types.ObjectId,
+                ref: 'parents_level'
+            },
+            price: {
+                type: Number,
+                required: [
+                    true,
+                    `Please input price as number`
+                ],
+                min: [
+                    0.001,
+                    `Price is invalid!`
+                ]
+            }
+
         }
 
     ],
-    group:{
-        type:Schema.Types.ObjectId,
-        ref:'customer_group'
+    group: {
+        type: Schema.Types.ObjectId,
+        ref: 'customer_group'
     }
 
 });

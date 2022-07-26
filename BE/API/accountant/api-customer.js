@@ -17,11 +17,11 @@ router.get('/contract', authenticateAccountantToken, async (req, res) => {
         })
     }
 
-    if (customer.contracts.length == 0) {
-        return res.status(404).json({
-            msg: `Customer contracts not found!`
-        })
-    }
+    // if (customer.contracts.length == 0) {
+    //     return res.status(404).json({
+    //         msg: `Customer contracts not found!`
+    //     })
+    // }
 
     return res.status(200).json({
         msg: `Load contract detail successfully!`,

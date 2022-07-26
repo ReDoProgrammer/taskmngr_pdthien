@@ -52,9 +52,6 @@
 <label class="font-weight-bold text-success" id="lblSuccessMsg"></label>
 
 
-
-
-
 <%-include('modal')%>
 
   <script>
@@ -62,8 +59,23 @@
     var page = 1;
     var customerId = '';
     $(document).ready(() => {
-      
+
       LoadCustomers();
+    });
+    $(document).on("click", "button[name='btnAddLine']", function () {
+      let price = $(this).val();
+      let customer = $(this).closest("tr").data("customer");    
+      let line = $(this).closest("tr").attr("id");
+      if (!$.isNumeric(price)) {
+        $.toast({
+          heading: 'Error',
+          text: 'Price is invalid!',
+          showHideTransition: 'fade',
+          icon: 'error'
+        });
+        return;
+      }
+      
     });
     $(document).on("change", "input[name='line-price']", function () {
       let price = $(this).val();
@@ -80,37 +92,34 @@
         return;
       }
 
-      $.ajax({
-        url: '/accountant/customer/contract',
-        type: 'put',
-        headers: {
-          authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-        data: { customer, contract, line, price },
-        success: function (data) {
-          $.toast({
-            heading: 'Information',
-            text: data.msg,
-            showHideTransition: 'slide',
-            icon: 'info'
-          })
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          $.toast({
-            heading: 'Error',
-            text: jqXHR.responseJSON.msg,
-            showHideTransition: 'fade',
-            icon: 'error'
-          });
-        }
-      })
+      // $.ajax({
+      //   url: '/accountant/customer/contract',
+      //   type: 'put',
+      //   headers: {
+      //     authorization: "Bearer " + localStorage.getItem("accessToken"),
+      //   },
+      //   data: { customer, contract, line, price },
+      //   success: function (data) {
+      //     $.toast({
+      //       heading: 'Information',
+      //       text: data.msg,
+      //       showHideTransition: 'slide',
+      //       icon: 'info'
+      //     })
+      //   },
+      //   error: function (jqXHR, textStatus, errorThrown) {
+      //     $.toast({
+      //       heading: 'Error',
+      //       text: jqXHR.responseJSON.msg,
+      //       showHideTransition: 'fade',
+      //       icon: 'error'
+      //     });
+      //   }
+      // })
 
     });
 
-    $(document).on("click", "button[name='contract']", function () {
-      customerId = $(this).closest("tr").attr("id");
-      $('#modalContract').modal();
-    });
+
 
 
 
@@ -379,8 +388,13 @@
 
 
 
-    $(document).on("click", "button[name='js-view-parents']", async function (e) {
+    $(document).on("click", "button[name='js-view-parents']", function (e) {
+      customerId = $(this).closest('tr').attr('id');
+      LoadContract(e, customerId);
+    });
 
+
+    async function LoadContract(e, customerId) {
       var $btn = $(e.target),
         $row = $btn.closest('tr'),
         $nextRow = $row.next('tr.expand-child');
@@ -402,7 +416,7 @@
           '</tr>' +
           '</thead>' +
           '<tbody>';
-        customerId = $(this).closest('tr').attr('id');
+
 
 
         let idx = 1;
@@ -416,30 +430,25 @@
             customerId
           },
           success: function (data) {
-
-
-            data.contract.lines.forEach(l => {
-              newRow += '<tr id = "' + l._id + '" data-contract="' + data.contract._id + '" data-customer="' + customerId + '">';
-              newRow += '<td class="text-right col-md-1">' + (idx++) + '</td>';
-              newRow += '<td class="font-weight-bold text-danger col-md-10">';
-              newRow += l.parents ? l.parents.name : l.root.name;
-              newRow += '</td>';
-              newRow += '<td class="text-right col-md-1" >';
-              newRow += "<input type:text class='form-control text-right' name='line-price' value='" + l.price + "'/>"
-              newRow += '</td>';
-              newRow += '</tr>';
-            })
-
+            if (typeof data.contract != 'undefined') {
+              data.contract.lines.forEach(l => {
+                newRow += '<tr id = "' + l._id + '" data-contract="' + data.contract._id + '" data-customer="' + customerId + '">';
+                newRow += '<td class="text-right col-md-1">' + (idx++) + '</td>';
+                newRow += '<td class="font-weight-bold text-danger col-md-10">';
+                newRow += l.parents ? l.parents.name : l.root.name;
+                newRow += '</td>';
+                newRow += '<td class="text-right col-md-1" >';
+                newRow += "<input type:text class='form-control text-right' name='line-price' value='" + l.price + "'/>"
+                newRow += '</td>';
+                newRow += '</tr>';
+              })
+            }
           }
         })
         newRow += '<tr>';
         newRow += '<td class="text-right col-md-1">' + (idx++) + '</td>';
         newRow += '<td class="font-weight-bold text-danger col-md-10">';
-
-        newRow += ' <div class="dropdown">'
-        newRow += '<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Level'
-        newRow += '<span class="caret"></span></button>'
-        newRow += '<ul class="dropdown-menu"> '
+        newRow += '<select name="root" class="form-control">';
         await $.ajax({
           url: '/accountant/root-level',
           type: 'get',
@@ -447,31 +456,32 @@
             authorization: "Bearer " + localStorage.getItem("accessToken"),
           },
           success: function (data) {
-             data.roots.forEach(r => {             
-              newRow += '<li class="dropdown-submenu">'
-              newRow += '<a class="test" tabindex="-1" href="#" data-root="' + r._id + '">' + r.name;
-              if (r.parents.length > 0) {               
-                newRow + ' <span class="caret"></span>';
-              }
-              newRow += '</a>';
+            data.roots.forEach(r => {
+              newRow += '<option value="' + r._id + '" class="font-weight-bold text-danger">' + r.name + '</option>';
               if (r.parents.length > 0) {
-                newRow += '<ul class="dropdown-menu">'
-                newRow += '<li><a tabindex="-1" href="#">2nd level dropdown</a></li>'
-                newRow += '<li><a tabindex="-1" href="#">2nd level dropdown</a></li>'
-                newRow += ' </ul>'
+                newRow += ' <optgroup label="' + r.name + ' children" class="text-info font-italic">'
+                r.parents.forEach(p => {
+                  newRow += '<option value="' + p._id + '">' + p.name + '</option>'
+                })
+
+                newRow += '</optgroup>'
               }
-
-              newRow += '</li>'
-
-
             })
           }
         })
-        newRow += '</ul>';
-        newRow += '</div>';
+
+        newRow += '</select>';
+
         newRow += '</td>';
         newRow += '<td class="text-right col-md-1" >';
-        newRow += "<input type:text class='form-control text-right' name='line-price' value='0'/>"
+        newRow += '<div class="input-group">'
+        newRow += '<input type="text" class="form-control text-right" id="txtPrice" value="0">'
+        newRow += '<div class="input-group-btn">'
+        newRow += '<button class="btn btn-info" name="btnAddLine">'
+        newRow += '<i class="fa fa-plus" aria-hidden="true"></i>'
+        newRow += '</button>'
+        newRow += ' </div>'
+        newRow += ' </div>'
         newRow += '</td>';
         newRow += '</tr>';
         newRow += '</tbody></table></td></tr>';
@@ -487,21 +497,6 @@
         e.stopPropagation();
         e.preventDefault();
       });
-    });
-
-
-
+    }
 
   </script>
-
-  <style>
-    .dropdown-submenu {
-      position: relative;
-    }
-
-    .dropdown-submenu .dropdown-menu {
-      top: 0;
-      left: 100%;
-      margin-top: -1px;
-    }
-  </style>
