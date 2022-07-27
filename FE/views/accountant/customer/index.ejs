@@ -133,8 +133,7 @@
               text: data.msg,
               showHideTransition: 'fade',
               icon: 'success'
-            })
-            LoadCustomers();
+            })          
           },
           error: function (jqXHR, textStatus, errorThrown) {
             $.toast({
@@ -142,7 +141,7 @@
               text: jqXHR.responseJSON.msg,
               showHideTransition: 'fade',
               icon: 'error'
-            });
+            });            
           }
 
         })
@@ -171,7 +170,8 @@
             });
           }
         })
-      }      
+      }   
+      LoadCustomers();   
     });
 
 
