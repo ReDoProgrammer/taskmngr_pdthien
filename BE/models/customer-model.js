@@ -164,10 +164,12 @@ const customerSchema = new Schema({
                     0.001,
                     `Price is invalid!`
                 ]
+            },
+            is_active:{
+                type:Boolean,
+                default:true
             }
-
         }
-
     ],
     group: {
         type: Schema.Types.ObjectId,

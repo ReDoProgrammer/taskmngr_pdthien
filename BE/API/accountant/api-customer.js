@@ -31,23 +31,20 @@ router.get('/contract', authenticateAccountantToken, async (req, res) => {
 
 router.get('/contracts', authenticateAccountantToken, async (req, res) => {
     let { customerId } = req.query;
-    let contracts = await Customer.findById(customerId)
-        .sort({ 'contracts.line.created.at': -1 })
-        .populate('contracts.lines.created.by')
-        .populate('contracts.lines.updated.by');
-
-    if (!contracts) {
+    let customer = await Customer.findById(customerId)
+    .populate('contracts.root')
+    .populate('contracts.parents');
+    if(!customer){
         return res.status(404).json({
-            msg: `Customer contracts list not found!`
+            msg:`Customer not found!`
         })
     }
 
     return res.status(200).json({
-        msg: `Load contracts list of customer successfully!`,
-        contracts
+        msg:`Load customer contracts successfully!`,
+        contracts:customer.contracts.filter(x=>x.is_active)
     })
-
-
+   
 })
 
 router.get('/detail', authenticateAccountantToken, async (req, res) => {
@@ -348,39 +345,60 @@ router.put('/', authenticateAccountantToken, async (req, res) => {
 
 })
 
-router.put('/contract',authenticateAccountantToken,async(req,res)=>{
-    let {customer,contract,line,price} = req.body;
-    
-    if(price <=0){
-        return res.status(403).json({
-            msg:`Price is invalid!`
-        })
-    }
-
-    let c = await Customer.findById(customer);
-
-    if(!c){
+router.put('/insert-contract-line',authenticateAccountantToken,async(req,res)=>{
+    let {customerId,levelId,is_root,price} = req.body;
+    let customer = await Customer.findById(customerId);
+    if(!customer){
         return res.status(404).json({
-            msg:`Customer not found to update contract line!`
+            msg:`Customer not found to insert new contract line!`
         })
     }
 
-    let ctr = c.contracts.filter(x=>x._id == contract);
-    if(ctr.length == 0){
+  
+
+    if(is_root == 1){
+        customer.contracts.push({
+            root:levelId,
+            price
+        })
+    }else{
+        customer.contracts.push({
+            parents:levelId,
+            price
+        })
+    }
+    await customer.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`New contract line has been inserted!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not insert contract line with error: ${new Error(err.message)}`
+        })
+    })
+})
+
+router.put('/update-contract-line',authenticateAccountantToken,async(req,res)=>{
+    let {customerId,lineId,price} = req.body;
+    let customer = await Customer.findById(customerId);
+    if(!customer){
         return res.status(404).json({
-            msg:`Can not update contract line when contract not found!`
+            msg:`Can not update contract line cause customer not found!`
         })
-    }
+    }    
 
-
-    let l = ctr[0].lines.filter(x=>x._id == line);
-    if(l.length == 0){
+    let lines = customer.contracts.filter(x=>x._id == lineId);
+    if(lines.length == 0){
         return res.status(404).json({
             msg:`Contract line not found!`
         })
     }
-    l[0].price = price;
-    await c.save()
+
+    lines[0].price = price;
+
+    await customer.save()
     .then(_=>{
         return res.status(200).json({
             msg:`Contract line has been updated!`
@@ -388,7 +406,7 @@ router.put('/contract',authenticateAccountantToken,async(req,res)=>{
     })
     .catch(err=>{
         return res.status(500).json({
-            msg:`Can not update contract line with error: ${new Error(err.message)}`
+            msg:`Can not update contract line. Error: ${new Error(err.message)}`
         })
     })
 })

@@ -59,29 +59,13 @@
     var page = 1;
     var customerId = '';
     $(document).ready(() => {
-
       LoadCustomers();
     });
-    $(document).on("click", "button[name='btnAddLine']", function () {
-      let price = $(this).val();
-      let customer = $(this).closest("tr").data("customer");    
-      let line = $(this).closest("tr").attr("id");
-      if (!$.isNumeric(price)) {
-        $.toast({
-          heading: 'Error',
-          text: 'Price is invalid!',
-          showHideTransition: 'fade',
-          icon: 'error'
-        });
-        return;
-      }
-      
-    });
+
+
     $(document).on("change", "input[name='line-price']", function () {
       let price = $(this).val();
-      let customer = $(this).closest("tr").data("customer");
-      let contract = $(this).closest("tr").data("contract");
-      let line = $(this).closest("tr").attr("id");
+      let lineId = $(this).closest("tr").attr("id");
       if (!$.isNumeric(price)) {
         $.toast({
           heading: 'Error',
@@ -91,32 +75,62 @@
         });
         return;
       }
+      if (typeof lineId === 'undefined') {
+        let levelId = $('#root option:selected').val();
+        let is_root = $('#root option:selected').data('root');
 
-      // $.ajax({
-      //   url: '/accountant/customer/contract',
-      //   type: 'put',
-      //   headers: {
-      //     authorization: "Bearer " + localStorage.getItem("accessToken"),
-      //   },
-      //   data: { customer, contract, line, price },
-      //   success: function (data) {
-      //     $.toast({
-      //       heading: 'Information',
-      //       text: data.msg,
-      //       showHideTransition: 'slide',
-      //       icon: 'info'
-      //     })
-      //   },
-      //   error: function (jqXHR, textStatus, errorThrown) {
-      //     $.toast({
-      //       heading: 'Error',
-      //       text: jqXHR.responseJSON.msg,
-      //       showHideTransition: 'fade',
-      //       icon: 'error'
-      //     });
-      //   }
-      // })
+        $.ajax({
+          url: '/accountant/customer/insert-contract-line',
+          type: 'put',
+          headers: {
+            authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+          data: { customerId, levelId, is_root, price },
+          success: function (data) {
+            $.toast({
+              heading: 'Successfully',
+              text: data.msg,
+              showHideTransition: 'fade',
+              icon: 'success'
+            })
+            LoadCustomers();
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            $.toast({
+              heading: 'Error',
+              text: jqXHR.responseJSON.msg,
+              showHideTransition: 'fade',
+              icon: 'error'
+            });
+          }
 
+        })
+      } else {
+        $.ajax({
+          url: '/accountant/customer/update-contract-line',
+          type: 'put',
+          headers: {
+            authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+          data: { customerId, lineId, price },
+          success: function (data) {
+            $.toast({
+              heading: 'Successfully',
+              text: data.msg,
+              showHideTransition: 'fade',
+              icon: 'success'
+            })
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            $.toast({
+              heading: 'Error',
+              text: jqXHR.responseJSON.msg,
+              showHideTransition: 'fade',
+              icon: 'error'
+            });
+          }
+        })
+      }      
     });
 
 
@@ -421,7 +435,7 @@
 
         let idx = 1;
         await $.ajax({
-          url: '/accountant/customer/contract',
+          url: '/accountant/customer/contracts',
           type: 'get',
           headers: {
             authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -430,25 +444,32 @@
             customerId
           },
           success: function (data) {
-            if (typeof data.contract != 'undefined') {
-              data.contract.lines.forEach(l => {
-                newRow += '<tr id = "' + l._id + '" data-contract="' + data.contract._id + '" data-customer="' + customerId + '">';
-                newRow += '<td class="text-right col-md-1">' + (idx++) + '</td>';
-                newRow += '<td class="font-weight-bold text-danger col-md-10">';
-                newRow += l.parents ? l.parents.name : l.root.name;
-                newRow += '</td>';
-                newRow += '<td class="text-right col-md-1" >';
-                newRow += "<input type:text class='form-control text-right' name='line-price' value='" + l.price + "'/>"
-                newRow += '</td>';
-                newRow += '</tr>';
-              })
-            }
+
+            data.contracts.forEach(l => {
+              newRow += '<tr id = "' + l._id + '">';
+              newRow += '<td class="text-right col-md-1">' + (idx++) + '</td>';
+              newRow += '<td class="font-weight-bold text-danger col-md-10">';
+              newRow += l.parents ? l.parents.name : l.root.name;
+              newRow += '</td>';
+              newRow += '<td class="text-right col-md-1" >';
+              newRow += '<div class="input-group">';
+              newRow += '<input type="text" class="form-control" name="line-price" value="'+l.price+'">';
+              newRow += '<div class="input-group-btn">';
+              newRow += '<button class="btn" name="delete">';
+              newRow += '<i class="fa fa-trash text-danger" aria-hidden="true"></i>';
+              newRow += ' </button>    '
+              newRow += '</div>';
+              newRow += '</div>'
+              newRow += '</td>';
+              newRow += '</tr>';
+            })
+
           }
         })
         newRow += '<tr>';
         newRow += '<td class="text-right col-md-1">' + (idx++) + '</td>';
         newRow += '<td class="font-weight-bold text-danger col-md-10">';
-        newRow += '<select name="root" class="form-control">';
+        newRow += '<select id="root" class="form-control">';
         await $.ajax({
           url: '/accountant/root-level',
           type: 'get',
@@ -457,11 +478,11 @@
           },
           success: function (data) {
             data.roots.forEach(r => {
-              newRow += '<option value="' + r._id + '" class="font-weight-bold text-danger">' + r.name + '</option>';
+              newRow += '<option value="' + r._id + '" class="font-weight-bold text-danger" data-root="1">' + r.name + '</option>';
               if (r.parents.length > 0) {
                 newRow += ' <optgroup label="' + r.name + ' children" class="text-info font-italic">'
                 r.parents.forEach(p => {
-                  newRow += '<option value="' + p._id + '">' + p.name + '</option>'
+                  newRow += '<option value="' + p._id + '" data-root="0">' + p.name + '</option>'
                 })
 
                 newRow += '</optgroup>'
@@ -474,14 +495,7 @@
 
         newRow += '</td>';
         newRow += '<td class="text-right col-md-1" >';
-        newRow += '<div class="input-group">'
-        newRow += '<input type="text" class="form-control text-right" id="txtPrice" value="0">'
-        newRow += '<div class="input-group-btn">'
-        newRow += '<button class="btn btn-info" name="btnAddLine">'
-        newRow += '<i class="fa fa-plus" aria-hidden="true"></i>'
-        newRow += '</button>'
-        newRow += ' </div>'
-        newRow += ' </div>'
+        newRow += '<input type="text" class="form-control text-right" name="line-price" value="0">';
         newRow += '</td>';
         newRow += '</tr>';
         newRow += '</tbody></table></td></tr>';
