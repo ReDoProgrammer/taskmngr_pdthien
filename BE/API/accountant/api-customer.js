@@ -357,7 +357,11 @@ router.put('/insert-contract-line',authenticateAccountantToken,async(req,res)=>{
         }
         customer.contracts.push({
             root:levelId,
-            price
+            price,
+            created:{
+                by:req.user._id,
+                at:new Date()
+            }
         })
     }else{
         let chk = customer.contracts.filter(x=>x.parents == levelId && x.is_active);
@@ -368,7 +372,11 @@ router.put('/insert-contract-line',authenticateAccountantToken,async(req,res)=>{
         }
         customer.contracts.push({
             parents:levelId,
-            price
+            price,
+            created:{
+                by:req.user._id,
+                at:new Date()
+            }
         })
     }
     await customer.save()
@@ -413,6 +421,30 @@ router.put('/update-contract-line',authenticateAccountantToken,async(req,res)=>{
             msg:`Can not update contract line. Error: ${new Error(err.message)}`
         })
     })
+})
+
+router.put('/delete-contract-line',authenticateAccountantToken,async (req,res)=>{
+    let {customerId,lineId} = req.body;
+    let customer = await Customer.findById(customerId);
+    if(!customer){
+        return res.status(404).json({
+            msg:`Customer not found!`
+        })
+    }
+    customer.contracts =await customer.contracts.filter(x=>x._id.toString() !== lineId);
+
+    await customer.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`The contract line has been deleted!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not delete this contract line with error: ${new Error(err.message)}`
+        })
+    })
+    
 })
 
 
