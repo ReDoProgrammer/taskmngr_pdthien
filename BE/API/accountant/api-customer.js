@@ -16,13 +16,6 @@ router.get('/contract', authenticateAccountantToken, async (req, res) => {
             msg: `Customer not found!`
         })
     }
-
-    // if (customer.contracts.length == 0) {
-    //     return res.status(404).json({
-    //         msg: `Customer contracts not found!`
-    //     })
-    // }
-
     return res.status(200).json({
         msg: `Load contract detail successfully!`,
         contract: customer.contracts[customer.contracts.length - 1]
@@ -354,14 +347,25 @@ router.put('/insert-contract-line',authenticateAccountantToken,async(req,res)=>{
         })
     }
 
-  
 
     if(is_root == 1){
+        let chk = customer.contracts.filter(x=>x.root == levelId && x.is_active);
+        if(chk.length > 0){
+            return res.status(409).json({
+                msg:`This level already exists`
+            })
+        }
         customer.contracts.push({
             root:levelId,
             price
         })
     }else{
+        let chk = customer.contracts.filter(x=>x.parents == levelId && x.is_active);
+        if(chk.length > 0){
+            return res.status(409).json({
+                msg:`This level already exists`
+            })
+        }
         customer.contracts.push({
             parents:levelId,
             price
