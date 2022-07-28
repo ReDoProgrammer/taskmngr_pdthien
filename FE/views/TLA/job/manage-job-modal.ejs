@@ -318,9 +318,10 @@
                   <div class="col-md-12 form-group">
                     <label for="">Initial status:</label>
                     <div>
+                      <label class="radio-inline"><input type="radio" name="optradio" id="rbtWait">Wait</label>
                       <label class="radio-inline"><input type="radio" name="optradio" checked
                           id="rbtStart">Start</label>
-                      <label class="radio-inline"><input type="radio" name="optradio" id="rbtPause">Pause</label>
+                     
                     </div>
                   </div>
                 </div>
@@ -585,6 +586,47 @@
     $('#panel_task').slideUp(500);
   })
 
+  $(document).on('click','button[name="btnEditTask"]',function(e){
+    let taskId = $(this).closest('tr').attr('id');
+    $('#panel_task').slideDown(500);
+    $.ajax({
+      url:'/tla/task/detail',
+      type:'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data:{taskId},
+      success:function(data){
+        console.log(data)
+        $('#slLocalLevels').val();
+        $('#txtAssignDate').val();
+        $('#txtDeadline').val();
+        $('#txtInputLink').val(data.task.basic.link.input);
+        $('#txtRemark').val(data.task.remarks[data.task.remarks.length-1].content)
+
+
+        if(data.task.editor.length > 0){
+          $('#ckbAssignEditor').prop('checked', true);
+        }else{
+          $('#ckbAssignEditor').prop('checked', false);
+        }
+
+        if(data.task.qa.length>0){
+          $('#ckbAssignQA').prop('checked', true);
+        }else{
+          $('#ckbAssignQA').prop('checked', false);
+        }
+
+        if(data.task.status === -10){
+
+        }else{
+
+        }
+
+      }
+    })
+  })
+
   $('#btnAddTask').click(function () {
     taskId = '';
     cc = '';
@@ -597,7 +639,6 @@
   })
   $("#JobMngrModal").on('shown.bs.modal', function (e) {
     $('#panel_task').slideUp(200);
-
     LoadTasks();
     LoadJob();
     LoadCCList();
@@ -676,6 +717,7 @@
             } else {
               $('#colQA').hide();
             }
+            
             if (data.task.status == -10) {
               $('#rbtPause').prop('checked', true);
             } else {
@@ -913,7 +955,9 @@
 </script>
 
 
+
 <script>
+ 
   $('.panel-collapse').on('show.bs.collapse', function () {
     $(this).siblings('.panel-heading').addClass('active');
   });
