@@ -496,8 +496,7 @@
                             },
                             data: { customerId },
                             success: function (data) {
-
-                                CustomerLevels = data.customer.contracts[data.customer.contracts.length - 1].lines.map(x => {
+                                CustomerLevels = data.customer.contracts.map(x => {
                                     let obj = {};
                                     obj._id = x.root ? x.root._id : x.parents._id;
                                     obj.name = x.root ? x.root.name : x.parents.name;
