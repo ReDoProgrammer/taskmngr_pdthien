@@ -1,5 +1,21 @@
 <div class="row">
-    <div class="col-md-offset-6 col-md-6 text-right">
+
+    <div class="col-md-4 form-inline">
+        <div class="form-group">
+            <label>From date:</label>
+            <input type="text" class="inputDate form-control" id="txtFromDate">
+        </div>
+    </div>
+
+    <div class="col-md-4 form-inline">
+        <div class="form-group">
+            <label>To date:</label>
+            <input type="text" class="inputDate form-control" id="txtToDate">
+        </div>
+    </div>
+
+
+    <div class="col-md-4 text-right">
         <div class="input-group">
             <div class="input-group-btn">
                 <select id="slJobStatus" multiple="multiple form-control">
@@ -10,6 +26,7 @@
                     <option value="2">Done</option>
                     <option value="3">Finished</option>
                 </select>
+
             </div><!-- /btn-group -->
             <input type="text" class="form-control" placeholder="Seach job..." id="txtSearch" />
             <div class="input-group-btn">
@@ -72,6 +89,8 @@
                     var customerId = '';
                     var allSelected = true;
                     $(document).ready(function () {
+                        $('#txtFromDate').val(getCurrentDateWithInitialTime());
+                        $('#txtToDate').val(getCurrentTime());
 
                         //multiple select
                         $('#slJobStatus').multiselect({
@@ -388,6 +407,26 @@
 
                     function LoadJobs() {
 
+                        fromdate = strToDate($('#txtFromDate').val());
+                        todate = strToDate($('#txtToDate').val());
+                        if (isNaN(fromdate) || fromdate === null) {
+                            $.toast({
+                                heading: 'Error',
+                                text: 'From date is invalid date time!',
+                                showHideTransition: 'fade',
+                                icon: 'error'
+                            });
+                            return;
+                        }
+                        if (isNaN(todate) || todate === null) {
+                            $.toast({
+                                heading: 'Error',
+                                text: 'From date is invalid date time!',
+                                showHideTransition: 'fade',
+                                icon: 'error'
+                            });
+                            return;
+                        }
                         $.ajax({
                             url: '/tla/job/list',
                             type: 'get',
@@ -395,6 +434,8 @@
                                 authorization: "Bearer " + localStorage.getItem("accessToken"),
                             },
                             data: {
+                                fromdate,
+                                todate,
                                 status: $('#slJobStatus').val(),
                                 search,
                                 page

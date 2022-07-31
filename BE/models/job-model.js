@@ -1,4 +1,6 @@
 require('dotenv').config();
+const moment = require('moment-timezone');
+const dateThailand = moment.tz(Date.now(), "Asia/Bangkok");
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
@@ -15,11 +17,13 @@ const jobSchema = new Schema({
     },
     deadline: {
         begin: {
-            type: Date,
+            type: Date, 
+            default: dateThailand,
             require: true
         },
         end: {
             type: Date,
+            default: dateThailand,
             require: true
         }
     },

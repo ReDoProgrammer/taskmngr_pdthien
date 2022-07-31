@@ -51,7 +51,12 @@ function strToDate(dtStr) {
     return null;
   }
 }
+function getCurrentDateWithInitialTime(){
+  var dt = new Date();
 
+  return `${dt.getDate().toString().padStart(2, '0')}/${(dt.getMonth() + 1).toString().padStart(2, '0')}/${dt.getFullYear().toString().padStart(4, '0')} 00:00:01`;
+  ;
+}
 function getCurrentTime() {
   var dt = new Date();
 

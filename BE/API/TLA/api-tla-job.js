@@ -10,17 +10,21 @@ const pageSize = 20;
 
 
 router.get('/list', authenticateTLAToken, async (req, res) => {
-    let { status,page, search } = req.query; 
+    let { fromdate,todate,status,page, search } = req.query; 
+  
     if(status.length == 0){
         return res.status(404).json({
             msg:`No available job status`,
             jobs:[]
         })
     }
+    console.log(todate)
     status = status.map(x=>parseInt(x));
   
     let jobs = await Job
         .find({
+            'deadline.begin':{$gte:fromdate},
+            'deadline.end':{$lte:todate},
             $or: [
                 { "name": { "$regex": search, "$options": "i" } },
                 { "intruction": { "$regex": search, "$options": "i" } }
@@ -44,6 +48,7 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
         .sort({ 'deadline.end': 1 })
         .skip((page - 1) * pageSize)
         .limit(pageSize);     
+
     let count = await Job.countDocuments({
         $or: [
             { "name": { "$regex": search, "$options": "i" } },
