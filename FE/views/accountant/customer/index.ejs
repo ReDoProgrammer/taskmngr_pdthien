@@ -55,15 +55,17 @@
 <%-include('modal')%>
 
   <script>
+
     var search = "";
     var page = 1;
     var customerId = '';
+    var contracts = [];
     $(document).ready(() => {
       LoadCustomers();
     });
 
     $(document).on("click", "button[name='delete-line']", function () {
-      let lineId = $(this).closest("tr").attr("id");     
+      let lineId = $(this).closest("tr").attr("id");
       Swal.fire({
         icon: 'question',
         title: 'Do you want to delete this contract line?',
@@ -81,16 +83,16 @@
             },
             data: {
               customerId,
-              lineId             
+              lineId
             },
             success: function (data) {
               $.toast({
-              heading: 'Successfully',
-              text: data.msg,
-              showHideTransition: 'fade',
-              icon: 'success'
-            })
-              LoadCustomers();
+                heading: 'Successfully',
+                text: data.msg,
+                showHideTransition: 'fade',
+                icon: 'success'
+              })
+              $("button[name='js-view-parents']").click();
             }
             , error: function (jqXHR, textStatus, errorThrown) {
               Swal.fire({
@@ -102,7 +104,7 @@
           })
         }
       })
-      
+
     })
     $(document).on("change", "input[name='line-price']", function () {
       let price = $(this).val();
@@ -133,7 +135,7 @@
               text: data.msg,
               showHideTransition: 'fade',
               icon: 'success'
-            })          
+            })
           },
           error: function (jqXHR, textStatus, errorThrown) {
             $.toast({
@@ -141,7 +143,7 @@
               text: jqXHR.responseJSON.msg,
               showHideTransition: 'fade',
               icon: 'error'
-            });            
+            });
           }
 
         })
@@ -170,8 +172,8 @@
             });
           }
         })
-      }   
-      LoadCustomers();   
+      }
+      $("button[name='js-view-parents']").click();
     });
 
 
@@ -443,13 +445,8 @@
 
 
 
-    $(document).on("click", "button[name='js-view-parents']", function (e) {
+    $(document).on("click", "button[name='js-view-parents']",async function (e) {
       customerId = $(this).closest('tr').attr('id');
-      LoadContract(e, customerId);
-    });
-
-
-    async function LoadContract(e, customerId) {
       var $btn = $(e.target),
         $row = $btn.closest('tr'),
         $nextRow = $row.next('tr.expand-child');
@@ -485,7 +482,8 @@
             customerId
           },
           success: function (data) {
-            data.contracts.forEach(l => {
+            contracts = data.contracts;
+            contracts.forEach(l => {
               newRow += '<tr id = "' + l._id + '">';
               newRow += '<td class="text-right col-md-1">' + (idx++) + '</td>';
               newRow += '<td class="font-weight-bold text-danger col-md-10">';
@@ -493,7 +491,7 @@
               newRow += '</td>';
               newRow += '<td class="text-right col-md-1" >';
               newRow += '<div class="input-group">';
-              newRow += '<input type="text" class="form-control" name="line-price" value="'+l.price+'">';
+              newRow += '<input type="text" class="form-control" name="line-price" value="' + l.price + '">';
               newRow += '<div class="input-group-btn">';
               newRow += '<button class="btn" name="delete-line">';
               newRow += '<i class="fa fa-trash text-danger" aria-hidden="true"></i>';
@@ -517,7 +515,7 @@
             authorization: "Bearer " + localStorage.getItem("accessToken"),
           },
           success: function (data) {
-            
+
             data.roots.forEach(r => {
               newRow += '<option value="' + r._id + '" class="font-weight-bold text-danger" data-root="1">' + r.name + '</option>';
               if (r.parents.length > 0) {
@@ -552,6 +550,8 @@
         e.stopPropagation();
         e.preventDefault();
       });
-    }
+    });
+
+
 
   </script>

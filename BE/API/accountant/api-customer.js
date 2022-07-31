@@ -364,6 +364,7 @@ router.put('/insert-contract-line',authenticateAccountantToken,async(req,res)=>{
                 at:new Date()
             }
         })
+        
     }else{
         let chk = customer.contracts.filter(x=>x.parents == levelId);
         if(chk.length > 0){
