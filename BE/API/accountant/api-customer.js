@@ -9,13 +9,14 @@ const pageSize = 20;
 router.get('/contract', authenticateAccountantToken, async (req, res) => {
     let { customerId } = req.query;
     let customer = await Customer.findById(customerId)
-        .populate('contracts.lines.parents')
-        .populate('contracts.lines.root');
+        .populate('contracts.parents')
+        .populate('contracts.root');      
     if (!customer) {
         return res.status(404).json({
             msg: `Customer not found!`
         })
     }
+    
     return res.status(200).json({
         msg: `Load contract detail successfully!`,
         contract: customer.contracts[customer.contracts.length - 1]
@@ -35,7 +36,7 @@ router.get('/contracts', authenticateAccountantToken, async (req, res) => {
 
     return res.status(200).json({
         msg:`Load customer contracts successfully!`,
-        contracts:customer.contracts.filter(x=>x.is_active)
+        contracts:customer.contracts
     })
    
 })
@@ -349,7 +350,7 @@ router.put('/insert-contract-line',authenticateAccountantToken,async(req,res)=>{
 
 
     if(is_root == 1){
-        let chk = customer.contracts.filter(x=>x.root == levelId && x.is_active);
+        let chk = customer.contracts.filter(x=>x.root == levelId);
         if(chk.length > 0){
             return res.status(409).json({
                 msg:`This level already exists`
@@ -364,7 +365,7 @@ router.put('/insert-contract-line',authenticateAccountantToken,async(req,res)=>{
             }
         })
     }else{
-        let chk = customer.contracts.filter(x=>x.parents == levelId && x.is_active);
+        let chk = customer.contracts.filter(x=>x.parents == levelId);
         if(chk.length > 0){
             return res.status(409).json({
                 msg:`This level already exists`

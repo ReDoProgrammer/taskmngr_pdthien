@@ -1,19 +1,19 @@
-<div class="row mt-2">
-    <div class="col-md-8 col-sm-8 col-xs-6">
-        <select id="slJobStatus" class="selectpicker form-control" multiple title="Choose one of the following status">
-            <option value="-1">Open</option>
-            <option value="-2">Canceled</option>
-            <option value="0">Processing</option>
-            <option value="1">Uploaded</option>
-            <option value="2">Done</option>
-            <option value="3">Finished</option>
-        </select>
-    </div>
-
-    <div class="col-md-4 col-sm-4 col-xs-6 text-right">
+<div class="row">
+    <div class="col-md-offset-6 col-md-6 text-right">
         <div class="input-group">
+            <div class="input-group-btn">
+                <select id="slJobStatus" multiple="multiple form-control">
+                    <option value="-1">Open</option>
+                    <option value="-2">Canceled</option>
+                    <option value="0">Processing</option>
+                    <option value="1">Uploaded</option>
+                    <option value="2">Done</option>
+                    <option value="3">Finished</option>
+                </select>
+            </div><!-- /btn-group -->
             <input type="text" class="form-control" placeholder="Seach job..." id="txtSearch" />
             <div class="input-group-btn">
+
                 <button class="btn btn-info" type="submit" id="btnSearch">
                     <i class="fa fa-search" aria-hidden="true"></i>
                 </button>
@@ -70,8 +70,21 @@
                     var page = 1;
                     var jobId = '';
                     var customerId = '';
+                    var allSelected = true;
                     $(document).ready(function () {
-                        $('#slJobStatus').val([-2, -1, 0, 1, 2, 3]).selectpicker('refresh');
+
+                        //multiple select
+                        $('#slJobStatus').multiselect({
+                            includeSelectAllOption: true,
+                            // enableFiltering: true,  
+                        });
+                        $('#slJobStatus option').each(function () {
+                            this.selected = true;
+                        });
+                        $('#slJobStatus').multiselect("refresh");
+
+
+                        // $("#slJobStatus").multiselect('selectAll', true);
                         LoadJobs();
                         setInterval(function () {
                             LoadJobs();
@@ -369,7 +382,8 @@
                         LoadJobs();
                     })
 
-                    function LoadJobs() {
+                    function LoadJobs() {                      
+                       
                         $.ajax({
                             url: '/tla/job/list',
                             type: 'get',
@@ -377,6 +391,7 @@
                                 authorization: "Bearer " + localStorage.getItem("accessToken"),
                             },
                             data: {
+                                status:$('#slJobStatus').val(),
                                 search,
                                 page
                             },

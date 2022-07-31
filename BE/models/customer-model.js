@@ -164,10 +164,15 @@ const customerSchema = new Schema({
                     0.001,
                     `Price is invalid!`
                 ]
-            },
-            is_active:{
-                type:Boolean,
-                default:true
+            },            
+            created:{
+                by:{
+                    type:Schema.Types.ObjectId,
+                    ref:'user'
+                },
+                at:{
+                    type:Date
+                }
             }
         }
     ],

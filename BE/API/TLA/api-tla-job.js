@@ -10,13 +10,14 @@ const pageSize = 20;
 
 
 router.get('/list', authenticateTLAToken, async (req, res) => {
-    let { page, search } = req.query;
+    let { status,page, search } = req.query;    
     let jobs = await Job
         .find({
             $or: [
                 { "name": { "$regex": search, "$options": "i" } },
                 { "intruction": { "$regex": search, "$options": "i" } }
-            ]
+            ],
+            status:{$in:[1,2,3]}
         })
         .populate([
             {
@@ -36,6 +37,7 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
         .skip((page - 1) * pageSize)
         .limit(pageSize);
 
+        console.log(jobs)
     let count = await Job.countDocuments({
         $or: [
             { "name": { "$regex": search, "$options": "i" } },

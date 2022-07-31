@@ -485,7 +485,6 @@
             customerId
           },
           success: function (data) {
-
             data.contracts.forEach(l => {
               newRow += '<tr id = "' + l._id + '">';
               newRow += '<td class="text-right col-md-1">' + (idx++) + '</td>';
@@ -518,6 +517,7 @@
             authorization: "Bearer " + localStorage.getItem("accessToken"),
           },
           success: function (data) {
+            
             data.roots.forEach(r => {
               newRow += '<option value="' + r._id + '" class="font-weight-bold text-danger" data-root="1">' + r.name + '</option>';
               if (r.parents.length > 0) {
