@@ -10,14 +10,22 @@ const pageSize = 20;
 
 
 router.get('/list', authenticateTLAToken, async (req, res) => {
-    let { status,page, search } = req.query;    
+    let { status,page, search } = req.query; 
+    if(status.length == 0){
+        return res.status(404).json({
+            msg:`No available job status`,
+            jobs:[]
+        })
+    }
+    status = status.map(x=>parseInt(x));
+  
     let jobs = await Job
         .find({
             $or: [
                 { "name": { "$regex": search, "$options": "i" } },
                 { "intruction": { "$regex": search, "$options": "i" } }
             ],
-            status:{$in:[1,2,3]}
+            status:{$in:status}
         })
         .populate([
             {
@@ -35,9 +43,7 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
         .sort({ urgent: -1 })
         .sort({ 'deadline.end': 1 })
         .skip((page - 1) * pageSize)
-        .limit(pageSize);
-
-        console.log(jobs)
+        .limit(pageSize);     
     let count = await Job.countDocuments({
         $or: [
             { "name": { "$regex": search, "$options": "i" } },

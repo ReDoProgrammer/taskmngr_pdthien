@@ -91,6 +91,10 @@
                         }, 10000);//run this thang every 10 seconds
                     })
 
+                    $('#slJobStatus').on('change', function () {
+                        LoadJobs();
+                    })
+
                     $(document).on("click", "button[name='js-view-parents']", async function (e) {
 
                         var $btn = $(e.target), $row = $btn.closest('tr'), $nextRow = $row.next('tr.expand-child');
@@ -382,8 +386,8 @@
                         LoadJobs();
                     })
 
-                    function LoadJobs() {                      
-                       
+                    function LoadJobs() {
+
                         $.ajax({
                             url: '/tla/job/list',
                             type: 'get',
@@ -391,7 +395,7 @@
                                 authorization: "Bearer " + localStorage.getItem("accessToken"),
                             },
                             data: {
-                                status:$('#slJobStatus').val(),
+                                status: $('#slJobStatus').val(),
                                 search,
                                 page
                             },
@@ -496,7 +500,14 @@
 
                             },
                             error: function (jqXHR, textStatus, errorThrown) {
-                                alert(jqXHR.responseJSON.msg + ". " + jqXHR.responseJSON.error);
+                                $('#tblJobs').empty();
+                                $('.pagination').empty();
+                                $.toast({
+                                    heading: 'Error',
+                                    text: jqXHR.responseJSON.msg,
+                                    showHideTransition: 'fade',
+                                    icon: 'error'
+                                });
                             }
                         })
                     }
