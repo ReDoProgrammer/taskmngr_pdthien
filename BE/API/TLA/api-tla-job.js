@@ -18,13 +18,12 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
             jobs:[]
         })
     }
-    console.log(todate)
     status = status.map(x=>parseInt(x));
   
     let jobs = await Job
         .find({
-            'deadline.begin':{$gte:fromdate},
-            'deadline.end':{$lte:todate},
+            'deadline.begin':{$gte: new Date(fromdate)},
+            'deadline.begin':{$lte:new Date(todate)},
             $or: [
                 { "name": { "$regex": search, "$options": "i" } },
                 { "intruction": { "$regex": search, "$options": "i" } }
