@@ -186,7 +186,6 @@ const customerSchema = new Schema({
 customerSchema.pre("save", function (next) {
     var customer = this;
 
-
     // generate a salt
     bcrypt.genSalt(SALT_WORK_FACTOR, function (err, salt) {
         if (err) return next(err);
