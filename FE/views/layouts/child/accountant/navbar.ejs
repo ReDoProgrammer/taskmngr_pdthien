@@ -158,8 +158,7 @@
         });
         $('#btnCloseModalChangePassword').click();
       },
-      error: function (err) {
-        console.log(err)
+      error: function (err) {        
         $.toast({
           heading: 'Error',
           text: err.responseJSON.msg,

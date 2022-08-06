@@ -321,7 +321,7 @@
                       <label class="radio-inline"><input type="radio" name="optradio" id="rbtWait">Wait</label>
                       <label class="radio-inline"><input type="radio" name="optradio" checked
                           id="rbtStart">Start</label>
-                     
+
                     </div>
                   </div>
                 </div>
@@ -428,11 +428,12 @@
             cc
           },
           success: function (data) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Successfully!',
-              text: data.msg
-            })
+            $.toast({
+              heading: 'Successfully!',
+              text: data.msg,
+              showHideTransition: 'fade',
+              icon: 'success'
+            });
             LoadTasks();
             $('#txtInputLink').val('');
             $('#txtRemark').val('');
@@ -463,20 +464,25 @@
             cc
           },
           success: function (data) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Successfully!',
-              text: data.msg
-            })
+            $.toast({
+              heading: 'Successfully!',
+              text: data.msg,
+              showHideTransition: 'fade',
+              icon: 'success'
+            });
             LoadTasks();
             LoadJob();
             $('#txtInputLink').val('');
             $('#txtRemark').val('');
             $('#divAddOrUpdateTask').slideUp(500);
           },
-          error: function (jqXHR, textStatus, errorThrown) {
-            $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
-            $('#msgError').show().delay(3000).fadeOut();
+          error: function (err) {
+            $.toast({
+              heading: 'Error',
+              text: err.responseJSON.msg,
+              showHideTransition: 'fade',
+              icon: 'error'
+            });
           },
         })
       }
@@ -503,19 +509,24 @@
             cc
           },
           success: function (data) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Successfully!',
-              text: data.msg
-            })
+            $.toast({
+              heading: 'Successfully!',
+              text: data.msg,
+              showHideTransition: 'fade',
+              icon: 'success'
+            });
             LoadTasks();
             $('#txtInputLink').val('');
             $('#txtRemark').val('');
             $('#divAddOrUpdateTask').slideUp(500);
           },
-          error: function (jqXHR, textStatus, errorThrown) {
-            $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
-            $('#msgError').show().delay(10000).fadeOut();
+          error: function (err) {
+            $.toast({
+              heading: 'Error',
+              text: err.responseJSON.msg,
+              showHideTransition: 'fade',
+              icon: 'error'
+            });
           },
         })
       } else {
@@ -538,11 +549,12 @@
             cc
           },
           success: function (data) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Successfully!',
-              text: data.msg
-            })
+            $.toast({
+              heading: 'Successfully!',
+              text: data.msg,
+              showHideTransition: 'fade',
+              icon: 'success'
+            });
             LoadTasks();
             LoadJob();
             $('#txtInputLink').val('');
@@ -582,39 +594,39 @@
     $('#panel_task').slideUp(500);
   })
 
-  $(document).on('click','button[name="btnEditTask"]',function(e){
+  $(document).on('click', 'button[name="btnEditTask"]', function (e) {
     let taskId = $(this).closest('tr').attr('id');
     $('#panel_task').slideDown(500);
     $.ajax({
-      url:'/tla/task/detail',
-      type:'get',
+      url: '/tla/task/detail',
+      type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data:{taskId},
-      success:function(data){
+      data: { taskId },
+      success: function (data) {
         $('#slLocalLevels').val();
         $('#txtAssignDate').val();
         $('#txtDeadline').val();
         $('#txtInputLink').val(data.task.basic.link.input);
-        $('#txtRemark').val(data.task.remarks[data.task.remarks.length-1].content)
+        $('#txtRemark').val(data.task.remarks[data.task.remarks.length - 1].content)
 
 
-        if(data.task.editor.length > 0){
+        if (data.task.editor.length > 0) {
           $('#ckbAssignEditor').prop('checked', true);
-        }else{
+        } else {
           $('#ckbAssignEditor').prop('checked', false);
         }
 
-        if(data.task.qa.length>0){
+        if (data.task.qa.length > 0) {
           $('#ckbAssignQA').prop('checked', true);
-        }else{
+        } else {
           $('#ckbAssignQA').prop('checked', false);
         }
 
-        if(data.task.status === -10){
+        if (data.task.status === -10) {
 
-        }else{
+        } else {
 
         }
 
@@ -712,7 +724,7 @@
             } else {
               $('#colQA').hide();
             }
-            
+
             if (data.task.status == -10) {
               $('#rbtPause').prop('checked', true);
             } else {
@@ -952,7 +964,7 @@
 
 
 <script>
- 
+
   $('.panel-collapse').on('show.bs.collapse', function () {
     $(this).siblings('.panel-heading').addClass('active');
   });
