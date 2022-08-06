@@ -55,8 +55,12 @@
         let description = $('#txtDescription').val().trim();
 
         if (name.trim().length == 0) {
-            $('#msgError').text('Module name can not be blank!');
-            $('#msgError').show();
+            $.toast({
+                heading: 'Error',
+                text: `Module name can not be blank!`,
+                showHideTransition: 'fade',
+                icon: 'error'
+            });
             return;
         }
 
@@ -75,15 +79,21 @@
                     status: $('#ckbStatus').is(':checked')
                 },
                 success: function (data, textStatus, xhr) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Successfully!',
-                        text: data.msg
+                    $.toast({
+                        heading: 'Successfully!',
+                        text: data.msg,
+                        showHideTransition: 'fade',
+                        icon: 'success'
                     });
                     $('#modalModule').modal('hide');
                     moduleId = '';
-                }, error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.responseJSON.msg);
+                }, error: function (err) {
+                    $.toast({
+                        heading: 'Error',
+                        text: err.responseJSON.msg,
+                        showHideTransition: 'fade',
+                        icon: 'error'
+                    });
                 }
             })
         } else {//trường hợp thêm mới 1 module
@@ -98,15 +108,21 @@
                     description
                 },
                 success: function (data, textStatus, xhr) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Successfully!',
-                        text: data.msg
+                    $.toast({
+                        heading: 'Successfully!',
+                        text: data.msg,
+                        showHideTransition: 'fade',
+                        icon: 'success'
                     });
                     $('#modalModule').modal('hide');
                     moduleId = '';
-                }, error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.responseJSON.msg);
+                }, error: function (err) {
+                    $.toast({
+                        heading: 'Error',
+                        text: err.responseJSON.msg,
+                        showHideTransition: 'fade',
+                        icon: 'error'
+                    });
                 }
             })
         }

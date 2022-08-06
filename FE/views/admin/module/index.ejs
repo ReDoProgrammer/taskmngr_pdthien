@@ -95,7 +95,6 @@
                 moduleId
             },
             success: function (data, textStatus, xhr) {
-                console.log(data);
                 $('#modalModule').modal();
                 $('#txtName').val(data.module.name);
                 $('#txtDescription').val(data.module.description);
@@ -105,7 +104,12 @@
                     $('#ckbStatus').prop('checked', false);
                 }
             }, error: function (jqXHR, textStatus, errorThrown) {
-                alert(jqXHR.responseJSON.msg);
+                $.toast({
+                    heading: 'Error',
+                    text: err.responseJSON.msg,
+                    showHideTransition: 'fade',
+                    icon: 'error'
+                });
             }
         });
 
@@ -113,4 +117,4 @@
 </script>
 
 <%-include('modal')%>
-<%-include('staff-modal')%>
+    <%-include('staff-modal')%>
