@@ -25,6 +25,9 @@
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
+        <button type="button" class="btn btn-warning mt-2 btn-sm" data-toggle="modal" data-target="#modalChangePassword">
+          <i class="fa fa-key" aria-hidden="true"></i>
+        </button>
         <button class="btn btn-sm btn-danger mt-2" id="btnLogout">
           <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
         </button>
@@ -36,6 +39,45 @@
 </nav>
 
 
+
+
+<!-- Modal -->
+<div id="modalChangePassword" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-sm">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title text-info">Change password</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group ">
+          <label for="">Current password:</label>
+          <input type="password" name="current_password" id="txtCurrentPassword" class="form-control">
+        </div>
+        <div class="form-group ">
+          <label for="">New password:</label>
+          <input type="password" name="new_password" id="txtNewPassword" class="form-control">
+        </div>
+        <div class="form-group ">
+          <label for="">Confirm new password:</label>
+          <input type="password" name="confirm_new_password" id="txtConfirmNewPassword" class="form-control">
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="btnSubmitChangePassword">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>
+          Submit change
+        </button>
+        <button type="button" class="btn btn-default" data-dismiss="modal"
+          id="btnCloseModalChangePassword">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 
 
@@ -67,4 +109,56 @@
     localStorage.removeItem('accessToken');
     window.location.href = '/dc/login';
   });
+
+  $('#btnSubmitChangePassword').click(function () {
+    let current_password = $('#txtCurrentPassword').val().trim();
+    let new_password = $('#txtNewPassword').val().trim();
+    let confirm_new_password = $('#txtConfirmNewPassword').val().trim();
+    if (current_password.length === 0 || new_password.length === 0 || confirm_new_password.length === 0) {
+      $.toast({
+        heading: 'Error',
+        text: 'Password field can not be empty!',
+        showHideTransition: 'fade',
+        icon: 'error'
+      });
+      $('#txtCurrentPassword').select();
+      return;
+    }
+    if (new_password !== confirm_new_password) {
+      $.toast({
+        heading: 'Error',
+        text: 'New password and confirm not match!',
+        showHideTransition: 'fade',
+        icon: 'error'
+      });
+      $('#txtNewPassword').select();
+      return;
+    }
+    $.ajax({
+      url: '/dc/auth/change-password',
+      type: 'put',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: { current_password, new_password },
+      success: function (data) {
+        $.toast({
+          heading: 'Successfully!',
+          text: data.msg,
+          showHideTransition: 'fade',
+          icon: 'success'
+        });
+        $('#btnCloseModalChangePassword').click();
+      },
+      error: function (err) {
+        console.log(err)
+        $.toast({
+          heading: 'Error',
+          text: err.responseJSON.msg,
+          showHideTransition: 'fade',
+          icon: 'error'
+        });
+      }
+    })
+  })
 </script>
