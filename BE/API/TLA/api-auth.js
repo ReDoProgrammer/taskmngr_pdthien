@@ -64,6 +64,41 @@ router.post("/login", (req, res) => {
     })
 });
 
+router.put('/change-password',authenticateTLAToken,async (req,res)=>{
+  let {current_password,new_password} = req.body;
+  if(current_password.length == 0){
+    return res.status(403).json({
+      msg:`Current password is invalid!`
+    })
+  }
+  if(new_password.length == 0){
+    return res.status(403).json({
+      msg:`New password is invalid!`
+    })
+  }
+  let user = await User.findById(req.user._id); 
+  checkAccount(user.username, current_password)
+  .then(async _=>{
+    user.password = new_password;
+    await user.save()
+    .then(_=>{
+      return res.status(200).json({
+        msg:`Your password has been changed successfully!`
+      })
+    })
+    .catch(err=>{
+      return res.status(500).json({
+        msg:`You can not change password with error: ${new Error(err.message)}`
+      })
+    })
+  })
+  .catch(err=>{
+    console.log(err)
+    return res.status(err.code).json({
+      msg:err.msg
+    })
+  })
+})
 
 
 
