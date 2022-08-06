@@ -108,14 +108,20 @@
                         mId: $(this).closest("tr").attr("id")
                     },
                     success: function (data, textStatus, xhr) {
-                        Swal.fire(
-                            'Deleted!',
-                            data.msg,
-                            'success'
-                        )
+                        $.toast({
+                            heading: 'Successfully!',
+                            text: data.msg,
+                            showHideTransition: 'fade',
+                            icon: 'success'
+                        });
                         LoadMaterialList();
                     }, error: function (jqXHR, textStatus, errorThrown) {
-                        alert(jqXHR.responseJSON.msg);
+                        $.toast({
+                            heading: 'Error',
+                            text: err.responseJSON.msg,
+                            showHideTransition: 'fade',
+                            icon: 'error'
+                        });
                     }
                 })
 

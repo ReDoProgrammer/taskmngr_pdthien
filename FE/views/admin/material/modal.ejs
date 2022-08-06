@@ -72,16 +72,21 @@
                     price
                 },
                 success: function (data) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Successfully!',
-                        text: data.msg
+                    $.toast({
+                        heading: 'Successfully!',
+                        text: data.msg,
+                        showHideTransition: 'fade',
+                        icon: 'success'
                     });
                     $('#materialModal').modal('hide');
                 }
                 , error: function (jqXHR, textStatus, errorThrown) {
-                    $('#materialMsg').removeClass('text-success').addClass('text-danger');
-                    $('#materialMsg').text(jqXHR.responseJSON.msg).fadeIn().delay(3000).fadeOut();
+                    $.toast({
+                        heading: 'Error',
+                        text: err.responseJSON.msg,
+                        showHideTransition: 'fade',
+                        icon: 'error'
+                    });
                 }
             })
         } else {
@@ -98,16 +103,21 @@
                     price
                 },
                 success: function (data) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Successfully!',
-                        text: data.msg
+                    $.toast({
+                        heading: 'Successfully!',
+                        text: data.msg,
+                        showHideTransition: 'fade',
+                        icon: 'success'
                     });
                     $('#materialModal').modal('hide');
                 }
                 , error: function (jqXHR, textStatus, errorThrown) {
-                    $('#materialMsg').removeClass('text-success').addClass('text-danger');
-                    $('#materialMsg').text(jqXHR.responseJSON.msg).fadeIn().delay(3000).fadeOut();
+                    $.toast({
+                        heading: 'Error',
+                        text: err.responseJSON.msg,
+                        showHideTransition: 'fade',
+                        icon: 'error'
+                    });
                 }
             })
         }
