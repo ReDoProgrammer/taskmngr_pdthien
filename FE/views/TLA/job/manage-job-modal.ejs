@@ -400,8 +400,12 @@
     let status = -1;
     // validateion component inputs
     if (isNaN(assigned_date) || assigned_date === null) {
-      $('#msgError').text('(*) Assign date or deadline is invalid!');
-      $('#msgError').show().delay(3000).fadeOut();
+      $.toast({
+        heading: 'Error',
+        text: 'Assign date or deadline is invalid!',
+        showHideTransition: 'fade',
+        icon: 'error'
+      });
       return;
     }
 
@@ -595,7 +599,7 @@
   })
 
   $(document).on('click', 'button[name="btnEditTask"]', function (e) {
-    let taskId = $(this).closest('tr').attr('id');
+    taskId = $(this).closest('tr').attr('id');
     $('#panel_task').slideDown(500);
     $.ajax({
       url: '/tla/task/detail',
@@ -605,24 +609,18 @@
       },
       data: { taskId },
       success: function (data) {
-        $('#slLocalLevels').val();
-        $('#txtAssignDate').val();
-        $('#txtDeadline').val();
+        console.log(data.task)
+        $('#slLocalLevels').val(data.task.basic.level._id);
+        $('#txtAssignDate').val(convertISODateToTimeFormat(data.task.basic.deadline.begin));
+        $('#txtDeadline').val(convertISODateToTimeFormat(data.task.basic.deadline.end));
         $('#txtInputLink').val(data.task.basic.link.input);
         $('#txtRemark').val(data.task.remarks[data.task.remarks.length - 1].content)
 
 
-        if (data.task.editor.length > 0) {
-          $('#ckbAssignEditor').prop('checked', true);
-        } else {
-          $('#ckbAssignEditor').prop('checked', false);
-        }
-
-        if (data.task.qa.length > 0) {
-          $('#ckbAssignQA').prop('checked', true);
-        } else {
-          $('#ckbAssignQA').prop('checked', false);
-        }
+        $('#ckbAssignEditor').prop('checked', data.task.editor.length > 0);
+        $('#ckbAssignQA').prop('checked', data.task.qa.length > 0);
+        data.task.editor.length > 0?$('#colEditor').show():$('#colEditor').hide();
+        data.task.qa.length > 0?$('#colQA').show():$('#colEditor').hide();
 
         if (data.task.status === -10) {
 
