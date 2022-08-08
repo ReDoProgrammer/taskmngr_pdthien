@@ -1,38 +1,38 @@
 const router = require('express').Router();
 const Combo = require('../../models/combo-model');
+const Job = require('../../models/job-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 
-router.get('/list-lines',authenticateAdminToken,async (req,res)=>{
-    let {combo} = req.query;
-    let cb = await Combo.findById(combo)
-            .populate('lines.root')
-            .populate('lines.parents');
-    if(!cb){
+router.get('/list-lines', authenticateAdminToken, async (req, res) => {
+    let { combo } = req.query;
+    let cb = await Combo.findById(combo)     
+        .populate('lines.mapping');
+    if (!cb) {
         return res.status(404).json({
-            msg:`Combo not found!`
+            msg: `Combo not found!`
         })
     }
     return res.status(200).json({
-        msg:`Load combo lines successfully!`,
+        msg: `Load combo lines successfully!`,
         lines: cb.lines
     })
 })
 
 router.get('/list', authenticateAdminToken, async (req, res) => {
-    let cbs = await Combo.find({})
+    let cbs = await Combo.find({
+        $or: [
+            { 'applied.unlimited': true },
+            { 'applied.to_date': { $gte: new Date() } }
+        ]
+    })
         .populate({
             path: 'lines',
             populate: {
-                path: 'root'
-            }
-        })
-        .populate({
-            path: 'lines',
-            populate: {
-                path: 'parents'
+                path: 'mapping'
             }
         });
+
 
     return res.status(200).json({
         msg: `Load combo list successfully!`,
@@ -64,7 +64,14 @@ router.delete('/', authenticateAdminToken, async (req, res) => {
         return res.status(404).json({
             msg: `Combo not found!`
         })
-    }  
+    }
+
+    let count = await Job.countDocuments({cb:_id});
+    if(count > 0){
+        return res.status(403).json({
+            msg:`Can not delete this combo cause having job based on it!`
+        })
+    }
 
     await cb.delete()
         .then(_ => {
@@ -80,7 +87,7 @@ router.delete('/', authenticateAdminToken, async (req, res) => {
 })
 
 router.put('/', authenticateAdminToken, async (req, res) => {
-    let { _id, name, description, price,from_date,to_date,unlimited } = req.body;
+    let { _id, name, description, price, from_date, to_date, unlimited } = req.body;
     let cb = await Combo.findById(_id);
     if (!cb) {
         return res.status(404).json({
@@ -92,8 +99,8 @@ router.put('/', authenticateAdminToken, async (req, res) => {
     cb.description = description;
     cb.price = price;
     cb.applied.from_date = from_date;
-    if(unlimited!='true'){
-        cb.applied.to_date = to_date;       
+    if (unlimited != 'true') {
+        cb.applied.to_date = to_date;
     }
     cb.applied.unlimited = unlimited;
 
@@ -111,21 +118,50 @@ router.put('/', authenticateAdminToken, async (req, res) => {
         })
 })
 
-router.put('/push-line',authenticateAdminToken,async (req,res)=>{
-    let {combo,level,divided,quantity} = req.body;
+router.put('/push-line', authenticateAdminToken, async (req, res) => {
+    let { combo, map, quantity } = req.body;
 
-    let check = await Combo.countDocuments({
-        _id: combo,
-        $or:[
-            {'lines.root':level},
-            {'lines.parents':level}
-        ]
+    let cb = await Combo.findById(combo);
+    if (!cb) {
+        return res.status(404).json({
+            msg: `Combo not found!`
+        })
+    }
+
+    let check = await Combo.find({
+        _id:combo,
+        'lines.mapping':map
     });
-    if(check>0){
+   
+    if(check.length > 0){
         return res.status(409).json({
             msg:`This line already exists in combo!`
         })
     }
+
+    cb.lines.push({
+        mapping:map,
+        quantity
+    });
+    await cb.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`The line has been push into this combo!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not push line into this combo with error: ${new Error(err.message)}`
+        })
+    })
+
+   
+
+
+})
+
+router.put('/pull-line',authenticateAdminToken,async (req,res)=>{
+    let {combo,lineId} = req.body;
     
     let cb = await Combo.findById(combo);
     if(!cb){
@@ -133,37 +169,62 @@ router.put('/push-line',authenticateAdminToken,async (req,res)=>{
             msg:`Combo not found!`
         })
     }
-    if(divided == 'true'){
-        cb.lines.push({
-            parents:level,
-            quantity
-        })
-    }else{
-        cb.lines.push({
-            root:level,
-            quantity
-        })
-    }
+    cb.lines = cb.lines.filter(x=>x.mapping!=lineId);
     
     await cb.save()
     .then(_=>{
         return res.status(200).json({
-            msg:`Line has been added into this combo!`
+            msg:`The line has been removed out of this combo!`
         })
     })
     .catch(err=>{
         return res.status(500).json({
-            msg:`Can not add line into combo with error: ${new Error(err.message)}`
+            msg:`Can not remove the line out of this combo with error: ${new Error(err.message)}`
         })
-    })   
+    })
+})
+
+router.put('/change-qty',authenticateAdminToken, async (req,res)=>{
+    let {combo,lineId,quantity} = req.body;
+    
+    let cb = await Combo.findById(combo);
+    if(!cb){
+        return res.status(404).json({
+            msg:`Combo not found!`
+        })
+    }
+
+    let lines = cb.lines.filter(x=>x.mapping == lineId);
+    if(lines.length == 0){
+        return res.status(404).json({
+            msg:`Combo line does not match!`
+        })
+    }
+
+    if(lines[0].quantity == quantity){
+        return;
+    }
+
+    lines[0].quantity = quantity;
+    await cb.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`Line quantity has been updated!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not update line quantity with error: ${new Error(err.message)}`
+        })
+    })
 })
 
 router.post('/', authenticateAdminToken, async (req, res) => {
-    let { name, description, price, from_date,to_date,status,unlimited } = req.body;
+    let { name, description, price, from_date, to_date, status, unlimited } = req.body;
     let combo = new Combo({
         name,
         description,
-        price            
+        price
     });
 
     combo.applied = {
@@ -172,7 +233,7 @@ router.post('/', authenticateAdminToken, async (req, res) => {
         status
     }
 
-    if(unlimited == 'false'){
+    if (unlimited == 'false') {
         combo.applied.to_date = to_date;
     }
 

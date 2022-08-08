@@ -16,47 +16,21 @@
                         </div>
                     </div>
                     <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-8 form-group">
-                                <label for="">Root levels</label>
-                                <select name="" id="slRootLevels" class="form-control"></select>
-                            </div>
-                            <div class="col-md-2 form-group" id="colRootQuantity">
-                                <label for="">Quantity:</label>
-                                <input type="text" name="quantity" value="0" id="txtRootQuantity" class="form-control">
-                            </div>
-                            <div class="col-md-2 form-group mt-2">
-                                <div class="checkbox mt-2">
-                                    <label class="mt-2"><input type="checkbox" value="" id="ckbDivide">Divide
-                                        levels</label>
-                                </div>
-                            </div>
+                        <div class="col-md-10">
+                            <select name="" id="slMappingList" class="form-control"></select>
                         </div>
-                        <div class="row" id="rowParents">
-                            <div class="col-md-10 form-group">
-                                <label for="">Parents levels:</label>
-                                <select name="" id="slParentsLevels" class="form-control"></select>
-                            </div>
-                            <div class="col-md-2 form-group">
-                                <label for="">Quantity:</label>
-                                <input type="text" name="quantity" id="txtParentsQuantity" value="0"
-                                    class="form-control">
-                            </div>
 
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 text-right">
-                                <button class="btn btn-primary" id="btnSubmitLine">
+                        <div class="col-md-2 input-group">
+                            <input type="text" class="form-control text-right" id="txtLineQty" value="0"
+                                name="quantity" />
+                            <div class="input-group-btn">
+                                <button class="btn btn-info" id="btnAddLine">
                                     <i class="fa fa-plus" aria-hidden="true"></i>
-                                    Add level to combo
                                 </button>
                             </div>
                         </div>
-                        <div class="row mt-2">
-                            <div class="col-md-12">
-                                <label id="lblLineMsg" class="text-danger font-weight-bold"></label>
-                            </div>
-                        </div>
+
+
 
                         <hr />
                         <div class="table-responsive mt-2">
@@ -82,14 +56,54 @@
 <script>
     var lineId = '';
     $(document).ready(function () {
-        LoadRootLevels();
+        LoadMappingList();
     })
+    $(document).on("focusout", "input[name='line-quantity']", function () {
+        let quantity = parseInt($(this).val());
+        if (isNaN(quantity) || quantity <= 0) {
+            $.toast({
+                heading: 'Validation',
+                text: `Quantity is invalid!`,
+                showHideTransition: 'fade',
+                icon: 'error'
+            });
+            return;
+        }
 
+        $.ajax({
+            url: '/admin/combo/change-qty',
+            type: 'put',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                combo: _id,
+                lineId: $(this).closest("tr").attr("id"),
+                quantity
+            },
+            success: function (data) {
+                $.toast({
+                    heading: 'Successfully!',
+                    text: data.msg,
+                    showHideTransition: 'fade',
+                    icon: 'success'
+                });
+            },
+            error: function (err) {
+                $.toast({
+                    heading: 'Error',
+                    text: err.responseJSON.msg,
+                    showHideTransition: 'fade',
+                    icon: 'error'
+                });
+            }
+        })
+    });
     $(document).on("click", "button[name='delete_line']", function () {
         Swal.fire({
             title: 'Are you sure want to delete this combo line?',
             text: "You won't be able to revert this!",
-            icon: 'warning',
+            icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
@@ -97,8 +111,8 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/admin/combo-line',
-                    type: 'delete',
+                    url: '/admin/combo/pull-line',
+                    type: 'put',
                     headers: {
                         authorization: "Bearer " + localStorage.getItem("accessToken"),
                     },
@@ -107,18 +121,21 @@
                         lineId: $(this).closest("tr").attr("id")
                     },
                     success: function (data, textStatus, xhr) {
-                        Swal.fire(
-                            'Deleted!',
-                            data.msg,
-                            'success'
-                        )
-                        LoadLines();
-                    }, error: function (jqXHR, textStatus, errorThrown) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Opp...!',
-                            text: jqXHR.responseJSON.msg
+                        $.toast({
+                            heading: 'Successfully!',
+                            text: data.msg,
+                            showHideTransition: 'fade',
+                            icon: 'success'
                         });
+                        LoadLines();
+                    }, error: function (err) {
+                        $.toast({
+                            heading: 'Error',
+                            text: err.responseJSON.msg,
+                            showHideTransition: 'fade',
+                            icon: 'error'
+                        });
+
                     }
                 })
 
@@ -127,11 +144,16 @@
     })
 
 
-    $('#btnSubmitLine').click(function () {
-        let quantity = parseInt($('#ckbDivide').is(':checked') ? $('#txtParentsQuantity').val() : $('#txtRootQuantity').val());
-        if (quantity == 0) {
-            $('#lblLineMsg').text('(!) Quantity must be greater than 0');
-            $('#lblLineMsg').fadeIn().delay(3000).fadeOut();
+    $('#btnAddLine').click(function () {
+        let quantity = parseInt($('#txtLineQty').val());
+
+        if (isNaN(quantity) || quantity <= 0) {
+            $.toast({
+                heading: 'Validation',
+                text: `Quantity is invalid!`,
+                showHideTransition: 'fade',
+                icon: 'error'
+            });
             return;
         }
         $.ajax({
@@ -142,24 +164,24 @@
             },
             data: {
                 combo: _id,
-                level: $('#ckbDivide').is(':checked') ? $('#slParentsLevels option:selected').val() : $('#slRootLevels option:selected').val(),
-                divided: $('#ckbDivide').is(':checked'),
+                map: $('#slMappingList option:selected').val(),
                 quantity
             },
             success: function (data) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Successfully!',
-                    text: data.msg
+                $.toast({
+                    heading: 'Successfully!',
+                    text: data.msg,
+                    showHideTransition: 'fade',
+                    icon: 'success'
                 });
-                ResetComponents();
                 LoadLines();
             }
-            , error: function (jqXHR, textStatus, errorThrown) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Opp...!',
-                    text: jqXHR.responseJSON.msg
+            , error: function (err) {
+                $.toast({
+                    heading: 'Error',
+                    text: err.responseJSON.msg,
+                    showHideTransition: 'fade',
+                    icon: 'error'
                 });
             }
         })
@@ -184,13 +206,13 @@
                 $('#tblLines').empty();
                 let idx = 1;
                 data.lines.forEach(l => {
-                    let tr = '<tr id="' + l._id + '">';
-                    tr += '<td>' + (idx++) + '</td>';
-                    tr += '<td class = "font-weight-bold text-primary">';
-                    tr += l.root ? l.root.name : l.parents.name;
+                    let tr = '<tr id="' + l.mapping._id + '">';
+                    tr += '<td class="col-md-1">' + (idx++) + '</td>';
+                    tr += '<td class = "font-weight-bold text-primary col-md-8">';
+                    tr += l.mapping.name;
                     tr += '</td>';
-                    tr += '<td class = "text-right">' + l.quantity + '</td>';
-                    tr += '<td class = "text-right">';
+                    tr += '<td class = "text-right col-md-2"> <input type="text" class="form-control text-right" value="' + l.quantity + '" name="line-quantity"/></td>';
+                    tr += '<td class = "text-right col-md-1">';
                     tr += '<button class = "btn btn-xs btn-danger ml-2" name="delete_line"><i class="fa fa-trash" aria-hidden="true"></i></button>';
                     tr += '</td>';
                     tr += '</tr>';
@@ -202,31 +224,11 @@
 
     $('#modalComboLine').on('shown.bs.modal', function (e) {
         LoadLines();
-        ResetComponents();
-
     })
 
-    $('input[name="quantity"]').focusout(function () {
-        if ($(this).val().length == 0) {
-            $(this).val('0');
-        }
-    })
 
-    $('input[name="quantity"]').keyup(function (e) {
-        if (/\D/g.test(this.value)) {
-            this.value = this.value.replace(/\D/g, '');
-        }
-    });
 
-    $('#ckbDivide').change(function () {
-        if (this.checked) {
-            $('#rowParents').slideDown(500);
-            $('#colRootQuantity').slideUp(500);
-        } else {
-            $('#colRootQuantity').slideDown(500);
-            $('#rowParents').slideUp(500);
-        }
-    });
+
 
     $(document).on('hidden.bs.modal', '#modalComboLine', function () {
         $('#txtName').val('');
@@ -236,76 +238,29 @@
         LoadCombo();
     });
 
-    $("#slRootLevels").change(function () {
-        LoadParentsByRoot();
-    });
 
-
-    function ResetComponents() {
-        $('#ckbDivide').prop('checked', false);
-        $('#rowParents').slideUp(500);
-        $('#colRootQuantity').slideDown(500);
-        $('input[name="quantity"]').val('0');
-    }
-
-    function LoadRootLevels() {
+    function LoadMappingList() {
         $.ajax({
-            url: '/admin/root-level',
+            url: '/admin/mapping/list',
             type: 'get',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
             success: function (data) {
-                $('#slRootLevels').empty();
-                data.roots.forEach(r => {
-                    let parents = (r.parents.map(x => x.name)).toString();
-                    $('#slRootLevels').append('<option value="' + r._id + '">' + r.name + ' [ ' + parents + ' ]</option>');
+                $('#slMappingList').empty();
+                data.maps.forEach(m => {
+                    $('#slMappingList').append('<option value="' + m._id + '">' + m.name + ' [ ' + m.description + ' ]</option>');
                 })
-                LoadParentsByRoot();
-            }, error: function (jqXHR, textStatus, errorThrown) {
-                alert(jqXHR.responseJSON.msg);
+            }, error: function (err) {
+                $.toast({
+                    heading: 'Error',
+                    text: err.responseJSON.msg,
+                    showHideTransition: 'fade',
+                    icon: 'error'
+                });
             }
         })
     }
 
-    function LoadParentsByRoot() {
-        $.ajax({
-            url: '/admin/parents-level/list-by-root',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: { rootId: $('#slRootLevels option:selected').val() },
-            success: function (data) {
-                $('#slParentsLevels').empty();
-                data.parentsList.forEach(p => {
-                    let levels = (p.job_levels.map(x => x.name)).toString();
-                    $('#slParentsLevels').append('<option value="' + p._id + '">' + p.name + ' [' + levels + ' ]</option>');
-                })
-            }
-        })
-    }
-
-
-    $("#txtQuantity").on("keypress keyup blur", function (event) {
-        //this.value = this.value.replace(/[^0-9\.]/g,'');
-        $(this).val(
-            $(this)
-                .val()
-                .replace(/[^0-9]/g, "")
-        );
-        if (
-            (event.which != 46 || $(this).val().indexOf(".") != -1) &&
-            (event.which < 48 || event.which > 57)
-        ) {
-            event.preventDefault();
-        }
-    });
 
 </script>
-
-<style>
-    input[name="quantity"] {
-        text-align: right;
-    }
-</style>

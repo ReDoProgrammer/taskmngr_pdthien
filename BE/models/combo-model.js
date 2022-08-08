@@ -34,14 +34,10 @@ const comboSchema = new Schema({
     },
     lines: [
         {
-           root:{
+           mapping:{
                type:Schema.Types.ObjectId,
-               ref:'root_level'
-           },
-           parents:{
-               type:Schema.Types.ObjectId,
-               ref:'parents_level'
-           },
+               ref:'mapping'
+           },          
            quantity:{
                type:Number,
                required: [true, 'Quantity is invalid!']

@@ -14,8 +14,8 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
-                <th scope="col">Description</th>
                 <th scope="col">Levels</th>
+                <th scope="col">Description</th>
                 <th scope="col" class="text-right">Price <span class="text-warning font-weight-bold">($)</span></th>
                 <th scope="col">From date</th>
                 <th scope="col">To date</th>
@@ -26,133 +26,131 @@
     </table>
 </div>
 
-<%-include('modal')%>
-    <%-include('modal_line')%>
 
 
-        <script>
-            var _id = '';
-            $(document).ready(function () {
-                LoadCombo();
-            })
-            $(document).on("click", "button[name='lines']", function () {
-                _id = $(this).closest("tr").attr("id");
-                $('#modalComboLine').modal();
-            })
+<script>
+    var _id = '';
+    $(document).ready(function () {
+        LoadCombo();
+    })
+    $(document).on("click", "button[name='lines']", function () {
+        _id = $(this).closest("tr").attr("id");
+        $('#modalComboLine').modal();
+    })
 
 
-            $(document).on("click", "button[name='delete']", function () {
-                Swal.fire({
-                    title: 'Are you sure want to delete this combo?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: '/admin/combo',
-                            type: 'delete',
-                            headers: {
-                                authorization: "Bearer " + localStorage.getItem("accessToken"),
-                            },
-                            data: {
-                                _id: $(this).closest("tr").attr("id")
-                            },
-                            success: function (data, textStatus, xhr) {
-                                Swal.fire(
-                                    'Deleted!',
-                                    data.msg,
-                                    'success'
-                                )
-                                LoadCombo();
-                            }, error: function (jqXHR, textStatus, errorThrown) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Opp...!',
-                                    text: jqXHR.responseJSON.msg
-                                });
-                            }
-                        })
-
-                    }
-                })
-            })
-            $(document).on("click", "button[name='update']", function () {
-                _id = $(this).closest("tr").attr("id");
-                $('#modalCombo').modal();
+    $(document).on("click", "button[name='delete']", function () {
+        Swal.fire({
+            title: 'Are you sure want to delete this combo?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
                 $.ajax({
-                    url: '/admin/combo/detail',
-                    type: 'get',
+                    url: '/admin/combo',
+                    type: 'delete',
                     headers: {
                         authorization: "Bearer " + localStorage.getItem("accessToken"),
                     },
                     data: {
-                        _id
+                        _id: $(this).closest("tr").attr("id")
                     },
-                    success: function (data) {
-                        $('#txtName').val(data.combo.name);
-                        $('#txtPrice').val(data.combo.price);
-                        $('#txaDescription').val(data.combo.description);
-                        $('#txtFromDate').val(convertISODateToTimeFormat(data.combo.applied.from_date));
-                        $('#txtToDate').val(convertISODateToTimeFormat(data.combo.applied.to_date));
-                        $('#cbkUnlimited').prop('checked', data.combo.applied.unlimited);
-                        $('#ckbActive').prop('checked', data.combo.applied.status);
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        alert(jqXHR.responseJSON.msg);
-
-                    }
-
-                })
-            })
-
-            $('#btnAddNew').click(function () {
-                _id = '';
-                $('#txtFromDate').val(getCurrentTime());
-                $('#modalCombo').modal();
-            })
-
-            function LoadCombo() {
-                $.ajax({
-                    url: '/admin/combo/list',
-                    type: 'get',
-                    headers: {
-                        authorization: "Bearer " + localStorage.getItem("accessToken"),
-                    },
-                    success: function (data) {
-                        $('#tblData').empty();
-                        let idx = 1;
-                        data.cbs.forEach(c => {
-                            let levels = (c.lines.map(x => {
-                                return x.root ? x.root.name : x.parents.name
-                            })).toString();
-
-
-                            let tr = '<tr id = "' + c._id + '">';
-                            tr += '<td>' + (idx++) + '</td>';
-                            tr += '<td class="font-weight-bold text-info">' + c.name + '</td>';
-                            tr += '<td>' + c.description + '</td>';
-                            tr += '<td class="font-weight-bold text-danger">' + levels + '</td>';
-                            tr += '<td class="text-warning text-right">' + c.price + '</td>';
-                            tr += '<td>' + convertISODateToTimeFormat(c.applied.from_date) + '</td>';
-                            tr += '<td>';
-                            if (!c.applied.unlimited) {
-                                tr += convertISODateToTimeFormat(c.applied.to_date);
-                            }
-                            tr += '</td>';
-                            tr += '<td class="text-right">';
-                            tr += '<button name = "lines" class="btn btn-xs btn-info"><i class="fa fa-bars" aria-hidden="true"></i></button>';
-                            tr += '<button name = "update" class="btn btn-xs btn-warning ml-2"><i class="fa fa-edit"></i></button>';
-                            tr += '<button name = "delete" class="btn btn-xs btn-danger ml-1"><i class="fa fa-trash" aria-hidden="true"></i></button>';
-                            tr += '</td>';
-                            tr += '</tr>';
-                            $('#tblData').append(tr);
-                        })
+                    success: function (data, textStatus, xhr) {
+                        $.toast({
+                            heading: 'Successfully!',
+                            text: data.msg,
+                            showHideTransition: 'fade',
+                            icon: 'success'
+                        });
+                        LoadCombo();
+                    }, error: function (err) {
+                        $.toast({
+                            heading: 'Error',
+                            text: err.responseJSON.msg,
+                            showHideTransition: 'fade',
+                            icon: 'error'
+                        });
                     }
                 })
+
+            }
+        })
+    })
+    $(document).on("click", "button[name='update']", function () {
+        _id = $(this).closest("tr").attr("id");
+        $('#modalCombo').modal();
+        $.ajax({
+            url: '/admin/combo/detail',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                _id
+            },
+            success: function (data) {
+                $('#txtName').val(data.combo.name);
+                $('#txtPrice').val(data.combo.price);
+                $('#txaDescription').val(data.combo.description);
+                $('#txtFromDate').val(convertISODateToTimeFormat(data.combo.applied.from_date));
+                $('#txtToDate').val(convertISODateToTimeFormat(data.combo.applied.to_date));
+                $('#cbkUnlimited').prop('checked', data.combo.applied.unlimited);
+                $('#ckbActive').prop('checked', data.combo.applied.status);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+
             }
 
-        </script>
+        })
+    })
+
+    $('#btnAddNew').click(function () {
+        _id = '';
+        $('#txtFromDate').val(getCurrentTime());
+        $('#modalCombo').modal();
+    })
+
+    function LoadCombo() {
+        $.ajax({
+            url: '/admin/combo/list',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            success: function (data) {
+                $('#tblData').empty();
+                let idx = 1;
+                data.cbs.forEach(c => {
+                    let levels = c.lines.map(x => x.mapping.name);
+                    let tr = '<tr id = "' + c._id + '">';
+                    tr += '<td>' + (idx++) + '</td>';
+                    tr += '<td class="font-weight-bold text-info">' + c.name + '</td>';
+                    tr += '<td class="font-weight-bold text-danger">' + levels + '</td>';
+                    tr += '<td>' + c.description + '</td>';
+                    tr += '<td class="text-warning text-right">' + c.price + '</td>';
+                    tr += '<td>' + convertISODateToTimeFormat(c.applied.from_date) + '</td>';
+                    tr += '<td>';
+                    if (!c.applied.unlimited) {
+                        tr += convertISODateToTimeFormat(c.applied.to_date);
+                    }
+                    tr += '</td>';
+                    tr += '<td class="text-right">';
+                    tr += '<button name = "lines" class="btn btn-xs btn-info"><i class="fa fa-bars" aria-hidden="true"></i></button>';
+                    tr += '<button name = "update" class="btn btn-xs btn-warning ml-2"><i class="fa fa-edit"></i></button>';
+                    tr += '<button name = "delete" class="btn btn-xs btn-danger ml-1"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                    tr += '</td>';
+                    tr += '</tr>';
+                    $('#tblData').append(tr);
+                })
+            }
+        })
+    }
+
+</script>
+<%-include('modal')%>
+    <%-include('modal_line')%>
