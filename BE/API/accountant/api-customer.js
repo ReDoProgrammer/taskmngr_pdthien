@@ -9,8 +9,7 @@ const pageSize = 20;
 router.get('/contract', authenticateAccountantToken, async (req, res) => {
     let { customerId } = req.query;
     let customer = await Customer.findById(customerId)
-        .populate('contracts.parents')
-        .populate('contracts.root');      
+        .populate('contracts.mapping');      
     if (!customer) {
         return res.status(404).json({
             msg: `Customer not found!`

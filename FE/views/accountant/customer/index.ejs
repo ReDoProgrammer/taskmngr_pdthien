@@ -445,7 +445,7 @@
 
 
 
-    $(document).on("click", "button[name='js-view-parents']",async function (e) {
+    $(document).on("click", "button[name='js-view-parents']", async function (e) {
       customerId = $(this).closest('tr').attr('id');
       var $btn = $(e.target),
         $row = $btn.closest('tr'),
@@ -507,25 +507,24 @@
         newRow += '<tr>';
         newRow += '<td class="text-right col-md-1">' + (idx++) + '</td>';
         newRow += '<td class="font-weight-bold text-danger col-md-10">';
-        newRow += '<select id="root" class="form-control">';
+        newRow += '<select name="customer_levels" class="form-control">';
         await $.ajax({
-          url: '/accountant/root-level',
+          url: '/accountant/mapping',
           type: 'get',
           headers: {
             authorization: "Bearer " + localStorage.getItem("accessToken"),
           },
           success: function (data) {
 
-            data.roots.forEach(r => {
-              newRow += '<option value="' + r._id + '" class="font-weight-bold text-danger" data-root="1">' + r.name + '</option>';
-              if (r.parents.length > 0) {
-                newRow += ' <optgroup label="' + r.name + ' children" class="text-info font-italic">'
-                r.parents.forEach(p => {
-                  newRow += '<option value="' + p._id + '" data-root="0">' + p.name + '</option>'
-                })
-
-                newRow += '</optgroup>'
+            data.maps.forEach(m => {
+              if (m.levels.length > 0) {
+                newRow += '<option value="' + m._id + '" data-root="0">' + m.name + '</option>'
               }
+
+
+
+
+
             })
           }
         })

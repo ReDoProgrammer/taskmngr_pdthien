@@ -146,14 +146,10 @@ const customerSchema = new Schema({
     ],
     contracts: [
         {
-            root: {
+            mapping: {
                 type: Schema.Types.ObjectId,
-                ref: 'root_level'
-            },
-            parents: {
-                type: Schema.Types.ObjectId,
-                ref: 'parents_level'
-            },
+                ref: 'mapping'
+            },           
             price: {
                 type: Number,
                 required: [
