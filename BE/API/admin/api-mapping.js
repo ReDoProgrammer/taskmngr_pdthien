@@ -6,10 +6,10 @@ const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 
 router.get('/list', authenticateAdminToken, async (req, res) => {
-    let map = await Mapping.find({}).populate('job_levels');
+    let maps = await Mapping.find({}).populate('job_levels');
     return res.status(200).json({
         msg: `Load mapping list successfully!`,
-        map
+        maps
     })
 })
 
@@ -30,6 +30,14 @@ router.get('/detail', authenticateAdminToken, async (req, res) => {
 
 router.post('/', authenticateAdminToken, async (req, res) => {
     let { name, description } = req.body;
+
+    let count = await Mapping.countDocuments({name});
+    if(count>0){
+        return res.status(409).json({
+            msg:`This map already exists!`
+        })
+    }
+
     let map = new Mapping({ name, description });
 
     await map.save()
@@ -148,7 +156,7 @@ router.put('/pull-child', authenticateAdminToken, async (req, res) => {
 
 router.delete('/', authenticateAdminToken, async (req, res) => {
     let { mId } = req.body;
-    let map = await ParentsLevel.findById(mId);
+    let map = await Mapping.findById(mId);
     if (!map) {
         return res.status(404).json({
             msg: `Map not found!`

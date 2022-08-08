@@ -82,9 +82,7 @@
 
 
     $(document).on("click", "button[name='update']", function () {
-
         moduleId = $(this).closest("tr").attr("id");
-
         $.ajax({
             url: "/admin/module/detail",
             type: "get",

@@ -16,7 +16,7 @@ const mappingSchema = new Schema({
           type:String,
           default:''
       },
-      job_levels:[
+      levels:[
           {
             type:Schema.Types.ObjectId,
             ref:'job_level'

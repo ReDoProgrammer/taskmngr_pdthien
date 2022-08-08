@@ -5,7 +5,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Mapping job level</h4>
+                <h4 class="modal-title">Mapping local and customer job level</h4>
             </div>
             <div class="modal-body">
                 <div class="form-group mt-2">
@@ -122,60 +122,23 @@
         })
     })
 
-    function LoadParentsByRoot() {
-        $.ajax({
-            url: '/admin/parents-level/list-by-root',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem('accessToken'),
-            },
-            data: { rootId },
-            success: function (data) {
-                $('#tblParents').empty();
-                let idx = 1;
-                data.parentsList.forEach(p => {
-                    let tr = '<tr id = "' + p._id + '">';
-                    tr += '<td>' + (idx++) + '</td>';
-                    tr += '<td class="font-weight-bold text-primary">' + p.name + '</td>';
-                    tr += '<td class="text-danger font-weight-bold">';
-                    if (p.job_levels.length > 0) {
-                        tr += (p.job_levels.map(x => x.name)).toString();
-                    }
-                    tr += '</td>';
-                    tr += '<td>' + p.description + '</td>';
-                    tr += '<td class="text-right">';
-                    tr += '<button class="btn btn-xs btn-danger ml-2" name="pull"><i class="fa fa-trash" aria-hidden="true"></i></button>';
-                    tr += '</td>';
-                    tr += '</tr>';
-                    $('#tblParents').append(tr);
-                })
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Opp..',
-                    text: jqXHR.responseJSON.msg
-                });
-            }
-        })
-    }
 
     function LoadParents() {
-        $.ajax({
-            url: '/admin/parents-level/list',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem('accessToken'),
-            },
-            success: function (data) {
-                $('#slParentsList').empty();
-                data.parentsList.forEach(p => {
-                    let children = p.job_levels.length > 0 ? p.job_levels.map(x => x.name) : '';
-                    let name = p.name + (children.length > 0 ? ' - [ ' + children.toString() + ' ]' : '');
-                    $('#slParentsList').append('<option value = "' + p._id + '">' + name + '</option>');
-                })
-            }
-        })
+        // $.ajax({
+        //     url: '/admin/mapping/list',
+        //     type: 'get',
+        //     headers: {
+        //         authorization: "Bearer " + localStorage.getItem('accessToken'),
+        //     },
+        //     success: function (data) {
+        //         $('#slParentsList').empty();
+        //         data.parentsList.forEach(p => {
+        //             let children = p.job_levels.length > 0 ? p.job_levels.map(x => x.name) : '';
+        //             let name = p.name + (children.length > 0 ? ' - [ ' + children.toString() + ' ]' : '');
+        //             $('#slParentsList').append('<option value = "' + p._id + '">' + name + '</option>');
+        //         })
+        //     }
+        // })
     }
 
 

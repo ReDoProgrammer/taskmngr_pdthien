@@ -5,21 +5,19 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Add or update root level</h4>
+                <h4 class="modal-title">Add or update map</h4>
             </div>
             <div class="modal-body">
                 <div class="form-group">
                     <label for="">Name:</label>
-                    <input type="text" placeholder="Root level name" id="txtName" class="form-control">
+                    <input type="text" placeholder="Customer job level name" id="txtName" class="form-control">
                 </div>
 
                 <div class="form-group">
                     <label for="">Description:</label>
-                    <textarea placeholder="Root level description" id="txaDescription" rows="3"
+                    <textarea placeholder="Customer job level description" id="txaDescription" rows="3"
                         class="form-control"></textarea>
-                </div>
-
-                <label id="errMsg" class="font-weight-bold"></label>
+                </div>               
 
             </div>
             <div class="modal-footer">
@@ -40,69 +38,78 @@
         let description = $('#txaDescription').val();
 
         if (name.length == 0) {
-            $('#errMsg').removeClass('text-success').addClass('text-danger');
-            $('#errMsg').text('(!) Please input material name').fadeIn().delay(3000).fadeOut();
+            $.toast({
+                heading: 'Error',
+                text: `Root name is invalid!`,
+                showHideTransition: 'fade',
+                icon: 'error'
+            });
             return;
         }
 
-
-
-        if (rootId.length == 0) {
+        if (mId.length === 0) {
             $.ajax({
-                url: '/admin/root-level',
+                url: '/admin/mapping',
                 type: 'post',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem('accessToken'),
                 },
-                data: {
-                    name,
-                    description
-                },
+                data: { name, description },
                 success: function (data) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Congratulation',
-                        text: data.msg
+                    $.toast({
+                        heading: 'Successfully!',
+                        text: data.msg,
+                        showHideTransition: 'fade',
+                        icon: 'success'
                     });
                     $('#modalRootLevel').modal('hide');
-                }
-                , error: function (jqXHR, textStatus, errorThrown) {
-                    $('#errMsg').removeClass('text-success').addClass('text-danger');
-                    $('#errMsg').text(jqXHR.responseJSON.msg).fadeIn().delay(3000).fadeOut();
+                },
+                error: function (err) {
+                    $.toast({
+                        heading: 'Error',
+                        text: err.responseJSON.msg,
+                        showHideTransition: 'fade',
+                        icon: 'error'
+                    });
                 }
             })
         } else {
             $.ajax({
-                url: '/admin/root-level',
+                url: '/admin/mapping',
                 type: 'put',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem('accessToken'),
                 },
-                data: {
-                    rootId,
-                    name,
-                    description
-                },
+                data: { mId, name, description },
                 success: function (data) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Congratulation',
-                        text: data.msg
+                    $.toast({
+                        heading: 'Successfully!',
+                        text: data.msg,
+                        showHideTransition: 'fade',
+                        icon: 'success'
                     });
                     $('#modalRootLevel').modal('hide');
-                }
-                , error: function (jqXHR, textStatus, errorThrown) {
-                    $('#errMsg').removeClass('text-success').addClass('text-danger');
-                    $('#errMsg').text(jqXHR.responseJSON.msg).fadeIn().delay(3000).fadeOut();
+                },
+                error: function (err) {
+                    $.toast({
+                        heading: 'Error',
+                        text: err.responseJSON.msg,
+                        showHideTransition: 'fade',
+                        icon: 'error'
+                    });
                 }
             })
         }
+
+
+
+
     })
 
 
     $('#modalRootLevel').on('hidden.bs.modal', function () {
-        LoadRootsList();
+        LoadMappingList();
     })
-   
+
 
 </script>
