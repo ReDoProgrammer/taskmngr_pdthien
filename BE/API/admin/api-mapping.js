@@ -6,7 +6,7 @@ const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 
 router.get('/list', authenticateAdminToken, async (req, res) => {
-    let maps = await Mapping.find({}).populate('job_levels');
+    let maps = await Mapping.find({}).populate('levels');
     return res.status(200).json({
         msg: `Load mapping list successfully!`,
         maps
@@ -16,7 +16,7 @@ router.get('/list', authenticateAdminToken, async (req, res) => {
 
 router.get('/detail', authenticateAdminToken, async (req, res) => {
     let { mId } = req.query;
-    let map = await Mapping.findById(mId);
+    let map = await Mapping.findById(mId).populate('levels');
     if (!map) {
         return res.status(404).json({
             msg: `Map not found!`
@@ -89,7 +89,7 @@ router.put('/push-child', authenticateAdminToken, async (req, res) => {
         })
     }
 
-    var chk = map.job_levels.indexOf(levelId);
+    var chk = map.levels.indexOf(levelId);
     if (chk > -1) {
         return res.status(303).json({
             msg: `This job level already has set in this map!`
@@ -104,7 +104,7 @@ router.put('/push-child', authenticateAdminToken, async (req, res) => {
     }
 
 
-    map.job_levels.push(jl);
+    map.levels.push(jl);
     await map.save()
         .then(_ => {
             return res.status(200).json({
@@ -138,7 +138,7 @@ router.put('/pull-child', authenticateAdminToken, async (req, res) => {
     }
 
 
-    map.job_levels.pull(jl);
+    map.levels.pull(jl);
     await map.save()
         .then(_ => {
             return res.status(200).json({
@@ -150,8 +150,6 @@ router.put('/pull-child', authenticateAdminToken, async (req, res) => {
                 msg: `Can not remove this job level from map with error: ${new Error(err.message)}`
             })
         })
-
-
 })
 
 router.delete('/', authenticateAdminToken, async (req, res) => {

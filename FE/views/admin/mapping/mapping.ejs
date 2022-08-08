@@ -1,3 +1,5 @@
+<script src="/js/bootstrap-select.min.js"></script>
+<link href="/css/bootstrap-select.min.css" rel="stylesheet" />
 <div id="modalMapping" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg">
 
@@ -9,11 +11,12 @@
             </div>
             <div class="modal-body">
                 <div class="form-group mt-2">
-                    <label for="">Parents levels</label>
+                    <label for="">Local levels</label>
                     <div class="input-group mt-2">
-                        <select name="" id="slParentsList" class="form-control"></select>
+                        <select name="" id="slChildren" class="form-control selectpicker"
+                            data-live-search="true"></select>
                         <div class="input-group-btn">
-                            <button class="btn btn-info" type="submit" id="btnAddParents">
+                            <button class="btn btn-info" type="submit" id="btnAddChild">
                                 <i class="fa fa-plus" aria-hidden="true"></i>
                             </button>
                         </div>
@@ -24,63 +27,58 @@
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Name</th>
-                            <th scope="col">Children</th>
                             <th scope="col">Description</th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
-                    <tbody id="tblParents"></tbody>
+                    <tbody id="tblChildren"></tbody>
                 </table>
-
-
             </div>
         </div>
-
     </div>
 </div>
 
 <script>
 
-    $(document).ready(function () {
-        LoadParents();
-    })
-
-    $('#btnAddParents').click(function () {
+    $('#btnAddChild').click(function () {
         $.ajax({
-            url: '/admin/root-level/push-parents',
+            url: '/admin/mapping/push-child',
             type: 'put',
             headers: {
                 authorization: "Bearer " + localStorage.getItem('accessToken'),
             },
             data: {
-                rootId,
-                parentsId: $('#slParentsList option:selected').val()
+                mId,
+                levelId: $('#slChildren option:selected').val()
             },
             success: function (data) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Congratulation',
-                    text: data.msg
+                $.toast({
+                    heading: 'Successfully!',
+                    text: data.msg,
+                    showHideTransition: 'fade',
+                    icon: 'success'
                 });
-                LoadParentsByRoot();
+                LoadChildren();
             },
-            error: function (jqXHR, textStatus, errorThrown) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Opp..',
-                    text: jqXHR.responseJSON.msg
+            error: function (err) {
+                $.toast({
+                    heading: 'Error',
+                    text: err.responseJSON.msg,
+                    showHideTransition: 'fade',
+                    icon: 'error'
                 });
             }
         })
     })
 
     $('#modalMapping').on('show.bs.modal', function () {
-        LoadParentsByRoot();
+        LoadLocalLevels();
+        LoadChildren();
     })
     $('#modalMapping').on('hidden.bs.modal', function () {
-        LoadRootsList();
+        LoadMappingList();
     })
-   
+
     $(document).on("click", "button[name='pull']", function () {
         parentsId = $(this).closest("tr").attr("id");
         Swal.fire({
@@ -103,18 +101,20 @@
                         parentsId
                     },
                     success: function (data) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Congratulation',
-                            text: data.msg
+                        $.toast({
+                            heading: 'Successfully!',
+                            text: data.msg,
+                            showHideTransition: 'fade',
+                            icon: 'success'
                         });
-                        LoadParentsByRoot();
+                        LoadChildren();
                     }
-                    , error: function (jqXHR, textStatus, errorThrown) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Opp..',
-                            text: jqXHR.responseJSON.msg
+                    , error: function (err) {
+                        $.toast({
+                            heading: 'Error',
+                            text: err.responseJSON.msg,
+                            showHideTransition: 'fade',
+                            icon: 'error'
                         });
                     }
                 })
@@ -123,23 +123,99 @@
     })
 
 
-    function LoadParents() {
-        // $.ajax({
-        //     url: '/admin/mapping/list',
-        //     type: 'get',
-        //     headers: {
-        //         authorization: "Bearer " + localStorage.getItem('accessToken'),
-        //     },
-        //     success: function (data) {
-        //         $('#slParentsList').empty();
-        //         data.parentsList.forEach(p => {
-        //             let children = p.job_levels.length > 0 ? p.job_levels.map(x => x.name) : '';
-        //             let name = p.name + (children.length > 0 ? ' - [ ' + children.toString() + ' ]' : '');
-        //             $('#slParentsList').append('<option value = "' + p._id + '">' + name + '</option>');
-        //         })
-        //     }
-        // })
+    function LoadLocalLevels() {
+        $.ajax({
+            url: '/admin/job-level',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem('accessToken'),
+            },
+            success: function (data) {
+                $('#slChildren').empty();
+                data.jl.forEach(l => {
+                    $('#slChildren').append('<option value = "' + l._id + '">' + l.name + '</option>');
+                });
+                $('#slChildren').selectpicker();
+                $('#slChildren').selectpicker('refresh');
+            }
+        })
     }
 
 
+    function LoadChildren() {
+        $.ajax({
+            url: '/admin/mapping/detail',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem('accessToken'),
+            },
+            data: { mId },
+            success: function (data) {
+                $('#tblChildren').empty();
+                let cIdx = 1;
+                data.map.levels.forEach(l => {
+                    let tr = '<tr id="' + l._id + '">';
+                    tr += '<td>'+(cIdx++) + '</td>';
+                    tr += '<td class="font-weight-bold text-info">' + l.name + '</td>';
+                    tr += '<td>' + l.description + '</td>';
+                    tr += '<td class="text-right">';
+                    tr += '<button class="btn btn-xs btn-danger ml-2" name="delete-child"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                    tr += '</td>';
+                    tr += '</tr>'
+                    $('#tblChildren').append(tr);
+                })
+            },
+            error: function (err) {
+                $.toast({
+                    heading: 'Error',
+                    text: err.responseJSON.msg,
+                    showHideTransition: 'fade',
+                    icon: 'error'
+                });
+            }
+        })
+    }
+
+    $(document).on("click", "button[name='delete-child']", function () {
+        levelId = $(this).closest("tr").attr("id");
+        Swal.fire({
+            icon: 'question',
+            title: 'Do you want to remove this child from map?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            denyButtonText: `No`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/admin/mapping/pull-child',
+                    type: 'put',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem('accessToken'),
+                    },
+                    data: {
+                        mId,
+                        levelId
+                    },
+                    success: function (data) {
+                        $.toast({
+                            heading: 'Successfully!',
+                            text: data.msg,
+                            showHideTransition: 'fade',
+                            icon: 'success'
+                        });
+                        LoadChildren();
+                    }
+                    , error: function (err) {
+                        $.toast({
+                            heading: 'Error',
+                            text: err.responseJSON.msg,
+                            showHideTransition: 'fade',
+                            icon: 'error'
+                        });
+                    }
+                })
+            }
+        })
+    })
 </script>

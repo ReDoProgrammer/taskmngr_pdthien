@@ -9,6 +9,7 @@
         <tr>
             <th scope="col">#</th>
             <th scope="col">Name</th>
+            <th scope="col">Children</th>
             <th scope="col">Description</th>
             <th scope="col"></th>
         </tr>
@@ -119,7 +120,7 @@
                     let tr = '<tr id = "' + m._id + '">';
                     tr += '<td>' + (idx++) + '</td>';
                     tr += '<td class="font-weight-bold text-primary">' + m.name + '</td>';
-                    tr += '<td class="text-info font-weight-bold">';
+                    tr += '<td class="text-danger font-weight-bold">';
                     if (m.levels.length > 0) {
                         tr += (m.levels.map(x => x.name)).toString();
                     }
