@@ -94,11 +94,10 @@ app.use('/accountant/job-level',accountantJobLevelAPI);
 const accountantNationalStyleAPI = require('./BE/API/accountant/api-national-style');
 app.use('/accountant/national-style',accountantNationalStyleAPI);
 
-const accountantParentsLevelAPI = require('./BE/API/accountant/api-parents-level');
-app.use('/accountant/parents-level',accountantParentsLevelAPI);
+const accountantMappingAPI = require('./BE/API/accountant/api-mapping-level');
+app.use('/accountant/mapping',accountantMappingAPI);
 
-const accountantRootLevelAPI = require('./BE/API/accountant/api-root-level');
-app.use('/accountant/root-level',accountantRootLevelAPI);
+
 
 const accountantSizeAPI = require('./BE/API/accountant/api-size');
 app.use('/accountant/size',accountantSizeAPI);
@@ -178,7 +177,7 @@ const adminMappingController = require('./BE/controllers/Admin/mapping-controlle
 const adminMaterialController = require('./BE/controllers/Admin/material-controller');
 const adminModuleController = require('./BE/controllers/Admin/module-controller');
 const adminNationalStyleController = require('./BE/controllers/Admin/national-style-controller');
-const adminParentsLevelController = require('./BE/controllers/Admin/parents-level-controller');
+const adminParentsLevelController = require('./BE/controllers/Admin/mapping-controller');
 const adminStaffLevelController = require("./BE/controllers/Admin/staff-level-controller");
 const adminSizeController = require('./BE/controllers/Admin/size-controller');
 const adminStatusController = require("./BE/controllers/Admin/status-controller");
@@ -222,8 +221,7 @@ const apiAdminJobLevel = require('./BE/API/admin/api-job-level');
 const apiMaterial = require('./BE/API/admin/api-material');
 const apiAdminModule = require('./BE/API/admin/api-module');
 const apiAdminNationalStyle = require('./BE/API/admin/api-national-style');
-const apiAdminParentsLevel  = require('./BE/API/admin/api-parents');
-const apiAdminRootLevel = require('./BE/API/admin/api-root-level');
+const apiAdminMapping  = require('./BE/API/admin/api-mapping');
 const apiAdminSize = require('./BE/API/admin/api-size');
 const apiAdminStaffLevel = require('./BE/API/admin/api-staff-level');
 const apiAdminStatus = require('./BE/API/admin/api-status');
@@ -352,8 +350,7 @@ app.use('/admin/job-level',apiAdminJobLevel);//quản lý thông tin danh sách 
 app.use('/admin/material',apiMaterial);//quan ly don gia hinh anh dau vao duoc chup boi sale
 app.use('/admin/module',apiAdminModule);// quản lý danh sách module của web
 app.use('/admin/national-style',apiAdminNationalStyle);//quản lý thông tin style của khách hàng theo quốc gia
-app.use('/admin/parents-level',apiAdminParentsLevel);
-app.use('/admin/root-level',apiAdminRootLevel);
+app.use('/admin/mapping',apiAdminMapping);
 app.use('/admin/size',apiAdminSize);//quản lý thông tin kích thước file hình ảnh 
 app.use('/admin/staff-level',apiAdminStaffLevel);//quản lý level của nhân viên, phân loại nhân viên: người mới, tập sự, học việc,...
 app.use('/admin/status',apiAdminStatus);//trạng thái của đơn hàng, tạm thời không sử dụng tới
@@ -387,7 +384,7 @@ app.use('/admin/setting/mapping',adminMappingController);
 app.use('/admin/setting/material',adminMaterialController);
 app.use('/admin/setting/module',adminModuleController);
 app.use('/admin/setting/national-style',adminNationalStyleController);
-app.use('/admin/setting/parents-level',adminParentsLevelController);
+app.use('/admin/setting/mapping',adminParentsLevelController);
 app.use("/admin/setting/size", adminSizeController);
 app.use("/admin/setting/status", adminStatusController);
 app.use("/admin/setting/style", adminStyleController);

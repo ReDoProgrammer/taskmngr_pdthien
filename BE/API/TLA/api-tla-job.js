@@ -1,8 +1,7 @@
 const router = require('express').Router();
 const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const Job = require('../../models/job-model');
-const Root = require('../../models/root-level-model');
-const Parents = require('../../models/parents-level-model');
+const Parents = require('../../models/mapping-model');
 const LocalLevel = require('../../models/job-level-model');
 
 const pageSize = 20;

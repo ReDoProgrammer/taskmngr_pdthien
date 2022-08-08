@@ -1,6 +1,5 @@
 const router = require('express').Router();
-const RootLevel = require('../../models/root-level-model');
-const ParentsLevel = require('../../models/parents-level-model');
+const Mapping = require('../../models/mapping-model');
 const { authenticateAccountantToken } = require("../../../middlewares/accountant-middleware");
 
 
