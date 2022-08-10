@@ -150,27 +150,6 @@
     LoadCaptureders();
   })
 
-  function LoadTemplates() {
-    $.ajax({
-      url: '/sale/customer/list-templates',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: { customerId },
-      success: function (data) {
-        $('#slTemplates').empty();
-        data.templates.forEach(temp => {
-          let name = temp.root ? temp.root.name : temp.parents.name;
-          $('#slTemplates').append('<option value="' + (temp.root ? temp.root._id : temp.parents._id) + '">' + name + '</option>')
-        })
-        $('#slTemplates').selectpicker();
-        $('#slTemplates').selectpicker('refresh');
-      }
-    })
-  }
-
-
 
   function LoadComboes() {
     $.ajax({
@@ -237,8 +216,7 @@
     $('#ckbChooseCombo').prop('checked', false);
     $('#divCombo').hide();
     LoadMaterials();
-    LoadComboes();
-    LoadTemplates();
+    LoadComboes();    
   })
   $('#addJobModal').on('hidden.bs.modal', function () {
     LoadCustomers();

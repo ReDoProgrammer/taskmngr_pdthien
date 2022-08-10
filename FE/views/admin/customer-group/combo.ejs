@@ -7,7 +7,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Modal Header</h4>
+                <h4 class="modal-title">Customer group & combo</h4>
             </div>
             <div class="modal-body">
                 <div class="input-group">
@@ -55,10 +55,11 @@
                 combo: $('#slComboes option:selected').val()
             },
             success: function (data) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Successfully!',
-                    text: data.msg
+                $.toast({
+                    heading: 'Successfully',
+                    text: data.msg,
+                    showHideTransition: 'fade',
+                    icon: 'success'
                 });
                 LoadComboesByGroup();
             },
@@ -101,10 +102,11 @@
                         combo: $(this).closest("tr").attr("id")
                     },
                     success: function (data) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Congratulation',
-                            text: data.msg
+                        $.toast({
+                            heading: 'Successfully',
+                            text: data.msg,
+                            showHideTransition: 'fade',
+                            icon: 'success'
                         });
                         LoadComboesByGroup();
                     }
@@ -130,8 +132,11 @@
             success: function (data) {
                 $('#slComboes').empty();
                 data.cbs.forEach(c => {
-                    let levels = (c.lines.map(x => x.root ? x.root.name : x.parents.name)).toString();
-                    $('#slComboes').append('<option value="' + c._id + '">' + c.name + ' [' + levels + ' ]</option>');
+                    if (c.lines.length > 0) {
+                        let levels = c.lines.map(x => x.mapping.name).toString();
+                        $('#slComboes').append('<option value="' + c._id + '">' + c.name + ' [' + levels + ' ]</option>');
+                    }
+
                 })
                 $('#slComboes').selectpicker();
                 $('#slComboes').selectpicker('refresh');
@@ -150,13 +155,11 @@
                 $('#tblComboes').empty();
                 let idx = 1;
                 data.comboes.forEach(c => {
-                    let details = c.lines.map(x => {
-                        return x.root ? ('{' + x.root.name + ' :' + x.quantity + '}') : ('{' + x.parents.name + ': ' + x.quantity + '}')
-                    })
 
+                    let details = c.lines.map(x => ` ${x.mapping.name}(${x.quantity})`);
                     let tr = '<tr id="' + c._id + '">';
                     tr += '<td>' + (idx++) + '</td>';
-                    tr += '<td class="text-primary font-weight-bold text-left">' + c.name + ' : [<span class="text-danger">' + details + '</span>]</td>';
+                    tr += '<td class="text-primary font-weight-bold text-left">' + c.name + ' - [<span class="text-danger">' + details + '</span>]</td>';
                     tr += '<td class="text-danger font-weight-bold ">' + c.price + '</td>';
                     tr += '<td class="text-right">';
                     tr += '<button name = "delete-combo" class="btn btn-xs btn-danger ml-1"><i class="fa fa-trash" aria-hidden="true"></i></button>';

@@ -14,17 +14,11 @@ router.get('/list', authenticateAdminToken, async (req, res) => {
 
 router.get('/list-comboes', authenticateAdminToken, async (req, res) => {
     let { groupId } = req.query;
-    let group = await CustomerGroup.findById(groupId)
+    let group = await CustomerGroup.findById(groupId)      
         .populate({
             path: 'comboes',
             populate: {
-                path: 'lines.root'
-            }
-        })
-        .populate({
-            path: 'comboes',
-            populate: {
-                path: 'lines.parents'
+                path: 'lines.mapping'
             }
         })
 

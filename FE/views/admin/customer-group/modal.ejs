@@ -5,7 +5,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Modal Header</h4>
+                <h4 class="modal-title">Add or update customer group</h4>
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -54,10 +54,11 @@
                     name, description
                 },
                 success: function (data) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Successfully!',
-                        text: data.msg
+                    $.toast({
+                        heading: 'Successfully',
+                        text: data.msg,
+                        showHideTransition: 'fade',
+                        icon: 'success'
                     });
                     $('#modalGroup').modal('hide');
                 }
@@ -73,10 +74,11 @@
                     groupId, name, description
                 },
                 success: function (data) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Successfully!',
-                        text: data.msg
+                    $.toast({
+                        heading: 'Successfully',
+                        text: data.msg,
+                        showHideTransition: 'fade',
+                        icon: 'success'
                     });
                     $('#modalGroup').modal('hide');
                 }
