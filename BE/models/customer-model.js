@@ -149,7 +149,7 @@ const customerSchema = new Schema({
             mapping: {
                 type: Schema.Types.ObjectId,
                 ref: 'mapping'
-            },           
+            },
             price: {
                 type: Number,
                 required: [
@@ -160,14 +160,23 @@ const customerSchema = new Schema({
                     0.001,
                     `Price is invalid!`
                 ]
-            },            
-            created:{
-                by:{
-                    type:Schema.Types.ObjectId,
-                    ref:'user'
+            },
+            created: {
+                by: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'user'
                 },
-                at:{
-                    type:Date
+                at: {
+                    type: Date
+                }
+            },
+            updated: {
+                by: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'user'
+                },
+                at: {
+                    type: Date
                 }
             }
         }

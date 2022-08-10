@@ -397,6 +397,10 @@ router.put('/update-contract-line',authenticateAccountantToken,async(req,res)=>{
     }
 
     lines[0].price = price;
+    lines[0].updated = {
+        at:new Date(),
+        by:req.user._id
+    }
 
     await customer.save()
     .then(_=>{

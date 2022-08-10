@@ -152,7 +152,7 @@
   }
 
   $('#btnAddNewLine').click(function () {
-    let lineId = $('#slCustomerLevels option:selected').val();
+    let levelId = $('#slCustomerLevels option:selected').val();
     let price = parseFloat($('#txtLevelPrice').val());
     if (isNaN(price) || price <=0) {
       $.toast({
