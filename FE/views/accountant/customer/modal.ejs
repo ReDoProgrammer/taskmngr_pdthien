@@ -25,7 +25,7 @@
                             <div class="form-group col-md-3 col-sm-3 col-xs-3">
                                 <label class="col-form-label">Lastname:</label>
                                 <input type="text" class="form-control" id="txtLastname" placeholder="Lastname" />
-                            </div>                            
+                            </div>
                         </div>
 
                         <div class="form-row">
@@ -198,20 +198,20 @@
         LoadCustomerGroups();
     })
 
-    function LoadCustomerGroups(){
-       $.ajax({
-        url:'/accountant/customer-group',
-        type:'get',
-        headers: {
-                    authorization: "Bearer " + localStorage.getItem("accessToken"),
-                },
-                success:function(data){
-                    $('#slCustomerGroups').empty();
-                    data.groups.forEach(g=>{
-                        $('#slCustomerGroups').append('<option value="'+g._id+'">'+g.name+'</option>');
-                    })
-                }
-       })
+    function LoadCustomerGroups() {
+        $.ajax({
+            url: '/accountant/customer-group',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            success: function (data) {
+                $('#slCustomerGroups').empty();
+                data.groups.forEach(g => {
+                    $('#slCustomerGroups').append('<option value="' + g._id + '">' + g.name + '</option>');
+                })
+            }
+        })
 
     }
 
@@ -272,7 +272,7 @@
 
     $("#btnSubmit").click(function () {
         let group = $('#slCustomerGroups option:selected').val();
-        if(!group || typeof group === 'undefined'){
+        if (!group || typeof group === 'undefined') {
             $('#lblError').text("(!) Customer group is invalid!");
             $('#lblError').show().delay(5000).fadeOut();
             return;
@@ -409,18 +409,19 @@
                     status
                 },
                 success: function (data) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Successfully!',
-                        text: data.msg
-                    })
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Opp.....!',
-                        text: jqXHR.responseJSON.msg
-                    })
+                    $.toast({
+                        heading: 'Successfully!',
+                        text: data.msg,
+                        showHideTransition: 'fade',
+                        icon: 'success'
+                    });
+                }, error: function (err) {
+                    $.toast({
+                        heading: 'Error',
+                        text: err.responseJSON.msg,
+                        showHideTransition: 'fade',
+                        icon: 'error'
+                    });
                 }
             });
         } else {
@@ -458,19 +459,19 @@
                     status
                 },
                 success: function (data) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Successfully!',
-                        text: data.msg
-                    })
-                },
-                error: function (jqXHR, textStatus, errorThrown) {                  
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Opp.....!',
-                        text: jqXHR.responseJSON.msg
-                    })
-
+                    $.toast({
+                        heading: 'Successfully!',
+                        text: data.msg,
+                        showHideTransition: 'fade',
+                        icon: 'success'
+                    });
+                }, error: function (err) {
+                    $.toast({
+                        heading: 'Error',
+                        text: err.responseJSON.msg,
+                        showHideTransition: 'fade',
+                        icon: 'error'
+                    });
                 }
             });
         }

@@ -1,315 +1,216 @@
 <script src="/js/bootstrap-select.min.js"></script>
+<script src="/js/common.js"></script>
 <link href="/css/bootstrap-select.min.css" rel="stylesheet" />
-<!-- Modal -->
-<div id="modalContract" class="modal fade" role="dialog">
-  <div class="modal-dialog modal-lg">
 
+<div id="modalContract" class="modal fade" role="dialog">
+  <div class="modal-dialog">
     <!-- Modal content-->
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Contract list</h4>
+        <h4 class="modal-title">Customer contract</h4>
       </div>
       <div class="modal-body">
-        <div class="panel panel-default mt-2" id="panelContract">
-          <div class="panel-heading">New contract</div>
-          <div class="panel-body">
-            <div class="col-md-8 form-group">
-              <label for="">Root levels</label>
-              <select name="" id="slRootLevels" class="form-control"></select>
-            </div>
-            <div class="col-md-2 form-group" id="colRootPrice">
-              <label for="">Price</label>
-              <input type="text" value="0" id="txtRootPrice" name="price" class="form-control">
-            </div>
-
-            <div class="col-md-2 form-group" id="colDivide">
-              <label for="">Divide level</label>
-              <div class="checkbox">
-                <label><input type="checkbox" id="ckbDivide" value="">Parents level</label>
-              </div>
-            </div>
-
-
-
-
-            <div id="divParentsLevel">
-              <div class="col-md-8 form-group">
-                <label for="">Parents level</label>
-                <select name="" id="slParentsLevels" class="form-control selectpicker" data-live-search="true"></select>
-              </div>
-              <div class="col-md-4 form-group">
-                <label for="">Parents price</label>
-                <input type="text" value="0" id="txtParentsPrice" name="price" class="form-control">
-              </div>
-            </div>
-
-            <label for="" class="font-weight-bold text-danger mt-2" id="lblContractMsg"></label>
-
-            <div class="col-md-12 mt-2 text-right">
-              <button class="btn btn-info" id="btnAddLine">
-                <i class="fa fa-plus" aria-hidden="true"></i>
-                Add contract line
-              </button>
-            </div>
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Level</th>
-                  <th>Price</th>
-                </tr>
-              </thead>
-              <tbody id="tblContractLines">
-              </tbody>
-            </table>
+        <div class="col-md-10">
+          <select name="" id="slCustomerLevels" class="form-control selectpicker" data-live-search="true"></select>
+        </div>
+        <div class="input-group col-md-2">
+          <input type="text" class="form-control text-right" id="txtLevelPrice" value="0">
+          <div class="input-group-btn">
+            <button class="btn btn-primary" id="btnAddNewLine">
+              <i class="fa fa-plus" aria-hidden="true"></i>
+            </button>
           </div>
         </div>
-
       </div>
       <div class="modal-footer">
-        <button class="btn btn-success" id="btnSubmitContract">
-          <i class="fa fa-floppy-o" aria-hidden="true"></i> Save contract
-        </button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Level</th>
+              <th>Price</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tblConrtactLines">
+          </tbody>
+        </table>
       </div>
     </div>
-
   </div>
 </div>
 
 <script>
-  var contract = {};
   $(document).ready(function () {
-    LoadRootLevels();
+    LoadCustomerLevels();
+  })
+  $(document).on('show.bs.modal', '#modalContract', function () {
+    LoadContractLines();
   })
 
-  $('#btnSubmitContract').click(function () {
-    if (jQuery.isEmptyObject(contract)) {
-      $('#lblContractMsg').text('(!) Please config at least one contract line to continue');
-      $('#lblContractMsg').fadeIn().delay(3000).fadeOut();
-      return;
-    }
+  $(document).on('click', 'button[name="delete-contract-line"]', function () {    
+    Swal.fire({
+      icon: 'question',
+      title: 'Do you want to delete this contract line?',
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+      denyButtonText: `No`,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          url: '/accountant/customer/delete-contract-line',
+          type: 'delete',
+          headers: {
+            authorization: "Bearer " + localStorage.getItem('accessToken'),
+          },
+          data: {
+            customerId,
+            lineId:$(this).closest("tr").attr("id")
+          },
+          success: function (data) {
+            $.toast({
+              heading: 'Successfully!',
+              text: data.msg,
+              showHideTransition: 'fade',
+              icon: 'success'
+            });
+            LoadContractLines();
+          }
+          , error: function (err) {
+            $.toast({
+              heading: 'Error',
+              text: err.responseJSON.msg,
+              showHideTransition: 'fade',
+              icon: 'error'
+            });
+          }
+        })
+      }
+    })
+  })
 
+  $(document).on('focusout', 'input[name="contract-price"]', function () {
+    let price = parseFloat($(this).val());
+    let lineId = $(this).closest("tr").attr("id");
     $.ajax({
-      url: '/accountant/customer/contract',
+      url: '/accountant/customer/update-contract-line',
       type: 'put',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { contract },
+      data: { customerId, lineId, price },
       success: function (data) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Successfully!',
-          text: data.msg
+        $.toast({
+          heading: 'Successfully!',
+          text: data.msg,
+          showHideTransition: 'fade',
+          icon: 'success'
         });
-        $('#btnCancelContract').click();
-        $('#modalContract').modal('hide');
+        LoadContractLines();
       },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $('#lblContractMsg').text(jqXHR.responseJSON.msg);
-        $('#lblContractMsg').show().delay(5000).fadeOut();
-
+      error: function (err) {
+        $.toast({
+          heading: 'Error',
+          text: err.responseJSON.msg,
+          showHideTransition: 'fade',
+          icon: 'error'
+        });
       }
     })
-
-  })
-
-  $('#btnAddLine').click(function () {
-    let title = $('#txtContractTitle').val();
-
-    let item = {};
-
-    if (jQuery.isEmptyObject(contract)) {
-      contract.customer = customerId;
-      contract.lines = [];
-    }
-
-    var mArr = contract.lines.map(x => x.value);
-    var check = -1;
-
-    if ($('#ckbDivide').is(':checked')) {
-      if (parseFloat($('#txtParentsPrice').val()) == 0) {
-        $('#lblContractMsg').text('(!) Price is invalid. It\'s must be larger than 0');
-        $('#lblContractMsg').fadeIn().delay(3000).fadeOut();
-        return;
-      }
-      check = mArr.indexOf($('#slParentsLevels option:selected').val());
-      item = {
-        name: $('#slParentsLevels option:selected').text(),
-        value: $('#slParentsLevels option:selected').val(),
-        price: $('#txtParentsPrice').val(),
-        child: true
-      }
-    } else {
-      if (parseFloat($('#txtRootPrice').val()) == 0) {
-        $('#lblContractMsg').text('(!) Price is invalid. It\'s must be larger than 0');
-        $('#lblContractMsg').fadeIn().delay(3000).fadeOut();
-        return;
-      }
-      check = mArr.indexOf($('#slRootLevels option:selected').val());
-      item = {
-        name: $('#slRootLevels option:selected').text(),
-        value: $('#slRootLevels option:selected').val(),
-        price: $('#txtRootPrice').val(),
-        child: false
-      }
-    }
-    if (check > -1) {
-      $('#lblContractMsg').text('(!) This item already exist in this contract');
-      $('#lblContractMsg').fadeIn().delay(3000).fadeOut();
-    } else {
-      contract.lines.push(item);
-      ShowContractLines();
-      $('#ckbDivide').prop('checked', false);
-      $('#divParentsLevel').slideUp(200);
-      $('#colRootPrice').fadeIn(200);
-      $('#colDivide').removeClass('col-md-4').addClass('col-md-2');
-    }
-
-  })
-
-  $(document).on('show.bs.modal', '#modalContract', function () {
-    contract = {};
-    ShowContractLines();
-    $('#divParentsLevel').slideUp(200);
-  })
-
-  $('#modalContract').on('hidden.bs.modal', function () {
-    LoadCustomers();
-  })
-
-  $('#slRootLevels').on('change', function () {
-    LoadParentsLevels();
   })
 
 
-
-
-
-
-
-  $('#ckbDivide').change(function () {
-    if (this.checked) {
-      $('#divParentsLevel').slideDown(500);
-      $('#colRootPrice').hide(500);
-      $('#colDivide').removeClass('col-md-2').addClass('col-md-4');
-      LoadParentsLevels();
-    } else {
-      $('#divParentsLevel').slideUp(500);
-      $('#colRootPrice').show(500);
-      $('#colDivide').removeClass('col-md-4').addClass('col-md-2');
-    }
-  });
-
-
-  $('input[name="price"]').focusout(function (e) {
-    if ($(this).val().length == 0) {
-      $(this).val('0');
-    }
-  })
-  $('input[name="price"]').keydown(function (e) {
-    if (event.shiftKey == true) {
-      event.preventDefault();
-    }
-
-    if ((event.keyCode >= 48 && event.keyCode <= 57) ||
-      (event.keyCode >= 96 && event.keyCode <= 105) ||
-      event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 37 ||
-      event.keyCode == 39 || event.keyCode == 46 || event.keyCode == 190) {
-
-    } else {
-      event.preventDefault();
-    }
-
-    if ($(this).val().indexOf('.') !== -1 && event.keyCode == 190)
-      event.preventDefault();
-    //if a decimal has been added, disable the "."-button
-  });
-
-  function ShowContractLines() {
-    $('#tblContractLines').empty();
-    let idx = 1;
-    if (!jQuery.isEmptyObject(contract)) {
-      contract.lines.forEach(l => {
-        let tr = '<tr id="' + l.value + '">';
-        tr += '<td>' + (idx++) + '</td>';
-        tr += '<td class="text-danger font-weight-bold">' + l.name + '</td>';
-        tr += '<td>' + l.price + '<td>';
-        tr += '<tr>';
-        $('#tblContractLines').append(tr);
-      })
-    }
-
-  }
-
-  function LoadParentsLevels() {
+  function LoadContractLines() {
+    $('#tblConrtactLines').empty();
     $.ajax({
-      url: '/accountant/parents-level',
+      url: '/accountant/customer/contracts',
       type: 'get',
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: {
-        rootId: $('#slRootLevels option:selected').val()
-      },
+      data: { customerId },
       success: function (data) {
-        $('#slParentsLevels').empty();
-        data.parentsList.forEach(p => {
-          let children = (p.job_levels.map(x => x.name)).toString();
-          let opt = '<option value="' + p._id + '">' + p.name + '[ ' + children + ' ]</option>';
-          $('#slParentsLevels').append(opt);
-        })
-        $('#slParentsLevels').selectpicker();
-        $('#slParentsLevels').selectpicker('refresh');
-      }
-    })
-  }
+        let idx = 1;
+        data.contracts.forEach(c => {
+          let levels = c.mapping.levels.map(x => x.name);
 
-  function LoadRootLevels() {
-    $.ajax({
-      url: '/accountant/root-level',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      success: function (data) {
-        data.roots.forEach(r => {
-          $('#slRootLevels').append('<option value="' + r._id + '">' + r.name + '</option>');
+          let tr = '<tr id="' + c._id + '">';
+          tr += '<td class="col-md-1">' + (idx++) + '</td>';
+          tr += '<td class="text-danger font-weight-bold col-md-7 text-left">' + c.mapping.name + ' <span class="text-info">[' + levels + ']</span></td>';
+          tr += '<td class="col-md-2"><input text="text" name="contract-price" class="text-right form-control" value="' + c.price + '"/></td>';
+          tr += '<td class="col-md-2">';
+          tr += '<button class="btn btn-xs btn-danger mt-1" name="delete-contract-line"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+          tr += '</td>';
+          tr += '</tr>';
+          $('#tblConrtactLines').append(tr);
+
         })
       }
     })
   }
 
+  $('#btnAddNewLine').click(function () {
+    let lineId = $('#slCustomerLevels option:selected').val();
+    let price = parseFloat($('#txtLevelPrice').val());
+    if (isNaN(price) || price <=0) {
+      $.toast({
+        heading: 'Error',
+        text: `Price is invalid!`,
+        showHideTransition: 'fade',
+        icon: 'error'
+      });
+      return;
+    }
+    $.ajax({
+      url: '/accountant/customer/insert-contract-line',
+      type: 'put',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: { customerId, levelId, price },
+      success: function (data) {
+        $.toast({
+          heading: 'Successfully!',
+          text: data.msg,
+          showHideTransition: 'fade',
+          icon: 'success'
+        });
+        LoadContractLines();
+      },
+      error: function (err) {
+        $.toast({
+          heading: 'Error',
+          text: err.responseJSON.msg,
+          showHideTransition: 'fade',
+          icon: 'error'
+        });
+      }
+    })
 
-  // function LoadContracts() {
-  //   $.ajax({
-  //     url: "/accountant/customer/contracts",
-  //     type: "get",
-  //     headers: {
-  //       authorization: "Bearer " + localStorage.getItem("accessToken"),
-  //     },
-  //     data: {
-  //       customerId
-  //     },
-  //     success: function (data) {
-  //       console.log(data)
-  //     },
-  //     error: function (jqXHR, textStatus, errorThrown) {
-  //       Swal.fire({
-  //         icon: 'error',
-  //         title: 'Ooop....!',
-  //         text: jqXHR.responseJSON.msg
-  //       })
-  //     }
-  //   })
-  // }
+  })
+
+  function LoadCustomerLevels() {
+    $.ajax({
+      url: '/accountant/mapping',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      success: function (data) {
+        $('#slCustomerLevels').empty();
+        data.maps.forEach(m => {
+          if (m.levels.length > 0) {
+            let levels = m.levels.map(x => x.name);
+            let opt = '<option value="' + m._id + '">' + m.name + ' [' + levels + ']</option>';
+            $('#slCustomerLevels').append(opt)
+          }
+
+        })
+        $('#slCustomerLevels').selectpicker();
+        $('#slCustomerLevels').selectpicker('refresh');
+      }
+    })
+  }
 </script>
-
-<style>
-  #txtRootPrice,
-  #txtParentsPrice {
-    text-align: right;
-  }
-</style>

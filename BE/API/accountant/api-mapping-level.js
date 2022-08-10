@@ -5,7 +5,8 @@ const { authenticateAccountantToken } = require("../../../middlewares/accountant
 
 
 router.get('/',authenticateAccountantToken, async (req, res) => {
-    let maps = await Mapping.find({});
+    //chir load cac level da dc map
+    let maps = await Mapping.find({}).populate('levels');
     return res.status(200).json({
         msg:`Load customer job leves successfully!`,
         maps

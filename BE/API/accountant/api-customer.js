@@ -24,9 +24,13 @@ router.get('/contract', authenticateAccountantToken, async (req, res) => {
 
 router.get('/contracts', authenticateAccountantToken, async (req, res) => {
     let { customerId } = req.query;
-    let customer = await Customer.findById(customerId)
-    .populate('contracts.root')
-    .populate('contracts.parents');
+    let customer = await Customer.findById(customerId)  
+    .populate({
+        path : 'contracts.mapping',
+        populate : {
+          path : 'levels'
+        }
+      });
     if(!customer){
         return res.status(404).json({
             msg:`Customer not found!`
@@ -339,51 +343,33 @@ router.put('/', authenticateAccountantToken, async (req, res) => {
 })
 
 router.put('/insert-contract-line',authenticateAccountantToken,async(req,res)=>{
-    let {customerId,levelId,is_root,price} = req.body;
+    let {customerId,levelId,price} = req.body;
+    
+
+    let chk = await Customer.find({
+        _id:customerId,
+        'contracts.mapping':levelId
+    });
+    if(chk.length>0){
+        return res.status(409).json({
+            msg:`This level already exists in customer's contract!`
+        })
+    }
+
     let customer = await Customer.findById(customerId);
-    if(!customer){
-        return res.status(404).json({
-            msg:`Customer not found to insert new contract line!`
-        })
-    }
-
-
-    if(is_root == 1){
-        let chk = customer.contracts.filter(x=>x.root == levelId);
-        if(chk.length > 0){
-            return res.status(409).json({
-                msg:`This level already exists`
-            })
+    customer.contracts.push({
+        mapping:levelId,
+        price,
+        created:{
+            by:req.user._id,
+            at:new Date()
         }
-        customer.contracts.push({
-            root:levelId,
-            price,
-            created:{
-                by:req.user._id,
-                at:new Date()
-            }
-        })
-        
-    }else{
-        let chk = customer.contracts.filter(x=>x.parents == levelId);
-        if(chk.length > 0){
-            return res.status(409).json({
-                msg:`This level already exists`
-            })
-        }
-        customer.contracts.push({
-            parents:levelId,
-            price,
-            created:{
-                by:req.user._id,
-                at:new Date()
-            }
-        })
-    }
+    })
+
     await customer.save()
     .then(_=>{
         return res.status(200).json({
-            msg:`New contract line has been inserted!`
+            msg:`Contract line has been added into contract`
         })
     })
     .catch(err=>{
@@ -391,6 +377,7 @@ router.put('/insert-contract-line',authenticateAccountantToken,async(req,res)=>{
             msg:`Can not insert contract line with error: ${new Error(err.message)}`
         })
     })
+   
 })
 
 router.put('/update-contract-line',authenticateAccountantToken,async(req,res)=>{
@@ -424,7 +411,7 @@ router.put('/update-contract-line',authenticateAccountantToken,async(req,res)=>{
     })
 })
 
-router.put('/delete-contract-line',authenticateAccountantToken,async (req,res)=>{
+router.delete('/delete-contract-line',authenticateAccountantToken,async (req,res)=>{
     let {customerId,lineId} = req.body;
     let customer = await Customer.findById(customerId);
     if(!customer){
