@@ -27,12 +27,13 @@ router.get('/', authenticateSaleToken, async (req, res) => {
     let cbIds = group.comboes;
     let comboes = await Combo.find({
         _id: { $in: cbIds },
-        // $or:[
-        //     {'applied.unlimited':true},
-        //     {'applied.to_date':{$gte:new Date()}}
-        // ]
+        $or:[
+            {'applied.unlimited':true},
+            {'applied.to_date':{$gte:new Date()}}
+        ]
     })
-    console.log(comboes)
+    .populate('lines.mapping');
+
     return res.status(200).json({
         msg:`Load comboes list successfully!`,
         comboes
