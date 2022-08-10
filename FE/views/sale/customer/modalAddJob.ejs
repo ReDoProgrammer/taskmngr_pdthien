@@ -164,7 +164,7 @@
           $('#rowCombo').slideDown(500);
           $('#slCombo').empty();
           data.comboes.forEach(c => {
-            let levels = c.lines.map(l => ` ${l.mapping.name}(${l.quantity})`);            
+            let levels = c.lines.map(l => ` ${l.mapping.name}(${l.quantity})`);
             let opt = '<option value="' + c._id + '">' + c.name + ' [ ' + levels + ' ]</option>';
             $('#slCombo').append(opt);
           })
@@ -216,7 +216,7 @@
     $('#ckbChooseCombo').prop('checked', false);
     $('#divCombo').hide();
     LoadMaterials();
-    LoadComboes();    
+    LoadComboes();
   })
   $('#addJobModal').on('hidden.bs.modal', function () {
     LoadCustomers();
@@ -265,7 +265,7 @@
     var templates = ($("#slTemplates").val() || []).join(', ');
     let urgent = $('#ckbUrgent').is(':checked');
 
-    if(name.trim().length === 0){
+    if (name.trim().length === 0) {
       $('#lblError').text('(*) Job name can not be blank!');
       $('#lblError').show().delay(3000).fadeOut();
       return;
@@ -315,13 +315,14 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { customer, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity, price, templates,urgent },
+      data: { customer, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity, price, templates, urgent },
       success: function (data) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Successfully!',
-          text: data.msg
-        })
+        $.toast({
+          heading: 'Successfully',
+          text: data.msg,
+          showHideTransition: 'fade',
+          icon: 'success'
+        });
         $('#addJobModal').modal('hide');
         customerId = "";
       },
