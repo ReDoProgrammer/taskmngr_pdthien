@@ -57,7 +57,7 @@ router.put('/push-child',authenticateAdminToken, async (req,res)=>{
         })
     }
 
-    if(temp.levels.includes(level) !=-1){
+    if(temp.levels.includes(level)){
         return res.status(409).json({
             msg:`This level has been already exists!`
         })
@@ -131,8 +131,8 @@ router.post('/',authenticateAdminToken, async (req,res)=>{
         name,
         description,
         created:{
-            by:req.user._id,
-            at: new Date()
+            by:req.user._id
+          
         }
     });
     await temp.save()
