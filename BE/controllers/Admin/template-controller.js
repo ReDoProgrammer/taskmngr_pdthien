@@ -3,7 +3,7 @@ const router = require('express').Router();
 
 router.get('/',(req,res)=>{
     res.render('admin/template/index',{
-        title:'Tempalte',
+        title:'Job template',
         layout:'layouts/admin-layout'
     });
 })

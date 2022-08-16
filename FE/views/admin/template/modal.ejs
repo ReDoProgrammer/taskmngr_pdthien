@@ -1,0 +1,238 @@
+<div class="modal" tabindex="-1" id="modalUserGroup">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title font-weight-bold text-info">Add or update user group</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="form-group col-md-4">
+            <label for="">Name</label>
+            <input type="text" name="txtName" id="txtName" class="form-control" placeholder="User type name" />
+          </div>
+          <div class="form-group col-md-8">
+            <label for="">Description</label>
+            <input type="text" name="txtDescription" id="txtDescription" class="form-control"
+              placeholder="Description" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+        <button type="button" class="btn btn-primary" id="btnSubmit">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var idx = 1;
+  var wageId = "";
+  $(document).ready(function () {
+
+    LoadLevel();
+  });
+
+  $(document).on("show.bs.modal", ".modal", function () {
+    $("#tblWages").empty();
+    $('#txtName').val('');
+    $('#txtDescription').val('');
+
+  });
+
+  $("#btnSubmit").click(function () {
+    let name = $("#txtName").val().trim();
+    let description = $("#txtDescription").val().trim();
+
+
+    if (ugId.length > 0) {//case update user type
+      $.ajax({
+        url: "/admin/user-group",
+        type: "put",
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: {
+          id: ugId,
+          name,
+          description
+        },
+        success: function (data, textStatus, xhr) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Successfully',
+            text: data.msg
+          })
+          $("#modalUserGroup").modal("hide");
+          ugId = "";
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          alert(jqXHR.responseJSON.msg);
+        },
+      });
+    } else {//case create a new customer type
+      $.ajax({
+        url: "/admin/user-group",
+        type: "post",
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: {
+          name,
+          description
+        },
+        success: function (data, textStatus, xhr) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Successfully',
+            text: data.msg
+          });
+          $("#modalUserGroup").modal("hide");
+          ugId = "";
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          alert(jqXHR.responseJSON.msg);
+        },
+      });
+    }
+  });
+
+
+
+  function LoadLevel() {
+    $.ajax({
+      url: "/admin/staff-level",
+      type: "get",
+      headers: {
+        authorization: "Bearer " + localStorage.getItem('accessToken'),
+      },
+      success: function (data, textStatus, xhr) {
+        $("#slLevel").empty();
+        data.levels.forEach((level) => {
+          opt = '<option value="' + level._id + '">' + level.name + "</option>";
+          $("#slLevel").append(opt);
+        });
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.msg);
+      },
+    });
+  }
+
+
+  $().ready(function () {
+    $("input[id*='txtWage']").keydown(function (event) {
+      if (event.shiftKey == true) {
+        event.preventDefault();
+      }
+
+      if ((event.keyCode >= 48 && event.keyCode <= 57) ||
+        (event.keyCode >= 96 && event.keyCode <= 105) ||
+        event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 37 ||
+        event.keyCode == 39 || event.keyCode == 46 || event.keyCode == 190) {
+
+      } else {
+        event.preventDefault();
+      }
+
+      if ($(this).val().indexOf('.') !== -1 && event.keyCode == 190)
+        event.preventDefault();
+      //if a decimal has been added, disable the "."-button
+    });
+  });
+
+
+
+  $("#btnAddNewLine").click(function () {
+    let skillId = $("#slSkill option:selected").val();
+    let skillName = $("#slSkill option:selected").text();
+
+    let levelId = $("#slLevel option:selected").val();
+    let levelName = $("#slLevel option:selected").text();
+    let wage = $("#txtWage").val();
+    if (wage <= 0) {
+      alert("Đơn giá không hợp lệ!");
+      return;
+    }
+
+    //duyệt table xem đã tồn tại level được chọn hay chưa
+    //nếu đã tồn tại thì không cho thêm
+    let exist = false;
+    $("#tblWages > tr").each(function (index, tr) {
+      let level = $(this).closest("tr").data("level");
+      let skill = $(this).closest("tr").data("skill");
+
+      if (skillId === skill && levelId === level) {
+        exist = true;
+        return;
+      }
+    });
+
+    if (wageId.trim().length == 0) {
+      if (!exist) {
+        let tr =
+          '<tr class="row" data-level="' +
+          levelId +
+          '" data-skill="' +
+          skillId +
+          '">';
+        tr += '<td class="col-md-1">' + idx++ + "</td>";
+        tr += '<td class="col-md-4">' + skillName + "</td>";
+        tr += '<td class="col-md-3">' + levelName + "</td>";
+        tr +=
+          '<td class="col-md-2 text-center font-weight-bold">' +
+          parseFloat(wage) +
+          "</td>";
+        tr +=
+          '<td class="col-md-2"><button class="btn btn-sm btn-danger ml-2" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button></td>';
+        tr += "</tr>";
+
+        $("#tblWages").append(tr);
+        $("#txtWage").val(0);
+      } else {
+        alert("Giá trị này đã tồn tại!");
+        return;
+      }
+    } else {
+      $('#tblWages').find('tr#' + wageId).find('td:eq(3)').html($('#txtWage').val());
+    }
+
+    $(this).text("Add new wage");
+    $('#slSkill:not(:selected)').attr('disabled', false);
+    $('#slLevel:not(:selected)').attr('disabled', false);
+    $('#txtWage').val(0);
+    wageId = '';
+  });
+
+  //delete line
+  $("#tblWages").on("click", "button[name='delete']", function () {
+    skillId = $(this).closest("tr").attr("id");
+    $("#" + skillId).remove();
+  });
+
+  //delete line
+  $("#tblWages").on("click", "button[name='update']", function () {
+    level = $(this).closest("tr").data("level");
+    skill = $(this).closest("tr").data("skill");
+    wageId = $(this).closest("tr").attr("id");
+
+
+    $("#btnAddNewLine").text("Update wage");
+    let wage = $(this).closest("tr").find("td").eq(3).text();
+    $("#slSkill").val(skill);
+    $("#slLevel").val(level);
+    $("#txtWage").val(wage);
+    $('#slSkill:not(:selected)').attr('disabled', true);
+    $('#slLevel:not(:selected)').attr('disabled', true);
+  });
+
+
+</script>
