@@ -474,12 +474,6 @@
           let tr = '<tr id="' + j._id + '" data-customer="' + j.customer._id + '">';
           tr += '<td>';
           let size = 0;
-          j.root.forEach(r => {
-            size += r.tasks.length;
-          })
-          j.parents.forEach(p => {
-            size += p.tasks.length;
-          })
           if (size > 0) {
             tr += '<button class="btn btn-xs parents js-view-parents " name="js-view-parents">(';
             tr += size + ') <i class="fa fa-plus"></i>'
@@ -518,10 +512,10 @@
           tr += '</td>';
 
           tr += '<td class="font-weight-bold">';
-          let templates = (j.templates.map(x => {
-            return x.root ? x.root.name : x.parents.name
-          }))
-          tr += templates;
+          if (j.template) {
+            tr += j.template.name;
+          }
+
           tr += '</td>';
 
 

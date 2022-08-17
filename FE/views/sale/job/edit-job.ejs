@@ -71,9 +71,10 @@
 
             <div class="form-group">
               <label for="">Template</label>
-              <select id="slTemplates" class="selectpicker form-control" multiple
-                title="Choose one of the following..."></select>
+              <select name="" id="slTemplates" class="form-control selectpicker" data-live-search="true"
+                title="Choose one of the job templates..."></select>
             </div>
+
 
 
             <div class="row">
@@ -140,6 +141,7 @@
   $(document).ready(function () {
     LoadCaptureders();
     LoadMaterials();
+    LoadJobTemplates();
   })
 
 
@@ -154,7 +156,6 @@
 
   $("#updateJobModal").on('shown.bs.modal', function (e) {
     LoadComboes();
-    LoadTemplates();
     LoadJobToEdit();
   })
 
@@ -170,11 +171,7 @@
         jobId
       },
       success: function (data) {
-
-        let templates = data.job.templates.map(x => {
-          return x.root ? x.root : x.parents
-        })
-        $('#slTemplates').val(templates).trigger('change');
+        $('#slTemplates').val(data.job.template);        
         $('#slTemplates').selectpicker('refresh')
 
         $('#lblCustomerFullname').text(data.job.customer.name.firstname + ' ' + data.job.customer.name.lastname);
@@ -207,35 +204,13 @@
           $('#ckbMaterial').prop('checked', false);
           $('#rMaterial').slideUp();
         }
-        $('#ckbUrgent').prop('checked',data.job.urgent);
+        $('#ckbUrgent').prop('checked', data.job.urgent);
       },
       error: function (jqXHR, textStatus, errorThrown) {
         alert(jqXHR.responseJSON.msg);
       },
     })
   }
-
-  function LoadTemplates() {
-    $.ajax({
-      url: '/sale/customer/list-templates',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: { customerId },
-      success: function (data) {
-        $('#slTemplates').empty();
-        data.templates.forEach(temp => {
-          let name = temp.root ? temp.root.name : temp.parents.name;
-          $('#slTemplates').append('<option value="' + (temp.root ? temp.root._id : temp.parents._id) + '">' + name + '</option>')
-        })
-        $('#slTemplates').selectpicker();
-        $('#slTemplates').selectpicker('refresh');
-
-      }
-    })
-  }
-
 
 
   $('#btnUpdateJob').click(function () {
@@ -252,7 +227,7 @@
 
     let urgent = $('#ckbUrgent').is(':checked');
 
-    if(name.trim().length === 0){
+    if (name.trim().length === 0) {
       $('#lblError').text('(*) Job name can not be blank!');
       $('#lblError').show().delay(3000).fadeOut();
       return;
@@ -289,7 +264,7 @@
       return;
     }
 
-    if ($('#ckbMaterial').is(':checked') && quantity<=0) {
+    if ($('#ckbMaterial').is(':checked') && quantity <= 0) {
       $('#lblError').text('(*) Material quantity is invalid!');
       $('#lblError').show().delay(3000).fadeOut();
       return;
@@ -303,7 +278,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { jobId, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity, templates,urgent },
+      data: { jobId, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity, templates, urgent },
       success: function (data) {
         Swal.fire({
           icon: 'success',
@@ -335,11 +310,9 @@
         if (data.comboes.length > 0) {
           $('#rowCombo').slideDown(500);
           $('#slComboes').empty();
-          data.comboes.forEach(c => {
-            let levels = (c.lines.map(x => (x.root ? x.root.name : x.parents.name) + ': ' + x.quantity)).toString();
-
-            let opt = '<option value="' + c._id + '">' + c.name + ' [ ' + levels + ' ]</option>';
-            $('#slComboes').append(opt);
+          data.comboes.forEach(c=>{
+            let levels = c.lines.map(x=>` ${x.mapping.name}`);
+            $('#slComboes').append('<option value="'+c._id+'">'+c.name+' - ['+levels+']</option>')
           })
         }
 
@@ -381,7 +354,25 @@
     })
   }
 
-
+  function LoadJobTemplates() {
+    $.ajax({
+      url: '/sale/template',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      success: function (data) {
+        data.templates.forEach(tmp => {
+          if (tmp.levels.length > 0) {
+            let levels = tmp.levels.map(x => ` ${x.name}`);
+            $('#slTemplates').append('<option value="' + tmp._id + '">' + tmp.name + '- [' + levels + ']</option>');
+          }
+        })
+        $('#slTemplates').selectpicker();
+        $('#slTemplates').selectpicker('refresh');
+      }
+    })
+  }
 
   $("#ckbMaterial").change(function () {
     if (this.checked) {
@@ -410,12 +401,12 @@
     separator: "/",
     alias: "dd/mm/yyyy hh:mm"
   })
-  
-  
-  $('#txtCapturedQuantity').focusout(function() {
-    if(($('#txtCapturedQuantity').val()).trim().length == 0){
+
+
+  $('#txtCapturedQuantity').focusout(function () {
+    if (($('#txtCapturedQuantity').val()).trim().length == 0) {
       console.log(0)
-    } 
-   
+    }
+
   })
 </script>
