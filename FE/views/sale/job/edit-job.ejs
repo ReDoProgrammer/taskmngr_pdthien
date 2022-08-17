@@ -39,13 +39,21 @@
 
 
             <div class="row">
-              <div class="col-sm-6">
+              <div class="col-sm-5">
                 <div class=" form-group">
                   <label for="">Received Date<span class="text-danger font-weight-bold">(*)</span> :</label>
                   <input type="text" class="inputDate form-control" id="txtReceivedDate">
                 </div>
               </div>
-              <div class="col-sm-6">
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label for="">Duration:</label>
+                  <input type="number" name="" id="txtDuration" class="form-control" value="0">
+                </div>
+              </div>
+
+              <div class="col-sm-5">
                 <div class="form-group">
                   <label for="">Delivery Date<span class="text-danger font-weight-bold">(*)</span> :</label>
                   <input type="text" class="inputDate form-control" id="txtDeliveryDate">
@@ -171,7 +179,7 @@
         jobId
       },
       success: function (data) {
-        $('#slTemplates').val(data.job.template);        
+        $('#slTemplates').val(data.job.template);
         $('#slTemplates').selectpicker('refresh')
 
         $('#lblCustomerFullname').text(data.job.customer.name.firstname + ' ' + data.job.customer.name.lastname);
@@ -310,9 +318,9 @@
         if (data.comboes.length > 0) {
           $('#rowCombo').slideDown(500);
           $('#slComboes').empty();
-          data.comboes.forEach(c=>{
-            let levels = c.lines.map(x=>` ${x.mapping.name}`);
-            $('#slComboes').append('<option value="'+c._id+'">'+c.name+' - ['+levels+']</option>')
+          data.comboes.forEach(c => {
+            let levels = c.lines.map(x => ` ${x.mapping.name}`);
+            $('#slComboes').append('<option value="' + c._id + '">' + c.name + ' - [' + levels + ']</option>')
           })
         }
 
@@ -388,9 +396,12 @@
       // Filter non-digits from input value.
       this.value = this.value.replace(/\D/g, '');
     }
+
     let duration = parseInt($('#txtDuration').val());
+  
     let assigned_date = strToDate($('#txtReceivedDate').val());
     let deadline = assigned_date.addHours(duration);
+    console.log(convertISODateToTimeFormat(deadline))
     $('#txtDeliveryDate').val(convertISODateToTimeFormat(deadline));
   });
 
