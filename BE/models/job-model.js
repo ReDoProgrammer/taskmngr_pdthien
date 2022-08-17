@@ -81,7 +81,7 @@ const jobSchema = new Schema({
             type: Boolean,
             default: false
         },
-       
+
         created: {
             at: {
                 type: Date
@@ -112,15 +112,17 @@ const jobSchema = new Schema({
             default: new Date()
         }
     },
-    updated: {
-        by: {
-            type: Schema.Types.ObjectId,
-            ref: 'user'
-        },
-        at: {
-            type: Date
+    updated: [
+        {
+            by: {
+                type: Schema.Types.ObjectId,
+                ref: 'user'
+            },
+            at: {
+                type: Date
+            }
         }
-    },
+    ],
 
     //phan lien quan toi nhan vien chup anh
     captured: {

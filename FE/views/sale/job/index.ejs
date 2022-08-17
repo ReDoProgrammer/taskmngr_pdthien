@@ -137,10 +137,11 @@
             jobId
           },
           success: function (data) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Congratulation',
-              text: data.msg
+            $.toast({
+              heading: 'Successfully',
+              text: data.msg,
+              showHideTransition: 'fade',
+              icon: 'success'
             });
             LoadJobs();
           }

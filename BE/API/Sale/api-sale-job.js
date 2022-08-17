@@ -129,7 +129,7 @@ router.get("/list", authenticateSaleToken, async (req, res) => {
       { path: 'captured.user' },
       { path: 'tasks' },
       { path: 'template' }
-      
+
     ])
     .sort({ urgent: -1 })
     .sort({ 'deadline.end': 1 })
@@ -163,13 +163,13 @@ router.get('/list-by-customer', authenticateSaleToken, async (req, res) => {
 
   let jobs = await Job.find({
     customer: custId
-  })  
+  })
     .populate('customer')
     .populate('cb')
     .populate('created.by')
     .populate('template');
 
-   
+
   return res.status(200).json({
     msg: `Load jobs depend on customer successfully!`,
     jobs
@@ -189,11 +189,6 @@ router.delete('/', [authenticateSaleToken, ValidateCheckIn], async (req, res) =>
     })
   }
 
-  if (job.root.length > 0 || job.parents.length > 0) {
-    return res.status(403).json({
-      msg: `Cannot delete this job when having tasks belong to it!`
-    })
-  }
 
   let customer = await Customer.findById(job.customer);
   if (!customer) {
@@ -237,7 +232,7 @@ router.put("/", [authenticateSaleToken, ValidateCheckIn], async (req, res) => {
     captureder,
     quantity,
     urgent,
-    templates
+    template
   } = req.body;
 
 
@@ -270,10 +265,11 @@ router.put("/", [authenticateSaleToken, ValidateCheckIn], async (req, res) => {
     job.cb = null;
   }
 
-  job.updated = {
+  job.updated.push({
     at: new Date(),
     by: req.user._id
   }
+  )
 
   if (material) {
     await Material.findById(material)
@@ -297,19 +293,13 @@ router.put("/", [authenticateSaleToken, ValidateCheckIn], async (req, res) => {
   job.urgent = urgent;
 
 
+  job.template = template;
+
   await job.save()
     .then(_ => {
-      ChangeTemplate(templates, job._id)
-        .then(_ => {
-          return res.status(200).json({
-            msg: `The job has been updated!`
-          })
-        })
-        .catch(err => {
-          return res.status(err.code).json({
-            msg: err.msg
-          })
-        })
+      return res.status(200).json({
+        msg: `The job has been updated!`
+      })
 
     })
     .catch(err => {
@@ -380,7 +370,7 @@ router.post("/", [authenticateSaleToken, ValidateCheckIn], async (req, res) => {
     at: new Date()
   }
 
-  if(template.length>0){
+  if (template.length > 0) {
     job.template = template;
   }
 

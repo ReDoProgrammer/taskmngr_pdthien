@@ -231,7 +231,7 @@
     let material = $('#ckbMaterial').is(':checked') ? $('#slMaterials option:selected').val() : null;
     let captureder = $('#ckbMaterial').is(':checked') ? $('#slCaptureders option:selected').val() : null;
     let quantity = $('#ckbMaterial').is(':checked') ? $('#txtCapturedQuantity').val() : 0;
-    var templates = ($("#slTemplates").val() || []).join(', ');
+    var template = $("#slTemplates option:selected").val();
 
     let urgent = $('#ckbUrgent').is(':checked');
 
@@ -286,13 +286,14 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { jobId, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity, templates, urgent },
+      data: { jobId, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity, template, urgent },
       success: function (data) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Successfully!',
-          text: data.msg
-        })
+        $.toast({
+          heading: 'Successfully',
+          text: data.msg,
+          showHideTransition: 'fade',
+          icon: 'success'
+        });
         $('#updateJobModal').modal('hide');
         LoadJobs();
       },
@@ -398,7 +399,7 @@
     }
 
     let duration = parseInt($('#txtDuration').val());
-  
+
     let assigned_date = strToDate($('#txtReceivedDate').val());
     let deadline = assigned_date.addHours(duration);
     console.log(convertISODateToTimeFormat(deadline))
