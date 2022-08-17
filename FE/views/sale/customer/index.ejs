@@ -51,6 +51,7 @@
         var customerId = "";
         $(document).ready(() => {
             LoadCustomers();
+            LoadJobTemplates();
         });
 
         $('#btnSearch').click(function () {
@@ -151,6 +152,25 @@
             })
         }
 
+        function LoadJobTemplates() {
+            $.ajax({
+                url: '/sale/template',
+                type: 'get',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                success: function (data) {
+                    data.templates.forEach(tmp => {
+                        if (tmp.levels.length > 0) {
+                            let levels = tmp.levels.map(x => ` ${x.name}`);
+                            $('#slTemplates').append('<option value="' + tmp._id + '">' + tmp.name + '- [' + levels + ']</option>');
+                        }
+                    })
+                    $('#slTemplates').selectpicker();
+                    $('#slTemplates').selectpicker('refresh');
+                }
+            })
+        }
 
         $(document).on("click", "button[name='js-view-parents']", async function (e) {
 
@@ -174,7 +194,7 @@
                     '<th>Created at by</th>' +
                     '<th>Created by</th>' +
                     '<th>Combo</th>' +
-                    '<th>Templates</th>' +
+                    '<th>Template</th>' +
                     '<th>Status</th>' +
                     '</tr>' +
                     '</thead>' +
@@ -218,10 +238,10 @@
                             }
                             newRow += '</td>';
                             newRow += '<td class="font-weight-bold text-danger">';
-                            let templates = (j.templates.map(x => {
-                                return x.root ? x.root.name : x.parents.name
-                            }))
-                            newRow += templates;
+                            if (j.template) {
+                                newRow += j.template.name;
+                            }
+
                             newRow += '</td>';
                             newRow += '<td>';
                             switch (j.status) {

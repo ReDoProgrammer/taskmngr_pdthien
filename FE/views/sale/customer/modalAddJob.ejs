@@ -79,8 +79,8 @@
 
             <div class="form-group">
               <label for="">Template</label>
-              <select id="slTemplates" class="selectpicker form-control" multiple
-                title="Choose one of the following..."></select>
+              <select name="" id="slTemplates" class="form-control selectpicker" data-live-search="true"
+                title="Choose one of the job templates..."></select>
             </div>
 
 
@@ -262,7 +262,7 @@
     let price = $('#ckbMaterial').is(':checked') ? parseInt($('#slMaterials option:selected').data('price')) : 0;
 
 
-    var templates = ($("#slTemplates").val() || []).join(', ');
+    var template = $("#slTemplates").val();
     let urgent = $('#ckbUrgent').is(':checked');
 
     if (name.trim().length === 0) {
@@ -315,7 +315,7 @@
       headers: {
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      data: { customer, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity, price, templates, urgent },
+      data: { customer, name, input_link, received_date, delivery_date, intruction, cb, material, captureder, quantity, price, template, urgent },
       success: function (data) {
         $.toast({
           heading: 'Successfully',

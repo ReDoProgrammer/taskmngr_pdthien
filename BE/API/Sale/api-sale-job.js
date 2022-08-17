@@ -128,8 +128,8 @@ router.get("/list", authenticateSaleToken, async (req, res) => {
       { path: 'cb' },
       { path: 'captured.user' },
       { path: 'tasks' },
-      { path: 'templates.root' },
-      { path: 'templates.parents' }
+      { path: 'template' }
+      
     ])
     .sort({ urgent: -1 })
     .sort({ 'deadline.end': 1 })
@@ -166,7 +166,8 @@ router.get('/list-by-customer', authenticateSaleToken, async (req, res) => {
   })  
     .populate('customer')
     .populate('cb')
-    .populate('created.by');
+    .populate('created.by')
+    .populate('template');
 
    
   return res.status(200).json({
@@ -336,7 +337,7 @@ router.post("/", [authenticateSaleToken, ValidateCheckIn], async (req, res) => {
     captureder,
     quantity,
     price,
-    templates,
+    template,
     urgent
   } = req.body;
 
@@ -379,12 +380,16 @@ router.post("/", [authenticateSaleToken, ValidateCheckIn], async (req, res) => {
     at: new Date()
   }
 
+  if(template.length>0){
+    job.template = template;
+  }
+
   job.urgent = urgent;
 
 
   await job.save()
     .then(async _ => {
-      Promise.all([PushJob(job._id, customer), PushTemplate(templates, job._id)])
+      PushJob(job._id, customer)
         .then(_ => {
           return res.status(201).json({
             msg: `Job has been created!`
@@ -517,71 +522,6 @@ const PullJob = (customerId, jobId) => {
   })
 }
 
-const PushTemplate = (templates, jobId) => {
-  return new Promise(async (resolve, reject) => {
-    let job = await Job.findById(jobId);
-    if (!job) {
-      return reject({
-        code: 404,
-        msg: `Job not found!`
-      })
-    }
-    if (templates.trim().length == 0) {
-      return resolve();
-    }
-    let arr = templates.split(',');
-    for (const temp of arr) {
-      let count = await Root.countDocuments({ _id: ObjectId(temp.trim()) });
-      if (count > 0) {
-        job.templates.push({ root: ObjectId(temp.trim()) })
-      } else {
-        job.templates.push({ parents: ObjectId(temp.trim()) })
-      }
-    }
-
-    await job.save()
-      .then(_ => {
-        return resolve(job)
-      })
-      .catch(err => {
-        return reject({
-          code: 500,
-          msg: `Can not push template with error: ${new Error(err.message)}`
-        })
-      })
-  })
-}
-
-const ChangeTemplate = (templates, jobId) => {
-  return new Promise(async (resolve, reject) => {
-    let job = await Job.findById(jobId);
-    job.templates = [];
-    if (templates.length > 0) {
-      let temp = (templates.split(',')).map(x => x.trim());
-      for (const t of temp) {
-        let count = await Root.countDocuments({ _id: t });
-        if (count > 0) {
-          job.templates.push({ root: t })
-        } else {
-          job.templates.push({ parents: t })
-        }
-      }
-    }
-
-    await job.save()
-      .then(_ => {
-        return resolve(job);
-      })
-      .catch(err => {
-        return reject({
-          code: 500,
-          msg: `Can not update job templates with error: ${new Error(err.message)}`
-        })
-      })
-
-
-  })
-}
 
 
 

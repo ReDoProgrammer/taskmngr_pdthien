@@ -17,7 +17,7 @@ const jobSchema = new Schema({
     },
     deadline: {
         begin: {
-            type: Date, 
+            type: Date,
             default: dateThailand,
             require: true
         },
@@ -71,20 +71,17 @@ const jobSchema = new Schema({
         },
         root: {
             type: Schema.Types.ObjectId,
-            ref: 'root_level'
-        },
-        parents: {
-            type: Schema.Types.ObjectId,
-            ref: 'parents_level'
+            ref: 'mapping',
+            tasks: [{
+                type: Schema.Types.ObjectId,
+                ref: 'task'
+            }]
         },
         fee: {
             type: Boolean,
             default: false
         },
-        tasks: [{
-            type: Schema.Types.ObjectId,
-            ref: 'task'
-        }],
+       
         created: {
             at: {
                 type: Date
@@ -146,19 +143,21 @@ const jobSchema = new Schema({
     },
 
     //phần liên quan tới job template
-    templates: [
+    template: {
+        type: Schema.Types.ObjectId,
+        ref: 'template'
+    },
+    //join job level khach hang & don gia khi TLA tao task
+    levels: [
         {
-            root: {
-
+            type: Schema.Types.ObjectId,
+            ref: 'mapping',
+            tasks: {
                 type: Schema.Types.ObjectId,
-                ref: 'root_level'
-
+                ref: 'task'
             },
-            parents: {
-
-                type: Schema.Types.ObjectId,
-                ref: 'parents_level'
-
+            price: {
+                type: Number
             }
         }
     ],
@@ -167,29 +166,7 @@ const jobSchema = new Schema({
     urgent: {
         type: Boolean,
         default: false
-    },
-
-    root: [{
-        ref: {
-            type: Schema.Types.ObjectId,
-            ref: 'root_level'
-        },
-        tasks: [{
-            type: Schema.Types.ObjectId,
-            ref: 'task'
-        }]
-    }],
-
-    parents: [{
-        ref: {
-            type: Schema.Types.ObjectId,
-            ref: 'parents_level'
-        },
-        tasks: [{
-            type: Schema.Types.ObjectId,
-            ref: 'task'
-        }]
-    }]
+    }
 });
 
 

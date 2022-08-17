@@ -275,6 +275,8 @@ app.use('/sale/material',apiSaleMaterial);
 const apiSaleTask = require('./BE/API/Sale/api-sale-task');
 app.use('/sale/task',apiSaleTask);
 
+const apiSaleTemplate = require('./BE/API/Sale/api-template');
+app.use('/sale/template',apiSaleTemplate);
 
 const apiSaleUser = require('./BE/API/Sale/api-user');
 app.use('/sale/user',apiSaleUser);
