@@ -63,7 +63,11 @@
                     $('#txtAmount').val('');
                 }
             }, error: function (request, status, error) {
-                alert(request.responseJSON.msg)
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Opp..',
+                    text: jqXHR.responseJSON.msg
+                });
             }
         })
     });

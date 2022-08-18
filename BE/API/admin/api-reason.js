@@ -3,27 +3,28 @@ const Reason = require('../../models/reason-model');
 const { authenticateAdminToken } = require("../../../middlewares/middleware");
 
 router.delete('/', authenticateAdminToken, async (req, res) => {
-    let reasonId = req.body.id;
+    let { reasonId } = req.body;
 
     let reason = await Reason.findById(reasonId);
-    if(!reason){
+
+    if (!reason) {
         return res.status(404).json({
-            msg:`Canceling task reason not found!`
+            msg: `Canceling task reason not found!`
         })
     }
 
     await reason.delete()
-    .then(_=>{
-        return res.status(200).json({
-            msg:`The canceling task reason has been deleted!`
+        .then(_ => {
+            return res.status(200).json({
+                msg: `The canceling task reason has been deleted!`
+            })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not delete canceling task reason with error: ${new Error(err.message)}`
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not delete canceling task reason with error: ${new Error(err.message)}`
+            })
         })
-    })
-    
+
 })
 
 router.get('/list', authenticateAdminToken, async (req, res) => {
@@ -58,7 +59,13 @@ router.post('/', authenticateAdminToken, async (req, res) => {
         });
     }
 
-    let reason = new Size({
+    if (is_penalty == 'true' && fines <= 0) {
+        return res.status(409).json({
+            msg: `Fines is invalid!`
+        })
+    }
+
+    let reason = new Reason({
         name,
         is_penalty,
         fines
@@ -89,6 +96,12 @@ router.put('/', authenticateAdminToken, async (req, res) => {
         });
     }
 
+    if (is_penalty == 'true' && fines <= 0) {
+        return res.status(409).json({
+            msg: `Fines is invalid!`
+        })
+    }
+
     let reason = await Reason.findById(reasonId);
 
     if (!reason) {
@@ -98,7 +111,7 @@ router.put('/', authenticateAdminToken, async (req, res) => {
     }
 
     reason.name = name;
-    reason.is_penalty = penalty;
+    reason.is_penalty = is_penalty;
     reason.fines = fines;
 
     await reason.save()

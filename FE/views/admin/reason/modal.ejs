@@ -1,0 +1,137 @@
+<div id="modalReason" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add or update reason</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="">Canceling task reason name:</label>
+                    <input type="text" name="" id="txtName" class="form-control"
+                        placeholder="Canceling task reason title">
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mt-2">
+                        <div class="checkbox mt-2">
+                            <label><input type="checkbox" value="" checked id="ckbPenalty">Penalty</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="">Fines</label>
+                        <input type="text" value="0" id="txtFines" class="form-control text-right"
+                            onkeypress='validate(event)'>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="btnSubmit">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Submit changes
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+
+    $('#btnSubmit').click(function () {
+        let name = $('#txtName').val().trim();
+        let is_penalty = $('#ckbPenalty').is(':checked');
+        let fines = parseInt($('#txtFines').val());
+
+
+        if (reasonId.length > 0) {
+            $.ajax({
+                url: '/admin/reason',
+                type: 'put',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem('accessToken'),
+                },
+                data: {
+                    reasonId,
+                    name,
+                    is_penalty,
+                    fines
+                },
+                success: function (data, textStatus, xhr) {
+                    $.toast({
+                        heading: 'Successfully',
+                        text: data.msg,
+                        showHideTransition: 'fade',
+                        icon: 'success'
+                    });
+                    $('#modalReason').modal('hide');
+                    reasonId = '';
+                }, error: function (jqXHR, textStatus, errorThrown) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Opp..',
+                        text: jqXHR.responseJSON.msg
+                    });
+                }
+            })
+        } else {
+            $.ajax({
+                url: '/admin/reason',
+                type: 'post',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem('accessToken'),
+                },
+                data: {
+                    name,
+                    is_penalty,
+                    fines
+                },
+                success: function (data, textStatus, xhr) {
+                    $.toast({
+                        heading: 'Successfully',
+                        text: data.msg,
+                        showHideTransition: 'fade',
+                        icon: 'success'
+                    });
+                    $('#modalReason').modal('hide');
+                    sizeId = '';
+                }, error: function (jqXHR, textStatus, errorThrown) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Opp..',
+                        text: jqXHR.responseJSON.msg
+                    });
+                }
+            })
+        }
+
+    })
+
+    $("#ckbPenalty").change(function () {
+        if (this.checked) {
+            $('#txtFines').prop('readonly', false);
+        } else {
+            $('#txtFines').prop('readonly', true);
+        }
+    });
+
+    function validate(evt) {
+        var theEvent = evt || window.event;
+
+        // Handle paste
+        if (theEvent.type === 'paste') {
+            key = event.clipboardData.getData('text/plain');
+        } else {
+            // Handle key press
+            var key = theEvent.keyCode || theEvent.which;
+            key = String.fromCharCode(key);
+        }
+        var regex = /[0-9]|\./;
+        if (!regex.test(key)) {
+            theEvent.returnValue = false;
+            if (theEvent.preventDefault) theEvent.preventDefault();
+        }
+    }
+</script>
