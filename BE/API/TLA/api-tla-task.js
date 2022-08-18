@@ -17,7 +17,31 @@ const _QA = 'QA';
 
 const pageSize = 20;
 
+router.get('/list-based-on-root', authenticateTLAToken, async (req, res) => {
+    let { jobId, rootId, is_root } = req.query;
+    let job = await Job.findById(jobId);
+    let taskIds = [];
+    if (is_root == 1) {
+        let root = (job.root.filter(x => x.ref == rootId))[0];
+        taskIds = root.tasks;
+    } else {
+        let parents = (job.parents.filter(x => x.ref == rootId))[0];
+        taskIds = parents.tasks;
+    }
+    let tasks = await Task.find({
+        'basic.job': jobId,
+        _id: { $in: taskIds },
+        // status: 3
+    }).populate('basic.level');
 
+
+
+    return res.status(200).json({
+        msg: `List tasks based on root and job successfully!`,
+        tasks
+    })
+
+})
 
 router.get('/list', authenticateTLAToken, async (req, res) => {
     let { jobId } = req.query;
