@@ -234,6 +234,7 @@ router.post('/', authenticateTLAToken, async (req, res) => {
     task.basic = {
         job: jobId,
         level,
+        mapping:customer_level,
         deadline: {
             begin: assigned_date,
             end: deadline
@@ -548,36 +549,36 @@ router.put('/', authenticateTLAToken, async (req, res) => {
 
 
 router.delete('/', authenticateTLAToken, async (req, res) => {
-    let { _id } = req.body;
+    let { taskId } = req.body;
 
-    //Bước 1: kiểm tra task có tồn tại hay không
-    let task = await Task.findById(_id);
-    if (!task) {
+    let task = await Task.findById(taskId);
+    if(!task){
         return res.status(404).json({
-            msg: `Task not found!`
+            msg:`Task not found!`
         })
     }
 
-
+    console.log(task)
     await task.delete()
-        .then(_ => {
-            Promise.all([PullTaskFromJob(task.basic.job, task._id), PullTaskFromCC(task.basic.job, task._id)])
-                .then(_ => {
-                    return res.status(200).json({
-                        msg: `Task has been deleted!`
-                    })
-                })
-                .catch(err => {
-                    return res.status(err.code).json({
-                        msg: err.msg
-                    })
-                })
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not delete this task with error: ${new Error(err.message)}`
+    .then(_=>{
+        PullTaskFromJob(task.basic.job,task.basic.mapping,task._id)
+        .then(_=>{
+            return res.status(200).json({
+                msg:`The task has been deleted!`
             })
         })
+        .catch(err=>{
+            return res.status(err.code).json({
+                msg:err.msg
+            })
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not delete this task with error: ${new Error(err.message)}`
+        })
+    })
+    
 })
 
 
@@ -609,39 +610,27 @@ const PushTaskIntoJob = (jobId, taskId, customer_job_level,price) => {
     })
 }
 
-const PullTaskFromJob = (jobId, taskId) => {
+const PullTaskFromJob = (jobId,level, taskId) => {
     return new Promise(async (resolve, reject) => {
-        let job = await Job.findById(jobId);
-        if (!job) {
+        let jl = await JobLine.findOne({job:jobId,level});
+        if(!jl){
             return reject({
-                code: 404,
-                msg: `Job not found!`
+                code:404,
+                msg:`Job line not found!`
             })
         }
 
-        job.root.forEach(r => {
-            r.tasks = r.tasks.filter(x => x != taskId.toString());
-            if (r.tasks.length == 0) {
-                job.root = job.root.filter(x => x != r);
-            }
-        });
-        job.parents.forEach(p => {
-            p.tasks = p.tasks.filter(x => x != taskId.toString());
-            if (p.tasks.length == 0) {
-                job.parents = job.parents.filter(x => x != p);
-            }
-        });
+        jl.tasks.pull(taskId);
 
-        await job.save()
-            .then(_ => {
-                return resolve(job);
+        await jl.save()
+        .then(_=>{ return resolve()})
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not remove task out of job with error: ${new Error(err.message)}`
             })
-            .catch(err => {
-                return reject({
-                    code: 500,
-                    msg: `Can not remove task from job with error: ${new Error(err.message)}`
-                })
-            })
+        })
+       
     })
 }
 

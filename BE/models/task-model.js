@@ -6,18 +6,20 @@ const Schema = mongoose.Schema;
 const taskSchema = new Schema({
     basic: {
         job: {
+            // tham chiếu tới job
             type: Schema.Types.ObjectId,
             ref: 'job'
         },
         level: {
+            //tham chiếu tới local level
             type: Schema.Types.ObjectId,
             ref: 'job_level'
         },
-        price: {
-            //lưu thông tin đơn giá của level để tính cho khách hàng
-            type: Number,
-            default: 0
-        },
+        mapping:{
+            //tham chiếu tới customer job level
+            type:Schema.Types.ObjectId,
+            ref:'mapping'
+        },       
         deadline: {
             begin: {
                 type: Date,
