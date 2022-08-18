@@ -3,7 +3,6 @@ const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const Task = require('../../models/task-model');
 const Job = require('../../models/job-model');
 const JobLine = require('../../models/job-line-model');
-const Customer = require('../../models/customer-model');
 
 const {
     getWage,
@@ -559,7 +558,11 @@ router.delete('/', authenticateTLAToken, async (req, res) => {
         })
     }
 
-    console.log(task)
+    if(task.status >0){
+        return res.status(409).json({
+            msg:`Can not delete task after submiting!`
+        })
+    }
     await task.delete()
     .then(_=>{
         PullTaskFromJob(task.basic.job,task.basic.mapping,task._id)
