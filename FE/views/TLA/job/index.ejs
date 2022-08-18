@@ -450,11 +450,11 @@
 
                     let tr = '<tr id="' + job._id + '" data-customer="' + job.customer._id + '">';
                     tr += '<td>';
-                    let size = 0;
-                        
-                    if (size > 0) {
+                  
+
+                    if (job.job_lines.length > 0) {
                         tr += '<button class="btn btn-xs btn-info parents js-view-parents" name="js-view-parents"> (';
-                        tr += size;
+                        tr += job.job_lines.length;
                         tr += ') <i class="fa fa-plus"></i></button>';
 
                     }
