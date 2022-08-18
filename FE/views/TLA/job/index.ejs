@@ -141,7 +141,7 @@
             jobId = $(this).closest('tr').attr('id');
 
             await $.ajax({
-                url: '/tla/job/list-tasks',
+                url: '/tla/task/list',
                 type: 'get',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -152,219 +152,96 @@
                 success: function (data) {
                     let idx = 1;
 
-                    data.job.root.forEach(r => {
-                        newRow += '<tr>';
+                    data.tasks.forEach(t => {
+                        newRow += '<tr id="' + t._id + '">';
+                        newRow += '<td>' + (idx++) + '</td>'
+                        newRow += '<td class="font-weight-bold text-primary">';
+                        newRow += '<span class="font-weight-bold text-danger">' + t.basic.mapping.name + '</span> - ' + t.basic.level.name;
 
-                        if (r.tasks.length > 0) {
-                            newRow += '<td rowspan="' + (r.tasks.length + 1) + '" class="text-danger font-weight-bold" > ';
-                            newRow += '<div class="v-middle">';
-                            newRow += r.ref.name;
-                            newRow += '</div>';
-                            newRow += '</td>';
+                        // let chk = (data.job.cc.filter(x => x.tasks.includes(t._id))).length > 0 ? true : false;
+                        // if (chk) {
+                        //     newRow += '<i class="fa fa-cc text-danger ml-2" aria-hidden="true"></i>'
+                        // }
+                        console.log(t)
+
+                        if (t.status === -10) {
+                            newRow += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true" ></i>';
                         }
+                        newRow += '</td>';
+
+                        newRow += '<td>';
+                        if (t.editor.length > 0) {
+                            newRow += t.editor[t.editor.length - 1].staff.username;
+                        }
+                        newRow += '</td>';
+
+                        newRow += '<td>';
+                        if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                            newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount;
+                        }
+                        newRow += '</td>';
+
+                        newRow += '<td>';
+                        if (t.qa.length > 0) {
+                            newRow += t.qa[t.qa.length - 1].staff.username;
+                        }
+                        newRow += '</td>';
+
+                        newRow += '<td>';
+                        if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
+                            t.dc[t.dc.length - 1].staff.username;
+                        }
+                        newRow += '</td>';
+
+                        newRow += '<td>';
+                        if (t.tla.uploaded.length > 0) {
+                            newRow += t.tla.uploaded[t.tla.uploaded.length - 1].by.username;
+                        }
+                        newRow += '</td>';
+
+                        newRow += '<td>';
+                        if (t.tla.uploaded.length > 0) {
+                            newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
+                        }
+                        newRow += '</td>';
+
+                        newRow += '<td>';
+                        newRow += '</td>';
+
+                        newRow += '<td>';
+                        newRow += '</td>';
+
+                        newRow += '<td>';
+                        newRow += '</td>';
+
+                        newRow += '<td>';
+                        switch (t.status) {
+                            case -10: newRow += '<span class="text-danger font-weight-bold">Wait</span>'; break;
+                            case -1: newRow += '<span class="text-info">Initial</span>'; break;
+                            case 0: newRow += '<span class="text-info">Processing</span>'; break;
+                            case 1:
+                                {
+                                    if (t.editor[t.editor.length - 1].submited.length > 1) {
+                                        newRow += '<span class="text-primary">Fixed</span>';
+                                    } else {
+                                        newRow += '<span class="text-primary">Edited</span>';
+                                    }
+                                    break;
+                                }
+                            case 2: newRow += '<span class="text-success">Q.A ok!</span>'; break;
+                            case 3: newRow += '<span class="text-success">DC ok!</span>'; break;
+                            case 4: newRow += '<span class="text-info font-weight-bold">Uploaded</span>'; break;
+                            case 5: newRow += '<span class="text-success font-weight-bold">Done</span>'; break;
+                            case 6: newRow += '<span class="text-success font-weight-bold">Finish</span>'; break;
+                            case -2: newRow += '<span class="text-danger">Q.A rejected</span>'; break;
+                            case -3: newRow += '<span class="text-danger">DC rejected</span>'; break;
+                            case -4: newRow += '<span class="text-danger">Sale rejected</span>'; break;
+                            case -5: newRow += '<span class="text-danger">Canceled</span>'; break;
+                            case -6: newRow += '<span class="text-danger font-weight-bold">Customer CC</span>'; break;
+                        }
+                        newRow += '</td>';
 
                         newRow += '</tr>';
-
-                        r.tasks.forEach(t => {
-                            newRow += '<tr id="' + t._id + '" data-root="' + r._id + '">';
-                            newRow += '<td class="font-weight-bold text-primary">';
-                            newRow += t.basic.level.name;
-
-                            let chk = (data.job.cc.filter(x => x.tasks.includes(t._id))).length > 0 ? true : false;
-                            if (chk) {
-                                newRow += '<i class="fa fa-cc text-danger ml-2" aria-hidden="true"></i>'
-                            }
-
-                            if (t.status === -10) {
-                                newRow += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true" ></i>';
-                            }
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            if (t.editor.length > 0) {
-                                newRow += t.editor[t.editor.length - 1].staff.username;
-                            }
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                                newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount;
-                            }
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            if (t.qa.length > 0) {
-                                newRow += t.qa[t.qa.length - 1].staff.username;
-                            }
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
-                                t.dc[t.dc.length - 1].staff.username;
-                            }
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            if (t.tla.uploaded.length > 0) {
-                                newRow += t.tla.uploaded[t.tla.uploaded.length - 1].by.username;
-                            }
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            if (t.tla.uploaded.length > 0) {
-                                newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
-                            }
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            switch (t.status) {
-                                case -10: newRow += '<span class="text-danger font-weight-bold">Wait</span>'; break;
-                                case -1: newRow += '<span class="text-info">Initial</span>'; break;
-                                case 0: newRow += '<span class="text-info">Processing</span>'; break;
-                                case 1:
-                                    {
-                                        if (t.editor[t.editor.length - 1].submited.length > 1) {
-                                            newRow += '<span class="text-primary">Fixed</span>';
-                                        } else {
-                                            newRow += '<span class="text-primary">Edited</span>';
-                                        }
-                                        break;
-                                    }
-                                case 2: newRow += '<span class="text-success">Q.A ok!</span>'; break;
-                                case 3: newRow += '<span class="text-success">DC ok!</span>'; break;
-                                case 4: newRow += '<span class="text-info font-weight-bold">Uploaded</span>'; break;
-                                case 5: newRow += '<span class="text-success font-weight-bold">Done</span>'; break;
-                                case 6: newRow += '<span class="text-success font-weight-bold">Finish</span>'; break;
-                                case -2: newRow += '<span class="text-danger">Q.A rejected</span>'; break;
-                                case -3: newRow += '<span class="text-danger">DC rejected</span>'; break;
-                                case -4: newRow += '<span class="text-danger">Sale rejected</span>'; break;
-                                case -5: newRow += '<span class="text-danger">Canceled</span>'; break;
-                                case -6: newRow += '<span class="text-danger font-weight-bold">Customer CC</span>'; break;
-                            }
-                            newRow += '</td>';
-
-                            newRow += '</tr>';
-                        })
-
-                    })
-
-
-                    data.job.parents.forEach(p => {
-                        newRow += '<tr>';
-
-                        if (p.tasks.length > 0) {
-                            console.log(p)
-                            newRow += '<td rowspan="' + (p.tasks.length + 1) + '" class="text-danger font-weight-bold" > ';
-                            newRow += '<div class="v-middle">';
-                            if (p.ref !== null) {
-                                newRow += p.ref.name
-                            }
-                            newRow += '</div>';
-                            newRow += '</td>';
-                        }
-
-                        newRow += '</tr>';
-
-
-                        p.tasks.forEach(t => {
-                            newRow += '<tr id="' + t._id + '" data-parents="' + p._id + '">';
-                            newRow += '<td class="font-weight-bold text-primary">';
-                            newRow += t.basic.level.name;
-
-                            let chk = (data.job.cc.filter(x => x.tasks.includes(t._id))).length > 0 ? true : false;
-                            if (chk) {
-                                newRow += '<i class="fa fa-cc text-danger ml-2" aria-hidden="true"></i>'
-                            }
-
-                            if (t.status === -10) {
-                                newRow += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true" ></i>';
-                            }
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            if (t.editor.length > 0) {
-                                newRow += t.editor[t.editor.length - 1].staff.username;
-                            }
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                                newRow += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount;
-                            }
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            if (t.qa.length > 0) {
-                                newRow += t.qa[t.qa.length - 1].staff.username;
-                            }
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
-                                t.dc[t.dc.length - 1].staff.username;
-                            }
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            if (t.tla.uploaded.length > 0) {
-                                newRow += t.tla.uploaded[t.tla.uploaded.length - 1].by.username;
-                            }
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            if (t.tla.uploaded.length > 0) {
-                                newRow += convertISODateToTimeFormat(t.tla.uploaded[t.tla.uploaded.length - 1].at);
-                            }
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            newRow += '</td>';
-
-                            newRow += '<td>';
-                            switch (t.status) {
-                                case -10: newRow += '<span class="text-danger font-weight-bold">Wait</span>'; break;
-                                case -1: newRow += '<span class="text-info">Initial</span>'; break;
-                                case 0: newRow += '<span class="text-info">Processing</span>'; break;
-                                case 1:
-                                    {
-                                        if (t.editor[t.editor.length - 1].submited.length > 1) {
-                                            newRow += '<span class="text-primary">Fixed</span>';
-                                        } else {
-                                            newRow += '<span class="text-primary">Edited</span>';
-                                        }
-                                        break;
-                                    }
-                                case 2: newRow += '<span class="text-success">Q.A ok!</span>'; break;
-                                case 3: newRow += '<span class="text-success">DC ok!</span>'; break;
-                                case 4: newRow += '<span class="text-info font-weight-bold">Uploaded</span>'; break;
-                                case 5: newRow += '<span class="text-success font-weight-bold">Done</span>'; break;
-                                case 6: newRow += '<span class="text-success font-weight-bold">Finish</span>'; break;
-                                case -2: newRow += '<span class="text-danger">Q.A rejected</span>'; break;
-                                case -3: newRow += '<span class="text-danger">DC rejected</span>'; break;
-                                case -4: newRow += '<span class="text-danger">Sale rejected</span>'; break;
-                                case -5: newRow += '<span class="text-danger">Canceled</span>'; break;
-                                case -6: newRow += '<span class="text-danger font-weight-bold">Customer CC</span>'; break;
-                            }
-                            newRow += '</td>';
-
-                            newRow += '</tr>';
-                        })
-
                     })
                 }
             })
@@ -450,7 +327,7 @@
 
                     let tr = '<tr id="' + job._id + '" data-customer="' + job.customer._id + '">';
                     tr += '<td>';
-                  
+
 
                     if (job.job_lines.length > 0) {
                         tr += '<button class="btn btn-xs btn-info parents js-view-parents" name="js-view-parents"> (';
@@ -552,12 +429,12 @@
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
             data: { customerId },
-            success: function (data) {   
-                CustomerLevels = data.customer.contracts.map(x=>{
+            success: function (data) {
+                CustomerLevels = data.customer.contracts.map(x => {
                     let obj = {};
                     obj._id = x.mapping._id;
                     obj.name = x.mapping.name;
-                    obj.levels = x.mapping.levels.map(y=>y.name);
+                    obj.levels = x.mapping.levels.map(y => y.name);
                     obj.price = x.price;
                     return obj;
                 });
@@ -654,7 +531,7 @@
 
                 if (typeof data.job.cb !== 'undefined' && data.job.cb) {
                     let idx = 1;
-                    data.job.cb.lines.forEach(l => {                       
+                    data.job.cb.lines.forEach(l => {
                         let tr = '<tr>';
                         tr += '<td>' + (idx++) + '</td>';
                         tr += '<td class="text-danger font-weight-bold">' + l.mapping.name + '</td>';
