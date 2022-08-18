@@ -41,9 +41,9 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
             { path: 'tasks' },
             {
                 path: 'template',
-                populate:{
-                    path:'levels'
-                }              
+                populate: {
+                    path: 'levels'
+                }
             },
 
 
@@ -139,26 +139,16 @@ router.get('/detail', authenticateTLAToken, async (req, res) => {
     let job = await Job.findById(jobId)
         .populate([
             { path: 'created.by', select: 'username fullname' },
-            { path: 'customer' },
-            {
-                path: 'cb',
-                populate: ([
-                    { path: 'lines.root' },
-                    { path: 'lines.parents' }
-                ])
-            },
-            { path: 'cc.root' },
-            { path: 'cc.root.tasks' },
-            { path: 'cc.parents' },
-            { path: 'cc.parents.tasks' },
+            { path: 'customer' },           
             { path: 'captured.material' },
             { path: 'captured.user' },
-            { path: 'templates.root' },
-            { path: 'templates.parents' },
-            { path: 'root.ref' },
-            { path: 'root.tasks' },
-            { path: 'parents.ref' },
-            { path: 'parents.tasks' }
+            {
+                path: 'cb',
+                populate: {
+                    path: 'lines.mapping'
+                }
+            }
+
         ]);
 
 
@@ -176,13 +166,13 @@ router.get('/detail', authenticateTLAToken, async (req, res) => {
 
 router.get('/local-level', authenticateTLAToken, async (req, res) => {
     let { customer_level } = req.query;
-    
+
     let map = await Mapping.findById(customer_level);
-    
-    let levels = await Level.find({_id:{$in:map.levels}});
-    
+
+    let levels = await Level.find({ _id: { $in: map.levels } });
+
     return res.status(200).json({
-        msg:`Load local levels successfully!`,
+        msg: `Load local levels successfully!`,
         levels
     })
 

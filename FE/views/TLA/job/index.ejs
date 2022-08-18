@@ -654,11 +654,10 @@
 
                 if (typeof data.job.cb !== 'undefined' && data.job.cb) {
                     let idx = 1;
-                    data.job.cb.lines.forEach(l => {
-                        let name = l.root ? l.root.name : l.parents.name;
+                    data.job.cb.lines.forEach(l => {                       
                         let tr = '<tr>';
                         tr += '<td>' + (idx++) + '</td>';
-                        tr += '<td class="text-danger font-weight-bold">' + (l.root ? l.root.name : l.parents.name) + '</td>';
+                        tr += '<td class="text-danger font-weight-bold">' + l.mapping.name + '</td>';
                         tr += '<td class="text-right">' + l.quantity + '</td>';
                         tr += '</tr>';
                         $('.tblComboLines').append(tr);
