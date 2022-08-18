@@ -1,33 +1,33 @@
 <div class="row mt-2">
   <div class="col-md-8 col-md-offset-4 text-right">
-      <div class="input-group">
-          <div class="input-group-btn">
-              <select id="slStatus" multiple="multiple form-control">
-                  <option value="-10">Wait</option>
-                  <option value="1">Editor submited</option>
-                  <option value="-1">Initial</option>
-                  <option value="0">Editing</option>
-                  <option value="2">Q.A submited</option>
-                  <option value="3">DC submited</option>
-                  <option value="4">Uploaded</option>
-                  <option value="-2">Q.A rejected</option>
-                  <option value="-3">DC rejected</option>
-                  <option value="-4">Canceled</option>
-              </select>
+    <div class="input-group">
+      <div class="input-group-btn">
+        <select id="slStatus" multiple="multiple form-control">
+          <option value="-10">Wait</option>
+          <option value="1">Editor submited</option>
+          <option value="-1">Initial</option>
+          <option value="0">Editing</option>
+          <option value="2">Q.A submited</option>
+          <option value="3">DC submited</option>
+          <option value="4">Uploaded</option>
+          <option value="-2">Q.A rejected</option>
+          <option value="-3">DC rejected</option>
+          <option value="-4">Canceled</option>
+        </select>
 
-          </div><!-- /btn-group -->
-          <input type="text" class="form-control" placeholder="Seach task..." id="txtSearchTask" />
-          <div class="input-group-btn">
+      </div><!-- /btn-group -->
+      <input type="text" class="form-control" placeholder="Seach task..." id="txtSearchTask" />
+      <div class="input-group-btn">
 
-              <button class="btn btn-info" type="submit" id="btnSearch">
-                  <i class="fa fa-search" aria-hidden="true"></i>
-              </button>
-              <button class="btn btn-primary" id="btnGetTask">
-                <i class="fa fa-plus" aria-hidden="true"></i>
-                Get more
-              </button>
-          </div>
+        <button class="btn btn-info" type="submit" id="btnSearch">
+          <i class="fa fa-search" aria-hidden="true"></i>
+        </button>
+        <button class="btn btn-primary" id="btnGetTask">
+          <i class="fa fa-plus" aria-hidden="true"></i>
+          Get more
+        </button>
       </div>
+    </div>
   </div>
 </div>
 
@@ -67,245 +67,247 @@
   </ul>
 </nav>
 
+
+<script src="/js/bootstrap-select.min.js"></script>
+<script src="/js/common.js"></script>
+<link href="/css/bootstrap-select.min.css" rel="stylesheet" />
+<script>
+  var page = 1;
+  var search = '';
+  var taskId = '';
+  var status = 100;
+
+  $(document).ready(function () {
+    $('#slStatus').val([-10, -4, -3, -2, -1, 0, 1, 2, 3, 4]).selectpicker('refresh');
+    LoadTasks();
+    setInterval(function () {
+      LoadTasks();
+    }, 10000);//run this thang every 10 seconds
+  })
+
+  $(document).on("click", "ul.pagination li a", function (e) {
+    e.preventDefault();
+    page = parseInt($(this).text());
+    LoadTasks();
+  });
+
+
+  $('#slStatus').on('change', function () {
+    LoadTasks();
+  })
+
+
+  $('#btnGetTask').click(function () {
+    $.ajax({
+      url: '/editor/task/get-more',
+      type: 'put',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      success: function (data) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Successfully!',
+          text: data.msg
+        });
+        LoadTasks();
+        taskId = data.newTask;
+        $('#modalTaskDetail').modal();
+        $('#btn-task-info').click();
+      }, error: function (request, status, error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oop!..!',
+          text: request.responseJSON.msg
+        });
+
+      }
+    })
+  })
+
+
+
+  $(document).on("click", "button[name='btnSubmitTask']", function () {
+    taskId = $(this).closest("tr").attr("id");
+    $('#modalSubmitTask').modal();
+  })
+
+  $(document).on("click", "button[name='btnChangeQuantity']", function () {
+    taskId = $(this).closest("tr").attr("id");
+    $('#modalChangeNumber').modal();
+  })
+
+
+  $(document).on("click", "button[name='btnTaskInfo']", function () {
+    taskId = $(this).closest("tr").attr("id");
+    $('#modalTaskDetail').modal();
+  })
+
+
+
+  function LoadTasks() {
+    $.ajax({
+      url: '/editor/task',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        page,
+        search: $('#txtSearch').val(),
+        status: ($("#slStatus").val() || []).join(',')
+      },
+      success: function (data) {
+
+        //phan phan trang
+        $('#navPages').empty();
+        for (i = 1; i <= data.pages; i++) {
+          if (i === page) {
+            $('#navPages').append('<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1">' + i + '</a></li>');
+          } else {
+            $('#navPages').append('<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>');
+          }
+        }
+
+
+        $('#tbdTasks').empty();
+
+        var idx = (page - 1) * 20;
+        data.tasks.forEach(t => {
+          let tr = '<tr id="' + t._id + '" data-status="' + t.status + '">';
+          tr += '<td>';
+          tr += '<button class="btn btn-xs btn-info ml-2" name="btnTaskInfo">';
+          tr += '<i class="fa fa-info-circle" aria-hidden="true"></i>';
+          tr += '</button>';
+          tr += '</td>';
+          tr += '<td>' + (++idx) + '</td>';
+          tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.name.firstname + ' ' + t.basic.job.customer.name.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
+          tr += '<td class="font-weight-bold">' + t.basic.job.name + '</td>';
+          tr += '<td class="font-weight-bold text-danger">';
+          tr += t.basic.level.name
+          let chk = (t.basic.job.cc.filter(x => x.tasks.includes(t._id))).length > 0 ? true : false;
+          if (chk) {
+            tr += '<i class="fa fa-cc text-danger ml-2" aria-hidden="true"></i>'
+          }
+          if (t.status === -10) {
+            tr += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true"></i>'
+          }
+          tr += '</td>';
+          tr += '<td class="text-center">';
+          if (t.basic.job.urgent) {
+            tr += '<i class="text-danger fa fa-exclamation-triangle" aria-hidden="true"></i>'
+          }
+          tr += '</td>';
+          tr += '<td ';
+          let dl = GetDifferenceBetweenTwoDatesToHours(t.basic.deadline.end)
+          if (dl <= 6 && dl > 4) {
+            tr += 'style="background-color:rgba(245,0,0,0.1); color:white; font-weight: bold;"'
+          }
+          if (dl <= 4 && dl > 2) {
+            tr += 'style="background-color:rgba(245,0,0,0.4); color:white; font-weight: bold;"'
+          }
+          if (dl <= 2) {
+            tr += 'style="background-color:rgba(245,0,0,0.6); color:white; font-weight: bold;"'
+          }
+
+          tr += '>' + convertISODateToTimeFormat(t.basic.deadline.end) + '</td>';
+
+          tr += '<td class="text-right">';
+          if (t.editor[t.editor.length - 1].submited !== null && t.editor[t.editor.length - 1].submited.length > 0) {
+            tr += t.editor[t.editor.length - 1].submited.length;
+          }
+          tr += '</td>';
+
+          tr += '<td class="text-right">';
+          if (t.editor[t.editor.length - 1].submited !== null && t.editor[t.editor.length - 1].submited.length > 0 && t.editor[t.editor.length - 1].submited[(t.editor[t.editor.length - 1].submited.length - 1)].amount) {
+            tr += t.editor[t.editor.length - 1].submited[(t.editor[t.editor.length - 1].submited.length - 1)].amount;
+          }
+          tr += '</td>';
+
+          tr += '<td>';
+          if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
+            tr += t.qa[t.qa.length - 1].staff.username;
+          }
+          tr += '</td>';
+
+          tr += '<td>';
+          if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
+            tr += t.dc[t.dc.length - 1].staff.username;
+          }
+          tr += '</td>';
+
+          tr += '<td><i>';
+
+          switch (t.status) {
+            case -10: tr += '<span class="text-danger font-weight-bold">Wait</span>'; break;
+            case -1: tr += '<span class="text-info">Initial</span>'; break;
+            case 0: tr += '<span class="text-info">Processing</span>'; break;
+            case 1:
+              {
+                if (t.editor[t.editor.length - 1].submited.length > 1) {
+                  tr += '<span class="text-primary">Fixed</span>';
+                } else {
+                  tr += '<span class="text-primary">Edited</span>';
+                }
+                break;
+              }
+            case 2: tr += '<span class="text-success">Q.A ok!</span>'; break;
+            case 3: tr += '<span class="text-success">DC ok!</span>'; break;
+            case 4: tr += '<span class="text-info font-weight-bold">Uploaded</span>'; break;
+            case 5: tr += '<span class="text-success font-weight-bold">Done</span>'; break;
+            case 6: tr += '<span class="text-success font-weight-bold">Finish</span>'; break;
+            case -2: tr += '<span class="text-danger">Q.A rejected</span>'; break;
+            case -3: tr += '<span class="text-danger">DC rejected</span>'; break;
+            case -4: tr += '<span class="text-danger">Sale rejected</span>'; break;
+            case -5: tr += '<span class="text-danger">Canceled</span>'; break;
+            case -6: tr += '<span class="text-danger font-weight-bold">Customer CC</span>'; break;
+          }
+          tr += '</i></td>';
+
+
+
+          tr += '<td>';
+
+          tr += t.remarks[t.remarks.length - 1].content;
+
+          tr += '</td>';
+
+
+          tr += '<td class="text-right">';
+
+          if (t.status == 0 || t.status == -1 || t.status == -2 || t.status == -3 || t.status == -4 || t.status == -6) {
+            tr += '<button class="btn btn-xs btn-success" name="btnSubmitTask">';
+            tr += '<i class="fa fa-send-o"></i>';
+            tr += '</button>';
+          }
+
+          if (t.status === 1) {
+            tr += '<button class="btn btn-xs btn-warning" name="btnChangeQuantity">';
+            tr += ' <i class="fa fa-edit"></i> ';
+            tr += '</button>';
+          }
+
+
+
+          tr += '</td>';
+
+
+
+          tr += '</tr>';
+          $('#tbdTasks').append(tr);
+        })
+
+      }, error: function (request, status, error) {
+        alert(request.responseJSON.msg)
+      }
+
+    })
+  }
+
+</script>
+
+
 <%-include('task_detail')%>
   <%-include('submit_modal')%>
     <%-include('modal_change')%>
       <%-include('modal_reject')%>
-
-        <script src="/js/bootstrap-select.min.js"></script>
-        <script src="/js/common.js"></script>
-        <link href="/css/bootstrap-select.min.css" rel="stylesheet" />
-        <script>
-          var page = 1;
-          var search = '';
-          var taskId = '';
-          var status = 100;
-
-          $(document).ready(function () {
-            $('#slStatus').val([-10, -4, -3, -2, -1, 0, 1, 2, 3, 4]).selectpicker('refresh');
-            LoadTasks();
-            setInterval(function () {
-              LoadTasks();
-            }, 10000);//run this thang every 10 seconds
-          })
-
-          $(document).on("click", "ul.pagination li a", function (e) {
-            e.preventDefault();
-            page = parseInt($(this).text());
-            LoadTasks();
-          });
-
-
-          $('#slStatus').on('change', function () {
-            LoadTasks();
-          })
-
-
-          $('#btnGetTask').click(function () {
-            $.ajax({
-              url: '/editor/task/get-more',
-              type: 'put',
-              headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-              },
-              success: function (data) {
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Successfully!',
-                  text: data.msg
-                });
-                LoadTasks();
-                taskId = data.newTask;
-                $('#modalTaskDetail').modal();
-                $('#btn-task-info').click();
-              }, error: function (request, status, error) {
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Oop!..!',
-                  text: request.responseJSON.msg
-                });
-
-              }
-            })
-          })
-
-
-
-          $(document).on("click", "button[name='btnSubmitTask']", function () {
-            taskId = $(this).closest("tr").attr("id");
-            $('#modalSubmitTask').modal();
-          })
-
-          $(document).on("click", "button[name='btnChangeQuantity']", function () {
-            taskId = $(this).closest("tr").attr("id");
-            $('#modalChangeNumber').modal();
-          })
-
-
-          $(document).on("click", "button[name='btnTaskInfo']", function () {
-            taskId = $(this).closest("tr").attr("id");
-            $('#modalTaskDetail').modal();
-          })
-
-
-
-          function LoadTasks() {
-            $.ajax({
-              url: '/editor/task',
-              type: 'get',
-              headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-              },
-              data: {
-                page,
-                search: $('#txtSearch').val(),
-                status: ($("#slStatus").val() || []).join(',')
-              },
-              success: function (data) {
-
-                //phan phan trang
-                $('#navPages').empty();
-                for (i = 1; i <= data.pages; i++) {
-                  if (i === page) {
-                    $('#navPages').append('<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1">' + i + '</a></li>');
-                  } else {
-                    $('#navPages').append('<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>');
-                  }
-                }
-
-
-                $('#tbdTasks').empty();
-
-                var idx = (page - 1) * 20;
-                data.tasks.forEach(t => {
-                  let tr = '<tr id="' + t._id + '" data-status="' + t.status + '">';
-                  tr += '<td>';
-                  tr += '<button class="btn btn-xs btn-info ml-2" name="btnTaskInfo">';
-                  tr += '<i class="fa fa-info-circle" aria-hidden="true"></i>';
-                  tr += '</button>';
-                  tr += '</td>';
-                  tr += '<td>' + (++idx) + '</td>';
-                  tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.name.firstname + ' ' + t.basic.job.customer.name.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
-                  tr += '<td class="font-weight-bold">' + t.basic.job.name + '</td>';
-                  tr += '<td class="font-weight-bold text-danger">';
-                  tr += t.basic.level.name
-                  let chk = (t.basic.job.cc.filter(x => x.tasks.includes(t._id))).length > 0 ? true : false;
-                  if (chk) {
-                    tr += '<i class="fa fa-cc text-danger ml-2" aria-hidden="true"></i>'
-                  }
-                  if (t.status === -10) {
-                    tr += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true"></i>'
-                  }
-                  tr += '</td>';
-                  tr += '<td class="text-center">';
-                  if (t.basic.job.urgent) {
-                    tr += '<i class="text-danger fa fa-exclamation-triangle" aria-hidden="true"></i>'
-                  }
-                  tr += '</td>';
-                  tr += '<td ';
-                  let dl = GetDifferenceBetweenTwoDatesToHours(t.basic.deadline.end)
-                  if (dl <= 6 && dl > 4) {
-                    tr += 'style="background-color:rgba(245,0,0,0.1); color:white; font-weight: bold;"'
-                  }
-                  if (dl <= 4 && dl > 2) {
-                    tr += 'style="background-color:rgba(245,0,0,0.4); color:white; font-weight: bold;"'
-                  }
-                  if (dl <= 2) {
-                    tr += 'style="background-color:rgba(245,0,0,0.6); color:white; font-weight: bold;"'
-                  }
-
-                  tr += '>' + convertISODateToTimeFormat(t.basic.deadline.end) + '</td>';
-
-                  tr += '<td class="text-right">';
-                  if (t.editor[t.editor.length - 1].submited !== null && t.editor[t.editor.length - 1].submited.length > 0) {
-                    tr += t.editor[t.editor.length - 1].submited.length;
-                  }
-                  tr += '</td>';
-
-                  tr += '<td class="text-right">';
-                  if (t.editor[t.editor.length - 1].submited !== null && t.editor[t.editor.length - 1].submited.length > 0 && t.editor[t.editor.length - 1].submited[(t.editor[t.editor.length - 1].submited.length - 1)].amount) {
-                    tr += t.editor[t.editor.length - 1].submited[(t.editor[t.editor.length - 1].submited.length - 1)].amount;
-                  }
-                  tr += '</td>';
-
-                  tr += '<td>';
-                  if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
-                    tr += t.qa[t.qa.length - 1].staff.username;
-                  }
-                  tr += '</td>';
-
-                  tr += '<td>';
-                  if (t.dc.length > 0 && !t.dc[t.dc.length - 1].unregisted) {
-                    tr += t.dc[t.dc.length - 1].staff.username;
-                  }
-                  tr += '</td>';
-
-                  tr += '<td><i>';
-
-                  switch (t.status) {
-                    case -10: tr += '<span class="text-danger font-weight-bold">Wait</span>'; break;
-                    case -1: tr += '<span class="text-info">Initial</span>'; break;
-                    case 0: tr += '<span class="text-info">Processing</span>'; break;
-                    case 1:
-                      {
-                        if (t.editor[t.editor.length - 1].submited.length > 1) {
-                          tr += '<span class="text-primary">Fixed</span>';
-                        } else {
-                          tr += '<span class="text-primary">Edited</span>';
-                        }
-                        break;
-                      }
-                    case 2: tr += '<span class="text-success">Q.A ok!</span>'; break;
-                    case 3: tr += '<span class="text-success">DC ok!</span>'; break;
-                    case 4: tr += '<span class="text-info font-weight-bold">Uploaded</span>'; break;
-                    case 5: tr += '<span class="text-success font-weight-bold">Done</span>'; break;
-                    case 6: tr += '<span class="text-success font-weight-bold">Finish</span>'; break;
-                    case -2: tr += '<span class="text-danger">Q.A rejected</span>'; break;
-                    case -3: tr += '<span class="text-danger">DC rejected</span>'; break;
-                    case -4: tr += '<span class="text-danger">Sale rejected</span>'; break;
-                    case -5: tr += '<span class="text-danger">Canceled</span>'; break;
-                    case -6: tr += '<span class="text-danger font-weight-bold">Customer CC</span>'; break;
-                  }
-                  tr += '</i></td>';
-
-
-
-                  tr += '<td>';
-
-                  tr += t.remarks[t.remarks.length - 1].content;
-
-                  tr += '</td>';
-
-
-                  tr += '<td class="text-right">';
-
-                  if (t.status == 0 || t.status == -1 || t.status == -2 || t.status == -3 || t.status == -4 || t.status == -6) {
-                    tr += '<button class="btn btn-xs btn-success" name="btnSubmitTask">';
-                    tr += '<i class="fa fa-send-o"></i>';
-                    tr += '</button>';
-                  }
-
-                  if (t.status === 1) {
-                    tr += '<button class="btn btn-xs btn-warning" name="btnChangeQuantity">';
-                    tr += ' <i class="fa fa-edit"></i> ';
-                    tr += '</button>';
-                  }
-
-
-
-                  tr += '</td>';
-
-
-
-                  tr += '</tr>';
-                  $('#tbdTasks').append(tr);
-                })
-
-              }, error: function (request, status, error) {
-                alert(request.responseJSON.msg)
-              }
-
-            })
-          }
-
-        </script>

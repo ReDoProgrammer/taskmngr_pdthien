@@ -39,16 +39,20 @@
                 remark
             },
             success: function (data) {
-                Swal.fire(
-                    'Done!',
-                    data.msg,
-                    'success'
-                )
+                $.toast({
+                    heading: 'Successfully',
+                    text: data.msg,
+                    showHideTransition: 'fade',
+                    icon: 'success'
+                });
                 $('#modalRejectTask').modal('hide');
             },
             error: function (request, status, error) {
-                alert(request.responseJSON.msg)
-                window.location.href = '/editor/default';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Opp..',
+                    text: jqXHR.responseJSON.msg
+                });
             }
         })
     })

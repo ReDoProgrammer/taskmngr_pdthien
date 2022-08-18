@@ -104,7 +104,11 @@
                 $('#modalSubmitTask').modal('hide');
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                alert(jqXHR.responseJSON.msg);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Opp..',
+                    text: jqXHR.responseJSON.msg
+                });
             }
         })
     })
