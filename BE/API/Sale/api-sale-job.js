@@ -6,6 +6,7 @@ const { ValidateCheckIn } = require('../../../middlewares/checkin-middleware');
 const Material = require('../../models/material-model');
 const Combo = require('../../models/combo-model');
 const Customer = require('../../models/customer-model');
+const JobLine = require('../../models/job-line-model');
 const { ObjectId } = require('mongodb');
 
 const pageSize = 20;

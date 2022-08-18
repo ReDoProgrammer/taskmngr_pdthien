@@ -625,15 +625,27 @@ const PullTaskFromJob = (jobId,level, taskId) => {
         }
 
         jl.tasks.pull(taskId);
-
-        await jl.save()
-        .then(_=>{ return resolve()})
-        .catch(err=>{
-            return reject({
-                code:500,
-                msg:`Can not remove task out of job with error: ${new Error(err.message)}`
+        if(jl.tasks.length == 0){
+            await jl.delete()
+            .then(_=> {return resolve()})
+            .catch(err=>{
+                return reject({
+                    code:500,
+                    msg:`Can not delete job line when tasks list is empty with error: ${new Error(err.message)}`
+                })
             })
-        })
+        }else{
+            await jl.save()
+            .then(_=>{ return resolve()})
+            .catch(err=>{
+                return reject({
+                    code:500,
+                    msg:`Can not remove task out of job with error: ${new Error(err.message)}`
+                })
+            })
+        }
+
+       
        
     })
 }
