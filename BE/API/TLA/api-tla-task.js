@@ -426,34 +426,17 @@ router.put('/upload', authenticateTLAToken, async (req, res) => {
         })
 })
 
-router.put('/cancel', authenticateTLAToken, (req, res) => {
+router.put('/cancel', authenticateTLAToken, async (req, res) => {
     let { taskId, canceled_reason, remark } = req.body;
-    Task
-        .findByIdAndUpdate(taskId, {
-            status: -4,
-            canceled_reason,
-            remark,
-            canceled_by: req.user._id,
-            canceled_at: new Date()
-        }, { new: true }, (err, task) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({
-                    msg: `Can not cancel task with error: ${new Error(err.message)}`
-                })
-            }
+    let task = await Task.findById(taskId);
 
-            if (!task) {
-                return res.status(404).json({
-                    msg: `Can not cancel task because it not found!`
-                })
-            }
-
-            return res.status(200).json({
-                msg: `The task has been canceled!`,
-                task
-            })
+    if(!task){
+        return res.status(404).json({
+            msg:`Task not found!`
         })
+    }
+
+    
 })
 
 
