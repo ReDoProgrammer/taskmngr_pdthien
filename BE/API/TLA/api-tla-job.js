@@ -9,25 +9,25 @@ const pageSize = 20;
 
 
 router.get('/list', authenticateTLAToken, async (req, res) => {
-    let { fromdate,todate,status,page, search } = req.query; 
-  
-    if(status.length == 0){
+    let { fromdate, todate, status, page, search } = req.query;
+
+    if (status.length == 0) {
         return res.status(404).json({
-            msg:`No available job status`,
-            jobs:[]
+            msg: `No available job status`,
+            jobs: []
         })
     }
-    status = status.map(x=>parseInt(x));
-  
+    status = status.map(x => parseInt(x));
+
     let jobs = await Job
         .find({
-            'deadline.begin':{$gte: new Date(fromdate)},
-            'deadline.begin':{$lte:new Date(todate)},
+            'deadline.begin': { $gte: new Date(fromdate) },
+            'deadline.begin': { $lte: new Date(todate) },
             $or: [
                 { "name": { "$regex": search, "$options": "i" } },
                 { "intruction": { "$regex": search, "$options": "i" } }
             ],
-            status:{$in:status}
+            status: { $in: status }
         })
         .populate([
             {
@@ -39,13 +39,19 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
             { path: 'cb' },
             { path: 'captured.user' },
             { path: 'tasks' },
-            { path: 'templates.root' },
-            { path: 'templates.parents' }
+            {
+                path: 'template',
+                populate:{
+                    path:'levels'
+                }              
+            },
+
+
         ])
         .sort({ urgent: -1 })
         .sort({ 'deadline.end': 1 })
         .skip((page - 1) * pageSize)
-        .limit(pageSize);     
+        .limit(pageSize);
 
     let count = await Job.countDocuments({
         $or: [
