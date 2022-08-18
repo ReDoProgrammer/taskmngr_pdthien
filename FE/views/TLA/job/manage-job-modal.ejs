@@ -398,6 +398,8 @@
     let editor = $("#ckbAssignEditor").is(':checked') ? $('#slEditor option:selected').val() : null;
     let qa = $("#ckbAssignQA").is(':checked') ? $('#slQA option:selected').val() : null;
     let status = -1;
+    let price = parseFloat($("#slCustomerLevles option:selected").data('price'));
+   
     // validateion component inputs
     if (isNaN(assigned_date) || assigned_date === null) {
       $.toast({
@@ -420,7 +422,7 @@
           data: {
             jobId,
             customer_level,
-            is_root,
+           price,
             level,
             assigned_date,
             deadline,
@@ -812,7 +814,7 @@
   function BindContract() {
     $('#slCustomerLevles').empty();
     CustomerLevels.forEach(l => {
-      $('#slCustomerLevles').append('<option value="' + l._id + '" >' + l.name + ' ['+l.levels+']</option>')
+      $('#slCustomerLevles').append('<option value="' + l._id + '" data-price = "'+l.price+'" >' + l.name + ' ['+l.levels+']</option>')
     })
     LoadLocalLevel();
   }

@@ -2,7 +2,8 @@ const router = require('express').Router();
 const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const Task = require('../../models/task-model');
 const Job = require('../../models/job-model');
-
+const JobLine = require('../../models/job-line-model');
+const Customer = require('../../models/customer-model');
 
 const {
     getWage,
@@ -214,7 +215,8 @@ router.get('/detail', authenticateTLAToken, async (req, res) => {
 router.post('/', authenticateTLAToken, async (req, res) => {
     let {
         jobId,
-        customer_level,       
+        customer_level,   
+        price,    
         level,
         assigned_date,
         deadline,
@@ -260,9 +262,11 @@ router.post('/', authenticateTLAToken, async (req, res) => {
         }
     ]
 
+
+
     await task.save()
         .then(async _ => {           
-            Promise.all([PushTaskIntoJob(jobId, task._id, customer_level), UpdateEditor(task._id, level, editor, req.user._id), PushCC(jobId, cc, task._id, customer_level)])
+            Promise.all([PushTaskIntoJob(jobId, task._id, customer_level,price), UpdateEditor(task._id, level, editor, req.user._id), PushCC(jobId, cc, task._id, customer_level)])
                 .then(_async => {
                     UpdateQA(task._id, level, qa, req.user._id)
                         .then(_ => {
@@ -579,29 +583,20 @@ router.delete('/', authenticateTLAToken, async (req, res) => {
 
 module.exports = router;
 
-const PushTaskIntoJob = (jobId, taskId, customer_job_level) => {
+const PushTaskIntoJob = (jobId, taskId, customer_job_level,price) => {
     return new Promise(async (resolve,reject)=>{
-        let job = await Job.findById(jobId);
-        if(!job){
-            return reject({
-                code:404,
-                msg:`Job not found!`
+        let jl = await JobLine.findOne({job:jobId,level:customer_job_level});
+        if(!jl){
+            jl = new JobLine({
+                job:jobId,
+                level:customer_job_level,
+                price,
+                tasks:[taskId]
             })
-        }
-        let levels = job.levels.filter(x=>x._id == customer_job_level);
-        if(levels.length>0){
-            if(levels[0].tasks && levels[0].tasks.length > 0){
-                levels[0].tasks.push(taskId);
-            }else{
-                levels[0].tasks = [taskId];
-            }
-           
         }else{
-            job.levels.push(customer_job_level);
-            job.levels[0].tasks = [taskId];
+            jl.tasks.push(taskId);
         }
-
-        await job.save()
+        await jl.save()
         .then(_=>{
             return resolve();
         })
@@ -611,7 +606,6 @@ const PushTaskIntoJob = (jobId, taskId, customer_job_level) => {
                 msg:`Can not push task into job with error: ${new Error(err.message)}`
             })
         })
-       
     })
 }
 
@@ -880,3 +874,4 @@ const PullTaskFromCC = (jobId, taskId) => {
             })
     })
 }
+

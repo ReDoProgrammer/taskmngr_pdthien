@@ -23,7 +23,7 @@ const jobLineSchema = new Schema({
         type:Number,
         min: [0, 'Price is invalid!'],
     },
-    taks:[
+    tasks:[
         {
             type:Schema.Types.ObjectId,
             ref:'task'

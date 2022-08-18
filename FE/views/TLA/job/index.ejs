@@ -552,16 +552,15 @@
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
             data: { customerId },
-            success: function (data) {                
+            success: function (data) {   
                 CustomerLevels = data.customer.contracts.map(x=>{
                     let obj = {};
                     obj._id = x.mapping._id;
                     obj.name = x.mapping.name;
-                    obj.levels = x.mapping.levels.map(y=>y.name)
+                    obj.levels = x.mapping.levels.map(y=>y.name);
+                    obj.price = x.price;
                     return obj;
                 });
-                
-                
                 BindContract();
 
 
