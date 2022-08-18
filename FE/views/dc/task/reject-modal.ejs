@@ -46,11 +46,12 @@
                         remark
                     },
                     success: function (data) {
-                        Swal.fire(
-                            'Done!',
-                            data.msg,
-                            'success'
-                        )
+                        $.toast({
+                            heading: 'Successfully',
+                            text: data.msg,
+                            showHideTransition: 'fade',
+                            icon: 'success'
+                        });
                         $('#modalRejectTask').modal('hide');
                         LoadTasks();
                     }, error: function (request, status, error) {

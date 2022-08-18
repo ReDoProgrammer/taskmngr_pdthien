@@ -60,187 +60,42 @@
   </ul>
 </div>
 
-<%-include('task_detail')%>
-  <%-include('reject-modal')%>
-    <%-include('bonus-or-penalty')%>
-
-      <script src="/js/bootstrap-select.min.js"></script>
-      <script src="/js/common.js"></script>
-      <link href="/css/bootstrap-select.min.css" rel="stylesheet" />
-      <script>
-        var page = 1;
-        var search = '';
-        var status = 100;
-        var taskId = '';
-
-        $(document).ready(function () {
-          $('#slStatus').val([-10, -4, -3, -2, -1, 0, 1, 2, 3, 4]).selectpicker('refresh');
-          LoadTasks();
-          setInterval(function () {
-            LoadTasks();
-          }, 10000);//run this thang every 10 seconds
-        })
-
-        $(document).on('click', '#funcMenu  li', function () {
-          let fnc = $(this).attr('id');
-
-          switch (fnc) {
-            case 'reject-task':
-              $('#modalRejectTask').modal();
-              break;
-            case 'submit-task':
-              Swal.fire({
-                title: 'Are you sure want to submit this task?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes'
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  $.ajax({
-                    url: '/dc/task/submit',
-                    type: 'put',
-                    headers: {
-                      authorization: "Bearer " + localStorage.getItem("accessToken"),
-                    },
-                    data: {
-                      taskId
-                    },
-                    success: function (data) {
-                      Swal.fire(
-                        'Done!',
-                        data.msg,
-                        'success'
-                      )
-                      LoadTasks();
-                    }, error: function (request, status, error) {
-
-                      Swal.fire(
-                        'Opp...!',
-                        request.responseJSON.msg,
-                        'error'
-                      )
-                    }
-                  })
-                }
-              })
-              break;
-
-            case 'unregister-task':
-              Swal.fire({
-                title: 'Are you sure want to unregisted this task?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes'
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  $.ajax({
-                    url: '/dc/task/unregister',
-                    type: 'put',
-                    headers: {
-                      authorization: "Bearer " + localStorage.getItem("accessToken"),
-                    },
-                    data: {
-                      taskId
-                    },
-                    success: function (data) {
-                      Swal.fire(
-                        'Done!',
-                        data.msg,
-                        'success'
-                      )
-                      LoadTasks();
-                    }, error: function (request, status, error) {
-                      Swal.fire(
-                        'Opp...!',
-                        request.responseJSON.msg,
-                        'error'
-                      )
-                    }
-                  })
-                }
-              })
-              break;
-            case 'bonus-or-penalty-task':
-              $('#modalBonusOrPenalty').modal();
-              break;
-          }
-        });
 
 
-        $(document).on("click", "button[name='functions']", function (e) {
-          var $contextMenu = $("#contextMenu");
-          $contextMenu.css({
-            display: "block",
-            left: e.pageX,
-            top: e.pageY
-          });
+<script src="/js/bootstrap-select.min.js"></script>
+<script src="/js/common.js"></script>
+<link href="/css/bootstrap-select.min.css" rel="stylesheet" />
+<script>
+  var page = 1;
+  var search = '';
+  var status = 100;
+  var taskId = '';
 
-          taskId = $(this).closest('tr').attr('id');
+  $(document).ready(function () {
+    $('#slStatus').val([-10, -4, -3, -2, -1, 0, 1, 2, 3, 4]).selectpicker('refresh');
+    LoadTasks();
+    setInterval(function () {
+      LoadTasks();
+    }, 10000);//run this thang every 10 seconds
+  })
 
-          $.ajax({
-            url: '/dc/task/detail',
-            type: 'get',
-            headers: {
-              authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-              taskId
-            },
-            success: function (data) {
-              customerId = data.customer._id;
-              levelId = data.task.basic.level._id;
+  $(document).on('click', '#funcMenu  li', function () {
+    let fnc = $(this).attr('id');
 
-              $('#funcMenu').empty();
-              let mn = '';
-              switch (data.task.status) {
-                case -1:
-                  mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
-                  break;
-                case 1:
-                  if (data.task.qa.length === 0) {
-                    mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Submit</a></li>';
-
-                  }
-                  mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
-                  mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
-
-                  break;
-                case 2:
-                  mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Submit</a></li>';
-                  mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
-                  mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
-                  break;
-
-                case 3: case 4: case 5: case 6:
-                  mn += '<li id="bonus-or-penalty-task"><a tabindex="-1" href="#"> <i class="fa fa-cog" aria-hidden="true"></i> Bonus or Penalty</a></li>';
-                  break;
-
-                default:
-                  $contextMenu.css({
-                    display: "none"
-                  });
-                  break;
-
-              }
-              $('#funcMenu').append(mn);
-            }
-          })
-
-
-          $('html').click(function () {
-            $contextMenu.hide();
-          });
-
-        });
-
-
-        $(document).on("click", "button[name='btnSubmitTask']", function () {
-          taskId = $(this).closest("tr").attr("id");
-          if (confirm("Are you sure want to submit this task?")) {
+    switch (fnc) {
+      case 'reject-task':
+        $('#modalRejectTask').modal();
+        break;
+      case 'submit-task':
+        Swal.fire({
+          title: 'Are you sure want to submit this task?',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes'
+        }).then((result) => {
+          if (result.isConfirmed) {
             $.ajax({
               url: '/dc/task/submit',
               type: 'put',
@@ -251,195 +106,342 @@
                 taskId
               },
               success: function (data) {
-                alert(data.msg);
+                $.toast({
+                  heading: 'Successfully',
+                  text: data.msg,
+                  showHideTransition: 'fade',
+                  icon: 'success'
+                });
                 LoadTasks();
+              }, error: function (request, status, error) {
+
+                Swal.fire(
+                  'Opp...!',
+                  request.responseJSON.msg,
+                  'error'
+                )
               }
             })
           }
-
         })
+        break;
 
-
-        $('#modalRejectTask').on('hidden.bs.modal', function () {
-          LoadTasks();
+      case 'unregister-task':
+        Swal.fire({
+          title: 'Are you sure want to unregisted this task?',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            $.ajax({
+              url: '/dc/task/unregister',
+              type: 'put',
+              headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+              },
+              data: {
+                taskId
+              },
+              success: function (data) {
+                Swal.fire(
+                  'Done!',
+                  data.msg,
+                  'success'
+                )
+                LoadTasks();
+              }, error: function (request, status, error) {
+                Swal.fire(
+                  'Opp...!',
+                  request.responseJSON.msg,
+                  'error'
+                )
+              }
+            })
+          }
         })
+        break;
+      case 'bonus-or-penalty-task':
+        $('#modalBonusOrPenalty').modal();
+        break;
+    }
+  });
 
 
-        $('#slStatus').on('change', function () {
-          status = this.value;
-          LoadTasks();
-        })
+  $(document).on("click", "button[name='functions']", function (e) {
+    var $contextMenu = $("#contextMenu");
+    $contextMenu.css({
+      display: "block",
+      left: e.pageX,
+      top: e.pageY
+    });
 
+    taskId = $(this).closest('tr').attr('id');
 
-        $(document).on("click", "button[name='btnTaskInfo']", function () {
-          taskId = $(this).closest("tr").attr("id");
-          $('#modalTaskDetail').modal();
-        })
-        function LoadTasks() {
-          $.ajax({
-            url: '/dc/task/personal-tasks',
-            type: 'get',
-            headers: {
-              authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-              page,
-              search: $('#txtSearch').val(),
-              status: ($("#slStatus").val() || []).join(','),
-            },
-            success: function (data) {
-              $('#tbdTasks').empty();
-              let idx = 1;
+    $.ajax({
+      url: '/dc/task/detail',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        taskId
+      },
+      success: function (data) {
+        customerId = data.customer._id;
+        levelId = data.task.basic.level._id;
 
-              data.tasks.forEach(t => {
+        $('#funcMenu').empty();
+        let mn = '';
+        switch (data.task.status) {
+          case -1:
+            mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
+            break;
+          case 1:
+            if (data.task.qa.length === 0) {
+              mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Submit</a></li>';
 
-                let tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '">';
-                if (typeof t.bp !== 'undefined' && t.bp !== null && t.bp.length > 0) {
-                  if (t.bp[0].is_bonus) {
-                    tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '" style="background-color: #E0F8E0">';
-                  } else {
-                    tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '" style="background-color:#FBEFEF">';
-                  }
-                }
-
-                tr += '<td>' + (idx++) + '</td>';
-
-                tr += '<td>';
-                tr += '<button class="btn btn-xs btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
-                tr += '</td>';
-
-                tr += '<td class="text-center">';
-                let p = t.bp.filter(x => x.bpId.is_bonus);
-                if (p.length > 0) {
-                  tr += '<button class="btn btn-xs btn-danger ml-1"><i class="fa fa-ban" aria-hidden="true"></i></button>';
-                }
-                if (t.bp.length > 0 && t.bp.length - p.length > 0) {
-                  tr += '<button class="btn btn-xs btn-success ml-1"><i class="fa fa-trophy" aria-hidden="true"></i></button>';
-                }
-                tr += '</td>';
-
-                tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.name.firstname + ' ' + t.basic.job.customer.name.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
-
-                tr += '<td class="font-weight-bold">';
-                tr += t.basic.level.name
-                if (t.fixible_task || t.additional_task) {
-                  tr += '<span class="font-weight-bold text-danger ml-2"><i class="fa fa-cc" aria-hidden="true"></i></span>';
-                }
-
-                tr += '</td>';
-
-                tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';
-
-                tr += '<td class="text-center"><i class="fa fa-exclamation-triangle text-danger" aria-hidden="true"></i></td>';
-
-                tr += '<td ';
-                let dl = GetDifferenceBetweenTwoDatesToHours(t.basic.deadline.end)
-                if (t.status < 3) {
-                  if (dl <= 6 && dl > 4) {
-                    tr += 'style="background-color:rgba(245,0,0,0.1); color:white; font-weight: bold;"'
-                  }
-                  if (dl <= 4 && dl > 2) {
-                    tr += 'style="background-color:rgba(245,0,0,0.4); color:white; font-weight: bold;"'
-                  }
-                  if (dl <= 2) {
-                    tr += 'style="background-color:rgba(245,0,0,0.6); color:white; font-weight: bold;"'
-                  }
-                }
-                tr += '>' + convertISODateToTimeFormat(t.basic.deadline.end) + '</td>';
-
-                tr += '<td>';
-                tr += t.remarks[t.remarks.length - 1].content;
-                tr += '</td>';
-
-
-                tr += '<td class="text-right">';
-                if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                  tr += t.editor[t.editor.length - 1].submited.length;
-                }
-                tr += '</td>';
-
-
-                tr += '<td class="text-right">';
-                if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                  tr += t.editor[t.editor.length - 1].submited[(t.editor[t.editor.length - 1].submited.length - 1)].amount;
-                }
-                tr += '</td>';
-
-
-                tr += '<td>';
-                if (t.editor.length > 0) {
-                  tr += t.editor[t.editor.length - 1].staff.username;
-                }
-                tr += '</td>';
-
-
-                tr += '<td>';
-                if (t.qa.length > 0) {
-                  tr += t.qa[t.qa.length - 1].staff.username;
-                }
-                tr += '</td>';
-
-                tr += '<td class="font-italic font-weight-bold">';
-                switch (t.status) {
-                  case -10: tr += '<span class="text-danger font-weight-bold">Wait</span>'; break;
-                  case -1: tr += '<span class="text-info">Initial</span>'; break;
-                  case 0: tr += '<span class="text-info">Processing</span>'; break;
-                  case 1:
-                    {
-                      if (t.editor[t.editor.length - 1].submited.length > 1) {
-                        tr += '<span class="text-primary">Fixed</span>';
-                      } else {
-                        tr += '<span class="text-primary">Edited</span>';
-                      }
-                      break;
-                    }
-                  case 2: tr += '<span class="text-success">Q.A ok!</span>'; break;
-                  case 3: tr += '<span class="text-success">DC ok!</span>'; break;
-                  case 4: tr += '<span class="text-info font-weight-bold">Uploaded</span>'; break;
-                  case 5: tr += '<span class="text-success font-weight-bold">Done</span>'; break;
-                  case 6: tr += '<span class="text-success font-weight-bold">Finish</span>'; break;
-                  case -2: tr += '<span class="text-danger">Q.A rejected</span>'; break;
-                  case -3: tr += '<span class="text-danger">DC rejected</span>'; break;
-                  case -4: tr += '<span class="text-danger">Sale rejected</span>'; break;
-                  case -5: tr += '<span class="text-danger">Canceled</span>'; break;
-                  case -6: tr += '<span class="text-danger font-weight-bold">Customer CC</span>'; break;
-                }
-                tr += '</td>';
-
-                tr += '<td class="text-right">';
-
-                if (
-                  ((t.status === 1 && (typeof t.qa === 'undefined' || t.qa.length == 0))
-                    || t.status === 2) && (typeof t.dc === 'undefined' || t.dc.length === 0)
-                ) {
-                  tr += '<button class="btn btn-xs btn-success ml-2" name="get-task"><i class="fa fa-plus" aria-hidden="true"></i></button>';
-                }
-
-                tr += '<button class="btn btn-xs btn-info ml-2" name="btnTaskInfo">';
-                tr += '<i class="fa fa-info-circle" aria-hidden="true"></i>';
-                tr += '</button>';
-                tr += '</td>';
-
-                tr += '</tr>';
-                $('#tbdTasks').append(tr);
-              })
             }
+            mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
+            mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
 
-          })
+            break;
+          case 2:
+            mn = '<li id="submit-task"><a tabindex="-1" href="#"> <i class="fa fa-paper-plane text-success" aria-hidden="true"></i> Submit</a></li>';
+            mn += '<li id="reject-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Reject</a></li>';
+            mn += '<li id="unregister-task"><a tabindex="-1" href="#"> <i class="fa fa-minus text-danger" aria-hidden="true"></i> Unregister</a></li>';
+            break;
+
+          case 3: case 4: case 5: case 6:
+            mn += '<li id="bonus-or-penalty-task"><a tabindex="-1" href="#"> <i class="fa fa-cog" aria-hidden="true"></i> Bonus or Penalty</a></li>';
+            break;
+
+          default:
+            $contextMenu.css({
+              display: "none"
+            });
+            break;
+
         }
+        $('#funcMenu').append(mn);
+      }
+    })
 
 
+    $('html').click(function () {
+      $contextMenu.hide();
+    });
 
-      </script>
+  });
 
-      <style>
-        #contextMenu {
-          position: absolute;
-          display: none;
+
+  $(document).on("click", "button[name='btnSubmitTask']", function () {
+    taskId = $(this).closest("tr").attr("id");
+    if (confirm("Are you sure want to submit this task?")) {
+      $.ajax({
+        url: '/dc/task/submit',
+        type: 'put',
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: {
+          taskId
+        },
+        success: function (data) {
+          alert(data.msg);
+          LoadTasks();
         }
+      })
+    }
 
-        tr:hover {
-          background: #c9e8f7;
-          position: relative;
-        }
-      </style>
+  })
+
+
+  $('#modalRejectTask').on('hidden.bs.modal', function () {
+    LoadTasks();
+  })
+
+
+  $('#slStatus').on('change', function () {
+    status = this.value;
+    LoadTasks();
+  })
+
+
+  $(document).on("click", "button[name='btnTaskInfo']", function () {
+    taskId = $(this).closest("tr").attr("id");
+    $('#modalTaskDetail').modal();
+  })
+  function LoadTasks() {
+    $.ajax({
+      url: '/dc/task/personal-tasks',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: {
+        page,
+        search: $('#txtSearch').val(),
+        status: ($("#slStatus").val() || []).join(','),
+      },
+      success: function (data) {
+        $('#tbdTasks').empty();
+        let idx = 1;
+
+        data.tasks.forEach(t => {
+
+          let tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '">';
+          if (typeof t.bp !== 'undefined' && t.bp !== null && t.bp.length > 0) {
+            if (t.bp[0].is_bonus) {
+              tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '" style="background-color: #E0F8E0">';
+            } else {
+              tr = '<tr id="' + t._id + '" data-job="' + t.basic.level._id + '" style="background-color:#FBEFEF">';
+            }
+          }
+
+          tr += '<td>' + (idx++) + '</td>';
+
+          tr += '<td>';
+          tr += '<button class="btn btn-xs btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
+          tr += '</td>';
+
+          tr += '<td class="text-center">';
+          let p = t.bp.filter(x => x.bpId.is_bonus);
+          if (p.length > 0) {
+            tr += '<button class="btn btn-xs btn-danger ml-1"><i class="fa fa-ban" aria-hidden="true"></i></button>';
+          }
+          if (t.bp.length > 0 && t.bp.length - p.length > 0) {
+            tr += '<button class="btn btn-xs btn-success ml-1"><i class="fa fa-trophy" aria-hidden="true"></i></button>';
+          }
+          tr += '</td>';
+
+          tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.name.firstname + ' ' + t.basic.job.customer.name.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
+
+          tr += '<td class="font-weight-bold">';
+          tr += t.basic.level.name
+          if (t.fixible_task || t.additional_task) {
+            tr += '<span class="font-weight-bold text-danger ml-2"><i class="fa fa-cc" aria-hidden="true"></i></span>';
+          }
+
+          tr += '</td>';
+
+          tr += '<td class="font-weight-bold">' + t.basic.level.name + '</td>';
+
+          tr += '<td class="text-center"><i class="fa fa-exclamation-triangle text-danger" aria-hidden="true"></i></td>';
+
+          tr += '<td ';
+          let dl = GetDifferenceBetweenTwoDatesToHours(t.basic.deadline.end)
+          if (t.status < 3) {
+            if (dl <= 6 && dl > 4) {
+              tr += 'style="background-color:rgba(245,0,0,0.1); color:white; font-weight: bold;"'
+            }
+            if (dl <= 4 && dl > 2) {
+              tr += 'style="background-color:rgba(245,0,0,0.4); color:white; font-weight: bold;"'
+            }
+            if (dl <= 2) {
+              tr += 'style="background-color:rgba(245,0,0,0.6); color:white; font-weight: bold;"'
+            }
+          }
+          tr += '>' + convertISODateToTimeFormat(t.basic.deadline.end) + '</td>';
+
+          tr += '<td>';
+          tr += t.remarks[t.remarks.length - 1].content;
+          tr += '</td>';
+
+
+          tr += '<td class="text-right">';
+          if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+            tr += t.editor[t.editor.length - 1].submited.length;
+          }
+          tr += '</td>';
+
+
+          tr += '<td class="text-right">';
+          if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+            tr += t.editor[t.editor.length - 1].submited[(t.editor[t.editor.length - 1].submited.length - 1)].amount;
+          }
+          tr += '</td>';
+
+
+          tr += '<td>';
+          if (t.editor.length > 0) {
+            tr += t.editor[t.editor.length - 1].staff.username;
+          }
+          tr += '</td>';
+
+
+          tr += '<td>';
+          if (t.qa.length > 0) {
+            tr += t.qa[t.qa.length - 1].staff.username;
+          }
+          tr += '</td>';
+
+          tr += '<td class="font-italic font-weight-bold">';
+          switch (t.status) {
+            case -10: tr += '<span class="text-danger font-weight-bold">Wait</span>'; break;
+            case -1: tr += '<span class="text-info">Initial</span>'; break;
+            case 0: tr += '<span class="text-info">Processing</span>'; break;
+            case 1:
+              {
+                if (t.editor[t.editor.length - 1].submited.length > 1) {
+                  tr += '<span class="text-primary">Fixed</span>';
+                } else {
+                  tr += '<span class="text-primary">Edited</span>';
+                }
+                break;
+              }
+            case 2: tr += '<span class="text-success">Q.A ok!</span>'; break;
+            case 3: tr += '<span class="text-success">DC ok!</span>'; break;
+            case 4: tr += '<span class="text-info font-weight-bold">Uploaded</span>'; break;
+            case 5: tr += '<span class="text-success font-weight-bold">Done</span>'; break;
+            case 6: tr += '<span class="text-success font-weight-bold">Finish</span>'; break;
+            case -2: tr += '<span class="text-danger">Q.A rejected</span>'; break;
+            case -3: tr += '<span class="text-danger">DC rejected</span>'; break;
+            case -4: tr += '<span class="text-danger">Sale rejected</span>'; break;
+            case -5: tr += '<span class="text-danger">Canceled</span>'; break;
+            case -6: tr += '<span class="text-danger font-weight-bold">Customer CC</span>'; break;
+          }
+          tr += '</td>';
+
+          tr += '<td class="text-right">';
+
+          if (
+            ((t.status === 1 && (typeof t.qa === 'undefined' || t.qa.length == 0))
+              || t.status === 2) && (typeof t.dc === 'undefined' || t.dc.length === 0)
+          ) {
+            tr += '<button class="btn btn-xs btn-success ml-2" name="get-task"><i class="fa fa-plus" aria-hidden="true"></i></button>';
+          }
+
+          tr += '<button class="btn btn-xs btn-info ml-2" name="btnTaskInfo">';
+          tr += '<i class="fa fa-info-circle" aria-hidden="true"></i>';
+          tr += '</button>';
+          tr += '</td>';
+
+          tr += '</tr>';
+          $('#tbdTasks').append(tr);
+        })
+      }
+
+    })
+  }
+
+
+
+</script>
+
+<style>
+  #contextMenu {
+    position: absolute;
+    display: none;
+  }
+
+  tr:hover {
+    background: #c9e8f7;
+    position: relative;
+  }
+</style>
+<%-include('task_detail')%>
+  <%-include('reject-modal')%>
+    <%-include('bonus-or-penalty')%>
