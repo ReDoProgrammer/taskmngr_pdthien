@@ -128,7 +128,12 @@ router.get("/list", authenticateSaleToken, async (req, res) => {
       { path: 'cb' },
       { path: 'captured.user' },
       { path: 'tasks' },
-      { path: 'template' }
+      { 
+        path: 'template' ,
+        populate:{
+          path:'levels'
+        }
+      }
 
     ])
     .sort({ urgent: -1 })

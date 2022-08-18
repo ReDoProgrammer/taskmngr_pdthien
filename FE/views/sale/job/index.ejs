@@ -514,7 +514,8 @@
 
           tr += '<td class="font-weight-bold">';
           if (j.template) {
-            tr += j.template.name;
+            let levels = j.template.levels.map(x => ` ${x.name}`)
+            tr += j.template.name + '[ <span class="text-danger font-weight-bold">' + levels + ']</span>';
           }
 
           tr += '</td>';
