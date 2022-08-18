@@ -203,6 +203,14 @@ router.delete('/', [authenticateSaleToken, ValidateCheckIn], async (req, res) =>
     })
   }
 
+  //rang buoc khong cho xoa khi co task lien quan toi job
+  let count = await JobLine.countDocuments({job:jobId});
+  if(count > 0){
+    return res.status(409).json({
+      msg:`Can not delete this job when having tasks based on it!`
+    })
+  }
+
   await job.delete()
     .then(async _ => {
       PullJob(job.customer, jobId)
