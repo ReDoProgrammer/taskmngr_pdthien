@@ -154,7 +154,7 @@ const jobSchema = new Schema({
         type: Boolean,
         default: false
     },
-    job_line:[{
+    job_lines:[{
         type:Schema.Types.ObjectId,
         ref:'job_line'
     }]
