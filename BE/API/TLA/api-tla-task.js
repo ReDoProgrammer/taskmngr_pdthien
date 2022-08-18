@@ -87,6 +87,7 @@ router.get('/all', authenticateTLAToken, async (req, res) => {
                 }
             },
             { path: 'basic.level', select: 'name' },
+            { path: 'basic.mapping', select: 'name' },
             { path: 'editor.staff', select: 'username fullname' },
             { path: 'qa.staff', select: 'username fullname' },
             { path: 'dc.staff', select: 'username fullname' },

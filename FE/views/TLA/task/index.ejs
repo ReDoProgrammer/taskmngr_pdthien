@@ -1,4 +1,3 @@
-
 <div class="row mt-2">
     <div class="col-md-8 col-sm-8 col-xs-6">
         <select id="slStatus" class="selectpicker form-control" multiple title="Choose one of the following status">
@@ -12,7 +11,7 @@
             <option value="-2">Q.A rejected</option>
             <option value="-3">DC rejected</option>
             <option value="-4">Canceled</option>
-        </select>       
+        </select>
     </div>
     <div class="col-md-4 col-sm-4 col-xs-6  text-right">
         <div class="input-group">
@@ -75,389 +74,390 @@
     </ul>
 </div>
 
+
+<script src="/js/bootstrap-select.min.js"></script>
+<script src="/js/common.js"></script>
+<link href="/css/bootstrap-select.min.css" rel="stylesheet" />
+
+<script>
+    var page = 1;
+    var search = '';
+    var customerId = '';
+    var status = 100;
+    var levelId = '';
+    var taskId = '';
+    var submitedLink = '';
+
+    $(document).ready(function () {
+        $('#slStatus').val([-10, -4, -3, -2, -1, 0, 1, 2, 3, 4]).selectpicker('refresh');
+        LoadTasks();
+        setInterval(function () {
+            LoadTasks();
+        }, 10000);//run this thang every 10 seconds
+    })
+
+
+
+    function DeleteTask() {
+        Swal.fire({
+            icon: 'question',
+            title: 'Do you want to delete this task?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            denyButtonText: `No`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/tla/task',
+                    type: 'delete',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                    data: {
+                        _id: taskId
+                    },
+                    success: function (data) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Deleted',
+                            text: data.msg
+                        });
+                        LoadTasks();
+                    }
+                    , error: function (jqXHR, textStatus, errorThrown) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Opp..',
+                            text: jqXHR.responseJSON.msg
+                        });
+                    }
+                })
+            }
+        })
+    }
+
+
+    $('#btnSearchTask').click(function () {
+        search = $('#txtSearchTask').val();
+        status = $('#slStatus option:selected').val();
+        LoadTasks();
+    })
+
+    $(document).on('click', '#funcMenu  li', function () {
+        let fnc = $(this).attr('id');
+
+        switch (fnc) {
+            case 'assign-editor':
+                $('#assignEditorModal').modal();
+                break;
+            case 'assign-qa':
+                $('#assignQAModal').modal();
+                break;
+            case 'auto-assign-editor':
+                AutoAssignEditor();
+                break;
+            case 'cancel-task':
+                $('#cancelTaskModal').modal();
+                break;
+            case 'delete-task':
+                DeleteTask();
+                break;
+            case 'edit-task':
+                $('#editTaskModal').modal();
+                break;
+            case 'bonus-penalty':
+                $('#modalBonusPenalty').modal();
+                break;
+            case 'upload-task':
+                $('#uploadTaskModal').modal();
+                break;
+
+        }
+    });
+
+
+    $(document).on("click", "button[name='functions']", function (e) {
+        var $contextMenu = $("#contextMenu");
+        $contextMenu.css({
+            display: "block",
+            left: e.pageX,
+            top: e.pageY
+        });
+
+        taskId = $(this).closest('tr').attr('id');
+        customerId = $(this).closest('tr').data('customer');
+        levelId = $(this).closest('tr').data('level');
+
+        $.ajax({
+            url: '/tla/task/detail',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                taskId
+            },
+            success: function (data) {
+                customerId = data.customer._id;
+                $('#funcMenu').empty();
+                let mn = '';
+                if (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].submited.length > 0) {
+                    submitedLink = data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link;
+                }
+                switch (data.task.status) {
+                    case -10: case -1: case 0:
+                        mn = '';
+                        mn += '<li id="edit-task"><a tabindex="-1" href="#"> <i class="fa fa-edit text-warning"></i> Edit</a></li>';
+                        mn += '<li id="delete-task"><a tabindex="-1" href="#"> <i class="fa fa-trash text-danger" aria-hidden="true"></i> Delete</a></li>';
+                        $('#funcMenu').append(mn);
+                        break;
+                    case 1: case 2://Q.A submited
+                        mn = '';
+                        mn += '<li id="cancel-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Cancel</a></li>';
+                        mn += '<li id="upload-task"><a tabindex="-1" href="#"> <i class="fa fa-upload text-success" aria-hidden="true"></i>Upload</a></li>';
+                        $('#funcMenu').append(mn);
+                        break;
+                    case 3://DC submited
+                        mn = '';
+                        mn += '<li id="cancel-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Cancel</a></li>';
+                        mn += '<li id="upload-task"><a tabindex="-1" href="#"> <i class="fa fa-upload text-success" aria-hidden="true"></i>Upload</a></li>';
+                        // if (data.task.bp !== null && data.task.bp.length > 0) {
+                        //     if (data.task.bp[data.task.pb.length - 1].is_bonus) {
+                        //         mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-trophy text-warning" aria-hidden="true"></i> Bonus</a></li>';
+                        //     } else {
+                        //         mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-credit-card text-danger"  aria-hidden="true"></i> Penalty</a></li>';
+                        //     }
+                        // }
+                        $('#funcMenu').append(mn);
+                        break;
+                    case 4: case 5: case 6:
+                        if (data.task.bp !== null && data.task.bp.length > 0) {
+                            if (data.task.bp[data.task.pb.length - 1].is_bonus) {
+                                mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-trophy text-warning" aria-hidden="true"></i> Bonus</a></li>';
+                            } else {
+                                mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-credit-card text-danger"  aria-hidden="true"></i> Penalty</a></li>';
+                            }
+                        }
+                        $('#funcMenu').append(mn);
+                        break;
+                    case -2://Q.A rejected
+                        mn = '';
+                        mn += '<li id="cancel-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Cancel</a></li>';
+                        $('#funcMenu').append(mn);
+                        break;
+
+                    default:
+                        $contextMenu.css({
+                            display: "none"
+                        });
+                        break;
+                }
+            }
+        })
+
+
+        $('html').click(function () {
+            $contextMenu.hide();
+        });
+
+    });
+
+    $(document).on("click", "button[name='task-info']", function () {
+        taskId = $(this).closest('tr').attr('id');
+        $('#modalTaskDetail').modal();
+    })
+
+
+    $('#slStatus').on('change', function () {
+        status = this.value;
+        LoadTasks();
+    })
+
+
+    function LoadTasks() {
+        $('#tblLines').empty();
+        $.ajax({
+            url: '/tla/task/all',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: {
+                search,
+                page,
+                status: ($("#slStatus").val() || []).join(',')
+            },
+            success: function (data) {
+
+                $('.pagination').empty();
+                for (let i = 1; i <= data.pages; i++) {
+                    let li = '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>';
+                    $('.pagination').append(li);
+                }
+
+
+                let idx = ((page - 1) * data.pageSize);
+                data.tasks.forEach(t => {
+                    let tr = '<tr id="' + t._id + '"  data-level="' + t.basic.level._id + '">';
+
+                    tr += '<td>' + (++idx) + '</td>';
+
+                    tr += '<td>';
+                    tr += '<button class="btn btn-xs btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
+                    tr += '</td>';
+
+                    tr += '<td class="text-center">';
+                    let p = t.bp.filter(x => x.bpId.is_bonus);
+                    if (p.length > 0) {
+                        tr += '<button class="btn btn-xs btn-danger ml-1"><i class="fa fa-ban" aria-hidden="true"></i></button>';
+                    }
+                    if (t.bp.length > 0 && t.bp.length - p.length > 0) {
+                        tr += '<button class="btn btn-xs btn-success ml-1"><i class="fa fa-trophy" aria-hidden="true"></i></button>';
+                    }
+                    tr += '</td>';
+
+                    tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.name.firstname + ' ' + t.basic.job.customer.name.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
+
+                    tr += '<td class="text-primary font-weight-bold">';
+                    tr += t.basic.job.name;
+                    tr += '</td>';
+                    tr += '<td class="text-warning font-weight-bold">';
+
+                    tr += '<span class="text-danger font-weight-bold">'+t.basic.mapping.name+'</span> - '+t.basic.level.name;
+                    let chk = (t.basic.job.cc.filter(x => x.tasks.includes(t._id))).length > 0 ? true : false;
+                    if (chk) {
+                        tr += '<i class="fa fa-cc text-danger ml-2" aria-hidden="true"></i>'
+                    }
+                    if (t.status == -10) {
+                        tr += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true"></i>';
+                    }
+                    tr += '</td>';
+                    tr += '<td class="text-center">';
+                    if (t.basic.job.urgent) {
+                        tr += '<i class="text-danger fa fa-exclamation-triangle" aria-hidden="true"></i>'
+                    }
+                    tr += '</td>';
+                    tr += '<td>' + convertISODateToTimeFormat(t.basic.job.deadline.begin) + '</td>';
+
+                    tr += '<td ';
+                    let dl = GetDifferenceBetweenTwoDatesToHours(t.basic.deadline.end)
+                    if (dl <= 6 && dl > 4) {
+                        tr += 'style="background-color:rgba(245,0,0,0.1); color:white; font-weight: bold;"'
+                    }
+                    if (dl <= 4 && dl > 2) {
+                        tr += 'style="background-color:rgba(245,0,0,0.4); color:white; font-weight: bold;"'
+                    }
+                    if (dl <= 2) {
+                        tr += 'style="background-color:rgba(245,0,0,0.6); color:white; font-weight: bold;"'
+                    }
+
+                    tr += '>' + convertISODateToTimeFormat(t.basic.deadline.end) + '</td>';
+
+
+
+
+
+                    tr += '<td>';
+                    if (t.editor.length > 0) {
+                        tr += t.editor[t.editor.length - 1].staff.username
+                    }
+                    tr += '</td>';
+                    tr += '<td>';
+                    if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
+                        tr += t.qa[t.qa.length - 1].staff.username
+                    }
+                    tr += '</td>';
+
+
+                    tr += '<td class="text-right">';
+                    if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                        tr += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount
+                    }
+                    tr += '</td>';
+
+                    tr += '<td class="text-right">';
+                    if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
+                        tr += t.editor[t.editor.length - 1].submited.length;
+                    }
+                    tr += '</td>';
+
+
+                    tr += '<td>';
+                    if (t.dc.length > 0) {
+                        tr += t.dc[t.dc.length - 1].staff.username;
+                    }
+                    tr += '</td>';
+
+                    tr += '<td>';
+                    if (t.remarks.length > 0) {
+                        tr += t.remarks[t.remarks.length - 1].content;
+                    }
+                    tr += '</td>';
+
+
+                    tr += '<td><i>';
+
+                    switch (t.status) {
+                        case -10: tr += '<span class="text-danger font-weight-bold">Wait</span>'; break;
+                        case -1: tr += '<span class="text-info">Initial</span>'; break;
+                        case 0: tr += '<span class="text-info">Processing</span>'; break;
+                        case 1:
+                            {
+                                if (t.editor[t.editor.length - 1].submited.length > 1) {
+                                    tr += '<span class="text-primary">Fixed</span>';
+                                } else {
+                                    tr += '<span class="text-primary">Edited</span>';
+                                }
+                                break;
+                            }
+                        case 2: tr += '<span class="text-success">Q.A ok!</span>'; break;
+                        case 3: tr += '<span class="text-success">DC ok!</span>'; break;
+                        case 4: tr += '<span class="text-info font-weight-bold">Uploaded</span>'; break;
+                        case 5: tr += '<span class="text-success font-weight-bold">Done</span>'; break;
+                        case 6: tr += '<span class="text-success font-weight-bold">Finish</span>'; break;
+                        case -2: tr += '<span class="text-danger">Q.A rejected</span>'; break;
+                        case -3: tr += '<span class="text-danger">DC rejected</span>'; break;
+                        case -4: tr += '<span class="text-danger">Sale rejected</span>'; break;
+                        case -5: tr += '<span class="text-danger">Canceled</span>'; break;
+                        case -6: tr += '<span class="text-danger font-weight-bold">Customer CC</span>'; break;
+                    }
+                    tr += '</i></td>';
+                    tr += '<td class="text-right">';
+                    tr += '<button class="btn btn-xs btn-info" name="task-info"><i class="fa fa-info-circle" aria-hidden="true"></i></button>';
+                    tr += '</td>';
+
+                    tr += '</tr>';
+                    $('#tblLines').append(tr);
+                })
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseJSON.msg);
+            }
+        })
+    }
+</script>
+
+
+
+<style>
+    #divAddOrUpdateTask {
+        z-index: -1000;
+    }
+
+    #contextMenu {
+        position: absolute;
+        display: none;
+    }
+
+    tr:hover {
+        background: #c9e8f7;
+        position: relative;
+    }
+</style>
+
 <%-include('edit-task-modal')%>
     <%-include('task_detail')%>
         <%-include('cancel-task-modal')%>
             <%-include('bonus-penalty-modal')%>
                 <%-include('upload-task-modal')%>
-
-                    <script src="/js/bootstrap-select.min.js"></script>
-                    <script src="/js/common.js"></script>
-                    <link href="/css/bootstrap-select.min.css" rel="stylesheet" />
-
-                    <script>
-                        var page = 1;
-                        var search = '';
-                        var customerId = '';
-                        var status = 100;
-                        var levelId = '';
-                        var taskId = '';
-                        var submitedLink = '';
-
-                        $(document).ready(function () {
-                            $('#slStatus').val([-10, -4, -3, -2, -1, 0, 1, 2, 3, 4]).selectpicker('refresh');
-                            LoadTasks();
-                            setInterval(function () {
-                                LoadTasks();
-                            }, 10000);//run this thang every 10 seconds
-                        })
-
-
-
-                        function DeleteTask() {
-                            Swal.fire({
-                                icon: 'question',
-                                title: 'Do you want to delete this task?',
-                                showDenyButton: true,
-                                showCancelButton: true,
-                                confirmButtonText: 'Yes',
-                                denyButtonText: `No`,
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    $.ajax({
-                                        url: '/tla/task',
-                                        type: 'delete',
-                                        headers: {
-                                            authorization: "Bearer " + localStorage.getItem("accessToken"),
-                                        },
-                                        data: {
-                                            _id: taskId
-                                        },
-                                        success: function (data) {
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: 'Deleted',
-                                                text: data.msg
-                                            });
-                                            LoadTasks();
-                                        }
-                                        , error: function (jqXHR, textStatus, errorThrown) {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Opp..',
-                                                text: jqXHR.responseJSON.msg
-                                            });
-                                        }
-                                    })
-                                }
-                            })
-                        }
-
-
-                        $('#btnSearchTask').click(function () {
-                            search = $('#txtSearchTask').val();
-                            status = $('#slStatus option:selected').val();
-                            LoadTasks();
-                        })
-
-                        $(document).on('click', '#funcMenu  li', function () {
-                            let fnc = $(this).attr('id');
-
-                            switch (fnc) {
-                                case 'assign-editor':
-                                    $('#assignEditorModal').modal();
-                                    break;
-                                case 'assign-qa':
-                                    $('#assignQAModal').modal();
-                                    break;
-                                case 'auto-assign-editor':
-                                    AutoAssignEditor();
-                                    break;
-                                case 'cancel-task':
-                                    $('#cancelTaskModal').modal();
-                                    break;
-                                case 'delete-task':
-                                    DeleteTask();
-                                    break;
-                                case 'edit-task':
-                                    $('#editTaskModal').modal();
-                                    break;
-                                case 'bonus-penalty':
-                                    $('#modalBonusPenalty').modal();
-                                    break;
-                                case 'upload-task':
-                                    $('#uploadTaskModal').modal();
-                                    break;
-
-                            }
-                        });
-
-
-                        $(document).on("click", "button[name='functions']", function (e) {
-                            var $contextMenu = $("#contextMenu");
-                            $contextMenu.css({
-                                display: "block",
-                                left: e.pageX,
-                                top: e.pageY
-                            });
-
-                            taskId = $(this).closest('tr').attr('id');
-                            customerId = $(this).closest('tr').data('customer');
-                            levelId = $(this).closest('tr').data('level');
-
-                            $.ajax({
-                                url: '/tla/task/detail',
-                                type: 'get',
-                                headers: {
-                                    authorization: "Bearer " + localStorage.getItem("accessToken"),
-                                },
-                                data: {
-                                    taskId
-                                },
-                                success: function (data) {
-                                    customerId = data.customer._id;
-                                    $('#funcMenu').empty();
-                                    let mn = '';
-                                    if (data.task.editor.length > 0 && data.task.editor[data.task.editor.length - 1].submited.length > 0) {
-                                        submitedLink = data.task.editor[data.task.editor.length - 1].submited[data.task.editor[data.task.editor.length - 1].submited.length - 1].link;
-                                    }
-                                    switch (data.task.status) {
-                                        case -10: case -1: case 0:
-                                            mn = '';
-                                            mn += '<li id="edit-task"><a tabindex="-1" href="#"> <i class="fa fa-edit text-warning"></i> Edit</a></li>';
-                                            mn += '<li id="delete-task"><a tabindex="-1" href="#"> <i class="fa fa-trash text-danger" aria-hidden="true"></i> Delete</a></li>';
-                                            $('#funcMenu').append(mn);
-                                            break;
-                                        case 1: case 2://Q.A submited
-                                            mn = '';
-                                            mn += '<li id="cancel-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Cancel</a></li>';
-                                            mn += '<li id="upload-task"><a tabindex="-1" href="#"> <i class="fa fa-upload text-success" aria-hidden="true"></i>Upload</a></li>';
-                                            $('#funcMenu').append(mn);
-                                            break;
-                                        case 3://DC submited
-                                            mn = '';
-                                            mn += '<li id="cancel-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Cancel</a></li>';
-                                            mn += '<li id="upload-task"><a tabindex="-1" href="#"> <i class="fa fa-upload text-success" aria-hidden="true"></i>Upload</a></li>';
-                                            // if (data.task.bp !== null && data.task.bp.length > 0) {
-                                            //     if (data.task.bp[data.task.pb.length - 1].is_bonus) {
-                                            //         mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-trophy text-warning" aria-hidden="true"></i> Bonus</a></li>';
-                                            //     } else {
-                                            //         mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-credit-card text-danger"  aria-hidden="true"></i> Penalty</a></li>';
-                                            //     }
-                                            // }
-                                            $('#funcMenu').append(mn);
-                                            break;
-                                        case 4: case 5: case 6:
-                                            if (data.task.bp !== null && data.task.bp.length > 0) {
-                                                if (data.task.bp[data.task.pb.length - 1].is_bonus) {
-                                                    mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-trophy text-warning" aria-hidden="true"></i> Bonus</a></li>';
-                                                } else {
-                                                    mn += '<li id="bonus-penalty"><a tabindex="-1" href="#"> <i class="fa fa-credit-card text-danger"  aria-hidden="true"></i> Penalty</a></li>';
-                                                }
-                                            }
-                                            $('#funcMenu').append(mn);
-                                            break;
-                                        case -2://Q.A rejected
-                                            mn = '';
-                                            mn += '<li id="cancel-task"><a tabindex="-1" href="#"> <i class="fa fa-ban text-danger" aria-hidden="true"></i> Cancel</a></li>';
-                                            $('#funcMenu').append(mn);
-                                            break;
-
-                                        default:
-                                            $contextMenu.css({
-                                                display: "none"
-                                            });
-                                            break;
-                                    }
-                                }
-                            })
-
-
-                            $('html').click(function () {
-                                $contextMenu.hide();
-                            });
-
-                        });
-
-                        $(document).on("click", "button[name='task-info']", function () {
-                            taskId = $(this).closest('tr').attr('id');
-                            $('#modalTaskDetail').modal();
-                        })
-
-
-                        $('#slStatus').on('change', function () {
-                            status = this.value;
-                            LoadTasks();
-                        })
-
-
-                        function LoadTasks() {
-                            $('#tblLines').empty();
-                            $.ajax({
-                                url: '/tla/task/all',
-                                type: 'get',
-                                headers: {
-                                    authorization: "Bearer " + localStorage.getItem("accessToken"),
-                                },
-                                data: {
-                                    search,
-                                    page,
-                                    status: ($("#slStatus").val() || []).join(',')
-                                },
-                                success: function (data) {
-
-                                    $('.pagination').empty();
-                                    for (let i = 1; i <= data.pages; i++) {
-                                        let li = '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>';
-                                        $('.pagination').append(li);
-                                    }
-
-
-                                    let idx = ((page - 1) * data.pageSize);
-                                    data.tasks.forEach(t => {
-                                        let tr = '<tr id="' + t._id + '"  data-level="' + t.basic.level._id + '">';
-
-                                        tr += '<td>' + (++idx) + '</td>';
-
-                                        tr += '<td>';
-                                        tr += '<button class="btn btn-xs btn-warning ml-2" name="functions"><i class="fa fa-cog" aria-hidden="true"></i></button>';
-                                        tr += '</td>';
-
-                                        tr += '<td class="text-center">';
-                                        let p = t.bp.filter(x => x.bpId.is_bonus);
-                                        if (p.length > 0) {
-                                            tr += '<button class="btn btn-xs btn-danger ml-1"><i class="fa fa-ban" aria-hidden="true"></i></button>';
-                                        }
-                                        if (t.bp.length > 0 && t.bp.length - p.length > 0) {
-                                            tr += '<button class="btn btn-xs btn-success ml-1"><i class="fa fa-trophy" aria-hidden="true"></i></button>';
-                                        }
-                                        tr += '</td>';
-
-                                        tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.name.firstname + ' ' + t.basic.job.customer.name.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
-
-                                        tr += '<td class="text-primary font-weight-bold">';
-                                        tr += t.basic.job.name;                                                                             
-                                        tr += '</td>';
-                                        tr += '<td class="text-warning font-weight-bold">';
-
-                                        tr += t.basic.level.name;
-                                        let chk = (t.basic.job.cc.filter(x => x.tasks.includes(t._id))).length > 0 ? true : false;
-                                        if (chk) {
-                                            tr += '<i class="fa fa-cc text-danger ml-2" aria-hidden="true"></i>'
-                                        }  
-                                        if (t.status == -10) {
-                                            tr += '<i class="fa fa-pause text-danger ml-2" aria-hidden="true"></i>';
-                                        }
-                                        tr += '</td>';
-                                        tr += '<td class="text-center">';
-                                        if (t.basic.job.urgent) {
-                                            tr += '<i class="text-danger fa fa-exclamation-triangle" aria-hidden="true"></i>'
-                                        }
-                                        tr += '</td>';
-                                        tr += '<td>' + convertISODateToTimeFormat(t.basic.job.deadline.begin) + '</td>';
-
-                                        tr += '<td ';
-                                        let dl = GetDifferenceBetweenTwoDatesToHours(t.basic.deadline.end)
-                                        if (dl <= 6 && dl > 4) {
-                                            tr += 'style="background-color:rgba(245,0,0,0.1); color:white; font-weight: bold;"'
-                                        }
-                                        if (dl <= 4 && dl > 2) {
-                                            tr += 'style="background-color:rgba(245,0,0,0.4); color:white; font-weight: bold;"'
-                                        }
-                                        if (dl <= 2) {
-                                            tr += 'style="background-color:rgba(245,0,0,0.6); color:white; font-weight: bold;"'
-                                        }
-
-                                        tr += '>' + convertISODateToTimeFormat(t.basic.deadline.end) + '</td>';
-
-
-
-
-
-                                        tr += '<td>';
-                                        if (t.editor.length > 0) {
-                                            tr += t.editor[t.editor.length - 1].staff.username
-                                        }
-                                        tr += '</td>';
-                                        tr += '<td>';
-                                        if (t.qa.length > 0 && !t.qa[t.qa.length - 1].unregisted) {
-                                            tr += t.qa[t.qa.length - 1].staff.username
-                                        }
-                                        tr += '</td>';
-
-
-                                        tr += '<td class="text-right">';
-                                        if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                                            tr += t.editor[t.editor.length - 1].submited[t.editor[t.editor.length - 1].submited.length - 1].amount
-                                        }
-                                        tr += '</td>';
-
-                                        tr += '<td class="text-right">';
-                                        if (t.editor.length > 0 && t.editor[t.editor.length - 1].submited.length > 0) {
-                                            tr += t.editor[t.editor.length - 1].submited.length;
-                                        }
-                                        tr += '</td>';
-
-
-                                        tr += '<td>';
-                                        if (t.dc.length > 0) {
-                                            tr += t.dc[t.dc.length - 1].staff.username;
-                                        }
-                                        tr += '</td>';
-
-                                        tr += '<td>';
-                                        if (t.remarks.length > 0) {
-                                            tr += t.remarks[t.remarks.length - 1].content;
-                                        }
-                                        tr += '</td>';
-
-
-                                        tr += '<td><i>';
-
-                                        switch (t.status) {
-                                            case -10: tr += '<span class="text-danger font-weight-bold">Wait</span>'; break;
-                                            case -1: tr += '<span class="text-info">Initial</span>'; break;
-                                            case 0: tr += '<span class="text-info">Processing</span>'; break;
-                                            case 1:
-                                                {
-                                                    if (t.editor[t.editor.length - 1].submited.length > 1) {
-                                                        tr += '<span class="text-primary">Fixed</span>';
-                                                    } else {
-                                                        tr += '<span class="text-primary">Edited</span>';
-                                                    }
-                                                    break;
-                                                }
-                                            case 2: tr += '<span class="text-success">Q.A ok!</span>'; break;
-                                            case 3: tr += '<span class="text-success">DC ok!</span>'; break;
-                                            case 4: tr += '<span class="text-info font-weight-bold">Uploaded</span>'; break;
-                                            case 5: tr += '<span class="text-success font-weight-bold">Done</span>'; break;
-                                            case 6: tr += '<span class="text-success font-weight-bold">Finish</span>'; break;
-                                            case -2: tr += '<span class="text-danger">Q.A rejected</span>'; break;
-                                            case -3: tr += '<span class="text-danger">DC rejected</span>'; break;
-                                            case -4: tr += '<span class="text-danger">Sale rejected</span>'; break;
-                                            case -5: tr += '<span class="text-danger">Canceled</span>'; break;
-                                            case -6: tr += '<span class="text-danger font-weight-bold">Customer CC</span>'; break;
-                                        }
-                                        tr += '</i></td>';
-                                        tr += '<td class="text-right">';
-                                        tr += '<button class="btn btn-xs btn-info" name="task-info"><i class="fa fa-info-circle" aria-hidden="true"></i></button>';
-                                        tr += '</td>';
-
-                                        tr += '</tr>';
-                                        $('#tblLines').append(tr);
-                                    })
-                                },
-                                error: function (jqXHR, textStatus, errorThrown) {
-                                    alert(jqXHR.responseJSON.msg);
-                                }
-                            })
-                        }
-                    </script>
-
-
-
-                    <style>
-                        #divAddOrUpdateTask {
-                            z-index: -1000;
-                        }
-
-                        #contextMenu {
-                            position: absolute;
-                            display: none;
-                        }
-
-                        tr:hover {
-                            background: #c9e8f7;
-                            position: relative;
-                        }
-                    </style>
