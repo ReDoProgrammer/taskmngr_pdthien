@@ -1,5 +1,5 @@
 <div class="row mt-2">
-    <div class="col-md-4 col-md-offset-8 text-right">
+    <div class="col-md-6 col-md-offset-6 text-right">
         <div class="input-group">
             <div class="input-group-btn">
                 <select id="slStatus" multiple="multiple form-control">
@@ -13,12 +13,12 @@
                     <option value="-2">Q.A rejected</option>
                     <option value="-3">DC rejected</option>
                     <option value="-4">Canceled</option>
-                </select>       
-    
+                </select>
+
             </div><!-- /btn-group -->
-            <input type="text" class="form-control" placeholder="Seach job..." id="txtSearch" />
+            <input type="text" class="form-control" placeholder="Seach task..." id="txtSearch" />
             <div class="input-group-btn">
-    
+
                 <button class="btn btn-info" type="submit" id="btnSearch">
                     <i class="fa fa-search" aria-hidden="true"></i>
                 </button>
@@ -117,13 +117,14 @@
                         authorization: "Bearer " + localStorage.getItem("accessToken"),
                     },
                     data: {
-                        _id: taskId
+                        taskId
                     },
                     success: function (data) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Deleted',
-                            text: data.msg
+                        $.toast({
+                            heading: 'Successfully',
+                            text: data.msg,
+                            showHideTransition: 'fade',
+                            icon: 'success'
                         });
                         LoadTasks();
                     }
@@ -326,7 +327,7 @@
                     tr += '</td>';
                     tr += '<td class="text-warning font-weight-bold">';
 
-                    tr += '<span class="text-danger font-weight-bold">'+t.basic.mapping.name+'</span> - '+t.basic.level.name;
+                    tr += '<span class="text-danger font-weight-bold">' + t.basic.mapping.name + '</span> - ' + t.basic.level.name;
                     let chk = (t.basic.job.cc.filter(x => x.tasks.includes(t._id))).length > 0 ? true : false;
                     if (chk) {
                         tr += '<i class="fa fa-cc text-danger ml-2" aria-hidden="true"></i>'
