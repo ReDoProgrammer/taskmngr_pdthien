@@ -184,6 +184,7 @@ const adminMaterialController = require('./BE/controllers/Admin/material-control
 const adminModuleController = require('./BE/controllers/Admin/module-controller');
 const adminNationalStyleController = require('./BE/controllers/Admin/national-style-controller');
 const adminParentsLevelController = require('./BE/controllers/Admin/mapping-controller');
+const adminReasonController = require('./BE/controllers/Admin/reason-controller');
 const adminStaffLevelController = require("./BE/controllers/Admin/staff-level-controller");
 const adminSizeController = require('./BE/controllers/Admin/size-controller');
 const adminStatusController = require("./BE/controllers/Admin/status-controller");
@@ -229,6 +230,7 @@ const apiMaterial = require('./BE/API/admin/api-material');
 const apiAdminModule = require('./BE/API/admin/api-module');
 const apiAdminNationalStyle = require('./BE/API/admin/api-national-style');
 const apiAdminMapping  = require('./BE/API/admin/api-mapping');
+const apiAdminReason = require('./BE/API/admin/api-reason');
 const apiAdminSize = require('./BE/API/admin/api-size');
 const apiAdminStaffLevel = require('./BE/API/admin/api-staff-level');
 const apiAdminStatus = require('./BE/API/admin/api-status');
@@ -361,6 +363,7 @@ app.use('/admin/material',apiMaterial);//quan ly don gia hinh anh dau vao duoc c
 app.use('/admin/module',apiAdminModule);// quản lý danh sách module của web
 app.use('/admin/national-style',apiAdminNationalStyle);//quản lý thông tin style của khách hàng theo quốc gia
 app.use('/admin/mapping',apiAdminMapping);
+app.use('/admin/reason',apiAdminReason);//quan ly ly do huy task
 app.use('/admin/size',apiAdminSize);//quản lý thông tin kích thước file hình ảnh 
 app.use('/admin/staff-level',apiAdminStaffLevel);//quản lý level của nhân viên, phân loại nhân viên: người mới, tập sự, học việc,...
 app.use('/admin/status',apiAdminStatus);//trạng thái của đơn hàng, tạm thời không sử dụng tới
@@ -396,6 +399,7 @@ app.use('/admin/setting/material',adminMaterialController);
 app.use('/admin/setting/module',adminModuleController);
 app.use('/admin/setting/national-style',adminNationalStyleController);
 app.use('/admin/setting/mapping',adminParentsLevelController);
+app.use('/admin/setting/reason',adminReasonController);
 app.use("/admin/setting/size", adminSizeController);
 app.use("/admin/setting/status", adminStatusController);
 app.use("/admin/setting/style", adminStyleController);
