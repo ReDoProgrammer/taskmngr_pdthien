@@ -131,8 +131,14 @@ app.use('/dc/task',dcTaskAPI);
 
 
 //Q.A CONTROLLERS
-const qaAuthController = require('./BE/API/qa/authenticate');
-app.use('/qa/auth',qaAuthController);
+const qaAuthAPI = require('./BE/API/qa/authenticate');
+app.use('/qa/auth',qaAuthAPI);
+
+const qaEditorController =require('./BE/controllers/qa/editor-controller');
+app.use('/qa/editor',qaEditorController);
+
+const qaEditorAPI = require('./BE/API/qa/api-editor');
+app.use('/qa/editor',qaEditorAPI);
 
 const qaTaskController = require('./BE/controllers/qa/task-controller');
 app.use('/qa/task',qaTaskController);
