@@ -58,7 +58,7 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
             { path: 'editor.staff', select: 'fullname username' },
             { path: 'qa.staff', select: 'fullname username' },
             { path: 'dc.staff' },
-            {path:'basic.mapping'}
+            { path: 'basic.mapping' }
         ]);
 
     return res.status(200).json({
@@ -215,8 +215,8 @@ router.get('/detail', authenticateTLAToken, async (req, res) => {
 router.post('/', authenticateTLAToken, async (req, res) => {
     let {
         jobId,
-        customer_level,   
-        price,    
+        customer_level,
+        price,
         level,
         assigned_date,
         deadline,
@@ -234,7 +234,7 @@ router.post('/', authenticateTLAToken, async (req, res) => {
     task.basic = {
         job: jobId,
         level,
-        mapping:customer_level,
+        mapping: customer_level,
         deadline: {
             begin: assigned_date,
             end: deadline
@@ -266,8 +266,8 @@ router.post('/', authenticateTLAToken, async (req, res) => {
 
 
     await task.save()
-        .then(async _ => {           
-            Promise.all([PushTaskIntoJob(jobId, task._id, customer_level,price), UpdateEditor(task._id, level, editor, req.user._id), PushCC(jobId, cc, task._id, customer_level)])
+        .then(async _ => {
+            Promise.all([PushTaskIntoJobLine(jobId, task._id, customer_level, price), UpdateEditor(task._id, level, editor, req.user._id), PushCC(jobId, cc, task._id, customer_level)])
                 .then(_async => {
                     UpdateQA(task._id, level, qa, req.user._id)
                         .then(_ => {
@@ -309,7 +309,7 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
         is_root
     } = req.body;
 
-    
+
     let task = await Task.findById(taskId);
 
     if (!task) {
@@ -344,7 +344,7 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
 
     await task.save()
         .then(_ => {
-           Promise.all([ChangeVisibleEditor(task._id, editor), PushCC(task.basic.job, cc, task._id, root_id, is_root)])
+            Promise.all([ChangeVisibleEditor(task._id, editor), PushCC(task.basic.job, cc, task._id, root_id, is_root)])
                 .then(_ => {
                     ChangeVisibleQA(task._id, qa)
                         .then(_ => {
@@ -352,7 +352,7 @@ router.put('/cc', authenticateTLAToken, async (req, res) => {
                                 .then(_ => {
                                     UpdateQA(task._id, level, qa, req.user._id)
                                         .then(_ => {
-                                            
+
                                             return res.status(200).json({
                                                 msg: `The task has been updated!`
                                             })
@@ -552,101 +552,161 @@ router.delete('/', authenticateTLAToken, async (req, res) => {
     let { taskId } = req.body;
 
     let task = await Task.findById(taskId);
-    if(!task){
+    if (!task) {
         return res.status(404).json({
-            msg:`Task not found!`
+            msg: `Task not found!`
         })
     }
 
-    if(task.status >0){
+    if (task.status > 0) {
         return res.status(409).json({
-            msg:`Can not delete task after submiting!`
+            msg: `Can not delete task after submiting!`
         })
     }
     await task.delete()
-    .then(_=>{
-        PullTaskFromJob(task.basic.job,task.basic.mapping,task._id)
-        .then(_=>{
-            return res.status(200).json({
-                msg:`The task has been deleted!`
+        .then(_ => {
+            PullTaskFromJob(task.basic.job, task.basic.mapping, task._id)
+                .then(_ => {
+                    return res.status(200).json({
+                        msg: `The task has been deleted!`
+                    })
+                })
+                .catch(err => {
+                    return res.status(err.code).json({
+                        msg: err.msg
+                    })
+                })
+        })
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not delete this task with error: ${new Error(err.message)}`
             })
         })
-        .catch(err=>{
-            return res.status(err.code).json({
-                msg:err.msg
-            })
-        })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not delete this task with error: ${new Error(err.message)}`
-        })
-    })
-    
+
 })
 
 
 module.exports = router;
 
-const PushTaskIntoJob = (jobId, taskId, customer_job_level,price) => {
-    return new Promise(async (resolve,reject)=>{
-        let jl = await JobLine.findOne({job:jobId,level:customer_job_level});
-        if(!jl){
-            jl = new JobLine({
-                job:jobId,
-                level:customer_job_level,
-                price,
-                tasks:[taskId]
+const PushJobLineIntoJob = (jobId, jobLineId) => {
+    return new Promise(async (resolve, reject) => {
+        let job = await Job.findById(jobId);
+        if (!job) {
+            return reject({
+                code: 404,
+                msg: `Can not push job line into job when job not found!`
             })
-        }else{
-            jl.tasks.push(taskId);
         }
-        await jl.save()
-        .then(_=>{
+
+        if (job.job_lines.includes(jobLineId)) {
             return resolve();
-        })
+        } else {
+            job.job_lines.push(jobLineId);
+            await job.save()
+                .then(_ => { return resolve() })
+                .catch(err => {
+                    return reject({
+                        code: 500,
+                        msg: `Can not push job line into job with error: ${new Error(err.message)}`
+                    })
+                })
+        }
+    })
+}
+
+const PullJobLineFromJob = (jobId,jobLineId)=>{
+    return new Promise(async (resolve,reject)=>{
+        let job = await Job.findById(jobId);
+        if(!job){
+            return reject({
+                code:404,
+                msg:`Can not pull job line from job cause job not found!`
+            })
+        }
+
+        job.job_lines.pull(jobLineId);
+
+        await job.save()
+        .then(_=>{return resolve()})
         .catch(err=>{
             return reject({
                 code:500,
-                msg:`Can not push task into job with error: ${new Error(err.message)}`
+                msg:`Can not remove job line out of job with error: ${new Error(err.message)}`
             })
         })
     })
 }
 
-const PullTaskFromJob = (jobId,level, taskId) => {
+const PushTaskIntoJobLine = (jobId, taskId, customer_job_level, price) => {
     return new Promise(async (resolve, reject) => {
-        let jl = await JobLine.findOne({job:jobId,level});
-        if(!jl){
+        let jl = await JobLine.findOne({ job: jobId, level: customer_job_level });
+        if (!jl) {
+            jl = new JobLine({
+                job: jobId,
+                level: customer_job_level,
+                price,
+                tasks: [taskId]
+            })
+        } else {
+            jl.tasks.push(taskId);
+        }
+        await jl.save()
+            .then(_ => {
+                PushJobLineIntoJob(jobId, jl._id)
+                    .then(_ => {
+                        return resolve();
+                    })
+                    .catch(err => {
+                        return reject(err);
+                    })
+
+            })
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not push task into job with error: ${new Error(err.message)}`
+                })
+            })
+    })
+}
+
+const PullTaskFromJob = (jobId, level, taskId) => {
+    return new Promise(async (resolve, reject) => {
+        let jl = await JobLine.findOne({ job: jobId, level });
+        if (!jl) {
             return reject({
-                code:404,
-                msg:`Job line not found!`
+                code: 404,
+                msg: `Job line not found!`
             })
         }
 
         jl.tasks.pull(taskId);
-        if(jl.tasks.length == 0){
+        if (jl.tasks.length == 0) {
             await jl.delete()
-            .then(_=> {return resolve()})
-            .catch(err=>{
-                return reject({
-                    code:500,
-                    msg:`Can not delete job line when tasks list is empty with error: ${new Error(err.message)}`
+                .then(_ => { 
+                    PullJobLineFromJob(jobId,jl)
+                    .then(_=>{return resolve();})
+                    .catch(err=>{return reject(err)})                   
                 })
-            })
-        }else{
+                .catch(err => {
+                    return reject({
+                        code: 500,
+                        msg: `Can not delete job line when tasks list is empty with error: ${new Error(err.message)}`
+                    })
+                })
+        } else {
             await jl.save()
-            .then(_=>{ return resolve()})
-            .catch(err=>{
-                return reject({
-                    code:500,
-                    msg:`Can not remove task out of job with error: ${new Error(err.message)}`
+                .then(_ => { return resolve() })
+                .catch(err => {
+                    return reject({
+                        code: 500,
+                        msg: `Can not remove task out of job with error: ${new Error(err.message)}`
+                    })
                 })
-            })
         }
 
-       
-       
+
+
     })
 }
 
@@ -836,7 +896,7 @@ const PushCC = (jobId, ccId, taskId, rootId) => {
         }
 
         let cc = (job.cc.filter(x => x._id == ccId))[0];
-        
+
 
 
         cc.tasks.push(taskId);
