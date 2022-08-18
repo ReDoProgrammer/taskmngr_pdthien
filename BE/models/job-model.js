@@ -153,7 +153,11 @@ const jobSchema = new Schema({
     urgent: {
         type: Boolean,
         default: false
-    }
+    },
+    job_line:[{
+        type:Schema.Types.ObjectId,
+        ref:'job_line'
+    }]
 });
 
 
