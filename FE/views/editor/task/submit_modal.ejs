@@ -68,7 +68,7 @@
         })
     });
     $('#modalSubmitTask').on('hidden.bs.modal', function () {
-        LoadTasks(); 
+        LoadTasks();
     });
 
     $('#btnSubmitTaskDone').click(function () {
@@ -95,12 +95,13 @@
                 amount
             },
             success: function (data) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Successfully!',
-                    text: data.msg
+                $.toast({
+                    heading: 'Successfully',
+                    text: data.msg,
+                    showHideTransition: 'fade',
+                    icon: 'success'
                 });
-                $('#modalSubmitTask').modal('hide');             
+                $('#modalSubmitTask').modal('hide');
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 alert(jqXHR.responseJSON.msg);

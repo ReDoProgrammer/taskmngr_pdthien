@@ -1,33 +1,38 @@
 <div class="row mt-2">
-  <div class="col-md-8 col-sm-8 col-xs-6">
-    <select id="slStatus" class="selectpicker form-control" multiple title="Choose one of the following status">
-      <option value="-10">Wait</option>
-      <option value="1">Editor submited</option>
-      <option value="-1">Initial</option>
-      <option value="0">Editing</option>
-      <option value="2">Q.A submited</option>
-      <option value="3">DC submited</option>
-      <option value="4">Uploaded</option>
-      <option value="-2">Q.A rejected</option>
-      <option value="-3">DC rejected</option>
-      <option value="-4">Canceled</option>
-    </select>
-  </div>
-  <div class="col-md-4 col-sm-4 col-xs-6  text-right">
-    <div class="input-group">
-      <input type="text" class="form-control" placeholder="Seach task..." id="txtSearchTask" />
-      <div class="input-group-btn">
-        <button class="btn btn-info" id="btnSearchTask">
-          <i class="fa fa-search" aria-hidden="true"></i>
-        </button>
-        <button class="btn btn-primary" id="btnGetTask">
-          <i class="fa fa-plus" aria-hidden="true"></i>
-          Get more
-        </button>
+  <div class="col-md-8 col-md-offset-4 text-right">
+      <div class="input-group">
+          <div class="input-group-btn">
+              <select id="slStatus" multiple="multiple form-control">
+                  <option value="-10">Wait</option>
+                  <option value="1">Editor submited</option>
+                  <option value="-1">Initial</option>
+                  <option value="0">Editing</option>
+                  <option value="2">Q.A submited</option>
+                  <option value="3">DC submited</option>
+                  <option value="4">Uploaded</option>
+                  <option value="-2">Q.A rejected</option>
+                  <option value="-3">DC rejected</option>
+                  <option value="-4">Canceled</option>
+              </select>
+
+          </div><!-- /btn-group -->
+          <input type="text" class="form-control" placeholder="Seach task..." id="txtSearchTask" />
+          <div class="input-group-btn">
+
+              <button class="btn btn-info" type="submit" id="btnSearch">
+                  <i class="fa fa-search" aria-hidden="true"></i>
+              </button>
+              <button class="btn btn-primary" id="btnGetTask">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+                Get more
+              </button>
+          </div>
       </div>
-    </div>
   </div>
 </div>
+
+
+
 <div class="table-responsive mt-2">
   <table class="table table-striped text-nowrap">
     <thead class="thead-dark">
@@ -182,7 +187,7 @@
                   tr += '<td>' + (++idx) + '</td>';
                   tr += '<td class="font-weight-bold text-info">' + (getFirstLetters(t.basic.job.customer.name.firstname + ' ' + t.basic.job.customer.name.lastname)).toUpperCase() + getLastLetters(t.basic.job.customer._id) + '</td>';
                   tr += '<td class="font-weight-bold">' + t.basic.job.name + '</td>';
-                  tr += '<td class="font-weight-bold">';
+                  tr += '<td class="font-weight-bold text-danger">';
                   tr += t.basic.level.name
                   let chk = (t.basic.job.cc.filter(x => x.tasks.includes(t._id))).length > 0 ? true : false;
                   if (chk) {

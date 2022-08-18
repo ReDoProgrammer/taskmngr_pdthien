@@ -68,12 +68,13 @@
                 amount
             },
             success: function (data) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Deleted',
-                    text: data.msg
+                $.toast({
+                    heading: 'Successfully',
+                    text: data.msg,
+                    showHideTransition: 'fade',
+                    icon: 'success'
                 });
-                $('#modalChangeNumber').modal('hide');               
+                $('#modalChangeNumber').modal('hide');
             },
             error: function (request, status, error) {
                 Swal.fire({
@@ -86,7 +87,7 @@
         })
     })
     $('#modalChangeNumber').on('hidden.bs.modal', function () {
-        LoadTasks(); 
+        LoadTasks();
     });
 
 </script>
