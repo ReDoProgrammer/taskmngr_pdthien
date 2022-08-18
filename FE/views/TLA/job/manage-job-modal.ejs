@@ -653,7 +653,8 @@
       },
       data: { taskId },
       success: function (data) {
-        console.log(data.task)
+        $('#slCustomerLevles').val(data.task.basic.mapping);
+        LoadLocalLevel();
         $('#slLocalLevels').val(data.task.basic.level._id);
         $('#txtAssignDate').val(convertISODateToTimeFormat(data.task.basic.deadline.begin));
         $('#txtDeadline').val(convertISODateToTimeFormat(data.task.basic.deadline.end));
@@ -701,82 +702,7 @@
 </script>
 
 <script>
-  function LoadAvailableTasks() {
-    $.ajax({
-      url: '/tla/task/list-based-on-root',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        jobId,
-        rootId: $('#slCustomerLevles option:selected').val(),
-        is_root: parseInt($('#slCustomerLevles option:selected').data('root'))
-      },
-      success: function (data) {
-        $('#slLocalLevels').empty();
-        data.tasks.forEach(t => {
-          let opt = '<option value="' + t.basic.level._id + '" data-task="' + t._id + '">' + t.basic.level.name + '</option>';
-          $('#slLocalLevels').append(opt);
-        })
-        LoadQA();
-        LoadEditor();
-        $.ajax({
-          url: '/tla/task/detail',
-          type: 'get',
-          headers: {
-            authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-          data: {
-            taskId: $('#slLocalLevels option:selected').data('task')
-          },
-          success: function (data) {
-            levelId = data.task.basic.level._id;
-            $('#divAddOrUpdateTask').slideUp(200);
-            $('#divAddOrUpdateTask').slideDown(1000);
-            $('#slJobLevels').val(data.task.basic.level._id);
-            $('#slJobLevels').attr("disabled", true);
-            $('#txtAssignDate').val(convertISODateToTimeFormat(data.task.basic.deadline.begin));
-            if (data.task.basic.deadline.end) {
-              $('#txtDeadline').val(convertISODateToTimeFormat(data.task.basic.deadline.end));
-            }
-            $('#txtInputLink').val(data.task.basic.link.input);
-            $('#txtRemark').val(ccRemark);
-            $('#ckbAssignQA').prop('checked', (data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla !== 'undefined') ? true : false);
-            if (data.task.editor.length === 0) {
-              $('#ckbAssignEditor').show();
-              $('#ckbAssignEditor').prop('checked', false);
-              $('#colEditor').slideUp();
-            } else {
-              $('#ckbAssignEditor').prop('checked', true);
-              $('#ckbAssignEditor').show();
-              $('#colEditor').show();
-              $('#slEditor').val(data.task.editor[data.task.editor.length - 1].staff._id).selectpicker('refresh');
-            }
-            if ((data.task.qa.length > 0 && data.task.qa[data.task.qa.length - 1].tla !== 'undefined')) {
-              $('#colQA').show();
-              $('#slQA').val(data.task.qa[data.task.qa.length - 1].staff._id).selectpicker('refresh');
-              if (data.task.status > 1) {
-                $('#ckbAssignQA').attr("disabled", true);
-                $('#slQA').attr("disabled", true);
-              } else {
-                $('#ckbAssignQA').attr("disabled", false);
-                $('#slQA').attr("disabled", false);
-              }
-            } else {
-              $('#colQA').hide();
-            }
-
-            if (data.task.status == -10) {
-              $('#rbtPause').prop('checked', true);
-            } else {
-              $('#rbtStart').prop('checked', true);
-            }
-          }
-        })
-      }
-    })
-  }
+ 
 
 
   function LoadEditor() {
