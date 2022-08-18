@@ -1,8 +1,8 @@
 const router = require('express').Router();
 const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const Job = require('../../models/job-model');
-const Parents = require('../../models/mapping-model');
-const LocalLevel = require('../../models/job-level-model');
+const Mapping = require('../../models/mapping-model');
+const Level = require('../../models/job-level-model');
 
 const pageSize = 20;
 
@@ -175,58 +175,16 @@ router.get('/detail', authenticateTLAToken, async (req, res) => {
 })
 
 router.get('/local-level', authenticateTLAToken, async (req, res) => {
-    let { customer_level, is_root } = req.query;
-    let levels = [];
-
-    if (is_root == 'true') {
-        let root = await Root.findById(customer_level)
-            .populate({
-                path: 'parents',
-                populate: {
-                    path: 'job_levels'
-                }
-            });
-
-        if (root) {
-            root.parents.forEach(p => {
-                p.job_levels.forEach(l => {
-                    const isFound = levels.some(x => {
-                        if (x._id == l._id) {
-                            return true;
-                        }
-                        return false;
-                    })
-                    if (!isFound) {
-                        levels.push({
-                            _id: l._id,
-                            name: l.name
-                        })
-                    }
-                })
-
-            })
-            return res.status(200).json({
-                msg: `Load local levels successfully!`,
-                levels
-            })
-        }
-
-    } else {
-        let parents = await Parents.findById(customer_level).populate('job_levels');
-        if (parents) {
-            levels = parents.job_levels.map(x => {
-                let obj = {};
-                obj._id = x._id;
-                obj.name = x.name;
-                return obj;
-            })
-            return res.status(200).json({
-                msg: `Load local levels successfully!`,
-                levels
-            })
-        }
-    }
-
+    let { customer_level } = req.query;
+    
+    let map = await Mapping.findById(customer_level);
+    
+    let levels = await Level.find({_id:{$in:map.levels}});
+    
+    return res.status(200).json({
+        msg:`Load local levels successfully!`,
+        levels
+    })
 
 
 })

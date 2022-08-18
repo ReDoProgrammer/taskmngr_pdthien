@@ -43,8 +43,13 @@ router.get('/detail',authenticateTLAToken,async (req,res)=>{
         {path:'style.color'},
         {path:'style.cloud'},
         {path:'style.nation'},
-        {path:'contracts.root'},
-        {path:'contracts.parents'}
+        {
+            path:'contracts.mapping',
+            populate:{
+                path:'levels'
+            }
+        }
+     
     ]);
     if(!customer){
         return res.status(404).json({

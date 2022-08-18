@@ -451,7 +451,7 @@
                     let tr = '<tr id="' + job._id + '" data-customer="' + job.customer._id + '">';
                     tr += '<td>';
                     let size = 0;
-                   
+
                     if (size > 0) {
                         tr += '<button class="btn btn-xs btn-info parents js-view-parents" name="js-view-parents"> (';
                         tr += size;
@@ -484,8 +484,11 @@
                     }
                     tr += '</td>';
                     tr += '<td class="font-weight-bold">';
-                    let levels = job.template.levels.map(x=>` ${x.name}`)
-                    tr += job.template.name +'[ <span class="text-danger font-weight-bold">'+levels+']</span>';
+                    if (job.template) {
+                        let levels = job.template.levels.map(x => ` ${x.name}`)
+                        tr += job.template.name + '[ <span class="text-danger font-weight-bold">' + levels + ']</span>';
+                    }
+
                     tr += '</td>';
                     tr += "<td>" + convertISODateToTimeFormat(job.deadline.begin) + "</td>";
                     tr += '<td ';
@@ -549,14 +552,16 @@
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
             data: { customerId },
-            success: function (data) {
-                CustomerLevels = data.customer.contracts.map(x => {
+            success: function (data) {                
+                CustomerLevels = data.customer.contracts.map(x=>{
                     let obj = {};
-                    obj._id = x.root ? x.root._id : x.parents._id;
-                    obj.name = x.root ? x.root.name : x.parents.name;
-                    obj.is_root = x.root ? 1 : 0;
+                    obj._id = x.mapping._id;
+                    obj.name = x.mapping.name;
+                    obj.levels = x.mapping.levels.map(y=>y.name)
                     return obj;
-                })
+                });
+                
+                
                 BindContract();
 
 

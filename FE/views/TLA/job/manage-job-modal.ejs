@@ -794,8 +794,7 @@
         authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       data: {
-        customer_level: $('#slCustomerLevles option:selected').val(),
-        is_root: $('#slCustomerLevles option:selected').data('root') == '1' ? true : false
+        customer_level: $('#slCustomerLevles option:selected').val()        
       },
       success: function (data) {
         $('#slLocalLevels').empty();
@@ -813,7 +812,7 @@
   function BindContract() {
     $('#slCustomerLevles').empty();
     CustomerLevels.forEach(l => {
-      $('#slCustomerLevles').append('<option value="' + l._id + '" data-root="' + l.is_root + '">' + l.name + '</option>')
+      $('#slCustomerLevles').append('<option value="' + l._id + '" >' + l.name + ' ['+l.levels+']</option>')
     })
     LoadLocalLevel();
   }
