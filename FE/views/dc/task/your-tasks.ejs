@@ -146,11 +146,12 @@
                 taskId
               },
               success: function (data) {
-                Swal.fire(
-                  'Done!',
-                  data.msg,
-                  'success'
-                )
+                $.toast({
+                  heading: 'Successfully',
+                  text: data.msg,
+                  showHideTransition: 'fade',
+                  icon: 'success'
+                });
                 LoadTasks();
               }, error: function (request, status, error) {
                 Swal.fire(
@@ -250,7 +251,12 @@
           taskId
         },
         success: function (data) {
-          alert(data.msg);
+          $.toast({
+            heading: 'Successfully',
+            text: data.msg,
+            showHideTransition: 'fade',
+            icon: 'success'
+          });
           LoadTasks();
         }
       })

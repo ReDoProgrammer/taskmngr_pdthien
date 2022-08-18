@@ -64,7 +64,11 @@
                 })
             },
             error: function (request, status, error) {
-                alert(request.responseJSON.msg)
+                Swal.fire(
+                    'Oop...!',
+                    request.responseJSON.msg,
+                    'error'
+                )
             }
         })
     }
@@ -100,11 +104,12 @@
                 remark
             },
             success: function (data) {
-                Swal.fire(
-                    'Successfully!',
-                    data.msg,
-                    'success'
-                )
+                $.toast({
+                    heading: 'Successfully',
+                    text: data.msg,
+                    showHideTransition: 'fade',
+                    icon: 'success'
+                });
                 $('#modalBonusOrPenalty').modal('hide');
                 LoadTasks();
             },
