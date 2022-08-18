@@ -136,6 +136,7 @@ const GetTask = taskId => {
             .populate([
                 { path: 'basic.job' },
                 { path: 'basic.level' },
+                {path:'basic.mapping', select:'name -_id'},
                 { path: 'editor.staff', select: 'username fullname' },
                 { path: 'qa.staff', select: 'username fullname' },
                 { path: 'dc.staff', select: 'username fullname' },

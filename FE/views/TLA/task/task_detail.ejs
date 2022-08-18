@@ -195,7 +195,7 @@
 
                 $('#lblJobName').text(data.task.basic.job.name);
 
-                $('#lblLevelName').text(data.task.basic.level.name);
+                $('#lblLevelName').html('<span class="text-danger font-weight-bold">'+data.task.basic.mapping.name+'</span> - '+data.task.basic.level.name);
                 $('#lblAssignDate').text(convertISODateToTimeFormat(data.task.basic.deadline.begin));
                 if (data.task.basic.deadline.end) {
                     $('#lblDeadline').text(convertISODateToTimeFormat(data.task.basic.deadline.end));

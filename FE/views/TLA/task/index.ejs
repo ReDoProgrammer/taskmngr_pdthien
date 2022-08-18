@@ -1,23 +1,25 @@
 <div class="row mt-2">
-    <div class="col-md-8 col-sm-8 col-xs-6">
-        <select id="slStatus" class="selectpicker form-control" multiple title="Choose one of the following status">
-            <option value="-10">Wait</option>
-            <option value="1">Editor submited</option>
-            <option value="-1">Initial</option>
-            <option value="0">Editing</option>
-            <option value="2">Q.A submited</option>
-            <option value="3">DC submited</option>
-            <option value="4">Uploaded</option>
-            <option value="-2">Q.A rejected</option>
-            <option value="-3">DC rejected</option>
-            <option value="-4">Canceled</option>
-        </select>
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-6  text-right">
+    <div class="col-md-4 col-md-offset-8 text-right">
         <div class="input-group">
-            <input type="text" class="form-control" placeholder="Seach task..." id="txtSearchTask" />
             <div class="input-group-btn">
-                <button class="btn btn-info" id="btnSearchTask">
+                <select id="slStatus" multiple="multiple form-control">
+                    <option value="-10">Wait</option>
+                    <option value="1">Editor submited</option>
+                    <option value="-1">Initial</option>
+                    <option value="0">Editing</option>
+                    <option value="2">Q.A submited</option>
+                    <option value="3">DC submited</option>
+                    <option value="4">Uploaded</option>
+                    <option value="-2">Q.A rejected</option>
+                    <option value="-3">DC rejected</option>
+                    <option value="-4">Canceled</option>
+                </select>       
+    
+            </div><!-- /btn-group -->
+            <input type="text" class="form-control" placeholder="Seach job..." id="txtSearch" />
+            <div class="input-group-btn">
+    
+                <button class="btn btn-info" type="submit" id="btnSearch">
                     <i class="fa fa-search" aria-hidden="true"></i>
                 </button>
                 <button class="btn btn-success" id="btnExportExcel">
