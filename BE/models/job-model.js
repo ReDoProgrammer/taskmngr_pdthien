@@ -153,11 +153,18 @@ const jobSchema = new Schema({
     levels: [
         {
             type: Schema.Types.ObjectId,
-            ref: 'mapping',
-            tasks: {
-                type: Schema.Types.ObjectId,
-                ref: 'task'
-            },
+            ref: 'mapping'
+        },
+        {
+            tasks: [
+                {
+                    type: Schema.Types.ObjectId,
+                    ref: 'task'
+                }
+            ],
+            
+        },
+        {
             price: {
                 type: Number
             }

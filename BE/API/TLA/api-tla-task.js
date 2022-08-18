@@ -214,8 +214,7 @@ router.get('/detail', authenticateTLAToken, async (req, res) => {
 router.post('/', authenticateTLAToken, async (req, res) => {
     let {
         jobId,
-        customer_level,
-        is_root,
+        customer_level,       
         level,
         assigned_date,
         deadline,
@@ -262,8 +261,8 @@ router.post('/', authenticateTLAToken, async (req, res) => {
     ]
 
     await task.save()
-        .then(async _ => {
-            Promise.all([PushTaskIntoJob(jobId, task._id, customer_level, is_root), UpdateEditor(task._id, level, editor, req.user._id), PushCC(jobId, cc, task._id, customer_level, is_root)])
+        .then(async _ => {           
+            Promise.all([PushTaskIntoJob(jobId, task._id, customer_level), UpdateEditor(task._id, level, editor, req.user._id), PushCC(jobId, cc, task._id, customer_level)])
                 .then(_async => {
                     UpdateQA(task._id, level, qa, req.user._id)
                         .then(_ => {
@@ -580,48 +579,39 @@ router.delete('/', authenticateTLAToken, async (req, res) => {
 
 module.exports = router;
 
-const PushTaskIntoJob = (jobId, taskId, customer_job_level, is_root) => {
-    return new Promise(async (resolve, reject) => {
+const PushTaskIntoJob = (jobId, taskId, customer_job_level) => {
+    return new Promise(async (resolve,reject)=>{
         let job = await Job.findById(jobId);
-        if (!job) {
+        if(!job){
             return reject({
-                code: 404,
-                msg: `Job not found!`
+                code:404,
+                msg:`Job not found!`
             })
         }
-
-        if (is_root == 'true') {
-            let chk = job.root.filter(x => x.ref == customer_job_level);
-            if (chk.length > 0) {
-                chk[0].tasks.push(taskId);
-            } else {
-                job.root.push({
-                    ref: customer_job_level,
-                    tasks: [taskId]
-                });
+        let levels = job.levels.filter(x=>x._id == customer_job_level);
+        if(levels.length>0){
+            if(levels[0].tasks && levels[0].tasks.length > 0){
+                levels[0].tasks.push(taskId);
+            }else{
+                levels[0].tasks = [taskId];
             }
-        } else {
-            let chk = job.parents.filter(x => x.ref == customer_job_level);
-            if (chk.length > 0) {
-                chk[0].tasks.push(taskId);
-            } else {
-                job.parents.push({
-                    ref: customer_job_level,
-                    tasks: [taskId]
-                });
-            }
+           
+        }else{
+            job.levels.push(customer_job_level);
+            job.levels[0].tasks = [taskId];
         }
 
         await job.save()
-            .then(_ => {
-                return resolve(job);
+        .then(_=>{
+            return resolve();
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not push task into job with error: ${new Error(err.message)}`
             })
-            .catch(err => {
-                return reject({
-                    code: 500,
-                    msg: `Can not add task into job with error: ${new Error(err.message)}`
-                })
-            })
+        })
+       
     })
 }
 
@@ -832,7 +822,7 @@ const ChangeVisibleQA = (taskId, qa) => {
     })
 }
 
-const PushCC = (jobId, ccId, taskId, rootId, is_root) => {
+const PushCC = (jobId, ccId, taskId, rootId) => {
     return new Promise(async (resolve, reject) => {
         if (!ccId) {
             return resolve();
@@ -847,15 +837,7 @@ const PushCC = (jobId, ccId, taskId, rootId, is_root) => {
         }
 
         let cc = (job.cc.filter(x => x._id == ccId))[0];
-        if (is_root == 1) {
-            if (cc.root) {
-                cc.root = rootId;
-            }
-        } else {
-            if (cc.parents) {
-                cc.parents = rootId;
-            }
-        }
+        
 
 
         cc.tasks.push(taskId);
