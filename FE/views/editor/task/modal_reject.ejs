@@ -36,8 +36,20 @@
                 remark: $('#txtRejectReason').val()
             },
             success: function (data) {
-                alert(data.msg);
+                $.toast({
+                    heading: 'Successfully',
+                    text: data.msg,
+                    showHideTransition: 'fade',
+                    icon: 'success'
+                });
                 $('#modalReject').modal('hide');
+            },
+            error: function (request, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oo0pppp! ....',
+                    text: request.responseJSON.msg
+                });
             }
         })
     })
