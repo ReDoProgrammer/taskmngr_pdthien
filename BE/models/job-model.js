@@ -149,28 +149,6 @@ const jobSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'template'
     },
-    //join job level khach hang & don gia khi TLA tao task
-    levels: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: 'mapping'
-        },
-        {
-            tasks: [
-                {
-                    type: Schema.Types.ObjectId,
-                    ref: 'task'
-                }
-            ],
-            
-        },
-        {
-            price: {
-                type: Number
-            }
-        }
-    ],
-
     //thuộc tính đánh dấu mức độ ưu tiên của job
     urgent: {
         type: Boolean,
