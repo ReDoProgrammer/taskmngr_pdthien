@@ -444,6 +444,14 @@ router.put('/cancel', authenticateTLAToken, async (req, res) => {
         by: req.user._id
     };
 
+    task.remarks.push({
+        content:remark,
+        created:{
+            by:req.user._id,
+            at:new Date()
+        }
+    })
+
     await task.save()
     .then(_=>{
         return res.status(200).json({
