@@ -50,13 +50,13 @@ const ccSchema = new Schema({
     },
     status: {
         /*
-            0: initial
-            1: processing
-           2: Done
+            -1: initial
+            0: processing
+           1: Done
 
         */
         type: Number,
-        default: 0
+        default: -1
     }
 
 

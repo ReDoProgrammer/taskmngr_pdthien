@@ -7,12 +7,12 @@ const {
 
 const pageSize = 20;
 router.get('/list-available-tasks',authenticateSaleToken,async (req,res)=>{
-    //ham tra ve nhung task da dc it nhat DC submit 
+    //ham tra ve nhung task da upload boi TLA
     //de Sale co the CC vao nhung task nay
     let {jobId} = req.query;
     let tasks = await Task.find({
       'basic.job':jobId,
-      status:{$lte:3}
+      status:{$lte:4}
     })
     .populate([
         {path:'basic.level',select:'name'},
