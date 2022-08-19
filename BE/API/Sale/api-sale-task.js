@@ -79,6 +79,12 @@ router.get('/all', authenticateSaleToken, async (req, res) => {
                 populate: {
                     path: 'customer',
                     select: 'name.firstname name.lastname'
+                }               
+            },
+            {
+                path:'basic.job',
+                populate:{
+                    path:'cc'
                 }
             },
             { path: 'basic.level', select: 'name' },
