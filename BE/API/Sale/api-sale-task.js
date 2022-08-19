@@ -24,7 +24,8 @@ router.get('/list', authenticateSaleToken, (req, res) => {
             { path: 'dc.staff', select: 'fullname username' },
             { path: 'tla.created.by', select: 'fullname username' },
             { path: 'tla.uploaded.by', select: 'fullname username' },
-            { path: 'remarks.created.by' }
+            { path: 'remarks.created.by' },
+            {path:'canceled.reason',select:'name'}
 
         ])
         .exec()
@@ -68,7 +69,8 @@ router.get('/all', authenticateSaleToken, async (req, res) => {
             { path: 'qa.staff', select: 'username fullname' },
             { path: 'dc.staff', select: 'username fullname' },
             { path: 'tla.uploaded.by', select: 'username fullname' },
-            { path: 'remarks' }
+            { path: 'remarks' },
+            {path:'canceled.reason',select:'name'}
         ]);
 
     let count = await Task.countDocuments({});

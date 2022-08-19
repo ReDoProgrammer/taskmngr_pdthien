@@ -226,8 +226,6 @@ router.get('/personal-tasks', authenticateDCToken, async (req, res) => {
         return parseInt(x.trim());
     })
 
-    console.log(stt)
-
     let tasks = await Task
         .find({
             status: { $in: stt },
