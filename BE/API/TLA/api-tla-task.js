@@ -72,7 +72,6 @@ router.get('/all', authenticateTLAToken, async (req, res) => {
     let stt = (status.split(',')).map(x => {
         return parseInt(x.trim());
     })
-    console.log(stt)
 
     let tasks = await Task
         .find({ status: { $in: stt } })
@@ -93,7 +92,8 @@ router.get('/all', authenticateTLAToken, async (req, res) => {
             { path: 'qa.staff', select: 'username fullname' },
             { path: 'dc.staff', select: 'username fullname' },
             { path: 'remarks' },
-            { path: 'bp.bpId', select: 'is_bonus' }
+            { path: 'bp.bpId', select: 'is_bonus' },
+            { path: 'canceled.reason', select: 'name' }
         ]);
 
     let count = await Task.countDocuments({});
@@ -428,12 +428,12 @@ router.put('/upload', authenticateTLAToken, async (req, res) => {
 })
 
 router.put('/cancel', authenticateTLAToken, async (req, res) => {
-    let { taskId, reason, penalty,fines, remark } = req.body;
+    let { taskId, reason, penalty, fines, remark } = req.body;
     let task = await Task.findById(taskId);
 
-    if(!task){
+    if (!task) {
         return res.status(404).json({
-            msg:`Task not found!`
+            msg: `Task not found!`
         })
     }
 
@@ -446,27 +446,27 @@ router.put('/cancel', authenticateTLAToken, async (req, res) => {
     };
 
     task.remarks.push({
-        content:remark,
-        created:{
-            by:req.user._id,
-            at:new Date()
+        content: remark,
+        created: {
+            by: req.user._id,
+            at: new Date()
         }
     })
 
     task.status = -5;//trang thai task bi TLA cancel
 
     await task.save()
-    .then(_=>{
-        return res.status(200).json({
-            msg:`The task has been canceled!`
+        .then(_ => {
+            return res.status(200).json({
+                msg: `The task has been canceled!`
+            })
         })
-    })
-    .catch(err=>{
-        return res.status(500).json({
-            msg:`Can not cancel this task with caught error: ${new Error(err.message)}`
+        .catch(err => {
+            return res.status(500).json({
+                msg: `Can not cancel this task with caught error: ${new Error(err.message)}`
+            })
         })
-    })
-    
+
 })
 
 
@@ -628,26 +628,26 @@ const PushJobLineIntoJob = (jobId, jobLineId) => {
     })
 }
 
-const PullJobLineFromJob = (jobId,jobLineId)=>{
-    return new Promise(async (resolve,reject)=>{
+const PullJobLineFromJob = (jobId, jobLineId) => {
+    return new Promise(async (resolve, reject) => {
         let job = await Job.findById(jobId);
-        if(!job){
+        if (!job) {
             return reject({
-                code:404,
-                msg:`Can not pull job line from job cause job not found!`
+                code: 404,
+                msg: `Can not pull job line from job cause job not found!`
             })
         }
 
         job.job_lines.pull(jobLineId);
 
         await job.save()
-        .then(_=>{return resolve()})
-        .catch(err=>{
-            return reject({
-                code:500,
-                msg:`Can not remove job line out of job with error: ${new Error(err.message)}`
+            .then(_ => { return resolve() })
+            .catch(err => {
+                return reject({
+                    code: 500,
+                    msg: `Can not remove job line out of job with error: ${new Error(err.message)}`
+                })
             })
-        })
     })
 }
 
@@ -697,10 +697,10 @@ const PullTaskFromJob = (jobId, level, taskId) => {
         jl.tasks.pull(taskId);
         if (jl.tasks.length == 0) {
             await jl.delete()
-                .then(_ => { 
-                    PullJobLineFromJob(jobId,jl)
-                    .then(_=>{return resolve();})
-                    .catch(err=>{return reject(err)})                   
+                .then(_ => {
+                    PullJobLineFromJob(jobId, jl)
+                        .then(_ => { return resolve(); })
+                        .catch(err => { return reject(err) })
                 })
                 .catch(err => {
                     return reject({

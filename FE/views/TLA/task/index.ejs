@@ -395,7 +395,10 @@
                     tr += '</td>';
 
                     tr += '<td>';
-                    if (t.remarks.length > 0) {
+                        if(t.status === -5){
+                            tr+='[<span class="text-danger font-weight-bold">'+t.canceled.reason.name+'</span>] - '
+                        }
+                    if (t.remarks.length > 0) {                        
                         tr += t.remarks[t.remarks.length - 1].content;
                     }
                     tr += '</td>';
