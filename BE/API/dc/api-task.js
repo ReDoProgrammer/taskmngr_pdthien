@@ -226,6 +226,8 @@ router.get('/personal-tasks', authenticateDCToken, async (req, res) => {
         return parseInt(x.trim());
     })
 
+    console.log(stt)
+
     let tasks = await Task
         .find({
             status: { $in: stt },
@@ -249,7 +251,8 @@ router.get('/personal-tasks', authenticateDCToken, async (req, res) => {
             },
             { path: 'editor.staff', select: 'username fullname' },
             { path: 'qa.staff', select: 'username fullname' },
-            { path: 'bp.bpId', select: 'is_bonus' }
+            { path: 'bp.bpId', select: 'is_bonus' },
+            {path:'canceled.reason',select:'name'}
         ]);
 
     let count = await Task.countDocuments({});
@@ -291,7 +294,8 @@ router.get('/list', authenticateDCToken, async (req, res) => {
             { path: 'qa.staff', select: 'fullname username' },
             { path: 'dc.staff', select: 'fullname username' },
             { path: 'remarks' },
-            { path: 'bp.bpId', select: 'is_bonus' }
+            { path: 'bp.bpId', select: 'is_bonus' },
+            {path:'canceled.reason',select:'name'}
         ]);
 
     let count = await Task.countDocuments({});
