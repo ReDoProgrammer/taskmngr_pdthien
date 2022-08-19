@@ -66,40 +66,8 @@ const jobSchema = new Schema({
     },
 
     cc: [{
-        remark: {
-            type: String
-        },
-        root: {
-            type: Schema.Types.ObjectId,
-            ref: 'mapping',
-            tasks: [{
-                type: Schema.Types.ObjectId,
-                ref: 'task'
-            }]
-        },
-        fee: {
-            type: Boolean,
-            default: false
-        },
-
-        created: {
-            at: {
-                type: Date
-            },
-            by: {
-                type: Schema.Types.ObjectId,
-                ref: 'user'
-            }
-        },
-        requested: {
-            at: {
-                type: Date,
-            },
-            by: {
-                type: Schema.Types.ObjectId,
-                ref: 'customer'
-            }
-        }
+        type:Schema.Types.ObjectId,
+        ref:'cc'
     }],
 
     created: {

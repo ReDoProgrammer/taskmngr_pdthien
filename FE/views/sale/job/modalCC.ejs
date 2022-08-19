@@ -8,58 +8,52 @@
                 <h4 class="modal-title">JOB CC</h4>
             </div>
             <div class="modal-body">
-                <div class="form-group row">
-                    <div class="col-md-4">
-                        <label for="">CC type:</label>
-                    </div>
-                    <div class="col-md-8">
-                        <label class="radio-inline"><input type="radio" name="optradio" id="rbtMoreTask" checked>More
-                            task</label>
-                        <label class="radio-inline ml-2"><input type="radio" name="optradio" id="rbtRefix">Refix</label>
-                    </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="cc" id="rbtAddTask" value="new-task" checked>
+                    <label class="form-check-label" for="rbtAddTask">
+                        New task <span class="text-primary"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="cc" id="rbtRefix" value="refix-task">
+                    <label class="form-check-label" for="rbtRefix">
+                        Refix task <span class="text-warning"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+                    </label>
                 </div>
 
-                <div class="row" id="rRefix" hidden>
-                    <div class="col-md-4 mt-1">
-                        <div class="form-check mt-1 pt-2">
-                            <input class="form-check-input" type="checkbox" value="" id="ckbChooseTask">
-                            <label class="form-check-label" for="defaultCheck1">
-                                Refix special task
-                            </label>
-                        </div>
+                <div id="divRefix" class="container mt-2">
+
+                    <div class="col-md-4">
+                        <input type="checkbox" id="ckbSpecialTask" name="ckbSpecialTask" value="ckbSpecialTask">
+                        <label for="ckbSpecialTask"> Special task</label>
+                    </div>
+                    <div class="col-md-6">
+                        <select name="" id="slAvailableTasks" class="form-control"></select>
                     </div>
 
-                    <div class="col-md-8">
-                        <div class="form-group" id="divTasksList" hidden>
-                            <label for="">Tasks list</label>
-                            <select name="" id="slTasks" class="form-control"></select>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="form-group mt-2">
-                    <label for="">Remark:</label>
-                    <textarea class="form-control" id="txaRemark" rows="3" placeholder="Input CC remark"></textarea>
+                    <label for="">CC remark:</label>
+                    <input type="text" placeholder="CC remark" id="txtCCRemark" class="form-control">
                 </div>
-                <div class="form-group">
-                    <button class="btn btn-success" id="btnSubmitCC">Submit</button>
-                    <button type="button" class="btn btn-default" id="btnCancelCC">Cancel</button>
-                </div>
-                <label class="font-weight-bold text-danger" id="ccMsg"></label>
 
-
+                <button class="btn btn-primary mt-2 text-center" id="btnSubmitCC">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Submit changes
+                </button>
 
 
 
             </div>
             <div class="modal-footer">
-
                 <table class="table table-striped table-hover js-table mt-2">
                     <thead>
                         <th>#</th>
                         <th>Level</th>
                         <th>Remark</th>
-                        <th>Status</th>
+                        <th  class="text-center">Status</th>
                         <th></th>
                     </thead>
                     <tbody id="tblCCList"></tbody>
@@ -73,247 +67,131 @@
 <script>
     var ccId = '';
 
-    $('#modalCC').on('shown.bs.modal', function (e) {
-        LoadTasks();
-        LoadCC();
-        ResetComponents();
-    })
+    $('#btnSubmitCC').click(function () {
+        let fee = $('#rbtAddTask').is(':checked');
+        let remark = $('#txtCCRemark').val();
+        let special_task = $('#ckbSpecialTask').is(':checked');
+        let root = $('#slAvailableTasks option:selected').data('root');
 
-    $('#btnCancelCC').click(function () {
-        ccId = '';
-        ResetComponents();
-    })
-
-    $(document).on("click", "button[name='btnDelCC']", function () {
-        ccId = $(this).closest("tr").attr("id");
-        if (confirm('Are you sure want to delete this CC?')) {
+        if (ccId.length == 0) {
             $.ajax({
                 url: '/sale/cc',
-                type: 'delete',
-                headers: {
-                    authorization: "Bearer " + localStorage.getItem("accessToken"),
-                },
-                data: {
-                    ccId
-                },
-                success: function (data) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Successfully!',
-                        text: data.msg
-                    })
-                    LoadCC();
-                    $('#btnCancelCC').click();
-                }
-            })
-        }
-    })
-
-    $(document).on("click", "button[name='btnUpdateCC']", function () {
-        ccId = $(this).closest("tr").attr("id");
-        $.ajax({
-            url: '/sale/cc/detail',
-            type: 'get',
-            headers: {
-                authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: {
-                ccId
-            },
-            success: function (data) {
-                $('#txaRemark').val(data.cc.remark);
-
-                if (data.cc.type) {
-                    $('#rbtMoreTask').prop('checked', true);
-                    $('#rRefix').slideUp(200);
-                } else {
-                    $('#rbtRefix').prop('checked', true);
-                    $('#rRefix').slideDown(500);
-                    if (data.cc.fixible_task) {
-                        $('#ckbChooseTask').prop('checked', true);
-                        $('#divTasksList').slideDown(500);
-                        $('#slTasks').val(data.cc.fixible_task);
-                        if (data.cc.status == 0 || data.cc.status == -1) {
-                            $('#slTasks').attr("disabled", false);
-                        } else {
-                            $('#slTasks').attr("disabled", true);
-                        }
-                    } else {
-                        $('#ckbChooseTask').prop('checked', false);
-                        $('#divTasksList').slideUp(200);
-                    }
-
-                }
-            }
-        })
-    })
-
-    $('#btnSubmitCC').click(function () {
-        ccType = $('#rbtMoreTask').is(':checked') ? true : false;
-        rootId = $('#ckbChooseTask').is(':checked') ? $('#slTasks option:selected').val() : null;
-        is_root = $('#ckbChooseTask').is(':checked') ? parseInt($('#slTasks option:selected').data('root')) : 0;
-        remark = $('#txaRemark').val();
-
-
-        if (remark.trim().length == 0) {
-            $('#ccMsg').text('(!) Please input CC remark');
-            $('#ccMsg').show().delay(2000).fadeOut();
-            return;
-        }
-        if (ccId.length === 0) {
-            $.ajax({
-                url: '/sale/job/cc',
                 type: 'post',
                 headers: {
                     authorization: "Bearer " + localStorage.getItem("accessToken"),
                 },
                 data: {
                     jobId,
-                    ccType,
-                    rootId,
-                    is_root,
+                    fee,
+                    special_task,
+                    root,
                     remark
                 },
                 success: function (data) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Successfully!',
-                        text: data.msg
-                    })
-                    LoadCC();
-                    $('#btnCancelCC').click();
+                    $.toast({
+                        heading: 'Successfully',
+                        text: data.msg,
+                        showHideTransition: 'fade',
+                        icon: 'success'
+                    });
+                    LoadCCList();
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.responseJSON.msg);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Opp.....!',
+                        text: jqXHR.responseJSON.msg
+                    })
                 }
             })
         } else {
-            $.ajax({
-                url: '/sale/job/cc',
-                type: 'put',
-                headers: {
-                    authorization: "Bearer " + localStorage.getItem("accessToken"),
-                },
-                data: {
-                    ccId,
-                    jobId,
-                    ccType,
-                    rootId,
-                    is_root,
-                    remark
-                },
-                success: function (data) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Successfully!',
-                        text: data.msg
-                    })
-                    LoadCC();
-                    $('#btnCancelCC').click();
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.responseJSON.msg);
-                }
-            })
+
         }
     })
 
-    $("#ckbChooseTask").change(function () {
-        if (this.checked) {
-            $('#divTasksList').slideDown(500);
-        } else {
-            $('#divTasksList').slideUp(500);
-        }
-    });
-
-    $('input[type=radio][name=optradio]').change(function () {
-
-        if ($('#rbtMoreTask').is(':checked')) {
-            ResetComponents();
-        } else {
-            $('#rRefix').slideDown(1000);
-        }
-    });
-
-    function LoadCC() {
+    function LoadCCList() {
         $.ajax({
-            url: '/sale/job/list-cc',
+            url: '/sale/cc/list-by-job',
             type: 'get',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
-            data: {
-                jobId
-            },
+            data: { jobId },
             success: function (data) {
-                $('#tblCCList').empty();
                 let idx = 1;
-                data.cc.forEach(c => {
+                $('#tblCCList').empty();
+                data.ccs.forEach(c => {
                     let tr = '<tr id="' + c._id + '">';
-                    tr += '<td class="text-left">' + (idx++) + '</td>';
-
-                    tr += '<td class="text-left text-danger font-weight-bold">';
+                    tr += '<td>' + (idx++) + '</td>';
+                    tr += '<td class="font-weight-bold text-primary text-left">';
                     if (c.root) {
                         tr += c.root.name;
                     }
-
-                    if (c.parents) {
-                        tr += c.parents.name;
+                    if (c.children.length > 0) {
+                        let levels = c.children.map(x => ` ${x.name}`);
+                        tr += ' -[<span class="text-danger">' + levels + '</span>]'
+                    }
+                    tr += '</td>';
+                    tr += '<td class="text-left">' + c.remark + '</td>';
+                    tr += '<td class="text-center">';
+                    switch (c.status) {
+                        case -1: tr += '<i class="text-info">Initial</i>'; break;
+                        case 0: tr += '<i class="text-primary">Processing</i>'; break;
+                        case 1: tr += '<i class="text-success">Finish</i>'; break;
                     }
                     tr += '</td>';
 
-                    tr += '<td class="text-left">' + c.remark + '</td>';
 
-                    tr += '<td class="text-left text-info"><i>';
-                    tr += c.tasks.length == 0 ? 'Initial' : 'Processing';
-                    tr += '</i></td>'
+                    tr += '<td class="text-right">';
+                    tr += '<button class="btn btn-xs btn-warning" name="edit-job"><i class="fa fa-refresh" aria-hidden="true"></i></button>';
+                    tr += '<button class="btn btn-xs btn-danger ml-2" name="delete-job"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                    tr += '</td>';
+
 
                     tr += '</tr>';
-
                     $('#tblCCList').append(tr);
                 })
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                alert(jqXHR.responseJSON.msg);
             }
         })
     }
 
-    function LoadTasks() {
+    function LoadAvailableTasks() {
         $.ajax({
-            url: '/sale/job/list-task',
+            url: '/sale/task/list-available-tasks',
             type: 'get',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
-            data: {
-                jobId
-            },
+            data: { jobId },
             success: function (data) {
-                $('#slTasks').empty();
-                data.job.root.forEach(r => {
-                    let opt = '<option value="' + r.ref._id + '" data-root="1">' + r.ref.name + '  - [ ';
-                    opt += r.tasks.map(x => ' ' + x.basic.level.name);
-                    opt += ' ]</option>';
-                    $('#slTasks').append(opt);
+                $('#slAvailableTasks').empty();
+                data.tasks.forEach(t => {
+                    $('#slAvailableTasks').append('<option value="' + t._id + '" data-root="' + t.basic.mapping._id + '">' + t.basic.mapping.name + ' - ' + t.basic.level.name + '</option>')
                 })
-                data.job.parents.forEach(p => {
-                    let opt = '<option value="' + p.ref._id + '" data-root="0">' + p.ref.name + '  - [ ';
-                    opt += p.tasks.map(x => ' ' + x.basic.level.name);
-                    opt += ' ]</option>';
-                    $('#slTasks').append(opt);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Opp.....!',
+                    text: jqXHR.responseJSON.msg
                 })
             }
         })
     }
 
-    function ResetComponents() {
-        $('#rbtMoreTask').prop('checked', true);
-        $('#rRefix').slideUp(200);
-        $('#ckbChooseTask').prop('checked', false);
-        $('#slTasks').attr("disabled", false);
-        $('#txaRemark').val('');
-        $('#divTasksList').slideUp(500);
-    }
+
+    $('input[type=radio][name=cc]').change(function () {
+        if (this.value == 'new-task') {
+            $('#divRefix').slideUp(300);
+        }
+        else {
+            $('#divRefix').slideDown(500);
+        }
+    });
+    $('#modalCC').on('shown.bs.modal', function (e) {
+        $('#divRefix').slideUp(300);
+        LoadAvailableTasks();
+        LoadCCList();
+    })
 
 </script>

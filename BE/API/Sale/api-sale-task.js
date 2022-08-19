@@ -6,7 +6,24 @@ const {
     GetCustomerById } = require('../common');
 
 const pageSize = 20;
-
+router.get('/list-available-tasks',authenticateSaleToken,async (req,res)=>{
+    //ham tra ve nhung task da dc it nhat DC submit 
+    //de Sale co the CC vao nhung task nay
+    let {jobId} = req.query;
+    let tasks = await Task.find({
+      'basic.job':jobId,
+      status:{$lte:3}
+    })
+    .populate([
+        {path:'basic.level',select:'name'},
+        {path:'basic.mapping',select:'name'}
+    ])
+    .select('basic.level.name basic.mapping.name');
+    return res.status(200).json({
+      msg:`Load available tasks successfully!`,
+      tasks
+    })
+  })
 router.get('/list', authenticateSaleToken, (req, res) => {
     let { jobId } = req.query;
     Task
