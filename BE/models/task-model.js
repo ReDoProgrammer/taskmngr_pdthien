@@ -15,11 +15,11 @@ const taskSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'job_level'
         },
-        mapping:{
+        mapping: {
             //tham chiếu tới customer job level
-            type:Schema.Types.ObjectId,
-            ref:'mapping'
-        },       
+            type: Schema.Types.ObjectId,
+            ref: 'mapping'
+        },
         deadline: {
             begin: {
                 type: Date,
@@ -278,15 +278,16 @@ const taskSchema = new Schema({
 
     canceled: {
         reason: {
-            /*
-           field này dùng để đánh dấu nguyên nhân task bị cancel
-           -1: TLA gán sai
-           -2: Sale thiết lập sai
-           -3: Khách hàng hủy
-           -4: Lý do khác
-    
-       */
-            type: Number
+            type: Schema.Types.ObjectId,
+            ref: 'reason'
+        },
+        is_penalty: {
+            type: Boolean,
+            default:false
+        },
+        fines: {
+            type: Number,
+            default:0
         },
         at: {
             type: Date
@@ -328,7 +329,7 @@ const taskSchema = new Schema({
         bpId: {
             type: Schema.Types.ObjectId,
             ref: 'bonus_penalty'
-        },      
+        },
         costs: {
             type: Number
         },

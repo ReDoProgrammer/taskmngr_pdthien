@@ -337,6 +337,8 @@ app.use('/tla/job',apiTLAJob);
 const apiTLALevel = require('./BE/API/TLA/api-tla-level');
 app.use('/tla/level',apiTLALevel);
 
+const apiTLAReason = require('./BE/API/TLA/api-reason');
+app.use('/tla/reason',apiTLAReason);
 
 const apiTLATask = require('./BE/API/TLA/api-tla-task');
 app.use('/tla/task',apiTLATask);

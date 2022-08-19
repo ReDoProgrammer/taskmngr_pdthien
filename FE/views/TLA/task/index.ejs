@@ -92,11 +92,13 @@
 
     $(document).ready(function () {
         $('#slStatus').val([-10, -4, -3, -2, -1, 0, 1, 2, 3, 4]).selectpicker('refresh');
-        LoadTasks();
+        LoadTasks();      
         setInterval(function () {
             LoadTasks();
         }, 10000);//run this thang every 10 seconds
     })
+
+
 
 
 
@@ -439,6 +441,8 @@
             }
         })
     }
+
+
 </script>
 
 

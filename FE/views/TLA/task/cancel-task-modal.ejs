@@ -19,12 +19,7 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-md-3 col-sm-3 col-xs-12 mt-2">
-                                <select name="" id="slReasons" class="form-control">
-                                    <option value="-1">Customer canceled</option>
-                                    <option value="-2">Sale's fault</option>
-                                    <option value="-3">Editor's fault</option>
-                                    <option value="-4">Other</option>
-                                </select>
+                                <select name="" id="slReasons" class="form-control"></select>
                             </div>
                             <div class="col-md-7 col-sm-7 col-xs-10 mt-2">
                                 <input type="text" placeholder="Reason note" id="txtCanceledRemark"
@@ -44,6 +39,9 @@
 
 
 <script>
+    $(document).ready(function () {
+        LoadReasons();
+    })
 
     $('#btnSubmitCancel').click(function () {
         $.ajax({
@@ -53,15 +51,52 @@
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
             data: {
-               taskId,
-               canceled_reason: $('#slReasons option:selected').val(),
-               remark: $('#txtCanceledRemark').val()
+                taskId,
+                reason: $('#slReasons option:selected').val(),
+                penalty: $('#slReasons option:selected').data('penalty'),
+                fines: $('#slReasons option:selected').data('fines'),
+                remark: $('#txtCanceledRemark').val()
             },
-            success:function(data){
-                alert(data.msg);
+            success: function (data) {
+                $.toast({
+                    heading: 'Successfully',
+                    text: data.msg,
+                    showHideTransition: 'fade',
+                    icon: 'success'
+                });
                 $('#cancelTaskModal').modal('hide');
                 LoadTasksList();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Opp..',
+                    text: jqXHR.responseJSON.msg
+                });
             }
         })
     })
+
+    function LoadReasons() {
+        $.ajax({
+            url: '/tla/reason',
+            type: 'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            success: function (data) {
+                data.reasons.forEach(r => {
+                    $('#slReasons').append('<option value="' + r._id + '" data-penalty="' + r.is_penalty + '" data-fines="' + r.fines + '">' + r.name + '</option>');
+                })
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Opp..',
+                    text: jqXHR.responseJSON.msg
+                });
+            }
+        })
+    }
+
 </script>
