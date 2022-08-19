@@ -72,6 +72,7 @@ router.get('/all', authenticateTLAToken, async (req, res) => {
     let stt = (status.split(',')).map(x => {
         return parseInt(x.trim());
     })
+    console.log(stt)
 
     let tasks = await Task
         .find({ status: { $in: stt } })
@@ -451,6 +452,8 @@ router.put('/cancel', authenticateTLAToken, async (req, res) => {
             at:new Date()
         }
     })
+
+    task.status = -5;//trang thai task bi TLA cancel
 
     await task.save()
     .then(_=>{
