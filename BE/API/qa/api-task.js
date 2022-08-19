@@ -209,7 +209,8 @@ router.get('/personal', authenticateQAToken, async (req, res) => {
             { path: 'editor.staff', select:'username fullname' },
             { path: 'qa.staff', select:'username fullname' },
             { path: 'dc.staff', select:'username fullname' },
-            { path: 'remarks' }
+            { path: 'remarks' },
+            {path:'canceled.reason',select:'name'}
         ]);
 
     let count = await Task.countDocuments({});
