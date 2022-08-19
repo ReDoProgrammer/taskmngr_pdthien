@@ -427,7 +427,7 @@ router.put('/upload', authenticateTLAToken, async (req, res) => {
 })
 
 router.put('/cancel', authenticateTLAToken, async (req, res) => {
-    let { taskId, canceled_reason, remark } = req.body;
+    let { taskId, reason, penalty,fines, remark } = req.body;
     let task = await Task.findById(taskId);
 
     if(!task){
@@ -436,6 +436,25 @@ router.put('/cancel', authenticateTLAToken, async (req, res) => {
         })
     }
 
+    task.canceled = {
+        reason,
+        penalty,
+        fines,
+        at: new Date(),
+        by: req.user._id
+    };
+
+    await task.save()
+    .then(_=>{
+        return res.status(200).json({
+            msg:`The task has been canceled!`
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            msg:`Can not cancel this task with caught error: ${new Error(err.message)}`
+        })
+    })
     
 })
 

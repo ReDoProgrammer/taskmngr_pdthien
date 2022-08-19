@@ -281,7 +281,7 @@ const taskSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'reason'
         },
-        is_penalty: {
+        penalty: {
             type: Boolean,
             default:false
         },
