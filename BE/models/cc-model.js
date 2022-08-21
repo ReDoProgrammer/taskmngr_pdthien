@@ -24,12 +24,12 @@ const ccSchema = new Schema({
         task: {
             type: Schema.Types.ObjectId,
             ref: 'task'
-        },
-        fee: {
-            type: Boolean
-        }
+        }     
 
     }],
+    fee: {
+        type: Boolean
+    },
     requested: {
         at: {
             type: Date,

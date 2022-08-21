@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { authenticateSaleToken } = require("../../../middlewares/sale-middleware");
 const CC = require('../../models/cc-model');
 const Job = require('../../models/job-model');
+const { ValidateCheckIn } = require('../../../middlewares/checkin-middleware');
 router.get('/', authenticateSaleToken, async (req, res) => {
     let ccs = await CC.find({})
         .populate([
@@ -21,8 +22,14 @@ router.get('/list-by-job', authenticateSaleToken, async (req, res) => {
         .populate([
             { path: 'job' },
             { path: 'root', select: 'name' },
-            { path: 'children.task', select: 'basic.level.name' }
+            { path: 'children.task', 
+                populate:({
+                    path:'basic.level',
+                    select:'name'
+                })
+             }
         ]);
+        
     return res.status(200).json({
         msg: `Load CC list by job successfully!`,
         ccs
@@ -43,18 +50,20 @@ router.get('/detail', authenticateSaleToken, async (req, res) => {
     })
 })
 
-router.post('/',authenticateSaleToken,async (req,res)=>{
+router.post('/',[authenticateSaleToken, ValidateCheckIn],async (req,res)=>{
     let {jobId,
-        fee,
-        special_task,
+        fee,     
         root,
+        task,
         remark} = req.body;
 
+        
     let cc = new CC();
     cc.job = jobId;
     cc.fee = fee;
-    if(special_task == 'true'){
+    if(root){
         cc.root = root;
+        cc.children = [{task}];
     }
     cc.remark = remark;
 

@@ -70,9 +70,12 @@
     $('#btnSubmitCC').click(function () {
         let fee = $('#rbtAddTask').is(':checked');
         let remark = $('#txtCCRemark').val();
-        let special_task = $('#ckbSpecialTask').is(':checked');
-        let root = $('#slAvailableTasks option:selected').data('root');
+        let root =  $('#ckbSpecialTask').is(':checked')?$('#slAvailableTasks option:selected').data('root'):null;
+        let task = $('#ckbSpecialTask').is(':checked')?$('#slAvailableTasks option:selected').val():null;
+       
 
+        // console.log({fee,remark,special_task,root});
+        // return;
         if (ccId.length == 0) {
             $.ajax({
                 url: '/sale/cc',
@@ -82,9 +85,9 @@
                 },
                 data: {
                     jobId,
-                    fee,
-                    special_task,
+                    fee,               
                     root,
+                    task,
                     remark
                 },
                 success: function (data) {
@@ -121,16 +124,16 @@
                 let idx = 1;
                 $('#tblCCList').empty();
                 data.ccs.forEach(c => {
-                    console.log(c)
                     let tr = '<tr id="' + c._id + '">';
                     tr += '<td>' + (idx++) + '</td>';
                     tr += '<td class="font-weight-bold text-primary text-left">';
                     if (c.root) {
                         tr += c.root.name;
                     }
-                    if (c.children.length > 0) {
-                        let levels = c.children.map(x => ` ${x.name}`);
-                        tr += ' -[<span class="text-danger">' + levels + '</span>]'
+                    
+                    if (c.children.length > 0) {                       
+                        let levels = c.children.map(x => ` ${x.task.basic.level.name}`);
+                        tr += ' - [<span class="text-danger">' + levels + '</span>]'
                     }
                     tr += '</td>';
                     tr += '<td class="text-left">' + c.remark + '</td>';
@@ -144,8 +147,8 @@
 
 
                     tr += '<td class="text-right">';
-                    tr += '<button class="btn btn-xs btn-warning" name="edit-job"><i class="fa fa-refresh" aria-hidden="true"></i></button>';
-                    tr += '<button class="btn btn-xs btn-danger ml-2" name="delete-job"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                    tr += '<button class="btn btn-xs btn-warning" name="edit-cc"><i class="fa fa-refresh" aria-hidden="true"></i></button>';
+                    tr += '<button class="btn btn-xs btn-danger ml-2" name="delete-cc"><i class="fa fa-trash" aria-hidden="true"></i></button>';
                     tr += '</td>';
 
 
@@ -180,6 +183,27 @@
         })
     }
 
+    $('#tblCCList').on("click", "button[name='edit-cc']", function () {
+        ccId = $(this).closest("tr").attr("id");
+        $.ajax({
+            url:'/sale/cc/detail',
+            type:'get',
+            headers: {
+                authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data:{ccId},
+            success:function(data){
+                console.log(data)
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Opp.....!',
+                    text: jqXHR.responseJSON.msg
+                })
+            }
+        })
+    })
 
     $('input[type=radio][name=cc]').change(function () {
         if (this.value == 'new-task') {
