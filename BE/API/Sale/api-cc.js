@@ -52,8 +52,9 @@ router.post('/',authenticateSaleToken,async (req,res)=>{
 
     let cc = new CC();
     cc.job = jobId;
+    cc.fee = fee;
     if(special_task == 'true'){
-        cc.special_task = special_task;
+        cc.root = root;
     }
     cc.remark = remark;
 

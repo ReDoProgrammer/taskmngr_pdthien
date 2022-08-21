@@ -121,6 +121,7 @@
                 let idx = 1;
                 $('#tblCCList').empty();
                 data.ccs.forEach(c => {
+                    console.log(c)
                     let tr = '<tr id="' + c._id + '">';
                     tr += '<td>' + (idx++) + '</td>';
                     tr += '<td class="font-weight-bold text-primary text-left">';

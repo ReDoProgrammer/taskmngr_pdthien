@@ -12,7 +12,7 @@ router.get('/list-available-tasks',authenticateSaleToken,async (req,res)=>{
     let {jobId} = req.query;
     let tasks = await Task.find({
       'basic.job':jobId,
-      status:{$lte:4}
+      status:{$gte:4}
     })
     .populate([
         {path:'basic.level',select:'name'},
