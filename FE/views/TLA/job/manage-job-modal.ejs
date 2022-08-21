@@ -798,28 +798,16 @@
         jobId
       },
       success: function (data) {
+        console.log(data)
         $('.tblCCList').empty();
         let idx = 1;
         data.cc.forEach(c => {
-          let tr = '<tr id="' + c._id + '"';
-          if (c.root) {
-            tr += ' data-root="' + c.root._id + '"';
-          }
-          if (c.parents) {
-            tr += ' data-root="' + c.parents._id + '"';
-          }
-
-          tr += 'data-fee = "' + c.fee + '"';
-
-          tr += '>';
+          let tr = '<tr id="' + c._id + '">';
           tr += '<td>' + (idx++) + '</td>';
           tr += '<td class="font-weight-bold text-danger text-left">';
-          if (c.root) {
-            tr += c.root.name;
-          }
-          if (c.parents) {
-            tr += c.parents.name;
-          }
+            if(c.root){
+              tr+= c.root.name;
+            }
           tr += '</td>';
           tr += '<td class="text-left" name="remark">' + c.remark + '</td>';
           tr += '<td class="text-left font-italic text-right">';
