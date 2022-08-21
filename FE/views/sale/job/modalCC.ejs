@@ -124,6 +124,7 @@
                 let idx = 1;
                 $('#tblCCList').empty();
                 data.ccs.forEach(c => {
+                    console.log(c)
                     let tr = '<tr id="' + c._id + '">';
                     tr += '<td>' + (idx++) + '</td>';
                     tr += '<td class="font-weight-bold text-primary text-left">';
@@ -193,7 +194,23 @@
             },
             data:{ccId},
             success:function(data){
-                console.log(data)
+                $('#txtRemark').val(data.cc.remark);
+                if(data.cc.fee){
+                    $('#rbtAddTask').prop('checked',true);
+                }else{
+                    $('#rbtRefix').prop('checked',true);
+                    if(typeof data.cc.root !=='undefined') {
+                        $('#divRefix').slideDown(300);
+                        $('#ckbSpecialTask').prop('checked',true);
+                        if(data.cc.children.length>0){
+                            $('#slAvailableTasks').val(data.cc.children[0].task._id);
+                        }
+                        
+                    }else{
+                        $('#divRefix').slideUp(300);
+                        $('#ckbSpecialTask').prop('checked',false);
+                    }
+                }
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 Swal.fire({
