@@ -8,41 +8,61 @@
                 <h4 class="modal-title">JOB CC</h4>
             </div>
             <div class="modal-body">
-
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="cc" id="rbtAddTask" value="new-task" checked>
-                    <label class="form-check-label" for="rbtAddTask">
-                        New task <span class="text-primary"><i class="fa fa-plus" aria-hidden="true"></i></span>
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="cc" id="rbtRefix" value="refix-task">
-                    <label class="form-check-label" for="rbtRefix">
-                        Refix task <span class="text-warning"><i class="fa fa-refresh" aria-hidden="true"></i></span>
-                    </label>
-                </div>
-
-                <div id="divRefix" class="container mt-2">
-
-                    <div class="col-md-4">
-                        <input type="checkbox" id="ckbSpecialTask" name="ckbSpecialTask" value="ckbSpecialTask">
-                        <label for="ckbSpecialTask"> Special task</label>
-                    </div>
-                    <div class="col-md-6">
-                        <select name="" id="slAvailableTasks" class="form-control"></select>
-                    </div>
-
-                </div>
-
-                <div class="form-group mt-2">
-                    <label for="">CC remark:</label>
-                    <input type="text" placeholder="CC remark" id="txtCCRemark" class="form-control">
-                </div>
-
-                <button class="btn btn-primary mt-2 text-center" id="btnSubmitCC">
-                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
-                    Submit changes
+                <button class="btn btn-info" id="btnAddNewCC">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                    Add new CC
                 </button>
+                <div class="panel panel-success mt-2" id="CCWrap">
+                    <div class="panel-heading">Add or update CC</div>
+                    <div class="panel-body">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="cc" id="rbtAddTask" value="new-task"
+                                checked>
+                            <label class="form-check-label" for="rbtAddTask">
+                                New task <span class="text-primary"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="cc" id="rbtRefix" value="refix-task">
+                            <label class="form-check-label" for="rbtRefix">
+                                Refix task <span class="text-warning"><i class="fa fa-refresh"
+                                        aria-hidden="true"></i></span>
+                            </label>
+                        </div>
+
+                        <div id="divRefix" class="mt-2">
+
+                            <div class="col-md-4">
+                                <input type="checkbox" id="ckbSpecialTask" name="ckbSpecialTask" value="ckbSpecialTask">
+                                <label for="ckbSpecialTask"> Special task</label>
+                            </div>
+                            <div class="col-md-8">
+                                <select name="" id="slAvailableTasks" class="form-control"></select>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group mt-2">
+                            <label for="">CC remark:</label>
+                            <input type="text" placeholder="CC remark" id="txtCCRemark" class="form-control">
+                        </div>
+
+                    </div>
+                    <div class="panel-footer text-right">
+                        <button class="btn btn-primary text-center" id="btnSubmitCC">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Submit changes
+                        </button>
+                        <button class="btn btn-default" id="btnCancelCC">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+
+                </div>
+
 
 
 
@@ -53,7 +73,7 @@
                         <th>#</th>
                         <th>Level</th>
                         <th>Remark</th>
-                        <th  class="text-center">Status</th>
+                        <th class="text-center">Status</th>
                         <th></th>
                     </thead>
                     <tbody id="tblCCList"></tbody>
@@ -70,12 +90,18 @@
     $('#btnSubmitCC').click(function () {
         let fee = $('#rbtAddTask').is(':checked');
         let remark = $('#txtCCRemark').val();
-        let root =  $('#ckbSpecialTask').is(':checked')?$('#slAvailableTasks option:selected').data('root'):null;
-        let task = $('#ckbSpecialTask').is(':checked')?$('#slAvailableTasks option:selected').val():null;
-       
+        let root = $('#ckbSpecialTask').is(':checked') ? $('#slAvailableTasks option:selected').data('root') : null;
+        let task = $('#ckbSpecialTask').is(':checked') ? $('#slAvailableTasks option:selected').val() : null;
 
-        // console.log({fee,remark,special_task,root});
-        // return;
+        if (remark.trim().length === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Opp.....! Validate CC entry',
+                text: `The CC remark can not be empty.`
+            })           
+            return;
+        }
+
         if (ccId.length == 0) {
             $.ajax({
                 url: '/sale/cc',
@@ -85,7 +111,7 @@
                 },
                 data: {
                     jobId,
-                    fee,               
+                    fee,
                     root,
                     task,
                     remark
@@ -98,6 +124,8 @@
                         icon: 'success'
                     });
                     LoadCCList();
+                    $('#CCWrap').slideUp(300);
+
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     Swal.fire({
@@ -108,8 +136,80 @@
                 }
             })
         } else {
-
+            $.ajax({
+                url: '/sale/cc',
+                type: 'put',
+                headers: {
+                    authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                data: {
+                    ccId,
+                    fee,
+                    root,
+                    task,
+                    remark
+                },
+                success: function (data) {
+                    $.toast({
+                        heading: 'Successfully',
+                        text: data.msg,
+                        showHideTransition: 'fade',
+                        icon: 'success'
+                    });
+                    LoadCCList();
+                    $('#CCWrap').slideUp(300);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Opp.....!',
+                        text: jqXHR.responseJSON.msg
+                    })
+                }
+            })
         }
+    })
+    $('#tblCCList').on("click", "button[name='delete-cc']", function () {
+
+        Swal.fire({
+            icon: 'question',
+            title: 'Do you want to delete this CC?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            denyButtonText: `No`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/sale/cc',
+                    type: 'delete',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                    data: {
+                        jobId,
+                        ccId: $(this).closest("tr").attr("id")
+                    },
+                    success: function (data) {
+                        $.toast({
+                            heading: 'Successfully',
+                            text: data.msg,
+                            showHideTransition: 'fade',
+                            icon: 'success'
+                        });
+                        LoadCCList();
+                    }
+                    , error: function (jqXHR, textStatus, errorThrown) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Opp..',
+                            text: jqXHR.responseJSON.msg
+                        });
+                    }
+                })
+            }
+        })
+
     })
 
     function LoadCCList() {
@@ -124,15 +224,14 @@
                 let idx = 1;
                 $('#tblCCList').empty();
                 data.ccs.forEach(c => {
-                    console.log(c)
                     let tr = '<tr id="' + c._id + '">';
                     tr += '<td>' + (idx++) + '</td>';
                     tr += '<td class="font-weight-bold text-primary text-left">';
                     if (c.root) {
                         tr += c.root.name;
                     }
-                    
-                    if (c.children.length > 0) {                       
+
+                    if (c.children.length > 0) {
                         let levels = c.children.map(x => ` ${x.task.basic.level.name}`);
                         tr += ' - [<span class="text-danger">' + levels + '</span>]'
                     }
@@ -184,31 +283,45 @@
         })
     }
 
+    $('#btnAddNewCC').click(function () {
+        $('#CCWrap').slideDown(300);
+        $('#rbtAddTask').prop('checked', true);
+        $('#txtCCRemark').val('');
+        $('#ckbSpecialTask').prop('checked', false);
+        ccId = '';
+    })
+    $('#btnCancelCC').click(function () {
+        ccId = '';
+        $('#CCWrap').slideUp(300);
+    })
     $('#tblCCList').on("click", "button[name='edit-cc']", function () {
         ccId = $(this).closest("tr").attr("id");
         $.ajax({
-            url:'/sale/cc/detail',
-            type:'get',
+            url: '/sale/cc/detail',
+            type: 'get',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
-            data:{ccId},
-            success:function(data){
-                $('#txtRemark').val(data.cc.remark);
-                if(data.cc.fee){
-                    $('#rbtAddTask').prop('checked',true);
-                }else{
-                    $('#rbtRefix').prop('checked',true);
-                    if(typeof data.cc.root !=='undefined') {
+            data: { ccId },
+            success: function (data) {
+                $('#CCWrap').slideDown(300);
+                $('#txtCCRemark').val(data.cc.remark);
+                if (data.cc.fee) {
+                    $('#rbtAddTask').prop('checked', true);
+                    $('#divRefix').slideUp(300);
+
+                } else {
+                    $('#rbtRefix').prop('checked', true);
+                    if (typeof data.cc.root !== 'undefined') {
                         $('#divRefix').slideDown(300);
-                        $('#ckbSpecialTask').prop('checked',true);
-                        if(data.cc.children.length>0){
+                        $('#ckbSpecialTask').prop('checked', true);
+                        if (data.cc.children.length > 0) {
                             $('#slAvailableTasks').val(data.cc.children[0].task._id);
                         }
-                        
-                    }else{
+
+                    } else {
                         $('#divRefix').slideUp(300);
-                        $('#ckbSpecialTask').prop('checked',false);
+                        $('#ckbSpecialTask').prop('checked', false);
                     }
                 }
             },
@@ -225,13 +338,15 @@
     $('input[type=radio][name=cc]').change(function () {
         if (this.value == 'new-task') {
             $('#divRefix').slideUp(300);
+            $('#ckbSpecialTask').prop('checked', false);
         }
         else {
             $('#divRefix').slideDown(500);
         }
     });
+
     $('#modalCC').on('shown.bs.modal', function (e) {
-        $('#divRefix').slideUp(300);
+        $('#CCWrap').slideUp(200);
         LoadAvailableTasks();
         LoadCCList();
     })

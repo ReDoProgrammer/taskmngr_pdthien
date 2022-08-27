@@ -48,6 +48,15 @@ const ccSchema = new Schema({
             ref: 'user'
         }
     },
+    updated: {
+        at: {
+            type: Date
+        },
+        by: {
+            type: Schema.Types.ObjectId,
+            ref: 'user'
+        }
+    },
     status: {
         /*
             -1: initial
