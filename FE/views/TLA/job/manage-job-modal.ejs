@@ -370,20 +370,45 @@
 
 
   $(document).on("click", "button[name='btnCC']", function () {
-    cc = $(this).closest('tr').attr('id');
-    fee = $(this).closest('tr').data('fee');
+    let ccId = $(this).closest('tr').attr('id');
+    BindContract();
+    $.ajax({
+      url:'/tla/cc/detail',
+      type:'get',
+      headers: {
+            authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+          data:{ccId},
+          success:function(data){           
+            if(data.cc.fee){
+              $('#btnAddTask').click();
+              cc = ccId;             
+            }else{
 
-    let rootId = $(this).closest('tr').data('root');
-    ccRemark = $(this).closest('tr').find('td[name="remark"]').text();
-    if (fee === true) {
-      BindContract();
-    } else {
-      if (rootId) {
-        $('#slCustomerLevles').val(rootId);
-      }
-      LoadAvailableTasks();
-    }
-    $('#panel_task').slideDown(500);
+            }
+          },
+           error: function (jqXHR, textStatus, errorThrown) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Opp..',
+              text: jqXHR.responseJSON.msg
+            });
+          }
+    })
+
+    // fee = $(this).closest('tr').data('fee');
+
+    // let rootId = $(this).closest('tr').data('root');
+    // ccRemark = $(this).closest('tr').find('td[name="remark"]').text();
+    // if (fee === true) {
+    //   BindContract();
+    // } else {
+    //   if (rootId) {
+    //     $('#slCustomerLevles').val(rootId);
+    //   }
+    //   LoadAvailableTasks();
+    // }
+    // $('#panel_task').slideDown(500);
   })
 
 
@@ -446,9 +471,12 @@
             $('#divAddOrUpdateTask').slideUp(500);
           },
           error: function (jqXHR, textStatus, errorThrown) {
-            $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
-            $('#msgError').show().delay(10000).fadeOut();
-          },
+            Swal.fire({
+              icon: 'error',
+              title: 'Opp..',
+              text: jqXHR.responseJSON.msg
+            });
+          }
         })
       } else {
         $.ajax({
@@ -798,7 +826,6 @@
         jobId
       },
       success: function (data) {
-        console.log(data)
         $('.tblCCList').empty();
         let idx = 1;
         data.ccs.forEach(c => {

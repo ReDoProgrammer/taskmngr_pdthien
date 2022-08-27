@@ -3,7 +3,19 @@ const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const CC = require('../../models/cc-model');
 const Job= require('../../models/job-model');
 
-
+router.get('/detail',authenticateTLAToken,async (req,res)=>{
+    let {ccId} = req.query;
+    let cc = await CC.findById(ccId);
+    if(!cc){
+        return res.status(404).json({
+            msg:`CC not found!`
+        })
+    }
+    return res.status(200).json({
+        msg:`Get CC detail successfully!`,
+        cc
+    })
+})
 router.get('/list',authenticateTLAToken,async (req,res)=>{
     let { jobId } = req.query;
     let job = await Job.findById(jobId);
