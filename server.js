@@ -321,6 +321,10 @@ app.use('/tla/auth',apiTLAAuth);
 
 
 
+const apiTLACC = require('./BE/API/TLA/api-cc');
+app.use('/tla/cc',apiTLACC);
+
+
 
 
 

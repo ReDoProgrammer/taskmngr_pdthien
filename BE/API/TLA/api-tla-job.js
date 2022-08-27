@@ -68,26 +68,6 @@ router.get('/list', authenticateTLAToken, async (req, res) => {
     })
 })
 
-router.get('/list-cc', authenticateTLAToken, async (req, res) => {
-    let { jobId } = req.query;
-    let job = await Job.findById(jobId)
-        .populate({
-            path: 'cc',
-            populate:{
-                path:'root'
-            }
-        });
-    if (!job) {
-        return res.status(404).json({
-            msg: `Job not found so can not load CC list`
-        })
-    }
-    return res.status(200).json({
-        msg: `Load cc list based on job successfully!`,
-        cc: job
-    })
-
-})
 
 
 router.get('/detail', authenticateTLAToken, async (req, res) => {
