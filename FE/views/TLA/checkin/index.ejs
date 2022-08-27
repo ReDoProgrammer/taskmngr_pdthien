@@ -5,7 +5,7 @@
 
     <div class="col-md-4 col-sm-4 col-xs-6 text-right">
         <div class="input-group">
-            <input type="text" class="form-control" placeholder="Seach job..." id="txtSearch" />
+            <input type="text" class="form-control" placeholder="Seach staff..." id="txtSearch" />
             <div class="input-group-btn">
                 <button class="btn btn-info" type="submit" id="btnSearch">
                     <i class="fa fa-search" aria-hidden="true"></i>
@@ -25,7 +25,7 @@
                 <div class="tableFixHead table-responsive mt-2">
                     <table class="table mt-1 table-striped bg-white text-dark text-nowrap">
                         <thead class="thead-dark">
-                            <tr>                                                     
+                            <tr>
                                 <th scope="col">Username</th>
                                 <th scope="col">Fullname</th>
                                 <th scope="col"></th>
@@ -72,16 +72,29 @@
         $('#btnCheckOut').hide();
     })
 
-    function CheckIn(staffId){
+    function CheckIn(staffId) {
         $.ajax({
-            url:'/tla/checkin',
-            type:'put',
+            url: '/tla/checkin',
+            type: 'put',
             headers: {
                 authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
-            data:{staffId},
-            success:function(data){
+            data: { staffId },
+            success: function (data) {
                 LoadStaffs($('#slModules option:selected').val());
+                $.toast({
+                    heading: 'Successfully',
+                    text: data.msg,
+                    showHideTransition: 'fade',
+                    icon: 'success'
+                });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Opp..',
+                    text: jqXHR.responseJSON.msg
+                });
             }
         })
     }
@@ -90,7 +103,7 @@
         LoadStaffs($('#slModules option:selected').val());
     })
 
-  
+
     $('#tblCheckIn').on("click", "button[name='btnCheckOut']", function () {
         let staffId = $(this).closest('tr').attr('id');
         CheckIn(staffId);
@@ -149,7 +162,7 @@
 
                 data.checkIn.forEach(u => {
                     let tr = '<tr id="' + u._id + '">';
-                  
+
                     tr += '<td class="font-weight-bold">' + u.username + '</td>';
                     tr += '<td>' + u.fullname + '</td>';
                     tr += '<td class="text-right"><button class="btn btn-xs btn-danger" name="btnCheckOut"><i class="fa fa-angle-double-right" aria-hidden="true"></i></button></td>';
@@ -162,10 +175,11 @@
 </script>
 
 <style>
-    button[name="btnCheckIn"]{
+    button[name="btnCheckIn"] {
         padding-right: 20px !important;
     }
-    button[name="btnCheckOut"]{
+
+    button[name="btnCheckOut"] {
         padding-left: 20px !important;
     }
 </style>

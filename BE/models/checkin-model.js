@@ -8,14 +8,10 @@ const checkInSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'user'       
     },
-    check:[{
-       in:{
-           type:Date
-       },
-       out:{
-            type:Date
-       }
-    }]
+    check_in:{
+        type:Boolean,
+        default:false
+    }
 });
 
 

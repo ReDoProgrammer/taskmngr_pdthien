@@ -1,29 +1,20 @@
-const CheckIn = require('../BE/models/staff-checkin');
+const CheckIn = require('../BE/models/checkin-model');
 
 
-function ValidateCheckIn(req, res, next) {
+async function ValidateCheckIn(req, res, next) {
 
     let userId = req.user._id;
 
-    CheckIn.find({ staff: userId })
-        .then(cki => {
-            if (cki.length == 0) {
-                return res.status(403).json({
-                    msg: `You can not execute this mission when you are out of office!`
-                })
-            }
-            if (cki[cki.length - 1].out) {
-                return res.status(403).json({
-                    msg: `You can not execute this mission when you are out of office!`
-                })
-            }
-            next();
+    let check = await CheckIn.countDocuments({
+        staff: userId,
+        check_in: true
+    });
+    if (check == 0) {
+        return res.status(403).json({
+            msg: `You can not access this function while you are out of company!`
         })
-        .catch(err => {
-            return res.status(500).json({
-                msg:`Error validate checkin: ${new Error(err.message)}`
-            })
-        })
+    }
+    next();
 }
 
 module.exports = {

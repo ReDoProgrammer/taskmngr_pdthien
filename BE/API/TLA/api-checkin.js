@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
-const CheckIn = require('../../models/staff-checkin');
+const CheckIn = require('../../models/checkin-model');
 const Module = require('../../models/module-model');
 const { ObjectId } = require('mongodb');
 
@@ -11,31 +11,21 @@ router.put('/', authenticateTLAToken, async (req, res) => {
     if (!chk) {
         chk = new CheckIn({
             staff: staffId,
-            check: {
-                in: new Date()
-            }
+            check_in:true
         })
     } else {
-
-        if (!chk.check[chk.check.length - 1].out) {
-            chk.check[chk.check.length - 1].out = new Date();
-        } else {
-            chk.check.push({
-                in: new Date()
-            })
-        }
+        chk.check_in = !chk.check_in;
     }
-    console.log(chk)
+
     await chk.save()
         .then(_ => {
             return res.status(200).json({
-                msg: `Set checkout into staff successfully!`
+                msg: `Set check in state into staff successfully!`
             })
         })
-        .catch(err => {
-            console.log(`Can not set checkout into staff with error: ${new Error(err.message)}`)
+        .catch(err => {           
             return res.status(500).json({
-                msg: `Can not set checkout into staff with error: ${new Error(err.message)}`
+                msg: `Can not set check in state into staff with error: ${new Error(err.message)}`
             })
         })
 
@@ -108,7 +98,7 @@ const GetCheckInList = (users) => {
         CheckIn
             .find({
                 staff: { $in: users },
-                'check.out': null
+                check_in:true
             })
             .populate('staff', 'username fullname')
             .then(ci => {

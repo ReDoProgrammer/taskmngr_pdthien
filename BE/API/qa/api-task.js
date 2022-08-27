@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const Task = require("../../models/task-model");
-const CheckIn = require('../../models/staff-checkin');
 const { authenticateQAToken } = require("../../../middlewares/qa-middleware");
 const { ValidateCheckIn } = require('../../../middlewares/checkin-middleware');
 const {
