@@ -231,8 +231,8 @@
                         tr += c.root.name;
                     }
 
-                    if (c.children.length > 0) {
-                        let levels = c.children.map(x => ` ${x.task.basic.level.name}`);
+                    if (c.tasks.length > 0) {
+                        let levels = c.tasks.map(x => ` ${x.basic.level.name}`);
                         tr += ' - [<span class="text-danger">' + levels + '</span>]'
                     }
                     tr += '</td>';
@@ -316,7 +316,7 @@
                     if (typeof data.cc.root !== 'undefined') {
                         $('#divRefix').slideDown(300);
                         $('#ckbSpecialTask').prop('checked', true);
-                        if (data.cc.children.length > 0) {
+                        if (data.cc.tasks.length > 0) {
                             $('#slAvailableTasks').val(data.cc.children[0].task._id);
                         }
 

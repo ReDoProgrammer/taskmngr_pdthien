@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
+const CC = require('../../models/cc-model');
 const Task = require('../../models/task-model');
 const Job = require('../../models/job-model');
 const JobLine = require('../../models/job-line-model');
@@ -229,14 +230,54 @@ router.post('/', authenticateTLAToken, async (req, res) => {
         qa,
         editor,
         start,
-        cc
+        ccId
     } = req.body;
 
 
     let task = new Task();
-    CreateOrUpdateTask( jobId,customer_level,level,assigned_date,deadline,input_link,remark,editor,start,cc,task,task,req.user._id,true)
+    task.basic = {
+        job: jobId,
+        level,
+        mapping: customer_level,
+        deadline: {
+            begin: assigned_date,
+            end: deadline
+        },
+        link: {
+            input: input_link
+        }
+    }
+
+
+    task.status = start == 'true' ? (editor ? 0 : -1) : -10;
+
+
+    task.tla = {
+        created: {
+            by: req.user._id
+        }
+    };
+
+    if(ccId.length > 0){
+        task.cc = ccId;
+    }
+
+
+    task.remarks = [
+        {
+            content: remark,
+            created: {
+                at: new Date(),
+                by: req.user._id
+            }
+        }
+    ]
+
+
+    // CreateOrUpdateTask( jobId,customer_level,level,assigned_date,deadline,input_link,remark,editor,start,cc,task,task,req.user._id,true)
+    await task.save()
         .then(async _ => {
-            Promise.all([PushTaskIntoJobLine(jobId, task._id, customer_level, price), UpdateEditor(task._id, level, editor, req.user._id), PushCC(jobId, cc, task._id, customer_level)])
+            Promise.all([PushTaskIntoJobLine(jobId, task._id, customer_level, price), UpdateEditor(task._id, level, editor, req.user._id), PushTaskIntoCC(ccId, task._id, customer_level)])
                 .then(_async => {
                     UpdateQA(task._id, level, qa, req.user._id)
                         .then(_ => {
@@ -770,35 +811,40 @@ const ChangeVisibleQA = (taskId, qa) => {
     })
 }
 
-const PushCC = (jobId, ccId, taskId, rootId) => {
+const PushTaskIntoCC = (ccId, taskId, rootId) => {
     return new Promise(async (resolve, reject) => {
-        if (!ccId) {
+        if (ccId.length ==0) {
             return resolve();
         }
 
-        let job = await Job.findById(jobId);
-        if (!job) {
+        let cc = await CC.findById(ccId);
+        if(!cc){
             return reject({
-                code: 404,
-                msg: `Can not push CC into job cause job not found!`
+                code:404,
+                msg:`Can not push task into not found CC!`
             })
         }
 
-        let cc = (job.cc.filter(x => x._id == ccId))[0];
+        if(!cc.root && rootId){
+            cc.root = rootId;
+        }
 
 
 
         cc.tasks.push(taskId);
-        await job.save()
-            .then(_ => {
-                return resolve(job)
+        if(cc.status == -1){
+            cc.status = 0;
+        }
+        await cc.save()
+        .then(_=>{return resolve()})
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not push task into CC with caught error: ${new Error(err.message)}`
             })
-            .catch(err => {
-                return reject({
-                    code: 500,
-                    msg: `Can not push task into job cc with error: ${new Error(err.message)}`
-                })
-            })
+        })
+
+        
     })
 }
 
@@ -816,6 +862,7 @@ const PullTaskFromCC = (jobId, taskId) => {
             c.tasks = c.tasks.filter(x => x._id != taskId);
         })
 
+      
         await job.save()
             .then(_ => {
                 return resolve(job);

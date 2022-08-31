@@ -217,7 +217,7 @@
                           <th scope="col">#</th>
                           <th scope="col">Task</th>
                           <th scope="col">Remark</th>
-                          <th scope="col" class="text-right">Status</th>
+                          <th scope="col" class="text-center">Status</th>
                           <th></th>
                         </tr>
                       </thead>
@@ -351,17 +351,13 @@
   let idx = 1;
   var taskId = '';
   var levelId = '';
-  var cc = '';
+  var ccId = '';
   var ccRemark = '';
   var fee = false;
   var CustomerLevels = [];
 
   $("#slCustomerLevles").change(function () {
-    if (cc.length > 0) {
-      LoadAvailableTasks();
-    } else {
-      LoadLocalLevel();
-    }
+    LoadLocalLevel();
   });
   $("#slLocalLevels").change(function () {
     LoadQA();
@@ -370,45 +366,30 @@
 
 
   $(document).on("click", "button[name='btnCC']", function () {
-    let ccId = $(this).closest('tr').attr('id');
+    ccId = $(this).closest('tr').attr('id');
     BindContract();
     $.ajax({
-      url:'/tla/cc/detail',
-      type:'get',
+      url: '/tla/cc/detail',
+      type: 'get',
       headers: {
-            authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-          data:{ccId},
-          success:function(data){           
-            if(data.cc.fee){
-              $('#btnAddTask').click();
-              cc = ccId;             
-            }else{
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: { ccId },
+      success: function (data) {
 
-            }
-          },
-           error: function (jqXHR, textStatus, errorThrown) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Opp..',
-              text: jqXHR.responseJSON.msg
-            });
-          }
+        $('#btnAddTask').click();
+        if (data.cc.root) {
+          $('#slCustomerLevles').val(data.cc.root);
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Opp..',
+          text: jqXHR.responseJSON.msg
+        });
+      }
     })
-
-    // fee = $(this).closest('tr').data('fee');
-
-    // let rootId = $(this).closest('tr').data('root');
-    // ccRemark = $(this).closest('tr').find('td[name="remark"]').text();
-    // if (fee === true) {
-    //   BindContract();
-    // } else {
-    //   if (rootId) {
-    //     $('#slCustomerLevles').val(rootId);
-    //   }
-    //   LoadAvailableTasks();
-    // }
-    // $('#panel_task').slideDown(500);
   })
 
 
@@ -436,174 +417,94 @@
       return;
     }
 
-    if (cc.length == 0) {
-      if (taskId.trim().length == 0) {
-        $.ajax({
-          url: '/tla/task',
-          type: 'post',
-          headers: {
-            authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-          data: {
-            jobId,
-            customer_level,
-            price,
-            level,
-            assigned_date,
-            deadline,
-            input_link,
-            remark,
-            qa,
-            editor,
-            start: $('#rbtStart').is(':checked'),
-            cc
-          },
-          success: function (data) {
-            $.toast({
-              heading: 'Successfully!',
-              text: data.msg,
-              showHideTransition: 'fade',
-              icon: 'success'
-            });
-            LoadTasks();
-            $('#txtInputLink').val('');
-            $('#txtRemark').val('');
-            $('#divAddOrUpdateTask').slideUp(500);
-          },
-          error: function (jqXHR, textStatus, errorThrown) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Opp..',
-              text: jqXHR.responseJSON.msg
-            });
-          }
-        })
-      } else {
-        $.ajax({
-          url: '/tla/task',
-          type: 'put',
-          headers: {
-            authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-          data: {
-            taskId,
-            level,
-            assigned_date,
-            deadline,
-            input_link,
-            remark,
-            qa,
-            editor,
-            start: $('#rbtStart').is(':checked'),
-            cc
-          },
-          success: function (data) {
-            $.toast({
-              heading: 'Successfully!',
-              text: data.msg,
-              showHideTransition: 'fade',
-              icon: 'success'
-            });
-            LoadTasks();
-            LoadJob();
-            $('#txtInputLink').val('');
-            $('#txtRemark').val('');
-            $('#divAddOrUpdateTask').slideUp(500);
-          },
-          error: function (err) {
-            $.toast({
-              heading: 'Error',
-              text: err.responseJSON.msg,
-              showHideTransition: 'fade',
-              icon: 'error'
-            });
-          },
-        })
-      }
-    } else {
-      if (fee) {
-        $.ajax({
-          url: '/tla/task',
-          type: 'post',
-          headers: {
-            authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-          data: {
-            jobId,
-            customer_level,
-            is_root,
-            level,
-            assigned_date,
-            deadline,
-            input_link,
-            remark,
-            qa,
-            editor,
-            start: $('#rbtStart').is(':checked'),
-            cc
-          },
-          success: function (data) {
-            $.toast({
-              heading: 'Successfully!',
-              text: data.msg,
-              showHideTransition: 'fade',
-              icon: 'success'
-            });
-            LoadTasks();
-            $('#txtInputLink').val('');
-            $('#txtRemark').val('');
-            $('#divAddOrUpdateTask').slideUp(500);
-          },
-          error: function (err) {
-            $.toast({
-              heading: 'Error',
-              text: err.responseJSON.msg,
-              showHideTransition: 'fade',
-              icon: 'error'
-            });
-          },
-        })
-      } else {
-        $.ajax({
-          url: '/tla/task/cc',
-          type: 'put',
-          headers: {
-            authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-          data: {
-            taskId: $('#slLocalLevels option:selected').data('task'),
-            level,
-            assigned_date,
-            deadline,
-            input_link,
-            remark,
-            qa,
-            editor,
-            start: $('#rbtStart').is(':checked'),
-            cc
-          },
-          success: function (data) {
-            $.toast({
-              heading: 'Successfully!',
-              text: data.msg,
-              showHideTransition: 'fade',
-              icon: 'success'
-            });
-            LoadTasks();
-            LoadJob();
-            $('#txtInputLink').val('');
-            $('#txtRemark').val('');
-            $('#divAddOrUpdateTask').slideUp(500);
-            cc = '';
 
-          },
-          error: function (jqXHR, textStatus, errorThrown) {
-            $('#msgError').text(`(!) ${jqXHR.responseJSON.msg}`);
-            $('#msgError').show().delay(3000).fadeOut();
-          }
-        })
-      }
+    if (taskId.trim().length == 0) {
+      $.ajax({
+        url: '/tla/task',
+        type: 'post',
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: {
+          jobId,
+          customer_level,
+          price,
+          level,
+          assigned_date,
+          deadline,
+          input_link,
+          remark,
+          qa,
+          editor,
+          start: $('#rbtStart').is(':checked'),
+          ccId
+        },
+        success: function (data) {
+          $.toast({
+            heading: 'Successfully!',
+            text: data.msg,
+            showHideTransition: 'fade',
+            icon: 'success'
+          });
+          LoadTasks();
+          LoadCCList();
+          $('#txtInputLink').val('');
+          $('#txtRemark').val('');
+          $('#divAddOrUpdateTask').slideUp(500);
+          ccId = '';
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Opp..',
+            text: jqXHR.responseJSON.msg
+          });
+        }
+      })
+    } else {
+      $.ajax({
+        url: '/tla/task',
+        type: 'put',
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: {
+          taskId,
+          level,
+          assigned_date,
+          deadline,
+          input_link,
+          remark,
+          qa,
+          editor,
+          start: $('#rbtStart').is(':checked')
+        },
+        success: function (data) {
+          $.toast({
+            heading: 'Successfully!',
+            text: data.msg,
+            showHideTransition: 'fade',
+            icon: 'success'
+          });
+          LoadTasks();
+          LoadJob();
+          LoadCCList();
+          $('#txtInputLink').val('');
+          $('#txtRemark').val('');
+          $('#divAddOrUpdateTask').slideUp(500);
+          ccId = '';          
+        },
+        error: function (err) {
+          $.toast({
+            heading: 'Error',
+            text: err.responseJSON.msg,
+            showHideTransition: 'fade',
+            icon: 'error'
+          });
+        },
+      })
     }
+
     $('#panel_task').slideUp(500);
   })
 
@@ -707,7 +608,6 @@
 
   $('#btnAddTask').click(function () {
     taskId = '';
-    cc = '';
     $('#ckbAssignEditor').prop('checked', false);
     $('#ckbAssignQA').prop('checked', false);
     $('#colEditor').slideUp(300);
@@ -730,7 +630,7 @@
 </script>
 
 <script>
- 
+
 
 
   function LoadEditor() {
@@ -832,11 +732,20 @@
           let tr = '<tr id="' + c._id + '">';
           tr += '<td>' + (idx++) + '</td>';
           tr += '<td class="font-weight-bold text-danger text-left">';
-            if(c.root){
-              tr+= c.root.name;
-            }
+          if (c.root) {
+            tr += c.root.name;
+          }
           tr += '</td>';
           tr += '<td class="text-left" name="remark">' + c.remark + '</td>';
+          tr += '<td class="text-center"><i>';
+          switch (c.status) {
+            case -1: tr += '<span class="text-danger">Initial</span>'; break;
+            case 0: tr += '<span class="text-info">Processing</span>'; break;
+            default:
+              tr += '<span class="text-primary">Done</span>'; break;
+          }
+
+          tr += '</i></td>';
           tr += '<td class="text-left font-italic text-right">';
           tr += '</td>';
           tr += '<td class="text-right">';
@@ -869,8 +778,8 @@
           if (t.status == -10) {
             tr += '<i class="fa fa-pause text-danger" aria-hidden="true" style="margin-right: 10px;"></i>';
           }
-          tr += '<span class="font-weight-bold text-danger">'+t.basic.mapping.name+'</span> - '+t.basic.level.name;
-          if (t.fixible_task || t.additional_task) {
+          tr += '<span class="font-weight-bold text-danger">' + t.basic.mapping.name + '</span> - ' + t.basic.level.name;
+          if (t.cc) {
             tr += ' <span class="text-danger"><i class="fa fa-cc" aria-hidden="true"></i></span>';
           }
           tr += "</td>";

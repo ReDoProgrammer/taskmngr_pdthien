@@ -362,7 +362,12 @@ const taskSchema = new Schema({
                 ref: 'user'
             }]
         }]
-    }]
+    }],
+
+    cc:{
+        type:Schema.Types.ObjectId,
+        ref:'cc'
+    }
 });
 
 

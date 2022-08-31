@@ -20,12 +20,9 @@ const ccSchema = new Schema({
     remark: {
         type: String
     },
-    children: [{
-        task: {
-            type: Schema.Types.ObjectId,
-            ref: 'task'
-        }     
-
+    tasks: [{
+        type: Schema.Types.ObjectId,
+        ref: 'task'
     }],
     fee: {
         type: Boolean
