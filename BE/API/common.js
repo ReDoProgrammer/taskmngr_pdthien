@@ -136,17 +136,17 @@ const GetTask = taskId => {
             .populate([
                 { path: 'basic.job' },
                 { path: 'basic.level' },
-                {path:'basic.mapping', select:'name -_id'},
+                { path: 'basic.mapping', select: 'name -_id' },
                 { path: 'editor.staff', select: 'username fullname' },
                 { path: 'qa.staff', select: 'username fullname' },
                 { path: 'dc.staff', select: 'username fullname' },
                 { path: 'remarks.created.by', select: 'username fullname' }
             ]);
         if (!task) {
-          return resolve({
-            code:404,
-            msg:`Task not found!`
-          })
+            return resolve({
+                code: 404,
+                msg: `Task not found!`
+            })
         }
         return resolve(task);
     })
@@ -176,19 +176,90 @@ const GetCustomerById = customerId => {
 }
 
 
-const GetAccessingLevels = staff_level =>{
-    return new Promise(async (resolve,reject)=>{
+const GetAccessingLevels = staff_level => {
+    return new Promise(async (resolve, reject) => {
         let sl = await StaffLevel.findById(staff_level);
-        if(sl.levels.length==0){
+        if (sl.levels.length == 0) {
             return reject({
-                code:403,
-                msg:`You can not access any job level`
+                code: 403,
+                msg: `You can not access any job level`
             })
         }
         return resolve(sl.levels);
     })
 }
 
+
+const CreateOrUpdateTask = (
+    jobId,
+    customer_level,
+    level,
+    assigned_date,
+    deadline,
+    input_link,
+    remark,
+    editor,
+    start,
+    cc,
+    task,
+    staff,
+    is_created
+) => {
+    return new Promise(async (resolve, reject) => {
+        task.basic = {
+            job: jobId,
+            level,
+            mapping: customer_level,
+            deadline: {
+                begin: assigned_date,
+                end: deadline
+            },
+            link: {
+                input: input_link
+            }
+        }
+
+
+        task.status = start == 'true' ? (editor ? 0 : -1) : -10;
+
+        if(is_created){
+            task.tla = {
+                created: {
+                    by: staff
+                }
+            };
+        }else{
+            task.updated = {
+                at: new Date(),
+                by: staff
+            }
+        }
+       
+
+        task.remarks = [
+            {
+                content: remark,
+                created: {
+                    at: new Date(),
+                    by: staff
+                }
+            }
+        ]
+
+
+
+        await task.save()
+        .then(_=>{
+            return resolve(task);
+        })
+        .catch(err=>{
+            return reject({
+                code:500,
+                msg:`Can not ${is_created?`create`:`update`} task with caught error: ${new Error(err.message)}`
+            })
+        })
+    })
+}
 
 
 
@@ -200,5 +271,6 @@ module.exports = {
     getWage,
     GetTask,
     GetCustomerById,
-    GetAccessingLevels
+    GetAccessingLevels,
+    CreateOrUpdateTask
 }

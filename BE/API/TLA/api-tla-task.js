@@ -7,7 +7,9 @@ const JobLine = require('../../models/job-line-model');
 const {
     getWage,
     GetTask,
-    GetCustomerById } = require('../common');
+    GetCustomerById,
+    CreateOrUpdateTask
+} = require('../common');
 const { log } = require('npm');
 
 
@@ -232,42 +234,7 @@ router.post('/', authenticateTLAToken, async (req, res) => {
 
 
     let task = new Task();
-
-    task.basic = {
-        job: jobId,
-        level,
-        mapping: customer_level,
-        deadline: {
-            begin: assigned_date,
-            end: deadline
-        },
-        link: {
-            input: input_link
-        }
-    }
-
-
-    task.status = start == 'true' ? (editor ? 0 : -1) : -10;
-
-    task.tla = {
-        created: {
-            by: req.user._id
-        }
-    };
-
-    task.remarks = [
-        {
-            content: remark,
-            created: {
-                at: new Date(),
-                by: req.user._id
-            }
-        }
-    ]
-
-
-
-    await task.save()
+    CreateOrUpdateTask( jobId,customer_level,level,assigned_date,deadline,input_link,remark,editor,start,cc,task,task,req.user._id,true)
         .then(async _ => {
             Promise.all([PushTaskIntoJobLine(jobId, task._id, customer_level, price), UpdateEditor(task._id, level, editor, req.user._id), PushCC(jobId, cc, task._id, customer_level)])
                 .then(_async => {
@@ -296,99 +263,7 @@ router.post('/', authenticateTLAToken, async (req, res) => {
         })
 })
 
-router.put('/cc', authenticateTLAToken, async (req, res) => {
-    let {
-        taskId,
-        level,
-        assigned_date,
-        deadline,
-        input_link,
-        remark,
-        qa,
-        editor,
-        cc,
-        root_id,
-        is_root
-    } = req.body;
 
-
-    let task = await Task.findById(taskId);
-
-    if (!task) {
-        return res.status(404).json({
-            msg: `Can not update task because it\'s not found!`
-        })
-    }
-    task.basic.level = level;
-    task.basic.deadline = {
-        begin: assigned_date,
-        end: deadline
-    };
-    task.basic.link.input = input_link;
-
-    task.status = -6;
-
-
-    task.remarks.push({
-        content: remark,
-        created: {
-            at: new Date(),
-            by: req.user._id
-        }
-    })
-
-
-    task.updated = {
-        at: new Date(),
-        by: req.user._id
-    }
-
-
-    await task.save()
-        .then(_ => {
-            Promise.all([ChangeVisibleEditor(task._id, editor), PushCC(task.basic.job, cc, task._id, root_id, is_root)])
-                .then(_ => {
-                    ChangeVisibleQA(task._id, qa)
-                        .then(_ => {
-                            UpdateEditor(task._id, level, editor, req.user._id)
-                                .then(_ => {
-                                    UpdateQA(task._id, level, qa, req.user._id)
-                                        .then(_ => {
-
-                                            return res.status(200).json({
-                                                msg: `The task has been updated!`
-                                            })
-                                        })
-                                        .catch(err => {
-                                            return res.status(err.code).json({
-                                                msg: err.msg
-                                            })
-                                        })
-                                })
-                                .catch(err => {
-                                    return res.status(err.code).json({
-                                        msg: err.msg
-                                    })
-                                })
-                        })
-                        .catch(err => {
-                            return res.status(err.code).json({
-                                msg: err.msg
-                            })
-                        })
-                })
-                .catch(err => {
-                    return res.status(err.code).json({
-                        msg: err.msg
-                    })
-                })
-        })
-        .catch(err => {
-            return res.status(500).json({
-                msg: `Can not update task with error: ${new Error(err.message)}`
-            })
-        })
-})
 
 router.put('/upload', authenticateTLAToken, async (req, res) => {
     let { taskId, uploaded_link, remark } = req.body;
