@@ -1,0 +1,40 @@
+<!-- Modal -->
+<div id="modalSubmit" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Submit finished task</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-inline text-center">
+                    <label class="text-danger">
+                        <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                        Choose paid way:
+                    </label>
+                    <label class="checkbox-inline">
+                        <input id="ckbFree" type="checkbox" value="genMale">Free task</label>
+                    <label class="checkbox-inline">
+                        <input id="ckbUnwage" type="checkbox" value="genMale">Unwage</label>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="btnSubmitDone">
+                    Submit task finished
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $('#modalSubmit').on('shown.bs.modal', function () {
+        $('#ckbFree').prop('checked', false);
+        $('#ckbUnwage').prop('checked', false);
+    });
+</script>

@@ -132,7 +132,7 @@ router.get('/detail', authenticateSaleToken, (req, res) => {
 })
 
 router.put('/submit', authenticateSaleToken, async (req, res) => {
-    let { taskId } = req.body;
+    let { taskId,free,unwage } = req.body;
     let task = await Task.findById(taskId);
     if (!task) {
         return res.status(404).json({
@@ -140,6 +140,8 @@ router.put('/submit', authenticateSaleToken, async (req, res) => {
         })
     }
     task.status = 5;
+    task.paid.free = free;
+    task.paid.unwage = unwage;
     task.done.push({
         at: new Date(),
         by: req.user._id

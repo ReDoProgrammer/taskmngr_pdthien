@@ -94,24 +94,60 @@
 
         switch (fnc) {
             case 'submit-task-done':
-                if (confirm('Are you sure want to submit done for this task?')) {
-                    $.ajax({
-                        url: '/sale/task/submit',
-                        type: 'put',
-                        headers: {
-                            authorization: "Bearer " + localStorage.getItem("accessToken"),
-                        },
-                        data: {
-                            taskId
-                        },
-                        success: function (data) {
-                            alert(data.msg);
-                            LoadTasks();
-                        }, error: function (request, status, error) {
-                            alert(request.responseJSON.msg);
+                $.ajax({
+                    url: '/sale/task/detail',
+                    type: 'get',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                    data: { taskId },
+                    success: function (data) {
+                        if (data.task.cc) {
+                            $('#modalSubmit').modal();
+                        } else {
+                            Swal.fire({
+                                icon: 'question',
+                                title: 'Do you want to submit finish this task?',
+                                showDenyButton: true,
+                                showCancelButton: true,
+                                confirmButtonText: 'Yes',
+                                denyButtonText: `No`,
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $.ajax({
+                                        url: '/sale/task/submit',
+                                        type: 'put',
+                                        headers: {
+                                            authorization: "Bearer " + localStorage.getItem("accessToken"),
+                                        },
+                                        data: {
+                                            taskId,
+                                            free:false,
+                                            unwage:false
+                                        },
+                                        success: function (data) {
+                                            $.toast({
+                                                heading: 'Successfully',
+                                                text: data.msg,
+                                                showHideTransition: 'fade',
+                                                icon: 'success'
+                                            });
+                                            LoadTasks();
+                                        }
+                                        , error: function (jqXHR, textStatus, errorThrown) {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Opp..',
+                                                text: jqXHR.responseJSON.msg
+                                            });
+                                        }
+                                    })
+                                }
+                            })
                         }
-                    })
-                }
+                    }
+                })
+
                 break;
             case 'reject-task':
                 $('#modalRejectTask').modal();
@@ -225,7 +261,7 @@
                     tr += '<td class="font-weight-bold text-info">' + t.basic.job.name + '</td>';
                     tr += '<td class="font-weight-bold">' + t.basic.level.name;
 
-                        console.log(t.basic.job.cc)
+                    console.log(t.basic.job.cc)
                     // let chk = (t.basic.job.cc.filter(x => x.tasks.includes(t._id))).length > 0 ? true : false;
                     // if (chk) {
                     //     tr += '<i class="fa fa-cc text-danger ml-2" aria-hidden="true"></i>'
@@ -389,3 +425,4 @@
 
 <%-include('task_detail')%>
     <%-include('reject-modal')%>
+        <%-include('submit-modal')%>

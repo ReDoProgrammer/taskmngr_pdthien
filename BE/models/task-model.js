@@ -43,6 +43,18 @@ const taskSchema = new Schema({
         }
     },
 
+    done: [
+        //thuộc tính đánh dấu trạng thái submit done của Sale
+        {
+            at: {
+                type: Date
+            },
+            by: {
+                type: Schema.Types.ObjectId,
+                ref: 'user'
+            }
+        }
+    ],
 
     dc: [{
         staff: {
@@ -283,11 +295,11 @@ const taskSchema = new Schema({
         },
         penalty: {
             type: Boolean,
-            default:false
+            default: false
         },
         fines: {
             type: Number,
-            default:0
+            default: 0
         },
         at: {
             type: Date
@@ -312,17 +324,6 @@ const taskSchema = new Schema({
             }
         }
     }],
-
-    fixible_task: {
-        //thuộc tính tham chiếu tới cột fixible_tasks trong cc model
-        type: Schema.Types.ObjectId,
-        ref: 'cc'
-    },
-    additional_task: {
-        //thuộc tính tham chiếu tới cột additional_tasks trong cc model
-        type: Schema.Types.ObjectId,
-        ref: 'cc'
-    },
 
     //thong tinh danh dau thuong/phat tu Sale or TLA
     bp: [{
@@ -364,9 +365,22 @@ const taskSchema = new Schema({
         }]
     }],
 
-    cc:{
-        type:Schema.Types.ObjectId,
-        ref:'cc'
+    cc: {
+        type: Schema.Types.ObjectId,
+        ref: 'cc'
+    },
+    paid: {
+        //áp dụng cho trường hợp task là CC
+        free: {
+            //thuộc tính đánh dấu tính tiền cho khách
+            type: Boolean,
+            default: false
+        },
+        unwage: {
+            //thuộc tính đánh dấu tính tiền cho nhân viên
+            type: Boolean,
+            default: false
+        }
     }
 });
 
