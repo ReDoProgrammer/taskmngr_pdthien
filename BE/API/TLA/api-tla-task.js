@@ -258,7 +258,7 @@ router.post('/', authenticateTLAToken, async (req, res) => {
         }
     };
 
-    if(ccId.length > 0){
+    if (ccId.length > 0) {
         task.cc = ccId;
     }
 
@@ -495,7 +495,7 @@ router.delete('/', authenticateTLAToken, async (req, res) => {
     }
     await task.delete()
         .then(_ => {
-            PullTaskFromJob(task.basic.job, task.basic.mapping, task._id)
+            Promise.all[PullTaskFromJob(task.basic.job, task.basic.mapping, task._id), PullTaskFromCC(task.cc, task._id)]
                 .then(_ => {
                     return res.status(200).json({
                         msg: `The task has been deleted!`
@@ -813,66 +813,66 @@ const ChangeVisibleQA = (taskId, qa) => {
 
 const PushTaskIntoCC = (ccId, taskId, rootId) => {
     return new Promise(async (resolve, reject) => {
-        if (ccId.length ==0) {
+        if (ccId.length == 0) {
             return resolve();
         }
 
         let cc = await CC.findById(ccId);
-        if(!cc){
+        if (!cc) {
             return reject({
-                code:404,
-                msg:`Can not push task into not found CC!`
+                code: 404,
+                msg: `Can not push task into not found CC!`
             })
         }
 
-        if(!cc.root && rootId){
+        if (!cc.root && rootId) {
             cc.root = rootId;
         }
 
 
 
         cc.tasks.push(taskId);
-        if(cc.status == -1){
+        if (cc.status == -1) {
             cc.status = 0;
         }
         await cc.save()
-        .then(_=>{return resolve()})
-        .catch(err=>{
-            return reject({
-                code:500,
-                msg:`Can not push task into CC with caught error: ${new Error(err.message)}`
-            })
-        })
-
-        
-    })
-}
-
-const PullTaskFromCC = (jobId, taskId) => {
-    return new Promise(async (resolve, reject) => {
-        let job = await Job.findById(jobId);
-        if (!job) {
-            return reject({
-                code: 404,
-                msg: `Job not found to pull task from CC!`
-            })
-        }
-
-        job.cc.forEach(c => {
-            c.tasks = c.tasks.filter(x => x._id != taskId);
-        })
-
-      
-        await job.save()
-            .then(_ => {
-                return resolve(job);
-            })
+            .then(_ => { return resolve() })
             .catch(err => {
                 return reject({
                     code: 500,
-                    msg: `Can not pull task from CC with error: ${new Error(err.message)}`
+                    msg: `Can not push task into CC with caught error: ${new Error(err.message)}`
                 })
             })
+
+
+    })
+}
+
+const PullTaskFromCC = (ccId, taskId) => {
+    return new Promise(async (resolve, reject) => {
+        if (!ccId) {
+            return resolve();
+        }
+        let cc = await CC.findById(ccId);
+        if (!cc) {
+            return reject({
+                code: 404,
+                msg: `Can not remove the task out of not found CC!`
+            })
+
+            cc.tasks.pull(taskId);
+            if (cc.tasks.length == 0) {
+                cc.status = -1;
+            }
+            await cc.save()
+                .then(_ => { return resolve() })
+                .catch(err => {
+                    return reject({
+                        code: 500,
+                        msg: `Can not remove the task out of CC with caught error: ${new Error(err.message)}`
+                    })
+                })
+        }
     })
 }
 
