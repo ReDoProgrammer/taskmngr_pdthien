@@ -8,8 +8,7 @@ const JobLine = require('../../models/job-line-model');
 const {
     getWage,
     GetTask,
-    GetCustomerById,
-    CreateOrUpdateTask
+    GetCustomerById
 } = require('../common');
 const { log } = require('npm');
 
@@ -18,6 +17,20 @@ const _EDITOR = 'EDITOR';
 const _QA = 'QA';
 
 const pageSize = 20;
+
+router.get('/list-available-tasks',authenticateTLAToken,async (req,res)=>{
+    let {jobId}  = req.query;
+    
+    let jobLine = await JobLine.find({job:jobId})
+    .populate([
+        {path:'level',select:'name'},
+        {path:'tasks'}
+    ])
+    ;
+   
+
+   console.log(jobLine)
+})
 
 router.get('/list-based-on-root', authenticateTLAToken, async (req, res) => {
     let { jobId, rootId, is_root } = req.query;

@@ -367,7 +367,6 @@
 
   $(document).on("click", "button[name='btnCC']", function () {
     ccId = $(this).closest('tr').attr('id');
-    BindContract();
     $.ajax({
       url: '/tla/cc/detail',
       type: 'get',
@@ -376,9 +375,20 @@
       },
       data: { ccId },
       success: function (data) {
-
-        $('#btnAddTask').click();
-        if (data.cc.root) {
+        if (data.cc.fee) {
+          $('#btnAddTask').click();
+        } else {
+          $.ajax({
+            url: '/tla/task/list-available-tasks',
+            type: 'get',
+            headers: {
+              authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            data: { jobId },
+            success: function (data) {
+              console.log(data)
+            }
+          })
           $('#slCustomerLevles').val(data.cc.root);
         }
       },
@@ -492,7 +502,7 @@
           $('#txtInputLink').val('');
           $('#txtRemark').val('');
           $('#divAddOrUpdateTask').slideUp(500);
-          ccId = '';          
+          ccId = '';
         },
         error: function (err) {
           $.toast({
@@ -608,6 +618,7 @@
 
   $('#btnAddTask').click(function () {
     taskId = '';
+    BindContract();
     $('#ckbAssignEditor').prop('checked', false);
     $('#ckbAssignQA').prop('checked', false);
     $('#colEditor').slideUp(300);
@@ -685,25 +696,28 @@
   }
 
   function LoadLocalLevel() {
-    $.ajax({
-      url: '/tla/job/local-level',
-      type: 'get',
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      data: {
-        customer_level: $('#slCustomerLevles option:selected').val()
-      },
-      success: function (data) {
-        $('#slLocalLevels').empty();
-        data.levels.forEach(l => {
-          let opt = '<option value="' + l._id + '">' + l.name + '</option>';
-          $('#slLocalLevels').append(opt);
-        })
-        LoadQA();
-        LoadEditor();
-      }
-    })
+    if (ccId == '') {
+      $.ajax({
+        url: '/tla/job/local-level',
+        type: 'get',
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: {
+          customer_level: $('#slCustomerLevles option:selected').val()
+        },
+        success: function (data) {
+          $('#slLocalLevels').empty();
+          data.levels.forEach(l => {
+            let opt = '<option value="' + l._id + '">' + l.name + '</option>';
+            $('#slLocalLevels').append(opt);
+          })
+          LoadQA();
+          LoadEditor();
+        }
+      })
+    }
+
   }
 
 
