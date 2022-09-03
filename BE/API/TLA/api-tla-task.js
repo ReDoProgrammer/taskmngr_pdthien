@@ -21,15 +21,25 @@ const pageSize = 20;
 router.get('/list-available-tasks',authenticateTLAToken,async (req,res)=>{
     let {jobId}  = req.query;
     
-    let jobLine = await JobLine.find({job:jobId})
+    let jobLines = await JobLine.find({
+        job:jobId
+    })
     .populate([
         {path:'level',select:'name'},
-        {path:'tasks'}
-    ])
-    ;
-   
+        {
+            path:'tasks',
+            match:{status:{$gt:3}},
+            populate:{
+                path:'basic.level',
+                select:'name'
+            }
+        }
+    ]);
 
-   console.log(jobLine)
+    return res.status(200).json({
+        msg:`Load job lines based on job with available tasks successfully!`,
+        jobLines
+    })
 })
 
 router.get('/list-based-on-root', authenticateTLAToken, async (req, res) => {
@@ -45,8 +55,7 @@ router.get('/list-based-on-root', authenticateTLAToken, async (req, res) => {
     }
     let tasks = await Task.find({
         'basic.job': jobId,
-        _id: { $in: taskIds },
-        // status: 3
+        _id: { $in: taskIds }        
     }).populate('basic.level');
 
 

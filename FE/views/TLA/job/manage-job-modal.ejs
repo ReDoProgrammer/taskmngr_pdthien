@@ -355,6 +355,7 @@
   var ccRemark = '';
   var fee = false;
   var CustomerLevels = [];
+  var tasks = [];
 
   $("#slCustomerLevles").change(function () {
     LoadLocalLevel();
@@ -387,6 +388,25 @@
             data: { jobId },
             success: function (data) {
               console.log(data)
+              $('#panel_task').slideDown(500);
+              $('#slCustomerLevles').empty();
+              CustomerLevels = data.jobLines.map(x=>{
+                let obj = {};
+                obj._id = x.level._id;
+                obj.name = x.level.name;
+                return obj;
+              });
+              console.log(CustomerLevels)
+              // tasks = data.jobLines.map(x=>{
+              //   let task = {};
+              //   task._id = x.tasks.map(y=>{
+              //     let t = {};
+              //     t._id = 
+              //   })
+              // })
+              data.jobLines.forEach(l=>{
+                $('#slCustomerLevles').append('<option value="'+l.level._id+'">'+l.level.name+'</option>');
+              })
             }
           })
           $('#slCustomerLevles').val(data.cc.root);
