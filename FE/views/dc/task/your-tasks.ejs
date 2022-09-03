@@ -10,6 +10,7 @@
           <option value="2">Q.A submited</option>
           <option value="3">DC submited</option>
           <option value="4">Uploaded</option>
+          <option value="5">Done</option>
           <option value="-2">Q.A rejected</option>
           <option value="-3">DC rejected</option>
           <option value="-4">Sale reject</option>
@@ -72,7 +73,7 @@
   var taskId = '';
 
   $(document).ready(function () {
-    $('#slStatus').val([-10, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4]).selectpicker('refresh');
+    $('#slStatus').val([-10, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4,5]).selectpicker('refresh');
     LoadTasks();
     setInterval(function () {
       LoadTasks();
