@@ -37,4 +37,50 @@
         $('#ckbFree').prop('checked', false);
         $('#ckbUnwage').prop('checked', false);
     });
+
+    $('#btnSubmitDone').click(function () {
+        let free = $('#ckbFree').is(':checked');
+        let unwage = $('#ckbUnwage').is(':checked');
+
+        Swal.fire({
+            icon: 'question',
+            title: 'Do you want to submit finish this task?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            denyButtonText: `No`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/sale/task/submit',
+                    type: 'put',
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                    data: {
+                        taskId,
+                        free,
+                        unwage
+                    },
+                    success: function (data) {
+                        $.toast({
+                            heading: 'Successfully',
+                            text: data.msg,
+                            showHideTransition: 'fade',
+                            icon: 'success'
+                        });
+                        $('#modalSubmit').modal('hide');
+                        LoadTasks();
+                    }
+                    , error: function (jqXHR, textStatus, errorThrown) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Opp..',
+                            text: jqXHR.responseJSON.msg
+                        });
+                    }
+                })
+            }
+        })
+    })
 </script>
