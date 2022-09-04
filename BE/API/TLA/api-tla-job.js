@@ -3,6 +3,7 @@ const { authenticateTLAToken } = require("../../../middlewares/tla-middleware");
 const Job = require('../../models/job-model');
 const Mapping = require('../../models/mapping-model');
 const Level = require('../../models/job-level-model');
+const JobLine = require('../../models/job-line-model');
 
 const pageSize = 20;
 
@@ -76,7 +77,7 @@ router.get('/detail', authenticateTLAToken, async (req, res) => {
     let job = await Job.findById(jobId)
         .populate([
             { path: 'created.by', select: 'username fullname' },
-            { path: 'customer' },           
+            { path: 'customer' },
             { path: 'captured.material' },
             { path: 'captured.user' },
             {
@@ -113,6 +114,34 @@ router.get('/local-level', authenticateTLAToken, async (req, res) => {
         levels
     })
 
+
+})
+
+router.get('/available-tasks', authenticateTLAToken, async (req, res) => {
+    let { jobId, rootId } = req.query;
+    let jl = await JobLine.findOne({
+        job: jobId,
+        level: rootId
+    })
+        .populate([{
+            path: 'tasks',           
+            populate: {
+                path: 'basic.level'
+            },
+           
+        },
+
+        {
+            path: 'tasks',
+            populate: {
+                path: 'editor.staff'
+            }
+        }]);
+
+    return res.status(200).json({
+        msg: `Load available task based on root successfully!`,
+        tasks: jl.tasks
+    })
 
 })
 

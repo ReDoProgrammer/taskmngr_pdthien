@@ -18,29 +18,6 @@ const _QA = 'QA';
 
 const pageSize = 20;
 
-router.get('/list-available-tasks',authenticateTLAToken,async (req,res)=>{
-    let {jobId}  = req.query;
-    
-    let jobLines = await JobLine.find({
-        job:jobId
-    })
-    .populate([
-        {path:'level',select:'name'},
-        {
-            path:'tasks',
-            match:{status:{$gt:3}},
-            populate:{
-                path:'basic.level',
-                select:'name'
-            }
-        }
-    ]);
-
-    return res.status(200).json({
-        msg:`Load job lines based on job with available tasks successfully!`,
-        jobLines
-    })
-})
 
 router.get('/list-based-on-root', authenticateTLAToken, async (req, res) => {
     let { jobId, rootId, is_root } = req.query;
@@ -55,7 +32,7 @@ router.get('/list-based-on-root', authenticateTLAToken, async (req, res) => {
     }
     let tasks = await Task.find({
         'basic.job': jobId,
-        _id: { $in: taskIds }        
+        _id: { $in: taskIds }
     }).populate('basic.level');
 
 
@@ -515,9 +492,11 @@ router.delete('/', authenticateTLAToken, async (req, res) => {
             msg: `Can not delete task after submiting!`
         })
     }
+
+    var tmp = task;
     await task.delete()
         .then(_ => {
-            Promise.all[PullTaskFromJob(task.basic.job, task.basic.mapping, task._id), PullTaskFromCC(task.cc, task._id)]
+            Promise.all[PullTaskFromJob(tmp.basic.job, tmp.basic.mapping, tmp._id), PullTaskFromCC(tmp.cc, tmp._id)]
                 .then(_ => {
                     return res.status(200).json({
                         msg: `The task has been deleted!`

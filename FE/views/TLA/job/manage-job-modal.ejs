@@ -352,10 +352,8 @@
   var taskId = '';
   var levelId = '';
   var ccId = '';
-  var ccRemark = '';
-  var fee = false;
-  var CustomerLevels = [];
-  var tasks = [];
+  var RefixCC = false;
+  var rootId = '';
 
   $("#slCustomerLevles").change(function () {
     LoadLocalLevel();
@@ -368,6 +366,7 @@
 
   $(document).on("click", "button[name='btnCC']", function () {
     ccId = $(this).closest('tr').attr('id');
+    rootId = $(this).closest('tr').data('root');
     $.ajax({
       url: '/tla/cc/detail',
       type: 'get',
@@ -376,41 +375,22 @@
       },
       data: { ccId },
       success: function (data) {
-        if (data.cc.fee) {
-          $('#btnAddTask').click();
+        $('#slCustomerLevles').prop("disabled", false);
+        $('#panel_task').slideDown(500);
+        if (rootId) {
+          $('#slCustomerLevles').val(rootId);
+          $('#slCustomerLevles').prop("disabled", true);
+          if (data.cc.fee) {
+            $('#btnAddTask').click();
+          } else {
+            RefixCC = true;
+            LoadLocalLevel();
+          }
         } else {
-          $.ajax({
-            url: '/tla/task/list-available-tasks',
-            type: 'get',
-            headers: {
-              authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-            data: { jobId },
-            success: function (data) {
-              console.log(data)
-              $('#panel_task').slideDown(500);
-              $('#slCustomerLevles').empty();
-              CustomerLevels = data.jobLines.map(x=>{
-                let obj = {};
-                obj._id = x.level._id;
-                obj.name = x.level.name;
-                return obj;
-              });
-              console.log(CustomerLevels)
-              // tasks = data.jobLines.map(x=>{
-              //   let task = {};
-              //   task._id = x.tasks.map(y=>{
-              //     let t = {};
-              //     t._id = 
-              //   })
-              // })
-              data.jobLines.forEach(l=>{
-                $('#slCustomerLevles').append('<option value="'+l.level._id+'">'+l.level.name+'</option>');
-              })
-            }
-          })
-          $('#slCustomerLevles').val(data.cc.root);
+          $('#slCustomerLevles').prop("disabled", false);
+
         }
+
       },
       error: function (jqXHR, textStatus, errorThrown) {
         Swal.fire({
@@ -562,6 +542,7 @@
 
   $(document).on('click', 'button[name="btnDelTask"]', function (e) {
     taskId = $(this).closest('tr').attr('id');
+    RefixCC = false;
     Swal.fire({
       icon: 'question',
       title: 'Do you want to delete this task out of job?',
@@ -602,6 +583,7 @@
   })
 
   $(document).on('click', 'button[name="btnEditTask"]', function (e) {
+    RefixCC = false;
     taskId = $(this).closest('tr').attr('id');
     $('#panel_task').slideDown(500);
     $.ajax({
@@ -638,6 +620,7 @@
 
   $('#btnAddTask').click(function () {
     taskId = '';
+    RefixCC = false;
     BindContract();
     $('#ckbAssignEditor').prop('checked', false);
     $('#ckbAssignQA').prop('checked', false);
@@ -716,7 +699,7 @@
   }
 
   function LoadLocalLevel() {
-    if (ccId == '') {
+    if (!RefixCC) {
       $.ajax({
         url: '/tla/job/local-level',
         type: 'get',
@@ -736,8 +719,31 @@
           LoadEditor();
         }
       })
-    }
+    } else {
+      $.ajax({
+        url: '/tla/job/available-tasks',
+        type: 'get',
+        headers: {
+          authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+        data: {
+          jobId,
+          rootId
+        },
+        success: function (data) {
+          $('#slLocalLevels').empty();
+          data.tasks.forEach(t => {
+            if (t.status >= 4) {
+              let opt = '<option value="' + t.basic.level._id + '">' + `${t.basic.level.name} - Editor: ${t.editor[t.editor.length-1].staff.username}` + '</option>';
+              $('#slLocalLevels').append(opt);
+            }
 
+          })
+          LoadQA();
+          LoadEditor();
+        }
+      })
+    }
   }
 
 
@@ -763,7 +769,11 @@
         $('.tblCCList').empty();
         let idx = 1;
         data.ccs.forEach(c => {
-          let tr = '<tr id="' + c._id + '">';
+          let tr = '<tr id="' + c._id + '"';
+          if (c.root) {
+            tr += 'data-root="' + c.root._id + '"';
+          }
+          tr += '>';
           tr += '<td>' + (idx++) + '</td>';
           tr += '<td class="font-weight-bold text-danger text-left">';
           if (c.root) {
