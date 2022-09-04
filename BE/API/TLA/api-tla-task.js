@@ -395,7 +395,9 @@ router.put('/', authenticateTLAToken, async (req, res) => {
         remark,
         qa,
         editor,
-        start
+        start,
+        RefixCC,
+        ccId
     } = req.body;
 
     let task = await Task.findById(taskId);
@@ -429,6 +431,13 @@ router.put('/', authenticateTLAToken, async (req, res) => {
         by: req.user._id
     }
 
+    if (RefixCC == 'true') {
+        task.status = -6;
+        task.cc = ccId;
+    }
+
+
+
     await task.save()
         .then(_ => {
             ChangeVisibleEditor(task._id, editor)
@@ -439,9 +448,18 @@ router.put('/', authenticateTLAToken, async (req, res) => {
                                 .then(_ => {
                                     UpdateQA(task._id, level, qa, req.user._id)
                                         .then(_ => {
-                                            return res.status(200).json({
-                                                msg: `The task has been updated!`
-                                            })
+                                            PushTaskIntoCC(ccId, task._id, task.basic.mapping)
+                                                .then(_ => {
+                                                    return res.status(200).json({
+                                                        msg: `The task has been updated!`
+                                                    })
+                                                })
+                                                .catch(err => {
+                                                    return res.status(err.code).json({
+                                                        msg: err.msg
+                                                    })
+                                                })
+
                                         })
                                         .catch(err => {
                                             return res.status(err.code).json({

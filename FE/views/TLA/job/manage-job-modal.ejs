@@ -388,7 +388,6 @@
           }
         } else {
           $('#slCustomerLevles').prop("disabled", false);
-
         }
 
       },
@@ -426,7 +425,6 @@
       });
       return;
     }
-
 
     if (taskId.trim().length == 0) {
       $.ajax({
@@ -487,7 +485,9 @@
           remark,
           qa,
           editor,
-          start: $('#rbtStart').is(':checked')
+          start: $('#rbtStart').is(':checked'),
+          RefixCC,
+          ccId
         },
         success: function (data) {
           $.toast({
@@ -537,6 +537,7 @@
 
   $('#btnCancelTask').click(function () {
     $('#panel_task').slideUp(500);
+    RefixCC = false;
   })
 
 
@@ -645,6 +646,42 @@
 
 <script>
 
+  function BindTask() {  
+    $.ajax({
+      url: '/tla/task/detail',
+      type: 'get',
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      data: { taskId },
+      success: function (data) {
+        $('#slLocalLevels').val(data.task.basic.level._id);
+        $('#txtAssignDate').val(convertISODateToTimeFormat(data.task.basic.deadline.begin));
+        $('#txtDeadline').val(convertISODateToTimeFormat(data.task.basic.deadline.end));
+        $('#txtInputLink').val(data.task.basic.link.input);
+        $('#txtRemark').val(data.task.remarks[data.task.remarks.length - 1].content)
+
+
+        $('#ckbAssignEditor').prop('checked', data.task.editor.length > 0);
+        $('#ckbAssignQA').prop('checked', data.task.qa.length > 0);
+        data.task.editor.length > 0 ? $('#colEditor').show() : $('#colEditor').hide();
+        data.task.qa.length > 0 ? $('#colQA').show() : $('#colEditor').hide();
+
+        if (data.task.status === -10) {
+
+        } else {
+
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Opp.....!',
+          text: jqXHR.responseJSON.msg
+        })
+      }
+    })
+  }
 
 
   function LoadEditor() {
@@ -734,13 +771,15 @@
           $('#slLocalLevels').empty();
           data.tasks.forEach(t => {
             if (t.status >= 4) {
-              let opt = '<option value="' + t.basic.level._id + '">' + `${t.basic.level.name} - Editor: ${t.editor[t.editor.length-1].staff.username}` + '</option>';
+              let opt = '<option value="' + t.basic.level._id + '" data-task="' + t._id + '">' + `${t.basic.level.name} - Editor: ${t.editor[t.editor.length - 1].staff.username}` + '</option>';
               $('#slLocalLevels').append(opt);
             }
 
           })
+          taskId= $('#slLocalLevels option:selected').data('task');          
           LoadQA();
           LoadEditor();
+          BindTask();
         }
       })
     }
